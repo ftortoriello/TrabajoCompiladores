@@ -1,2 +1,2 @@
 # TrabajoCompiladores
-Trabajo final para la asitgnatura de Compiladores de la UNNOBA
+Trabajo final para la asignatura de Compiladores de la UNNOBA
