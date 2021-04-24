@@ -33,3 +33,6 @@ dist/
 .idea/
 out/
 *.iml
+
+# Archivos autogenerados
+MiLexico.java
