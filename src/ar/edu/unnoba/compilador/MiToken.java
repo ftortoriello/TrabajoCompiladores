@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ejemplo.jflex;
+package ar.edu.unnoba.compilador;
 
 import java.util.Arrays;
 

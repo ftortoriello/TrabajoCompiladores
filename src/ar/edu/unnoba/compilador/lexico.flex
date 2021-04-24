@@ -38,34 +38,37 @@ import java_cup.sym;
     }
 %}
 
-FinDeLinea      =    \r|\n|\r\n
-
+FinDeLinea      =  \r|\n|\r\n
 EspacioEnBlanco =  \s
 
-DigitoSinCero   =     [1-9]
 
-Digito  =        [0-9]
+DigitoSinCero   =   [1-9]
+Digito          =   [0-9]
+Entero          =   0|{DigitoSinCero}{Digito}* // TODO: modificar para aceptar decimales
 
-Entero =        0|{DigitoSinCero}{Digito}*
+Id = ([:letter:]|_)\w*      // TODO: modificar según el enunciado
 
-Id =                ([:letter:]|_)\w* 
+TipoDeDato = boolean|integer|float
+// TODO: agregar constantes booleanas
 
-
+// TODO: ver cómo aceptar comentarios anidados
 %%
    
 <YYINITIAL> {
 
+    {EspacioEnBlanco}   { /* Ignora los espacios en blanco */ }
     "+"                 { return token("MAS", yytext()); }
     "-"                 { return token("MENOS", yytext()); }
     "/"                 { return token("DIV", yytext()); }
     "*"                 { return token("MULT", yytext()); }
     "("                 { return token("PAR_ABRE", yytext()); }  
-    ")"                 { return token("PAR_CIERRA", yytext()); }        
+    ")"                 { return token("PAR_CIERRA", yytext()); }
+    {TipoDeDato}        { return token("TIPO_DE_DATO", yytext()); }
     {Id}                { return token("IDENTIFICADOR", yytext()); }
-    {EspacioEnBlanco}   { /* Ignora los espacios en blanco */ }
     {Entero}            { return token("ENTERO", yytext()); }
 
 }
-/* probarrrr:: 10variable */
+/* probarrrr:: 10variable
+   Toma 10 como ENTERO y el resto como IDENTIFICADOR sin importar el orden de las reglas (así que está mal) */
 
 [^]                     { throw new Error("Entrada no permitida: <" + yytext() + ">"); }

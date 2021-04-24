@@ -1,4 +1,4 @@
-package ejemplo.jflex;
+package ar.edu.unnoba.compilador;
 
 import java_cup.runtime.*;
 import java.util.ArrayList;
