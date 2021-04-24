@@ -39,14 +39,18 @@ import java_cup.sym;
     }
 %}
 
-FinDeLinea      =  \r|\n|\r\n
-EspacioEnBlanco =  \s
+FinDeLinea      = \r|\n|\r\n
+EspacioEnBlanco = \s
 
-DigitoSinCero   =   [1-9]
-Digito          =   [0-9]
-Entero          =   0|{DigitoSinCero}{Digito}* // TODO: modificar para aceptar decimales
-
-Id = ([:letter:]|_)\w*\??
+DigitoSinCero   =  [1-9]
+Digito          =  [0-9]
+/* Los Identificadores tendrían que soportar números y letras como superscript o subscript... Ej: x²
+ * https://en.wikipedia.org/wiki/Unicode_subscripts_and_superscripts#Superscripts_and_subscripts_block */
+DigitoScript    = [\u2070\u00B9\u00B2\u00B3\u2074-\u2079\u2080-\u2089]
+LetraScript     = [\u2071\u207F\u2090-\u209C]
+Id              = ([:letter:]|_|{LetraScript})[\w{LetraScript}{DigitoScript}]*\??
+Entero          = 0|{DigitoSinCero}{Digito}*  /* FIXME: pasa similar a 10variable, toma 001 como 0 y 01... */
+Flotante        = ({Entero}\.{Digito}*|\.{Digito}*)
 
 TipoDeDato = boolean|integer|float
 // TODO: agregar constantes booleanas
@@ -71,11 +75,14 @@ OpLogico        = and|or|not
 // TODO: when
 // TODO: while
 // TODO: for
-// TODO: comentarios
+
+Comentario      = #.*{FinDeLinea}            // TODO: Bloques de comentarios
+
 %%
    
 <YYINITIAL> {
 
+    {Comentario}        { /* Ignorar */ }
     {EspacioEnBlanco}   { /* Ignora los espacios en blanco */ }
     "("                 { return token("PAR_ABRE", yytext()); }  
     ")"                 { return token("PAR_CIERRA", yytext()); }
@@ -84,11 +91,15 @@ OpLogico        = and|or|not
     {OpAritmetico}      { return token("OPERADOR_ARITMÉTICO", yytext()); }
     {OpLogico}          { return token("OPERADOR_LÓGICO", yytext()); }
     {Id}                { return token("IDENTIFICADOR", yytext()); }
+    {Flotante}          { return token("FLOTANTE", yytext()); }
     {Entero}            { return token("ENTERO", yytext()); }
 
 }
 
 /* probarrrr:: 10variable
-   Toma 10 como ENTERO y el resto como IDENTIFICADOR sin importar el orden de las reglas (así que está mal) */
+   Toma 10 como ENTERO y el resto como IDENTIFICADOR sin importar el orden de las reglas (así que está mal)
+   Está bien que no lo tome como IDENTIFICADOR porque tiene que comenzar con una letra o _, pero tendría que
+   tirar un error sintáctico creo...... tampoco es 10 * variable porque tiene que estar el "*" (y calculo que
+   los espacios) "*/
 
 [^]                     { throw new Error("Entrada no permitida: <" + yytext() + ">"); }
