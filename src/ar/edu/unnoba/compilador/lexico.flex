@@ -1,5 +1,6 @@
 package ar.edu.unnoba.compilador;
 
+import java.util.List;
 import java.util.ArrayList;
 import java_cup.runtime.*;
 import java_cup.sym;
@@ -41,33 +42,52 @@ import java_cup.sym;
 FinDeLinea      =  \r|\n|\r\n
 EspacioEnBlanco =  \s
 
-
 DigitoSinCero   =   [1-9]
 Digito          =   [0-9]
 Entero          =   0|{DigitoSinCero}{Digito}* // TODO: modificar para aceptar decimales
 
-Id = ([:letter:]|_)\w*      // TODO: modificar según el enunciado
+Id = ([:letter:]|_)\w*\??
 
 TipoDeDato = boolean|integer|float
 // TODO: agregar constantes booleanas
 
-// TODO: ver cómo aceptar comentarios anidados
+// TODO: prioridad mediante paréntesis para operadores
+OpAritmetico    = \+|-|\*|\/
+OpComparacion   = ==|\!=|\>|\>=|\<|\<=
+OpLogico        = and|or|not
+
+// TODO: condiciones
+// TODO: sentencias, asignaciones
+
+// TODO: cadenas de caracteres
+
+// TODO: bloques
+// TODO: funciones
+
+// TODO: if
+// if <condición> then <sentencia>;
+// if <condición> then <sentencia1> else <sentencia2>;
+
+// TODO: when
+// TODO: while
+// TODO: for
+// TODO: comentarios
 %%
    
 <YYINITIAL> {
 
     {EspacioEnBlanco}   { /* Ignora los espacios en blanco */ }
-    "+"                 { return token("MAS", yytext()); }
-    "-"                 { return token("MENOS", yytext()); }
-    "/"                 { return token("DIV", yytext()); }
-    "*"                 { return token("MULT", yytext()); }
     "("                 { return token("PAR_ABRE", yytext()); }  
     ")"                 { return token("PAR_CIERRA", yytext()); }
     {TipoDeDato}        { return token("TIPO_DE_DATO", yytext()); }
+    {OpComparacion}     { return token("OPERADOR_COMPARACIÓN", yytext()); }
+    {OpAritmetico}      { return token("OPERADOR_ARITMÉTICO", yytext()); }
+    {OpLogico}          { return token("OPERADOR_LÓGICO", yytext()); }
     {Id}                { return token("IDENTIFICADOR", yytext()); }
     {Entero}            { return token("ENTERO", yytext()); }
 
 }
+
 /* probarrrr:: 10variable
    Toma 10 como ENTERO y el resto como IDENTIFICADOR sin importar el orden de las reglas (así que está mal) */
 
