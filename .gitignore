@@ -35,4 +35,6 @@ out/
 *.iml
 
 # Archivos autogenerados
-MiLexico.java
+.\src\ar\edu\unnoba\compilador\MiLexico.java
+.\src\ar\edu\unnoba\compilador\MiParser.java
+.\src\ar\edu\unnoba\compilador\MiParserSym.java
