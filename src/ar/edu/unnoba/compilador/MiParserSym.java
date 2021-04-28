@@ -8,29 +8,57 @@ package ar.edu.unnoba.compilador;
 /** CUP generated class containing symbol constants. */
 public class MiParserSym {
   /* terminals */
-  public static final int MENOS = 3;
-  public static final int MULT = 4;
-  public static final int ENTERO = 10;
-  public static final int MENOS_UNARIO = 8;
-  public static final int PAR_CIERRA = 7;
+  public static final int VALOR_BOOLEANO_FALSE = 21;
+  public static final int PR_THEN = 17;
+  public static final int PAR_CIERRA = 15;
+  public static final int TDD_FLOAT = 24;
+  public static final int TDD_INTEGER = 23;
+  public static final int OP_COND_IGUALDAD = 6;
+  public static final int OP_ARIT_SUMA = 2;
+  public static final int OP_COND_MAYOR_IGUAL = 8;
+  public static final int OP_COND_MAYOR = 7;
+  public static final int OP_ARIT_DIV = 5;
+  public static final int OP_LOG_BIN_OR = 11;
+  public static final int PAR_ABRE = 14;
+  public static final int OP_LOG_UNA_NOT = 13;
+  public static final int PR_IF = 16;
+  public static final int VALOR_BOOLEANO_TRUE = 20;
   public static final int EOF = 0;
-  public static final int MAS = 2;
-  public static final int PAR_ABRE = 6;
-  public static final int DIV = 5;
+  public static final int OP_COND_MENOR_IGUAL = 10;
+  public static final int OP_ARIT_PROD = 4;
   public static final int error = 1;
-  public static final int IDENTIFICADOR = 9;
+  public static final int TDD_BOOLEAN = 22;
+  public static final int OP_COND_MENOR = 9;
+  public static final int OP_ARIT_RESTA = 3;
+  public static final int OP_LOG_BIN_AND = 12;
+  public static final int PUNTO_Y_COMA = 19;
+  public static final int PR_ELSE = 18;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
-  "MAS",
-  "MENOS",
-  "MULT",
-  "DIV",
+  "OP_ARIT_SUMA",
+  "OP_ARIT_RESTA",
+  "OP_ARIT_PROD",
+  "OP_ARIT_DIV",
+  "OP_COND_IGUALDAD",
+  "OP_COND_MAYOR",
+  "OP_COND_MAYOR_IGUAL",
+  "OP_COND_MENOR",
+  "OP_COND_MENOR_IGUAL",
+  "OP_LOG_BIN_OR",
+  "OP_LOG_BIN_AND",
+  "OP_LOG_UNA_NOT",
   "PAR_ABRE",
   "PAR_CIERRA",
-  "MENOS_UNARIO",
-  "IDENTIFICADOR",
-  "ENTERO"
+  "PR_IF",
+  "PR_THEN",
+  "PR_ELSE",
+  "PUNTO_Y_COMA",
+  "VALOR_BOOLEANO_TRUE",
+  "VALOR_BOOLEANO_FALSE",
+  "TDD_BOOLEAN",
+  "TDD_INTEGER",
+  "TDD_FLOAT"
   };
 }
 

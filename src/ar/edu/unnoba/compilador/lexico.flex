@@ -52,13 +52,12 @@ Id              = ([:letter:]|_|{LetraScript})[\w{LetraScript}{DigitoScript}]*\?
 Entero          = 0|{DigitoSinCero}{Digito}*  /* FIXME: pasa similar a 10variable, toma 001 como 0 y 01... */
 Flotante        = ({Entero}\.{Digito}*|\.{Digito}*)
 
-TipoDeDato = boolean|integer|float
-// TODO: agregar constantes booleanas
+// TODO: prioridad mediante paréntesis para operadores (se hace en el parser)
 
-// TODO: prioridad mediante paréntesis para operadores
-OpAritmetico    = \+|-|\*|\/
-OpComparacion   = ==|\!=|\>|\>=|\<|\<=
-OpLogico        = and|or|not
+// Comento esto porque las reconozco directamente a partir del string,
+// pero lo dejo porque las regex pueden servir para el .cup
+// OpAritmeticoSuma= \+|-|\*|\/
+// OpComparacion   = ==|\!=|\>|\>=|\<|\<=
 
 // TODO: condiciones
 // TODO: sentencias, asignaciones
@@ -79,17 +78,34 @@ OpLogico        = and|or|not
 Comentario      = #.*{FinDeLinea}            // TODO: Bloques de comentarios
 
 %%
-   
+
 <YYINITIAL> {
 
     {Comentario}        { /* Ignorar */ }
     {EspacioEnBlanco}   { /* Ignora los espacios en blanco */ }
-    "("                 { return token("PAR_ABRE", yytext()); }  
+    "("                 { return token("PAR_ABRE", yytext()); }
     ")"                 { return token("PAR_CIERRA", yytext()); }
-    {TipoDeDato}        { return token("TIPO_DE_DATO", yytext()); }
-    {OpComparacion}     { return token("OPERADOR_COMPARACIÓN", yytext()); }
-    {OpAritmetico}      { return token("OPERADOR_ARITMÉTICO", yytext()); }
-    {OpLogico}          { return token("OPERADOR_LÓGICO", yytext()); }
+    "if"                { return token("PR_IF", yytext()); }
+    "then"              { return token("PR_THEN", yytext()); }
+    "else"              { return token("PR_ELSE", yytext()); }
+    ";"                 { return token("PUNTO_Y_COMA", yytext()); }
+    "+"                 { return token("OP_ARIT_SUMA", yytext()); }
+    "-"                 { return token("OP_ARIT_RESTA", yytext()); }
+    "*"                 { return token("OP_ARIT_PROD", yytext()); }
+    "/"                 { return token("OP_ARIT_DIV", yytext()); }
+    "=="                { return token("OP_COND_IGUALDAD", yytext()); }
+    ">"                 { return token("OP_COND_MAYOR", yytext()); }
+    ">="                { return token("OP_COND_MAYOR_IGUAL", yytext()); }
+    "<"                 { return token("OP_COND_MENOR", yytext()); }
+    "<="                { return token("OP_COND_MENOR_IGUAL", yytext()); }
+    "or"                { return token("OP_LOG_BIN_OR", yytext()); }
+    "and"               { return token("OP_LOG_BIN_AND", yytext()); }
+    "not"               { return token("OP_LOG_UNA_NOT", yytext()); }
+    "true"              { return token("VALOR_BOOLEANO_TRUE", yytext()); }
+    "false"             { return token("VALOR_BOOLEANO_FALSE", yytext()); }
+    "boolean"           { return token("TDD_BOOLEAN", yytext()); }
+    "integer"           { return token("TDD_INTEGER", yytext()); }
+    "float"             { return token("TDD_FLOAT", yytext()); }
     {Id}                { return token("IDENTIFICADOR", yytext()); }
     {Flotante}          { return token("FLOTANTE", yytext()); }
     {Entero}            { return token("ENTERO", yytext()); }

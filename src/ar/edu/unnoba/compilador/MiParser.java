@@ -36,10 +36,8 @@ public class MiParser extends java_cup.runtime.lr_parser {
   /** Production table. */
   protected static final short _production_table[][] = 
     unpackFromStrings(new String[] {
-    "\000\012\000\002\002\004\000\002\002\003\000\002\003" +
-    "\005\000\002\003\005\000\002\003\005\000\002\003\005" +
-    "\000\002\003\005\000\002\003\003\000\002\003\003\000" +
-    "\002\003\004" });
+    "\000\005\000\002\002\004\000\002\002\007\000\002\002" +
+    "\011\000\002\003\002\000\002\004\002" });
 
   /** Access to production table. */
   public short[][] production_table() {return _production_table;}
@@ -47,26 +45,12 @@ public class MiParser extends java_cup.runtime.lr_parser {
   /** Parse-action table. */
   protected static final short[][] _action_table = 
     unpackFromStrings(new String[] {
-    "\000\023\000\012\005\006\010\004\013\005\014\011\001" +
-    "\002\000\012\005\006\010\004\013\005\014\011\001\002" +
-    "\000\016\002\ufffa\004\ufffa\005\ufffa\006\ufffa\007\ufffa\011" +
-    "\ufffa\001\002\000\012\005\006\010\004\013\005\014\011" +
-    "\001\002\000\014\002\000\004\014\005\015\006\013\007" +
-    "\016\001\002\000\004\002\012\001\002\000\016\002\ufff9" +
-    "\004\ufff9\005\ufff9\006\ufff9\007\ufff9\011\ufff9\001\002\000" +
-    "\004\002\001\001\002\000\012\005\006\010\004\013\005" +
-    "\014\011\001\002\000\012\005\006\010\004\013\005\014" +
-    "\011\001\002\000\012\005\006\010\004\013\005\014\011" +
-    "\001\002\000\012\005\006\010\004\013\005\014\011\001" +
-    "\002\000\016\002\ufffc\004\ufffc\005\ufffc\006\ufffc\007\ufffc" +
-    "\011\ufffc\001\002\000\016\002\ufffe\004\ufffe\005\ufffe\006" +
-    "\013\007\016\011\ufffe\001\002\000\016\002\uffff\004\uffff" +
-    "\005\uffff\006\013\007\016\011\uffff\001\002\000\016\002" +
-    "\ufffd\004\ufffd\005\ufffd\006\ufffd\007\ufffd\011\ufffd\001\002" +
-    "\000\016\002\ufff8\004\ufff8\005\ufff8\006\ufff8\007\ufff8\011" +
-    "\ufff8\001\002\000\014\004\014\005\015\006\013\007\016" +
-    "\011\025\001\002\000\016\002\ufffb\004\ufffb\005\ufffb\006" +
-    "\ufffb\007\ufffb\011\ufffb\001\002" });
+    "\000\013\000\004\022\004\001\002\000\004\023\ufffe\001" +
+    "\002\000\004\002\006\001\002\000\004\002\001\001\002" +
+    "\000\004\023\010\001\002\000\006\024\ufffd\025\ufffd\001" +
+    "\002\000\006\024\012\025\013\001\002\000\004\025\ufffd" +
+    "\001\002\000\004\002\000\001\002\000\004\025\015\001" +
+    "\002\000\004\002\uffff\001\002" });
 
   /** Access to parse-action table. */
   public short[][] action_table() {return _action_table;}
@@ -74,14 +58,11 @@ public class MiParser extends java_cup.runtime.lr_parser {
   /** <code>reduce_goto</code> table. */
   protected static final short[][] _reduce_table = 
     unpackFromStrings(new String[] {
-    "\000\023\000\006\002\007\003\006\001\001\000\004\003" +
-    "\023\001\001\000\002\001\001\000\004\003\022\001\001" +
-    "\000\002\001\001\000\002\001\001\000\002\001\001\000" +
-    "\002\001\001\000\004\003\021\001\001\000\004\003\020" +
-    "\001\001\000\004\003\017\001\001\000\004\003\016\001" +
+    "\000\013\000\004\002\004\001\001\000\004\003\006\001" +
     "\001\000\002\001\001\000\002\001\001\000\002\001\001" +
-    "\000\002\001\001\000\002\001\001\000\002\001\001\000" +
-    "\002\001\001" });
+    "\000\004\004\010\001\001\000\002\001\001\000\004\004" +
+    "\013\001\001\000\002\001\001\000\002\001\001\000\002" +
+    "\001\001" });
 
   /** Access to <code>reduce_goto</code> table. */
   public short[][] reduce_table() {return _reduce_table;}
@@ -157,12 +138,12 @@ class CUP$MiParser$actions {
       switch (CUP$MiParser$act_num)
         {
           /*. . . . . . . . . . . . . . . . . . . .*/
-          case 0: // $START ::= expression EOF 
+          case 0: // $START ::= ESTRUCT_COND_IF EOF 
             {
               Object RESULT =null;
 		int start_valleft = ((java_cup.runtime.Symbol)CUP$MiParser$stack.elementAt(CUP$MiParser$top-1)).left;
 		int start_valright = ((java_cup.runtime.Symbol)CUP$MiParser$stack.elementAt(CUP$MiParser$top-1)).right;
-		String start_val = (String)((java_cup.runtime.Symbol) CUP$MiParser$stack.elementAt(CUP$MiParser$top-1)).value;
+		Object start_val = (Object)((java_cup.runtime.Symbol) CUP$MiParser$stack.elementAt(CUP$MiParser$top-1)).value;
 		RESULT = start_val;
               CUP$MiParser$result = parser.getSymbolFactory().newSymbol("$START",0, ((java_cup.runtime.Symbol)CUP$MiParser$stack.elementAt(CUP$MiParser$top-1)), ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()), RESULT);
             }
@@ -171,149 +152,38 @@ class CUP$MiParser$actions {
           return CUP$MiParser$result;
 
           /*. . . . . . . . . . . . . . . . . . . .*/
-          case 1: // expression ::= expr 
+          case 1: // ESTRUCT_COND_IF ::= PR_IF CONDICION PR_THEN SENTENCIA PUNTO_Y_COMA 
             {
-              String RESULT =null;
-		int eleft = ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()).left;
-		int eright = ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()).right;
-		String e = (String)((java_cup.runtime.Symbol) CUP$MiParser$stack.peek()).value;
-		
-            System.out.println("REGLA 0: expr -> expr EOF");
-            RESULT = e;
-        
-              CUP$MiParser$result = parser.getSymbolFactory().newSymbol("expression",0, ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()), ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()), RESULT);
+              Object RESULT =null;
+
+              CUP$MiParser$result = parser.getSymbolFactory().newSymbol("ESTRUCT_COND_IF",0, ((java_cup.runtime.Symbol)CUP$MiParser$stack.elementAt(CUP$MiParser$top-4)), ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()), RESULT);
             }
           return CUP$MiParser$result;
 
           /*. . . . . . . . . . . . . . . . . . . .*/
-          case 2: // expr ::= expr MAS expr 
+          case 2: // ESTRUCT_COND_IF ::= PR_IF CONDICION PR_THEN SENTENCIA PR_ELSE SENTENCIA PUNTO_Y_COMA 
             {
-              String RESULT =null;
-		int e1left = ((java_cup.runtime.Symbol)CUP$MiParser$stack.elementAt(CUP$MiParser$top-2)).left;
-		int e1right = ((java_cup.runtime.Symbol)CUP$MiParser$stack.elementAt(CUP$MiParser$top-2)).right;
-		String e1 = (String)((java_cup.runtime.Symbol) CUP$MiParser$stack.elementAt(CUP$MiParser$top-2)).value;
-		int e2left = ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()).left;
-		int e2right = ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()).right;
-		String e2 = (String)((java_cup.runtime.Symbol) CUP$MiParser$stack.peek()).value;
-		
-            System.out.println("REGLA 1.1: expr -> expr MAS expr");
-            RESULT = e1+"+"+e2;
-        
-              CUP$MiParser$result = parser.getSymbolFactory().newSymbol("expr",1, ((java_cup.runtime.Symbol)CUP$MiParser$stack.elementAt(CUP$MiParser$top-2)), ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()), RESULT);
+              Object RESULT =null;
+
+              CUP$MiParser$result = parser.getSymbolFactory().newSymbol("ESTRUCT_COND_IF",0, ((java_cup.runtime.Symbol)CUP$MiParser$stack.elementAt(CUP$MiParser$top-6)), ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()), RESULT);
             }
           return CUP$MiParser$result;
 
           /*. . . . . . . . . . . . . . . . . . . .*/
-          case 3: // expr ::= expr MENOS expr 
+          case 3: // CONDICION ::= 
             {
-              String RESULT =null;
-		int e1left = ((java_cup.runtime.Symbol)CUP$MiParser$stack.elementAt(CUP$MiParser$top-2)).left;
-		int e1right = ((java_cup.runtime.Symbol)CUP$MiParser$stack.elementAt(CUP$MiParser$top-2)).right;
-		String e1 = (String)((java_cup.runtime.Symbol) CUP$MiParser$stack.elementAt(CUP$MiParser$top-2)).value;
-		int e2left = ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()).left;
-		int e2right = ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()).right;
-		String e2 = (String)((java_cup.runtime.Symbol) CUP$MiParser$stack.peek()).value;
-		
-            System.out.println("REGLA 1.2: expr -> expr MENOS expr");
-            RESULT = e1+"-"+e2;
-        
-              CUP$MiParser$result = parser.getSymbolFactory().newSymbol("expr",1, ((java_cup.runtime.Symbol)CUP$MiParser$stack.elementAt(CUP$MiParser$top-2)), ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()), RESULT);
+              Object RESULT =null;
+
+              CUP$MiParser$result = parser.getSymbolFactory().newSymbol("CONDICION",1, ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()), RESULT);
             }
           return CUP$MiParser$result;
 
           /*. . . . . . . . . . . . . . . . . . . .*/
-          case 4: // expr ::= expr MULT expr 
+          case 4: // SENTENCIA ::= 
             {
-              String RESULT =null;
-		int e1left = ((java_cup.runtime.Symbol)CUP$MiParser$stack.elementAt(CUP$MiParser$top-2)).left;
-		int e1right = ((java_cup.runtime.Symbol)CUP$MiParser$stack.elementAt(CUP$MiParser$top-2)).right;
-		String e1 = (String)((java_cup.runtime.Symbol) CUP$MiParser$stack.elementAt(CUP$MiParser$top-2)).value;
-		int e2left = ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()).left;
-		int e2right = ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()).right;
-		String e2 = (String)((java_cup.runtime.Symbol) CUP$MiParser$stack.peek()).value;
-		
-            System.out.println("REGLA 1.3: expr -> expr MULT expr");
-            RESULT = e1+"*"+e2;
-        
-              CUP$MiParser$result = parser.getSymbolFactory().newSymbol("expr",1, ((java_cup.runtime.Symbol)CUP$MiParser$stack.elementAt(CUP$MiParser$top-2)), ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()), RESULT);
-            }
-          return CUP$MiParser$result;
+              Object RESULT =null;
 
-          /*. . . . . . . . . . . . . . . . . . . .*/
-          case 5: // expr ::= expr DIV expr 
-            {
-              String RESULT =null;
-		int e1left = ((java_cup.runtime.Symbol)CUP$MiParser$stack.elementAt(CUP$MiParser$top-2)).left;
-		int e1right = ((java_cup.runtime.Symbol)CUP$MiParser$stack.elementAt(CUP$MiParser$top-2)).right;
-		String e1 = (String)((java_cup.runtime.Symbol) CUP$MiParser$stack.elementAt(CUP$MiParser$top-2)).value;
-		int e2left = ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()).left;
-		int e2right = ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()).right;
-		String e2 = (String)((java_cup.runtime.Symbol) CUP$MiParser$stack.peek()).value;
-		
-            System.out.println("REGLA 1.4: expr -> expr DIV expr");
-            RESULT = e1+"*"+e2;
-        
-              CUP$MiParser$result = parser.getSymbolFactory().newSymbol("expr",1, ((java_cup.runtime.Symbol)CUP$MiParser$stack.elementAt(CUP$MiParser$top-2)), ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()), RESULT);
-            }
-          return CUP$MiParser$result;
-
-          /*. . . . . . . . . . . . . . . . . . . .*/
-          case 6: // expr ::= PAR_ABRE expr PAR_CIERRA 
-            {
-              String RESULT =null;
-		int eleft = ((java_cup.runtime.Symbol)CUP$MiParser$stack.elementAt(CUP$MiParser$top-1)).left;
-		int eright = ((java_cup.runtime.Symbol)CUP$MiParser$stack.elementAt(CUP$MiParser$top-1)).right;
-		String e = (String)((java_cup.runtime.Symbol) CUP$MiParser$stack.elementAt(CUP$MiParser$top-1)).value;
-		
-            System.out.println("REGLA 1.5: expr -> ( expr )");
-            RESULT = "("+e+")";
-        
-              CUP$MiParser$result = parser.getSymbolFactory().newSymbol("expr",1, ((java_cup.runtime.Symbol)CUP$MiParser$stack.elementAt(CUP$MiParser$top-2)), ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()), RESULT);
-            }
-          return CUP$MiParser$result;
-
-          /*. . . . . . . . . . . . . . . . . . . .*/
-          case 7: // expr ::= IDENTIFICADOR 
-            {
-              String RESULT =null;
-		int idleft = ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()).left;
-		int idright = ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()).right;
-		String id = (String)((java_cup.runtime.Symbol) CUP$MiParser$stack.peek()).value;
-		
-            System.out.println("REGLA 1.6: expr -> IDENTIFICADOR)");
-            RESULT = id;
-        
-              CUP$MiParser$result = parser.getSymbolFactory().newSymbol("expr",1, ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()), ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()), RESULT);
-            }
-          return CUP$MiParser$result;
-
-          /*. . . . . . . . . . . . . . . . . . . .*/
-          case 8: // expr ::= ENTERO 
-            {
-              String RESULT =null;
-		int entleft = ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()).left;
-		int entright = ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()).right;
-		String ent = (String)((java_cup.runtime.Symbol) CUP$MiParser$stack.peek()).value;
-		
-            System.out.println("REGLA 1.6: expr -> ENTERO)");
-            RESULT = ent;
-        
-              CUP$MiParser$result = parser.getSymbolFactory().newSymbol("expr",1, ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()), ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()), RESULT);
-            }
-          return CUP$MiParser$result;
-
-          /*. . . . . . . . . . . . . . . . . . . .*/
-          case 9: // expr ::= MENOS expr 
-            {
-              String RESULT =null;
-		int eleft = ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()).left;
-		int eright = ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()).right;
-		String e = (String)((java_cup.runtime.Symbol) CUP$MiParser$stack.peek()).value;
-		
-            System.out.println("REGLA 1.7: expr -> MENOS expr)");
-            RESULT = "-"+e;
-        
-              CUP$MiParser$result = parser.getSymbolFactory().newSymbol("expr",1, ((java_cup.runtime.Symbol)CUP$MiParser$stack.elementAt(CUP$MiParser$top-1)), ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()), RESULT);
+              CUP$MiParser$result = parser.getSymbolFactory().newSymbol("SENTENCIA",2, ((java_cup.runtime.Symbol)CUP$MiParser$stack.peek()), RESULT);
             }
           return CUP$MiParser$result;
 
