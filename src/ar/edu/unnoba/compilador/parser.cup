@@ -35,44 +35,90 @@ parser code
 
 // start with expression;
 
-// Operadores aritméticos
-terminal String OP_ARIT_SUMA, OP_ARIT_RESTA, OP_ARIT_PROD, OP_ARIT_DIV;
+terminal String IDENTIFICADOR, ENTERO, FLOTANTE,
+    OP_ARIT_SUMA, OP_ARIT_RESTA, OP_ARIT_PROD, OP_ARIT_DIV,
+    OP_LOG_BIN_OR, OP_LOG_BIN_AND, OP_LOG_UNA_NOT,
+    OP_COND_IGUALDAD, OP_COND_MAYOR, OP_COND_MAYOR_IGUAL, OP_COND_MENOR, OP_COND_MENOR_IGUAL,
+    PAR_ABRE, PAR_CIERRA, PR_IF, PR_THEN, PR_ELSE, PUNTO_Y_COMA, IGUAL,
+    VALOR_BOOLEANO_TRUE, VALOR_BOOLEANO_FALSE,
+    TDD_BOOLEAN, TDD_INTEGER, TDD_FLOAT;
 
-// Operadores condicionales
-terminal String OP_COND_IGUALDAD, OP_COND_MAYOR, OP_COND_MAYOR_IGUAL, OP_COND_MENOR, OP_COND_MENOR_IGUAL;
+// No terminales
+nonterminal String programa,
+    estructura_condicional_if,
+    sentencia, asignacion, expresion, comparacion, termino,
+    expresion_logica_or, expresion_logica_and,
+    op_aritmetica_suma_resta, op_aritmetica_producto_division,
+    operadores_suma_resta, operadores_producto_division, operadores_logicos,
+    numero_constante, tipo_de_dato, valores_booleanos;
 
-// Operadores lógicos
-terminal String OP_LOG_BIN_OR, OP_LOG_BIN_AND, OP_LOG_UNA_NOT;
-
-// Palabras reservadas y otros
-terminal String PAR_ABRE, PAR_CIERRA, PR_IF, PR_THEN, PR_ELSE, PUNTO_Y_COMA;
-
-// Constantes booleanas
-terminal String VALOR_BOOLEANO_TRUE, VALOR_BOOLEANO_FALSE;
-
-// Tipos de datos
-terminal String TDD_BOOLEAN, TDD_INTEGER, TDD_FLOAT;
-
-// Variables no terminales
-nonterminal ESTRUCT_COND_IF, CONDICION, SENTENCIA;
-
-
-// Precedencia de operadores. Ni idea si está bien así, no lo puedo probar
+// Precedencia de operadores. Ni idea si está bien así, todavía no lo puedo probar
 // FIXME: operador unario "-", ¿cómo diferenciarlo de la resta?
 precedence left OP_LOG_BIN_OR, OP_ARIT_SUMA, OP_ARIT_RESTA;
 precedence left OP_LOG_BIN_AND, OP_ARIT_PROD, OP_ARIT_DIV;
 precedence left OP_LOG_UNA_NOT;
 
-// Lo pongo así para que compile, cambiar por expresión o similar más adelante
-start with ESTRUCT_COND_IF;
+start with programa;
 
-ESTRUCT_COND_IF::=  PR_IF CONDICION PR_THEN SENTENCIA PUNTO_Y_COMA
-                    | PR_IF CONDICION PR_THEN SENTENCIA PR_ELSE SENTENCIA PUNTO_Y_COMA;
+// FIXME
+programa::= op_aritmetica_suma_resta;
 
-// TODO:
-CONDICION::= ;
-SENTENCIA::= ;
+estructura_condicional_if::=  PR_IF expresion_logica_or PR_THEN sentencia PUNTO_Y_COMA
+                            | PR_IF expresion_logica_or PR_THEN sentencia PR_ELSE sentencia PUNTO_Y_COMA;
 
+tipo_de_dato::= TDD_BOOLEAN | TDD_INTEGER | TDD_FLOAT;
+valores_booleanos::= VALOR_BOOLEANO_TRUE | VALOR_BOOLEANO_FALSE;
+
+// FIXME: agregar llamadas a funciones y lo que haga falta
+sentencia::= asignacion; // | funcion
+
+expresion::= expresion_logica_or|op_aritmetica_suma_resta; //PUNTO_Y_COMA ;
+
+expresion_logica_or::= comparacion OP_LOG_BIN_OR expresion_logica_or
+                    | comparacion OP_LOG_BIN_OR expresion_logica_and
+                    | comparacion;
+expresion_logica_and::= comparacion OP_LOG_BIN_AND expresion_logica_and
+                    | comparacion;
+
+operadores_logicos::= OP_COND_IGUALDAD | OP_COND_MAYOR | OP_COND_MAYOR_IGUAL | OP_COND_MENOR | OP_COND_MENOR_IGUAL;
+comparacion::= termino operadores_logicos termino;
+
+// op_aritmetica_suma_resta ::= termino OP_ARIT_SUMA op_aritmetica_suma_resta | termino operadores_suma_resta op_aritmetica_producto_division | termino;
+
+op_aritmetica_suma_resta ::= termino:t1 operadores_suma_resta:tipo_op op_aritmetica_suma_resta:op1 {:
+        RESULT = t1 + tipo_op + op1;
+        System.out.println("REGLA 1.1: -> termino + " + tipo_op + " op_aritmetica_suma_resta (" + RESULT + ")");
+    :};
+
+op_aritmetica_suma_resta ::= termino:t1 operadores_suma_resta:tipo_op termino:t2 {:
+        RESULT = t1 + tipo_op + t2;
+        System.out.println("REGLA 1.2: -> termino operadores_suma_resta termino (" + RESULT + ")");
+    :};
+
+// op_aritmetica_producto_division ::= termino operadores_producto_division op_aritmetica_producto_division | termino;
+operadores_suma_resta::= OP_ARIT_SUMA | OP_ARIT_RESTA;
+operadores_producto_division::= OP_ARIT_PROD | OP_ARIT_DIV;
+
+termino::= numero_constante {:
+        System.out.println("REGLA 5.1: termino -> numero_constante");
+    :};
+termino::= IDENTIFICADOR {:
+        System.out.println("REGLA 5.2: termino -> IDENTIFICADOR");
+    :};
+// FIXME: la op. aritmética tmb puede tener como término funciones que devuelvan un número
+// termino:: funcion {:
+
+numero_constante::= ENTERO:num {:
+        System.out.println("REGLA 6.1: numero_constante -> ENTERO");
+        RESULT = num;
+    :};
+
+numero_constante::= FLOTANTE:num {:
+        System.out.println("REGLA 6.2: numero_constante -> FLOTANTE");
+        RESULT = num;
+    :};
+
+asignacion::= IDENTIFICADOR IGUAL expresion;
 
 
 // Reglas semánticas del ejemplo viejo, las dejo para tenerlas a mano -- borrar más adelante.

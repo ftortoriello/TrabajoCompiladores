@@ -106,6 +106,7 @@ Comentario      = #.*{FinDeLinea}            // TODO: Bloques de comentarios
     "boolean"           { return token("TDD_BOOLEAN", yytext()); }
     "integer"           { return token("TDD_INTEGER", yytext()); }
     "float"             { return token("TDD_FLOAT", yytext()); }
+    "="                 { return token("IGUAL", yytext()); }
     {Id}                { return token("IDENTIFICADOR", yytext()); }
     {Flotante}          { return token("FLOTANTE", yytext()); }
     {Entero}            { return token("ENTERO", yytext()); }
