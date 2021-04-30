@@ -52,60 +52,42 @@ Id              = ([:letter:]|_|{LetraScript})[\w{LetraScript}{DigitoScript}]*\?
 Entero          = 0|{DigitoSinCero}{Digito}*  /* FIXME: pasa similar a 10variable, toma 001 como 0 y 01... */
 Flotante        = ({Entero}\.{Digito}*|\.{Digito}*)
 
-// TODO: prioridad mediante paréntesis para operadores (se hace en el parser)
 
-// Comento esto porque las reconozco directamente a partir del string,
-// pero lo dejo porque las regex pueden servir para el .cup
-// OpAritmeticoSuma= \+|-|\*|\/
-// OpComparacion   = ==|\!=|\>|\>=|\<|\<=
-
-// TODO: condiciones
-// TODO: sentencias, asignaciones
+OpAritSumaYResta    = \+|-
+OpAritProdYDiv      = \*|\/
+OpComparacion       = ==|\!=|\>|\>=|\<|\<=
+TiposDeDato         = boolean|integer|float
+CtesBooleanas       = true|false
 
 // TODO: cadenas de caracteres
-
-// TODO: bloques
-// TODO: funciones
-
-// TODO: if
-// if <condición> then <sentencia>;
-// if <condición> then <sentencia1> else <sentencia2>;
-
-// TODO: when
-// TODO: while
-// TODO: for
+// TODO: palabras reservadas para when, while, for y otros
 
 Comentario      = #.*{FinDeLinea}            // TODO: Bloques de comentarios
 
 %%
 
+// variable < nombre v ariable> i s < tipo>;
+
 <YYINITIAL> {
 
     {Comentario}        { /* Ignorar */ }
     {EspacioEnBlanco}   { /* Ignora los espacios en blanco */ }
+    {OpAritSumaYResta}  { return token("OP_ARIT_SUMA_O_RESTA", yytext()); }
+    {OpAritProdYDiv}    { return token("OP_ARIT_PROD_O_DIV", yytext()); }
+    {OpComparacion}     { return token("OP_COMPARACION", yytext()); }
+    {CtesBooleanas}     { return token("CTE_BOOLEANA", yytext()); }
+    {TiposDeDato}       { return token("TIPO_DE_DATO", yytext()); }
     "("                 { return token("PAR_ABRE", yytext()); }
     ")"                 { return token("PAR_CIERRA", yytext()); }
+    "variable"          { return token("PR_VARIABLE", yytext()); }
+    "is"                { return token("PR_IS", yytext()); }
     "if"                { return token("PR_IF", yytext()); }
     "then"              { return token("PR_THEN", yytext()); }
     "else"              { return token("PR_ELSE", yytext()); }
     ";"                 { return token("PUNTO_Y_COMA", yytext()); }
-    "+"                 { return token("OP_ARIT_SUMA", yytext()); }
-    "-"                 { return token("OP_ARIT_RESTA", yytext()); }
-    "*"                 { return token("OP_ARIT_PROD", yytext()); }
-    "/"                 { return token("OP_ARIT_DIV", yytext()); }
-    "=="                { return token("OP_COND_IGUALDAD", yytext()); }
-    ">"                 { return token("OP_COND_MAYOR", yytext()); }
-    ">="                { return token("OP_COND_MAYOR_IGUAL", yytext()); }
-    "<"                 { return token("OP_COND_MENOR", yytext()); }
-    "<="                { return token("OP_COND_MENOR_IGUAL", yytext()); }
     "or"                { return token("OP_LOG_BIN_OR", yytext()); }
     "and"               { return token("OP_LOG_BIN_AND", yytext()); }
     "not"               { return token("OP_LOG_UNA_NOT", yytext()); }
-    "true"              { return token("VALOR_BOOLEANO_TRUE", yytext()); }
-    "false"             { return token("VALOR_BOOLEANO_FALSE", yytext()); }
-    "boolean"           { return token("TDD_BOOLEAN", yytext()); }
-    "integer"           { return token("TDD_INTEGER", yytext()); }
-    "float"             { return token("TDD_FLOAT", yytext()); }
     "="                 { return token("IGUAL", yytext()); }
     {Id}                { return token("IDENTIFICADOR", yytext()); }
     {Flotante}          { return token("FLOTANTE", yytext()); }

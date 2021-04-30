@@ -23,146 +23,108 @@ parser code
 
 :};
 
-
-// Definiciones que estaban en el ejemplo original (borrar en próximos commits):
-// terminal MAS, MENOS, MULT, DIV, PAR_ABRE, PAR_CIERRA, MENOS_UNARIO;
-// terminal String IDENTIFICADOR, ENTERO;
-// nonterminal String expression, expr;
-
-// precedence left MAS, MENOS;
-// precedence left MULT, DIV;
-// precedence left MENOS_UNARIO;
-
-// start with expression;
-
-terminal String IDENTIFICADOR, ENTERO, FLOTANTE,
-    OP_ARIT_SUMA, OP_ARIT_RESTA, OP_ARIT_PROD, OP_ARIT_DIV,
+terminal String IDENTIFICADOR,
+    OP_ARIT_SUMA_O_RESTA, OP_ARIT_PROD_O_DIV, OP_COMPARACION,
     OP_LOG_BIN_OR, OP_LOG_BIN_AND, OP_LOG_UNA_NOT,
-    OP_COND_IGUALDAD, OP_COND_MAYOR, OP_COND_MAYOR_IGUAL, OP_COND_MENOR, OP_COND_MENOR_IGUAL,
     PAR_ABRE, PAR_CIERRA, PR_IF, PR_THEN, PR_ELSE, PUNTO_Y_COMA, IGUAL,
-    VALOR_BOOLEANO_TRUE, VALOR_BOOLEANO_FALSE,
-    TDD_BOOLEAN, TDD_INTEGER, TDD_FLOAT;
+    PR_VARIABLE, PR_IS,
+    TIPO_DE_DATO, CTE_BOOLEANA, ENTERO, FLOTANTE;
 
-// No terminales
 nonterminal String programa,
     estructura_condicional_if,
     sentencia, asignacion, expresion, comparacion, termino,
     expresion_logica_or, expresion_logica_and,
     op_aritmetica_suma_resta, op_aritmetica_producto_division,
-    operadores_suma_resta, operadores_producto_division, operadores_logicos,
-    numero_constante, tipo_de_dato, valores_booleanos;
+    numero_constante;
 
 // Precedencia de operadores. Ni idea si está bien así, todavía no lo puedo probar
 // FIXME: operador unario "-", ¿cómo diferenciarlo de la resta?
-precedence left OP_LOG_BIN_OR, OP_ARIT_SUMA, OP_ARIT_RESTA;
-precedence left OP_LOG_BIN_AND, OP_ARIT_PROD, OP_ARIT_DIV;
+precedence left OP_LOG_BIN_OR, OP_ARIT_SUMA_O_RESTA;
+precedence left OP_LOG_BIN_AND, OP_ARIT_PROD_O_DIV;
 precedence left OP_LOG_UNA_NOT;
 
 start with programa;
 
-// FIXME
-programa::= op_aritmetica_suma_resta;
+// FIXME: programa::= declaracion(variables o funciones)* sentencia*
+programa::= expresion;
+
+declaracion::=
+        PR_VARIABLE IDENTIFICADOR PR_IS TIPO_DE_DATO {:
+
+        :} |
+        PR_VARIABLE IDENTIFICADOR PR_IS TIPO_DE_DATO IGUAL expresion{:
+
+        :} |
+        ;
 
 estructura_condicional_if::=  PR_IF expresion_logica_or PR_THEN sentencia PUNTO_Y_COMA
                             | PR_IF expresion_logica_or PR_THEN sentencia PR_ELSE sentencia PUNTO_Y_COMA;
 
-tipo_de_dato::= TDD_BOOLEAN | TDD_INTEGER | TDD_FLOAT;
-valores_booleanos::= VALOR_BOOLEANO_TRUE | VALOR_BOOLEANO_FALSE;
+// FIXME: agregar llamadas a funciones, estructuras de control y lo que haga falta
+sentencia::= asignacion;
+asignacion::= IDENTIFICADOR IGUAL termino;
 
-// FIXME: agregar llamadas a funciones y lo que haga falta
-sentencia::= asignacion; // | funcion
+expresion::= expresion_logica_or;
+expresion::= op_aritmetica_suma_resta;
 
-expresion::= expresion_logica_or|op_aritmetica_suma_resta; //PUNTO_Y_COMA ;
+expresion_logica_or::=
+        comparacion OP_LOG_BIN_OR expresion_logica_or {:
+        :} |
+        comparacion {:
+        :}
+        expresion_logica_and {:
+        :} |;
 
-expresion_logica_or::= comparacion OP_LOG_BIN_OR expresion_logica_or
-                    | comparacion OP_LOG_BIN_OR expresion_logica_and
-                    | comparacion;
-expresion_logica_and::= comparacion OP_LOG_BIN_AND expresion_logica_and
-                    | comparacion;
+expresion_logica_and::=
+        comparacion OP_LOG_BIN_AND expresion_logica_and {:
+        :} |
+        comparacion {:
+        :};
 
-operadores_logicos::= OP_COND_IGUALDAD | OP_COND_MAYOR | OP_COND_MAYOR_IGUAL | OP_COND_MENOR | OP_COND_MENOR_IGUAL;
-comparacion::= termino operadores_logicos termino;
+comparacion::= termino OP_COMPARACION termino;
 
-// op_aritmetica_suma_resta ::= termino OP_ARIT_SUMA op_aritmetica_suma_resta | termino operadores_suma_resta op_aritmetica_producto_division | termino;
+op_aritmetica_suma_resta ::=
+        termino:t1 OP_ARIT_SUMA_O_RESTA:tipo_op op_aritmetica_suma_resta:terminos_restantes {:
+            RESULT = t1 + tipo_op + terminos_restantes;
+            System.out.println("REGLA 10.1: op_aritmetica_suma_resta -> termino " + tipo_op + " op_aritmetica_suma_resta (" + RESULT + ")");
+        :} |
+        termino:t1 OP_ARIT_SUMA_O_RESTA:tipo_op termino:t2 {:
+                RESULT = t1 + tipo_op + t2;
+                System.out.println("REGLA 10.2: op_aritmetica_suma_resta -> termino " + tipo_op + " termino (" + RESULT + ")");
+        :} |
+        op_aritmetica_producto_division:terminos_restantes {:
+            RESULT = terminos_restantes;
+            System.out.println("REGLA 10.3: op_aritmetica_suma_resta -> op_aritmetica_producto_division (" + RESULT + ")");
+        :};
 
-op_aritmetica_suma_resta ::= termino:t1 operadores_suma_resta:tipo_op op_aritmetica_suma_resta:op1 {:
-        RESULT = t1 + tipo_op + op1;
-        System.out.println("REGLA 1.1: -> termino + " + tipo_op + " op_aritmetica_suma_resta (" + RESULT + ")");
-    :};
+op_aritmetica_producto_division ::=
+        termino:t1 OP_ARIT_PROD_O_DIV:tipo_op op_aritmetica_producto_division:terminos_restantes {:
+            RESULT = t1 + tipo_op + terminos_restantes;
+            System.out.println("REGLA 11.1: op_aritmetica_producto_division -> termino " + tipo_op + " op_aritmetica_producto_division (" + RESULT + ")");
+        :} |
+        termino:t1 OP_ARIT_PROD_O_DIV:tipo_op termino:t2 {:
+            RESULT = t1 + tipo_op + t2;
+            System.out.println("REGLA 11.2: op_aritmetica_producto_division -> termino " + tipo_op + " termino (" + RESULT + ")");
+        :};
 
-op_aritmetica_suma_resta ::= termino:t1 operadores_suma_resta:tipo_op termino:t2 {:
-        RESULT = t1 + tipo_op + t2;
-        System.out.println("REGLA 1.2: -> termino operadores_suma_resta termino (" + RESULT + ")");
-    :};
+// FIXME: el término tmb. puede ser una función que devuelvan un valor
+termino::=
+        numero_constante {:
+            System.out.println("REGLA 5.1: termino -> numero_constante");
+        :} |
+        IDENTIFICADOR {:
+            System.out.println("REGLA 5.2: termino -> IDENTIFICADOR");
+        :} |
+        CTE_BOOLEANA {:
+            System.out.println("REGLA 5.3: termino -> CTE_BOOLEANA");
+        :};
 
-// op_aritmetica_producto_division ::= termino operadores_producto_division op_aritmetica_producto_division | termino;
-operadores_suma_resta::= OP_ARIT_SUMA | OP_ARIT_RESTA;
-operadores_producto_division::= OP_ARIT_PROD | OP_ARIT_DIV;
-
-termino::= numero_constante {:
-        System.out.println("REGLA 5.1: termino -> numero_constante");
-    :};
-termino::= IDENTIFICADOR {:
-        System.out.println("REGLA 5.2: termino -> IDENTIFICADOR");
-    :};
-// FIXME: la op. aritmética tmb puede tener como término funciones que devuelvan un número
-// termino:: funcion {:
-
-numero_constante::= ENTERO:num {:
-        System.out.println("REGLA 6.1: numero_constante -> ENTERO");
-        RESULT = num;
-    :};
-
-numero_constante::= FLOTANTE:num {:
-        System.out.println("REGLA 6.2: numero_constante -> FLOTANTE");
-        RESULT = num;
-    :};
-
-asignacion::= IDENTIFICADOR IGUAL expresion;
-
-
-// Reglas semánticas del ejemplo viejo, las dejo para tenerlas a mano -- borrar más adelante.
-//expression ::= expr:e {:
-//            System.out.println("REGLA 0: expr -> expr EOF");
-//            RESULT = e;
-//        :};
-//
-//expr ::= expr:e1 MAS expr:e2 {:
-//            System.out.println("REGLA 1.1: expr -> expr MAS expr");
-//            RESULT = e1+"+"+e2;
-//        :};
-//
-//expr ::= expr:e1 MENOS expr:e2 {:
-//            System.out.println("REGLA 1.2: expr -> expr MENOS expr");
-//            RESULT = e1+"-"+e2;
-//        :};
-//
-//expr ::= expr:e1 MULT expr:e2 {:
-//            System.out.println("REGLA 1.3: expr -> expr MULT expr");
-//            RESULT = e1+"*"+e2;
-//        :};
-//
-//expr ::= expr:e1 DIV expr:e2 {:
-//            System.out.println("REGLA 1.4: expr -> expr DIV expr");
-//            RESULT = e1+"*"+e2;
-//        :};
-//
-//expr ::= PAR_ABRE expr:e PAR_CIERRA {:
-//            System.out.println("REGLA 1.5: expr -> ( expr )");
-//            RESULT = "("+e+")";
-//        :};
-//
-//expr ::= IDENTIFICADOR:id {:
-//            System.out.println("REGLA 1.6: expr -> IDENTIFICADOR)");
-//            RESULT = id;
-//        :};
-//
-//expr ::= ENTERO:ent {:
-//            System.out.println("REGLA 1.6: expr -> ENTERO)");
-//            RESULT = ent;
-//        :};
-//
-//expr ::= MENOS expr:e{:
-//            System.out.println("REGLA 1.7: expr -> MENOS expr)");
-//            RESULT = "-"+e;
-//        :} %prec MENOS_UNARIO;
+numero_constante::=
+        ENTERO:num {:
+            System.out.println("REGLA 6.1: numero_constante -> ENTERO");
+            RESULT = num;
+        :} |
+        FLOTANTE:num {:
+            System.out.println("REGLA 6.2: numero_constante -> FLOTANTE");
+            RESULT = num;
+        :};
