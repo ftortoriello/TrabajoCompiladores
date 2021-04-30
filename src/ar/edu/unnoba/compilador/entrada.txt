@@ -1,2 +1,1 @@
-variable radio is float = 1.5;
-variable superficie₁ is float = 0;
+if radio < 0 then radio = 1;
