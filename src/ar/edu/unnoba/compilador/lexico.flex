@@ -93,6 +93,9 @@ Comentario      = #.*{FinDeLinea}            // TODO: Bloques de comentarios
     "and"               { return token("OP_LOG_BIN_AND", yytext()); }
     "not"               { return token("OP_LOG_UNA_NOT", yytext()); }
     "="                 { return token("IGUAL", yytext()); }
+    "write"             { return token("PR_WRITE", yytext()); }
+    "writeln"           { return token("PR_WRITELN", yytext()); }
+    "read_"             { return token("PR_READ_GB", yytext()); }
     {Id}                { return token("IDENTIFICADOR", yytext()); }
     {Flotante}          { return token("FLOTANTE", yytext()); }
     {Entero}            { return token("ENTERO", yytext()); }
