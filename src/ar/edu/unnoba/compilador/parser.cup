@@ -52,11 +52,9 @@ programa ::= lst_decs_vars_y_funcs PR_MAIN_IS cuerpo PR_END_PUNTO;
 
 lst_decs_vars_y_funcs ::=
         dec_var PUNTO_Y_COMA lst_decs_vars_y_funcs {: :} |
-        dec_fun PUNTO_Y_COMA lst_decs_vars_y_funcs {: :} |
-        dec_var PUNTO_Y_COMA {:
-                :}
-        dec_fun PUNTO_Y_COMA {:
-        :};
+        dec_fun lst_decs_vars_y_funcs {: :} |
+        dec_var PUNTO_Y_COMA {: :} |
+        dec_fun {: :};
 
 // TODO: En el caso de tratarse de una variable global, dicha expresión no deberá admitir
 // invocaciones a funciones como parte de la expresión (no ocurriendo lo mismo con
@@ -64,23 +62,23 @@ lst_decs_vars_y_funcs ::=
 dec_var ::=
         PR_VARIABLE arg {: :};
 
-dec_fun ::= PR_FUNCTION IDENTIFICADOR PAR_ABRE PAR_CIERRA PR_RETURN TIPO_DE_DATO ;
+dec_fun ::=
+        PR_FUNCTION IDENTIFICADOR PAR_ABRE PAR_CIERRA PR_RETURN TIPO_DE_DATO {: :} |
+        PR_FUNCTION IDENTIFICADOR PAR_ABRE lst_args PAR_CIERRA PR_RETURN TIPO_DE_DATO {: :};
 
 lst_args ::=
         arg PR_COMA lst_args {: :} |
         arg {: :};
 
 arg ::=
-        IDENTIFICADOR PR_IS TIPO_DE_DATO  {:
-        :} |
-        IDENTIFICADOR PR_IS TIPO_DE_DATO IGUAL expresion {:
-        :};
+        IDENTIFICADOR PR_IS TIPO_DE_DATO  {: :} |
+        IDENTIFICADOR PR_IS TIPO_DE_DATO IGUAL termino {: :};
 
 // TODO: agregar funciones, por ej. writeln("..."), al cuerpo
 // TODO: agregar las estructuras de control e iteración que definamos al cuerpo
 cuerpo ::= estructura_condicional_if;
 
-estructura_condicional_if::=
+estructura_condicional_if ::=
         PR_IF expresion_logica_or PR_THEN sentencia PUNTO_Y_COMA {: :} |
         PR_IF expresion_logica_or PR_THEN sentencia PR_ELSE sentencia PUNTO_Y_COMA {: :};
 
