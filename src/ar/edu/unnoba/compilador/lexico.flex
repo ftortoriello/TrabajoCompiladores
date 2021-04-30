@@ -66,10 +66,9 @@ Comentario      = #.*{FinDeLinea}            // TODO: Bloques de comentarios
 
 %%
 
-// variable < nombre v ariable> i s < tipo>;
-
 <YYINITIAL> {
-
+    "main is"           { return token("PR_MAIN_IS", yytext()); }
+    "end."              { return token("PR_END_PUNTO", yytext()); }
     {Comentario}        { /* Ignorar */ }
     {EspacioEnBlanco}   { /* Ignora los espacios en blanco */ }
     {OpAritSumaYResta}  { return token("OP_ARIT_SUMA_O_RESTA", yytext()); }
@@ -81,6 +80,11 @@ Comentario      = #.*{FinDeLinea}            // TODO: Bloques de comentarios
     ")"                 { return token("PAR_CIERRA", yytext()); }
     "variable"          { return token("PR_VARIABLE", yytext()); }
     "is"                { return token("PR_IS", yytext()); }
+    "function"          { return token("PR_FUNCTION", yytext()); }
+    "return"            { return token("PR_RETURN", yytext()); }
+    ","                 { return token("PR_COMA", yytext()); }
+    "begin"             { return token("PR_BEGIN", yytext()); }
+    "end"               { return token("PR_END", yytext()); }
     "if"                { return token("PR_IF", yytext()); }
     "then"              { return token("PR_THEN", yytext()); }
     "else"              { return token("PR_ELSE", yytext()); }

@@ -27,10 +27,13 @@ terminal String IDENTIFICADOR,
     OP_ARIT_SUMA_O_RESTA, OP_ARIT_PROD_O_DIV, OP_COMPARACION,
     OP_LOG_BIN_OR, OP_LOG_BIN_AND, OP_LOG_UNA_NOT,
     PAR_ABRE, PAR_CIERRA, PR_IF, PR_THEN, PR_ELSE, PUNTO_Y_COMA, IGUAL,
-    PR_VARIABLE, PR_IS,
+    PR_MAIN_IS, PR_END_PUNTO, PR_VARIABLE, PR_IS,
+    PR_FUNCTION, PR_RETURN, PR_COMA,
+    PR_BEGIN, PR_END,
     TIPO_DE_DATO, CTE_BOOLEANA, ENTERO, FLOTANTE;
 
-nonterminal String programa,
+nonterminal String programa, cuerpo,
+    lst_decs_vars_y_funcs, dec_var, dec_fun, lst_args, arg,
     estructura_condicional_if,
     sentencia, asignacion, expresion, comparacion, termino,
     expresion_logica_or, expresion_logica_and,
@@ -45,29 +48,51 @@ precedence left OP_LOG_UNA_NOT;
 
 start with programa;
 
-// FIXME: programa::= declaracion(variables o funciones)* sentencia*
-programa::= expresion;
+programa ::= lst_decs_vars_y_funcs PR_MAIN_IS cuerpo PR_END_PUNTO;
 
-declaracion::=
-        PR_VARIABLE IDENTIFICADOR PR_IS TIPO_DE_DATO {:
+lst_decs_vars_y_funcs ::=
+        dec_var PUNTO_Y_COMA lst_decs_vars_y_funcs {: :} |
+        dec_fun PUNTO_Y_COMA lst_decs_vars_y_funcs {: :} |
+        dec_var PUNTO_Y_COMA {:
+                :}
+        dec_fun PUNTO_Y_COMA {:
+        :};
 
+// TODO: En el caso de tratarse de una variable global, dicha expresión no deberá admitir
+// invocaciones a funciones como parte de la expresión (no ocurriendo lo mismo con
+// variables locales a un bloque de sentencias o función, donde dicha restricción no existe).
+dec_var ::=
+        PR_VARIABLE arg {: :};
+
+dec_fun ::= PR_FUNCTION IDENTIFICADOR PAR_ABRE PAR_CIERRA PR_RETURN TIPO_DE_DATO ;
+
+lst_args ::=
+        arg PR_COMA lst_args {: :} |
+        arg {: :};
+
+arg ::=
+        IDENTIFICADOR PR_IS TIPO_DE_DATO  {:
         :} |
-        PR_VARIABLE IDENTIFICADOR PR_IS TIPO_DE_DATO IGUAL expresion{:
+        IDENTIFICADOR PR_IS TIPO_DE_DATO IGUAL expresion {:
+        :};
 
-        :} |
-        ;
+// TODO: agregar funciones, por ej. writeln("..."), al cuerpo
+// TODO: agregar las estructuras de control e iteración que definamos al cuerpo
+cuerpo ::= estructura_condicional_if;
 
-estructura_condicional_if::=  PR_IF expresion_logica_or PR_THEN sentencia PUNTO_Y_COMA
-                            | PR_IF expresion_logica_or PR_THEN sentencia PR_ELSE sentencia PUNTO_Y_COMA;
+estructura_condicional_if::=
+        PR_IF expresion_logica_or PR_THEN sentencia PUNTO_Y_COMA {: :} |
+        PR_IF expresion_logica_or PR_THEN sentencia PR_ELSE sentencia PUNTO_Y_COMA {: :};
 
 // FIXME: agregar llamadas a funciones, estructuras de control y lo que haga falta
-sentencia::= asignacion;
-asignacion::= IDENTIFICADOR IGUAL termino;
+sentencia ::= asignacion;
+asignacion ::= IDENTIFICADOR IGUAL termino;
 
-expresion::= expresion_logica_or;
-expresion::= op_aritmetica_suma_resta;
+expresion ::=
+        expresion_logica_or {: :} |
+        op_aritmetica_suma_resta {: :};
 
-expresion_logica_or::=
+expresion_logica_or ::=
         comparacion OP_LOG_BIN_OR expresion_logica_or {:
         :} |
         comparacion {:
@@ -75,14 +100,15 @@ expresion_logica_or::=
         expresion_logica_and {:
         :} |;
 
-expresion_logica_and::=
+expresion_logica_and ::=
         comparacion OP_LOG_BIN_AND expresion_logica_and {:
         :} |
         comparacion {:
         :};
 
-comparacion::= termino OP_COMPARACION termino;
+comparacion ::= termino OP_COMPARACION termino;
 
+// FIXME: modificar precedencia mediante paréntesis
 op_aritmetica_suma_resta ::=
         termino:t1 OP_ARIT_SUMA_O_RESTA:tipo_op op_aritmetica_suma_resta:terminos_restantes {:
             RESULT = t1 + tipo_op + terminos_restantes;
@@ -108,7 +134,7 @@ op_aritmetica_producto_division ::=
         :};
 
 // FIXME: el término tmb. puede ser una función que devuelvan un valor
-termino::=
+termino ::=
         numero_constante {:
             System.out.println("REGLA 5.1: termino -> numero_constante");
         :} |
@@ -119,7 +145,7 @@ termino::=
             System.out.println("REGLA 5.3: termino -> CTE_BOOLEANA");
         :};
 
-numero_constante::=
+numero_constante ::=
         ENTERO:num {:
             System.out.println("REGLA 6.1: numero_constante -> ENTERO");
             RESULT = num;
