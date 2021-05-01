@@ -23,6 +23,7 @@ hs_err_pid*
 
 # Backups
 *~
+*.swp
 
 # Netbeans build directory
 build/
