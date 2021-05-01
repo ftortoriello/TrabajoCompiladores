@@ -2,6 +2,7 @@ package ar.edu.unnoba.compilador;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Stack;
 import java_cup.runtime.*;
 import java_cup.sym;
 
@@ -39,30 +40,35 @@ import java_cup.sym;
     *  del analizador léxico.
     *************************************************************************/
     
-    /*
     int string_yyline = 0;
     int string_yycolumn = 0;
-    */
 
-    int nivelComentariosLlave = 0;
-    int nivelComentariosPascal = 0;
+    StringBuffer string = new StringBuffer();
+
+    enum TipoComentario { LLAVES, PASCAL }
+    Stack<TipoComentario> comentariosAbiertos = new Stack<TipoComentario>();
 
     public List<MiToken> tablaDeSimbolos = new ArrayList<>();
- 
+
     /* sirven para algo los tokens con valor null??? */
+    /*
     private MiToken token(String nombre) {
         return new MiToken(nombre, this.yyline, this.yycolumn);
     }
+    */
 
     private MiToken token(String nombre, Object valor) {
         return new MiToken(nombre, this.yyline, this.yycolumn, valor);
     }
 
-    /*
     private MiToken token(String nombre, int line, int column, Object valor) {
         return new MiToken(nombre, line, column, valor);
     }
-    */
+
+    /* unificar formato de mensajes de error */
+    private void errorLexico(String msg) {
+        throw new Error("Línea " + this.yyline + ", columna " + this.yycolumn + ": " + msg);
+    }
 %}
 
 FinDeLinea      = \r|\n|\r\n
@@ -90,15 +96,18 @@ CtesBooleanas       = true|false
 
 ComentarioUnaLinea  = #.*{FinDeLinea}            // TODO: Bloques de comentarios
 
-%state COMENT_LLAVES COMENT_PASCAL
+%state COMENT_LLAVES COMENT_PASCAL STRING
 
 %%
 
 <YYINITIAL> {
+    \"                  { string.setLength(0); yybegin(STRING);
+                          string_yyline = this.yyline; string_yycolumn = this.yycolumn; }
     "main is"           { return token("PR_MAIN_IS", yytext()); }
     "end."              { return token("PR_END_PUNTO", yytext()); }
-    "{"                 { nivelComentariosLlave = 1; yybegin(COMENT_LLAVES); }
-    "(*"                { nivelComentariosPascal = 1; yybegin(COMENT_PASCAL); }
+    "{"                 { comentariosAbiertos.push(TipoComentario.LLAVES); yybegin(COMENT_LLAVES); }
+    "(*"                { comentariosAbiertos.push(TipoComentario.PASCAL); yybegin(COMENT_PASCAL); }
+    (\}|\*\))           { errorLexico("Cierre de comentario inesperado"); }
     {ComentarioUnaLinea} { /* ignorar */ }
     {EspacioEnBlanco}   { /* ignorar */ }
     {OpAritSumaYResta}  { return token("OP_ARIT_SUMA_O_RESTA", yytext()); }
@@ -133,21 +142,61 @@ ComentarioUnaLinea  = #.*{FinDeLinea}            // TODO: Bloques de comentarios
 }
 
 <COMENT_LLAVES> {
-    "}"                 { nivelComentariosLlave--;
-                          if (nivelComentariosLlave == 0) yybegin(YYINITIAL);
+    "}"                 {
+                            if (comentariosAbiertos.pop() == TipoComentario.LLAVES) {
+                                /* se cerro un comentario de llaves */
+                                if (comentariosAbiertos.empty()) {
+                                    /* se cerraron todos los comentarios */
+                                    yybegin(YYINITIAL);
+                                } else if (comentariosAbiertos.peek() == TipoComentario.PASCAL) {
+                                    yybegin(COMENT_PASCAL);
+                                }
+                            } else {
+                                errorLexico("Error del programador al cerrar un bloque de comentario de llaves. Esto no debería ocurrir...");
+                            }
                         }
-    "{"                 { nivelComentariosLlave++; System.out.printf("Abriendo comentario de llaves anidado, nivel: %d%n", nivelComentariosLlave); }
-    "(*"                { nivelComentariosPascal++; yybegin(COMENT_PASCAL); }
+
+                        /* comentarios anidados */
+    "{"                 { comentariosAbiertos.push(TipoComentario.LLAVES); }    /* seguir en este estado */
+    "(*"                { comentariosAbiertos.push(TipoComentario.PASCAL); yybegin(COMENT_PASCAL); }
+
+    "*)"                { errorLexico("Se esperaba un cierre de comentario de llaves, no de tipo Pascal"); }
+
     [^]                 { /* ignorar todo lo demás */ }
 }
 
 <COMENT_PASCAL> {
-    "*)"                { nivelComentariosPascal--;
-                          if (nivelComentariosPascal == 0) yybegin(YYINITIAL);
+    "*)"                {
+                            if (comentariosAbiertos.pop() == TipoComentario.PASCAL) {
+                                /* se cerro un comentario tipo Pascal */
+                                if (comentariosAbiertos.empty()) {
+                                    /* se cerraron todos los comentarios */
+                                    yybegin(YYINITIAL);
+                                } else if (comentariosAbiertos.peek() == TipoComentario.LLAVES) {
+                                    yybegin(COMENT_PASCAL);
+                                }
+                            } else {
+                                errorLexico("Error del programador al cerrar un bloque de comentario de tipo Pascal. Esto no debería ocurrir...");
+                            }
                         }
-    "(*"                 { nivelComentariosPascal++; System.out.printf("Abriendo comentario tipo Pascal anidado, nivel: %d%n", nivelComentariosPascal); }
-    "{"                 { nivelComentariosLlave++; yybegin(COMENT_LLAVES); }
+
+                        /* comentarios anidados */
+    "(*"                { comentariosAbiertos.push(TipoComentario.PASCAL); }    /* seguir en este estado */
+    "{"                 { comentariosAbiertos.push(TipoComentario.LLAVES); yybegin(COMENT_LLAVES); }
+
+    "}"                 { errorLexico("Se esperaba un cierre de comentario de tipo Pascal, no de llaves"); }
+
     [^]                 { /* ignorar todo lo demás */ }
+}
+
+<STRING> {
+    \"                  {   /* fin del string */
+                            yybegin(YYINITIAL);
+                            return token("STRING", string_yyline, string_yycolumn, string.toString());
+                        }
+    {FinDeLinea}        { string.append('\n'); }
+    [^]                 { string.append( yytext() ); }
+    /* TODO ver si hace falta \t, \n, etc */
 }
 
 /* probarrrr:: 10variable
@@ -156,5 +205,5 @@ ComentarioUnaLinea  = #.*{FinDeLinea}            // TODO: Bloques de comentarios
    tirar un error sintáctico creo...... tampoco es 10 * variable porque tiene que estar el "*" (y calculo que
    los espacios) "*/
 
-[^]                     { throw new Error("Entrada no permitida: <" + yytext() + ">"); }
+[^]                     { errorLexico("Entrada no permitida: '" + yytext() + "'"); }
 
