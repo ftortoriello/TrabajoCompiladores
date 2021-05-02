@@ -2,13 +2,17 @@
 # forma que está hecho ahora, el while, el if y funca = false son todas "sentencias",
 # y las sentencias estan diseñadas para llevar siempre punto y coma.)
 
+variable X is float;
 
-while getUno() == 1 do
-    if radio < 0 then
-        X = 55.5;
-        altura = 10 - 10 + 20;
-        ancho = getAncho();
-        imprimir(msj);
-    else
-        estoNoVaAFuncionar();
-        funca = false;;;
+main is
+    writeln("HOLA CHEE!");
+    while getUno() == 1 do
+        if radio < 0 then
+            X = .55;
+            altura = 10 - 10 + 20 * 4 / 2;
+            ancho = getAncho();
+            imprimir(msj);
+        else
+            estoNoVaAFuncionar();
+            funca = 5 == 1;;; { xD }
+end.

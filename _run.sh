@@ -7,9 +7,7 @@ if [ ! -f "src/${SRCDIR}/$1.java" ] ; then
   exit 1
 fi
 
-pushd src > /dev/null
-javac -cp ".:../lib/*" -Xlint "ar/edu/unnoba/compilador/$1.java" && \
-java -cp ".:../lib/*" "ar/edu/unnoba/compilador/$1" && \
-popd > /dev/null
+javac -cp "src:lib/*" -d out -Xlint "src/ar/edu/unnoba/compilador/$1.java" && \
+java -cp "out:lib/*" "ar/edu/unnoba/compilador/$1"
 
 exit $?

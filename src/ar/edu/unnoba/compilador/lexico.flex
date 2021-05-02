@@ -6,12 +6,7 @@ import java.util.Stack;
 import java_cup.runtime.*;
 import java_cup.sym;
 
-/* Implementación del analizador léxico para el TP Integrador de Compiladores
- * Alumnos:
- * Bruno Conti
- * Franco Tortoriello
- * Facundo Oyola
- */
+/* Implementación del analizador léxico */
 
 %%
 
@@ -76,16 +71,17 @@ DigitoScript        = [\u2070\u00B9\u00B2\u00B3\u2074-\u2079\u2080-\u2089]
 LetraScript         = [\u2071\u207F\u2090-\u209C]
 Id                  = ([:letter:]|_|{LetraScript})[\w{LetraScript}{DigitoScript}]*\??
 
-/* FIXME: 10id no tendría que ser aceptado, ni 0.123.4.
+/* FIXME: 10id ni 0.123.4 tendrían que ser aceptado como dos tokens distintos.
  * Podría solucionarse agregando \b a las regex, pero no funciona en JFlex :(
+ * Igualmente en esos casos tiene que fallar el análisis sintáctico.
  */
-Entero              = \d*
+Entero              = \d+
 Flotante            = \d*\.\d*
 
 OpAritSumaYResta    = \+|-
 OpAritProdYDiv      = \*|\/
 OpComparacion       = ==|\!=|\>|\>=|\<|\<=
-TiposDeDato         = boolean|integer|float
+TiposDeDato         = boolean|integer|float // que raro que no vaya un tipo "string"...
 CtesBooleanas       = true|false
 
 FinDeLinea         = \r|\n|\r\n
@@ -138,8 +134,8 @@ ComentarioUnaLinea = #.*{FinDeLinea}
     {OpAritProdYDiv}    { return token("OP_ARIT_PROD_O_DIV", yytext()); }
 
     {OpComparacion}     { return token("OP_COMPARACION", yytext()); }
-    "and"               { return token("OP_LOG_BIN_AND", yytext()); }
     "or"                { return token("OP_LOG_BIN_OR", yytext()); }
+    "and"               { return token("OP_LOG_BIN_AND", yytext()); }
     "not"               { return token("OP_LOG_UNA_NOT", yytext()); }
  
     "("                 { return token("PAR_ABRE", yytext()); }
