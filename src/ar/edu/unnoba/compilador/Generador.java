@@ -8,15 +8,15 @@ import java.util.logging.Logger;
 public class Generador {
 
     public static void main(String[] args) {
-        String path = "ar/edu/unnoba/compilador/lexico.flex";
+        String path = "src/ar/edu/unnoba/compilador/lexico.flex";
         generarLexer(path);
         
         String[] param = new String[5];
         param[0] = "-destdir";
-        param[1] = "ar/edu/unnoba/compilador/";
+        param[1] = "src/ar/edu/unnoba/compilador/";
         param[2] = "-parser";
         param[3] = "MiParser";
-        param[4] = "ar/edu/unnoba/compilador/parser.cup";
+        param[4] = "src/ar/edu/unnoba/compilador/parser.cup";
         generarParser(param);
     }
 
