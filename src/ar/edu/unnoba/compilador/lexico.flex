@@ -40,8 +40,8 @@ import java_cup.sym;
     *  del analizador léxico.
     *************************************************************************/
     
-    int string_yyline = 0;
-    int string_yycolumn = 0;
+    int cadena_yyline = 0;
+    int cadena_yycolumn = 0;
 
     StringBuffer stringBuffer = new StringBuffer();
 
@@ -68,16 +68,16 @@ import java_cup.sym;
     }
 %}
 
-FinDeLinea      = \r|\n|\r\n
-EspacioEnBlanco = \s
+EspacioEnBlanco     = \s
 
 /* Los Identificadores tendrían que soportar números y letras como superscript o subscript... Ej: x²
  * https://en.wikipedia.org/wiki/Unicode_subscripts_and_superscripts#Superscripts_and_subscripts_block */
-DigitoScript    = [\u2070\u00B9\u00B2\u00B3\u2074-\u2079\u2080-\u2089]
-LetraScript     = [\u2071\u207F\u2090-\u209C]
-Id              = ([:letter:]|_|{LetraScript})[\w{LetraScript}{DigitoScript}]*\??
-Entero          = \d*
-Flotante        = \d*\.\d*
+DigitoScript        = [\u2070\u00B9\u00B2\u00B3\u2074-\u2079\u2080-\u2089]
+LetraScript         = [\u2071\u207F\u2090-\u209C]
+Id                  = ([:letter:]|_|{LetraScript})[\w{LetraScript}{DigitoScript}]*\??
+
+Entero              = \d*
+Flotante            = \d*\.\d*
 
 OpAritSumaYResta    = \+|-
 OpAritProdYDiv      = \*|\/
@@ -85,54 +85,72 @@ OpComparacion       = ==|\!=|\>|\>=|\<|\<=
 TiposDeDato         = boolean|integer|float
 CtesBooleanas       = true|false
 
-// TODO: palabras reservadas para when, while, for y otros
 
-ComentarioUnaLinea  = #.*{FinDeLinea}
+FinDeLinea         = \r|\n|\r\n
+ComentarioUnaLinea = #.*{FinDeLinea}
 
-%state COMENT_LLAVES COMENT_PASCAL STRING
+%state COMENT_LLAVES COMENT_PASCAL CADENA
 
 %%
 
 <YYINITIAL> {
-    \"                  { stringBuffer.setLength(0); yybegin(STRING);
+    \"                  { stringBuffer.setLength(0); yybegin(CADENA);
                           /* guardar posición inicial para dejarla bien en el lexema */
-                          string_yyline = this.yyline; string_yycolumn = this.yycolumn; }
-    "main is"           { return token("PR_MAIN_IS", yytext()); }
-    "end."              { return token("PR_END_PUNTO", yytext()); }
+                          cadena_yyline = this.yyline; cadena_yycolumn = this.yycolumn; }
     "{"                 { comentariosAbiertos.push(TipoComentario.LLAVES); yybegin(COMENT_LLAVES); }
     "(*"                { comentariosAbiertos.push(TipoComentario.PASCAL); yybegin(COMENT_PASCAL); }
     (\}|\*\))           { errorLexico("Cierre de comentario inesperado"); }
     {ComentarioUnaLinea} { /* ignorar */ }
-    {EspacioEnBlanco}   { /* ignorar */ }
-    {OpAritSumaYResta}  { return token("OP_ARIT_SUMA_O_RESTA", yytext()); }
-    {OpAritProdYDiv}    { return token("OP_ARIT_PROD_O_DIV", yytext()); }
-    {OpComparacion}     { return token("OP_COMPARACION", yytext()); }
-    {CtesBooleanas}     { return token("CTE_BOOLEANA", yytext()); }
-    {TiposDeDato}       { return token("TIPO_DE_DATO", yytext()); }
-    "("                 { return token("PAR_ABRE", yytext()); }
-    ")"                 { return token("PAR_CIERRA", yytext()); }
+
+    /* palabras reservadas */
+    "main is"           { return token("PR_MAIN_IS", yytext()); }
+    "end."              { return token("PR_END_PUNTO", yytext()); }
     "variable"          { return token("PR_VARIABLE", yytext()); }
     "is"                { return token("PR_IS", yytext()); }
     "function"          { return token("PR_FUNCTION", yytext()); }
     "return"            { return token("PR_RETURN", yytext()); }
-    ","                 { return token("PR_COMA", yytext()); }
     "begin"             { return token("PR_BEGIN", yytext()); }
     "end"               { return token("PR_END", yytext()); }
     "if"                { return token("PR_IF", yytext()); }
     "then"              { return token("PR_THEN", yytext()); }
     "else"              { return token("PR_ELSE", yytext()); }
-    ";"                 { return token("PUNTO_Y_COMA", yytext()); }
-    "or"                { return token("OP_LOG_BIN_OR", yytext()); }
-    "and"               { return token("OP_LOG_BIN_AND", yytext()); }
-    "not"               { return token("OP_LOG_UNA_NOT", yytext()); }
-    "="                 { return token("IGUAL", yytext()); }
-    "write"             { return token("PR_WRITE", yytext()); }
+    "when"              { return token("PR_WHEN", yytext()); }
+    "while"             { return token("PR_WHILE", yytext()); }
+    "for"               { return token("PR_FOR", yytext()); }
+    "from"              { return token("PR_FROM", yytext()); }
+    "to"                { return token("PR_TO", yytext()); }
+    "by"                { return token("PR_BY", yytext()); }
+    "do"                { return token("PR_DO", yytext()); }
+    "break"             { return token("PR_BREAK", yytext()); }
+    "continue"          { return token("PR_CONTINUE", yytext()); }
     "writeln"           { return token("PR_WRITELN", yytext()); }
-    "read_"             { return token("PR_READ_GB", yytext()); }
+    "write"             { return token("PR_WRITE", yytext()); }
+    "read_integer"      { return token("PR_READ_INTEGER", yytext()); }
+    "read_float"        { return token("PR_READ_FLOAT", yytext()); }
+    "read_boolean"      { return token("PR_READ_BOOLEAN", yytext()); }
+    {TiposDeDato}       { return token("TIPO_DE_DATO", yytext()); }
+    {CtesBooleanas}     { return token("CTE_BOOLEANA", yytext()); }
+  
+    /* operadores */
+    {OpAritSumaYResta}  { return token("OP_ARIT_SUMA_O_RESTA", yytext()); }
+    {OpAritProdYDiv}    { return token("OP_ARIT_PROD_O_DIV", yytext()); }
+
+    {OpComparacion}     { return token("OP_COMPARACION", yytext()); }
+    "and"               { return token("OP_LOG_BIN_AND", yytext()); }
+    "or"                { return token("OP_LOG_BIN_OR", yytext()); }
+    "not"               { return token("OP_LOG_UNA_NOT", yytext()); }
+ 
+    "("                 { return token("PAR_ABRE", yytext()); }
+    ")"                 { return token("PAR_CIERRA", yytext()); }
+
+    ","                 { return token("PR_COMA", yytext()); }
+    ";"                 { return token("PUNTO_Y_COMA", yytext()); }
+    "="                 { return token("IGUAL", yytext()); }
+
+    {EspacioEnBlanco}   { /* ignorar */ }
     {Id}                { return token("IDENTIFICADOR", yytext()); }
     {Flotante}          { return token("FLOTANTE", yytext()); }
     {Entero}            { return token("ENTERO", yytext()); }
-
 }
 
 <COMENT_LLAVES> {
@@ -151,7 +169,7 @@ ComentarioUnaLinea  = #.*{FinDeLinea}
                         }
 
                         /* comentarios anidados */
-    "{"                 { comentariosAbiertos.push(TipoComentario.LLAVES); }    /* seguir en este estado */
+    "{"                 { comentariosAbiertos.push(TipoComentario.LLAVES); }    // seguir en este estado
     "(*"                { comentariosAbiertos.push(TipoComentario.PASCAL); yybegin(COMENT_PASCAL); }
 
     "*)"                { errorLexico("Se esperaba un cierre de comentario de llaves, no de tipo Pascal"); }
@@ -175,7 +193,7 @@ ComentarioUnaLinea  = #.*{FinDeLinea}
                         }
 
                         /* comentarios anidados */
-    "(*"                { comentariosAbiertos.push(TipoComentario.PASCAL); }    /* seguir en este estado */
+    "(*"                { comentariosAbiertos.push(TipoComentario.PASCAL); }    // seguir en este estado
     "{"                 { comentariosAbiertos.push(TipoComentario.LLAVES); yybegin(COMENT_LLAVES); }
 
     "}"                 { errorLexico("Se esperaba un cierre de comentario de tipo Pascal, no de llaves"); }
@@ -183,15 +201,18 @@ ComentarioUnaLinea  = #.*{FinDeLinea}
     [^]                 { /* ignorar todo lo demás */ }
 }
 
-<STRING> {
-    \"                  {   /* fin del string */
+<CADENA> {
+    \"                  {   /* fin de la cadena */
                             yybegin(YYINITIAL);
-                            return token("STRING", string_yyline, string_yycolumn, stringBuffer.toString());
+                            return token("CADENA", cadena_yyline, cadena_yycolumn, stringBuffer.toString());
                         }
-    {FinDeLinea}        { stringBuffer.append('\n'); }
-    \\\"                { stringBuffer.append('"'); }           // comillas dobles escapadas (\")
-    /* FIXME \\                  { stringBuffer.append('\'); } */
-    [^]                 { stringBuffer.append( yytext() ); }
+    \\\"                { stringBuffer.append('"'); }   // comillas dobles escapadas (\")
+    \\t                 { stringBuffer.append('\t'); }
+    \\n                 { stringBuffer.append('\n'); }
+    \\r                 { stringBuffer.append('\r'); }
+    \\\\                { stringBuffer.append('\\'); }  // \\ --> \
+    /* permitir todo lo demás, excepto \ que no estén seguidas por lo definido arriba */
+    [^\\]               { stringBuffer.append( yytext() ); }
 }
 
 /* probarrrr:: 10variable
@@ -200,5 +221,5 @@ ComentarioUnaLinea  = #.*{FinDeLinea}
    tirar un error sintáctico creo...... tampoco es 10 * variable porque tiene que estar el "*" (y calculo que
    los espacios) "*/
 
-[^]                     { errorLexico("Entrada no permitida: '" + yytext() + "'"); }
+[^]                     { errorLexico("Entrada no permitida: (" + yytext() + ")"); }
 
