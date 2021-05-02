@@ -16,3 +16,5 @@ main is
             estoNoVaAFuncionar();
             funca = 5 == 1;;; { xD }
 end.
+
+(* (x and y) or not z *)
