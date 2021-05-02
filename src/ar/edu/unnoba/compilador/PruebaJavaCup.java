@@ -8,7 +8,7 @@ public class PruebaJavaCup {
 
     public static void main(String[] args) {
         try {   
-            String path = "ar/edu/unnoba/compilador/entrada.txt";
+            String path = "src/ar/edu/unnoba/compilador/entrada.txt";
             System.out.println("Análisis sintáctico iniciado:");
             MiLexico lexer = new MiLexico(new FileReader(path));
             MiParser parser = new MiParser(lexer);
