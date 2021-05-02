@@ -76,6 +76,9 @@ DigitoScript        = [\u2070\u00B9\u00B2\u00B3\u2074-\u2079\u2080-\u2089]
 LetraScript         = [\u2071\u207F\u2090-\u209C]
 Id                  = ([:letter:]|_|{LetraScript})[\w{LetraScript}{DigitoScript}]*\??
 
+/* FIXME: 10id no tendría que ser aceptado, ni 0.123.4.
+ * Podría solucionarse agregando \b a las regex, pero no funciona en JFlex :(
+ */
 Entero              = \d*
 Flotante            = \d*\.\d*
 
@@ -84,7 +87,6 @@ OpAritProdYDiv      = \*|\/
 OpComparacion       = ==|\!=|\>|\>=|\<|\<=
 TiposDeDato         = boolean|integer|float
 CtesBooleanas       = true|false
-
 
 FinDeLinea         = \r|\n|\r\n
 ComentarioUnaLinea = #.*{FinDeLinea}
@@ -214,12 +216,6 @@ ComentarioUnaLinea = #.*{FinDeLinea}
     /* permitir todo lo demás, excepto \ que no estén seguidas por lo definido arriba */
     [^\\]               { stringBuffer.append( yytext() ); }
 }
-
-/* probarrrr:: 10variable
-   Toma 10 como ENTERO y el resto como IDENTIFICADOR sin importar el orden de las reglas (así que está mal)
-   Está bien que no lo tome como IDENTIFICADOR porque tiene que comenzar con una letra o _, pero tendría que
-   tirar un error sintáctico creo...... tampoco es 10 * variable porque tiene que estar el "*" (y calculo que
-   los espacios) "*/
 
 [^]                     { errorLexico("Entrada no permitida: (" + yytext() + ")"); }
 

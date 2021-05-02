@@ -11,14 +11,14 @@ class MiParser;
 
 parser code
 {:
-    public void syntax_error(Symbol s){
-        System.out.println("Error en la linea "+ (s.left+1)+ " Columna "+ s.right+ ". Simbolo '"
-        +s.value+"' . Simbolo n° "+s.sym+ " no reconocido." );
+    public void syntax_error(Symbol s) {
+        System.out.println("Error en la línea "+ (s.left+1)+ " Columna "+ s.right+ ". Símbolo '"
+        +s.value+"'. Símbolo n° "+s.sym+ " no reconocido." );
     }
 
-    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{
-        System.out.println("Error en la linea "+ (s.left+1)+ " Columna "+ s.right+ ". Simbolo '"
-        +s.value+"' . Simbolo n° "+s.sym+ " no reconocido." );
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception {
+        System.out.println("Error en la línea "+ (s.left+1)+ " Columna "+ s.right+ ". Símbolo '"
+        +s.value+"'. Símbolo n° "+s.sym+ " no reconocido." );
     }
 
 :};
