@@ -2,8 +2,8 @@
 # forma que está hecho ahora, el while, el if y funca = false son todas "sentencias",
 # y las sentencias estan diseñadas para llevar siempre punto y coma.)
 
-
-while getUno() == 1 do
+(*
+ while getUno() == 1 do
     if radio < 0 then
         X = 55.5;
         altura = 10 - 10 + 20;
@@ -12,3 +12,6 @@ while getUno() == 1 do
     else
         estoNoVaAFuncionar();
         funca = false;;;
+*)
+
+(x and y) or not z

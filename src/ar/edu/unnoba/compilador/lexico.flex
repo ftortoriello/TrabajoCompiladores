@@ -79,7 +79,7 @@ Id                  = ([:letter:]|_|{LetraScript})[\w{LetraScript}{DigitoScript}
 /* FIXME: 10id no tendría que ser aceptado, ni 0.123.4.
  * Podría solucionarse agregando \b a las regex, pero no funciona en JFlex :(
  */
-Entero              = \d*
+Entero              = \d\d*     // Le agregué un \d porque sino aceptaba cadena nula
 Flotante            = \d*\.\d*
 
 OpAritSumaYResta    = \+|-

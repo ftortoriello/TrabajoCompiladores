@@ -38,9 +38,9 @@ nonterminal String programa, cuerpo,
     lst_decs_vars_y_funcs, dec_var, dec_fun, lst_args, arg,
     estructura_condicional_if, estructura_condicional_if_else, estructura_condicional_when,
     estructura_iterativa_while, estructura_iterativa_for,
-    sentencia, asignacion, expresion, comparacion,
-    invocacion_funcion, lst_terminos, termino,
-    expresion_logica_or, expresion_logica_and,
+    sentencia, asignacion, operacion,
+    invocacion_funcion, lst_terminos, factor,
+    expresion_logica_or, expresion_logica_and, expresion_logica_not, expresion_logica_basica,
     op_aritmetica_suma_resta, op_aritmetica_producto_division,
     numero_constante;
 
@@ -55,7 +55,7 @@ precedence left OP_LOG_UNA_NOT;
 // FIXME: ver si se puede encontrar una regla no ambigua.
 // precedence nonassoc PR_ELSE;
 
-start with cuerpo;
+start with expresion_logica_or;
 
 // TODO: ver si se puede encontrar una forma coherente de numerar las reglas...
 // TODO: bloques begin/end
@@ -119,10 +119,10 @@ arg ::=
             RESULT = String.join(" ", id, is, td);
             System.out.println("REGLA 1.3.2.1: IDENTIFICADOR PR_IS TIPO_DE_DATO (" + RESULT + ") -> arg");
         :} |
-        IDENTIFICADOR:id PR_IS:is TIPO_DE_DATO:td IGUAL:igual expresion:exp {:
+        IDENTIFICADOR:id PR_IS:is TIPO_DE_DATO:td IGUAL:igual operacion:exp {:
             RESULT = String.join(" ", id, is, td, igual, exp);
             System.out.println("REGLA 1.3.2.2: IDENTIFICADOR PR_IS TIPO_DE_DATO " +
-            "IGUAL expresion (" + RESULT + ") -> arg");
+            "IGUAL operacion (" + RESULT + ") -> arg");
         :};
 
 cuerpo ::=
@@ -188,104 +188,121 @@ estructura_iterativa_while ::=
 estructura_iterativa_for ::=;
 
 asignacion ::=
-        IDENTIFICADOR:id IGUAL:igual expresion:expr {:
-            RESULT = String.join(" ", id, igual, expr);
-            System.out.println("REGLA 4: IDENTIFICADOR IGUAL expresion (" + RESULT + ") -> asignacion");
+        IDENTIFICADOR:id IGUAL:igual operacion:operacion {:
+            RESULT = String.join(" ", id, igual, operacion);
+            System.out.println("REGLA 4: IDENTIFICADOR IGUAL operacion (" + RESULT + ") -> asignacion");
         :} |
-        IDENTIFICADOR:id IGUAL:igual termino:t {:
-            RESULT = String.join(" ", id, igual, t);
-            System.out.println("REGLA 4: IDENTIFICADOR IGUAL termino (" + RESULT + ") -> asignacion");
+        IDENTIFICADOR:id IGUAL:igual factor:f {:
+            RESULT = String.join(" ", id, igual, f);
+            System.out.println("REGLA 4: IDENTIFICADOR IGUAL factor (" + RESULT + ") -> asignacion");
         :};
 
-expresion ::=
+operacion ::=
         expresion_logica_or:exp_or {:
             RESULT = exp_or;
-            System.out.println("REGLA 5.1: expresion_logica_or (" + RESULT + ") -> expresion");
+            System.out.println("REGLA 5.1: expresion_logica_or (" + RESULT + ") -> operacion");
         :} |
         op_aritmetica_suma_resta:op_arit {:
             RESULT = op_arit;
-            System.out.println("REGLA 5.2: op_aritmetica_suma_resta (" + RESULT + ") -> expresion");
+            System.out.println("REGLA 5.2: op_aritmetica_suma_resta (" + RESULT + ") -> operacion");
         :};
 
-// TODO: not
 expresion_logica_or ::=
-        expresion_logica_and:lst_exp_and OP_LOG_BIN_OR:op expresion_logica_or:expr_or {:
-            RESULT = String.join(" ", expr_or, op, lst_exp_and);
-            System.out.println("REGLA 6.1: lst_exp_and OP_LOG_BIN_OR expr_or (" + RESULT +") -> expresion_logica_or");
+        expresion_logica_or:resto OP_LOG_BIN_OR:op_or expresion_logica_and:expr_and{:
+            RESULT = String.join(" ", resto, op_or, expr_and);
+            System.out.println("REGLA 6.1: expresion_logica_or OP_LOG_BIN_OR expresion_logica_and (" + RESULT +") -> expresion_logica_or");
         :} |
-        expresion_logica_and:lst_exp_and {:
-            RESULT = lst_exp_and;
+        expresion_logica_and:expr {:
+            RESULT = expr;
             System.out.println("REGLA 6.2: expresion_logica_and (" + RESULT + ") -> expresion_logica_or");
         :} |;
 
 expresion_logica_and ::=
-        comparacion:cmp OP_LOG_BIN_AND:op expresion_logica_and:exp {:
-            RESULT = String.join(" ", cmp, op, exp);
-            System.out.println("REGLA 7.1: comparacion OP_LOG_BIN_AND expresion_logica_and (" + RESULT + ") -> expresion_logica_and");
+        expresion_logica_and:resto OP_LOG_BIN_AND:op_and expresion_logica_not:expr_not {:
+            RESULT = String.join(" ", resto, op_and, expr_not);
+            System.out.println("REGLA 7.1: expresion_logica_and OP_LOG_BIN_AND expresion_logica_not (" + RESULT + ") -> expresion_logica_and");
         :} |
-        comparacion:cmp {:
-            RESULT = cmp;
-            System.out.println("REGLA 7.2: comparacion (" + RESULT + ") -> expresion_logica_and");
+        expresion_logica_not:expr {:
+            RESULT = String.join(" ", expr);
+            System.out.println("REGLA 7.2: expresion_logica_not (" + RESULT + ") -> expresion_logica_and");
         :};
 
-comparacion ::=
-        termino:t1 OP_COMPARACION:op termino:t2 {:
-            RESULT = String.join(" ", t1, op, t2);
-            System.out.println("REGLA 8: termino OP_COMPARACION termino (" + RESULT + ") -> comparacion");
-    :};
+expresion_logica_not ::=
+        OP_LOG_UNA_NOT:op_not expresion_logica_basica:expr_basica {:
+            RESULT = String.join(" ", op_not, expr_basica);
+            System.out.println("REGLA 8.1: OP_LOG_UNA_NOT expresion_logica_basica (" + RESULT + ") -> expresion_logica_not");
+        :} |
+        expresion_logica_basica:expr_basica {:
+            RESULT = String.join(" ", expr_basica);
+            System.out.println("REGLA 8.1: expresion_logica_basica (" + RESULT + ") -> expresion_logica_not");
+        :};
+
+expresion_logica_basica ::=
+        factor:f1 OP_COMPARACION:op factor:f2 {:
+            RESULT = String.join(" ", f1, op, f2);
+            System.out.println("REGLA 9.1: factor OP_COMPARACION factor (" + RESULT + ") -> expresion_logica_basica");
+        :} |
+        factor:f1 {:
+            RESULT = f1;
+            System.out.println("REGLA 9.2: factor (" + RESULT + ") -> expresion_logica_basica");
+        :} |
+        PAR_ABRE:pa expresion_logica_or:expr_or PAR_CIERRA:pc {:
+            RESULT = String.join(" ", pa, expr_or, pc);
+            System.out.println("REGLA 9.3: PAR_ABRE expresion_logica_or PAR_CIERRA (" + RESULT + ") -> expresion_logica_basica");
+        :};
 
 // FIXME: modificar precedencia mediante paréntesis
 op_aritmetica_suma_resta ::=
-        termino:t1 OP_ARIT_SUMA_O_RESTA:tipo_op op_aritmetica_suma_resta:terminos_restantes {:
-            RESULT = String.join(" ", t1, tipo_op, terminos_restantes);
-            System.out.println("REGLA 9.1: termino " + tipo_op + " op_aritmetica_suma_resta (" + RESULT + ") -> op_aritmetica_suma_resta");
+        factor:f1 OP_ARIT_SUMA_O_RESTA:tipo_op op_aritmetica_suma_resta:terminos_restantes {:
+            RESULT = String.join(" ", f1, tipo_op, terminos_restantes);
+            System.out.println("REGLA 20.1: factor " + tipo_op + " op_aritmetica_suma_resta (" + RESULT + ") -> op_aritmetica_suma_resta");
         :} |
-        termino:t1 OP_ARIT_SUMA_O_RESTA:tipo_op termino:t2 {:
-            RESULT = String.join(" ", t1, tipo_op, t2);
-            System.out.println("REGLA 9.2: termino " + tipo_op + " termino (" + RESULT + ") -> op_aritmetica_suma_resta");
+        factor:f1 OP_ARIT_SUMA_O_RESTA:tipo_op factor:f2 {:
+            RESULT = String.join(" ", f1, tipo_op, f2);
+            System.out.println("REGLA 20.2: factor " + tipo_op + " factor (" + RESULT + ") -> op_aritmetica_suma_resta");
         :} |
         op_aritmetica_producto_division:terminos_restantes {:
             RESULT = terminos_restantes;
-            System.out.println("REGLA 9.3: op_aritmetica_producto_division (" + RESULT + ") -> op_aritmetica_suma_resta");
+            System.out.println("REGLA 20.3: op_aritmetica_producto_division (" + RESULT + ") -> op_aritmetica_suma_resta");
         :};
 
 op_aritmetica_producto_division ::=
-        termino:t1 OP_ARIT_PROD_O_DIV:tipo_op op_aritmetica_producto_division:terminos_restantes {:
-            RESULT = String.join(" ", t1, tipo_op, terminos_restantes);
-            System.out.println("REGLA 10.1: termino " + tipo_op + " op_aritmetica_producto_division (" + RESULT + ") -> op_aritmetica_producto_division");
+        factor:f1 OP_ARIT_PROD_O_DIV:tipo_op op_aritmetica_producto_division:terminos_restantes {:
+            RESULT = String.join(" ", f1, tipo_op, terminos_restantes);
+            System.out.println("REGLA 21.1: factor " + tipo_op + " op_aritmetica_producto_division (" + RESULT + ") -> op_aritmetica_producto_division");
         :} |
-        termino:t1 OP_ARIT_PROD_O_DIV:tipo_op termino:t2 {:
-            RESULT = String.join(" ", t1, tipo_op, t2);
-            System.out.println("REGLA 10.2: op_aritmetica_producto_division -> termino " + tipo_op + " termino (" + RESULT + ") -> op_aritmetica_producto_division");
+        factor:f1 OP_ARIT_PROD_O_DIV:tipo_op factor:f2 {:
+            RESULT = String.join(" ", f1, tipo_op, f2);
+            System.out.println("REGLA 21.2: op_aritmetica_producto_division -> factor " + tipo_op + " factor (" + RESULT + ") -> op_aritmetica_producto_division");
         :};
 
 // FIXME: también agregar strings
-termino ::=
+factor ::=
         numero_constante:num {:
             RESULT = num;
-            System.out.println("REGLA 11.1: numero_constante (" + RESULT + ") -> termino");
+            System.out.println("REGLA 11.1: numero_constante (" + RESULT + ") -> factor");
         :} |
         IDENTIFICADOR:id {:
             RESULT = id;
-            System.out.println("REGLA 11.2: IDENTIFICADOR (" + RESULT + ") -> termino");
+            System.out.println("REGLA 11.2: IDENTIFICADOR (" + RESULT + ") -> factor");
         :} |
         CTE_BOOLEANA:cte {:
             RESULT = cte;
-            System.out.println("REGLA 11.3: CTE_BOOLEANA (" + RESULT + ") -> termino");
+            System.out.println("REGLA 11.3: CTE_BOOLEANA (" + RESULT + ") -> factor");
         :} |
         invocacion_funcion:fun {:
             RESULT = fun;
-            System.out.println("REGLA 11.4: invocacion_funcion (" + RESULT + ") -> termino");
+            System.out.println("REGLA 11.4: invocacion_funcion (" + RESULT + ") -> factor");
         :};
 
-lst_terminos ::=
-        termino:t lst_terminos:lst_t {:
-            RESULT = String.join(" ", t, lst_t);
-            System.out.println("REGLA 12.1: termino lst_terminos (" + RESULT + ") -> lst_terminos");
+lst_args ::=
+        factor:f PR_COMA:pr_coma lst_args:lst {:
+            RESULT = String.join(" ", f, pr_coma, lst);
+            System.out.println("REGLA 12.1: factor lst (" + RESULT + ") -> lst_args");
         :} |
-        termino:t {:
-            RESULT = String.join(" ", t);
-            System.out.println("REGLA 12.2: termino (" + RESULT + ") -> lst_terminos");
+        factor:f {:
+            RESULT = String.join(" ", f);
+            System.out.println("REGLA 12.2: factor (" + RESULT + ") -> lst_args");
         :};
 
 numero_constante ::=
@@ -303,7 +320,7 @@ invocacion_funcion ::=
             RESULT = String.join(" ", id, pa, pc);
             System.out.println("REGLA 13.1: IDENTIFICADOR PAR_ABRE PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
         :} |
-        IDENTIFICADOR:id PAR_ABRE:pa lst_terminos:lst_ts PAR_CIERRA:pc {:
-            RESULT = String.join(" ", id, pa, lst_ts, pc);
+        IDENTIFICADOR:id PAR_ABRE:pa lst_args:lst_args PAR_CIERRA:pc {:
+            RESULT = String.join(" ", id, pa, lst_args, pc);
             System.out.println("REGLA 13.2: IDENTIFICADOR PAR_ABRE lst_terminos PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
         :};
