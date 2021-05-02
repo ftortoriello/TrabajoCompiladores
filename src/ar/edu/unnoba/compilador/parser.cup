@@ -26,16 +26,20 @@ parser code
 terminal String IDENTIFICADOR,
     OP_ARIT_SUMA_O_RESTA, OP_ARIT_PROD_O_DIV, OP_COMPARACION,
     OP_LOG_BIN_OR, OP_LOG_BIN_AND, OP_LOG_UNA_NOT,
-    PAR_ABRE, PAR_CIERRA, PR_IF, PR_THEN, PR_ELSE, PUNTO_Y_COMA, IGUAL,
+    PAR_ABRE, PAR_CIERRA, PUNTO_Y_COMA, IGUAL,
+    PR_IF, PR_THEN, PR_ELSE, PR_WHILE, PR_DO,
+    PR_FOR, PR_FROM, PR_TO, PR_BY, PR_WHEN,
     PR_MAIN_IS, PR_END_PUNTO, PR_VARIABLE, PR_IS,
     PR_FUNCTION, PR_RETURN, PR_COMA,
-    PR_BEGIN, PR_END,
+    PR_BEGIN, PR_END, PR_CONTINUE, PR_BREAK,
     TIPO_DE_DATO, CTE_BOOLEANA, ENTERO, FLOTANTE;
 
 nonterminal String programa, cuerpo,
     lst_decs_vars_y_funcs, dec_var, dec_fun, lst_args, arg,
-    estructura_condicional_if,
-    lst_sentencia, sentencia, asignacion, expresion, comparacion, termino,
+    estructura_condicional_if, estructura_condicional_if_else, estructura_condicional_when,
+    estructura_iterativa_while, estructura_iterativa_for,
+    sentencia, asignacion, expresion, comparacion,
+    invocacion_funcion, lst_terminos, termino,
     expresion_logica_or, expresion_logica_and,
     op_aritmetica_suma_resta, op_aritmetica_producto_division,
     numero_constante;
@@ -49,17 +53,17 @@ precedence left OP_LOG_UNA_NOT;
 // Hay un conflicto de shift/reduce en el if porque es ambiguo.
 // Con esto hace el shift (busca leer lo máx. posible, o sea el else).
 // FIXME: ver si se puede encontrar una regla no ambigua.
-precedence nonassoc PR_ELSE;
+// precedence nonassoc PR_ELSE;
 
 start with cuerpo;
 
 // TODO: ver si se puede encontrar una forma coherente de numerar las reglas...
 // TODO: bloques begin/end
 programa ::=
-    lst_decs_vars_y_funcs:lst PR_MAIN_IS:is cuerpo:cuerpo PR_END_PUNTO:end {:
-        RESULT = String.join(" ", lst, is, cuerpo, end);
-        System.out.println("REGLA 0 -> lst_decs_vars_y_funcs PR_MAIN_IS cuerpo PR_END_PUNTO (" + RESULT + ") -> programa");
-    :};
+        lst_decs_vars_y_funcs:lst PR_MAIN_IS:is cuerpo:cuerpo PR_END_PUNTO:end {:
+            RESULT = String.join(" ", lst, is, cuerpo, end);
+            System.out.println("REGLA 0 -> lst_decs_vars_y_funcs PR_MAIN_IS cuerpo PR_END_PUNTO (" + RESULT + ") -> programa");
+        :};
 
 lst_decs_vars_y_funcs ::=
         dec_var:dec_var lst_decs_vars_y_funcs:lst {:
@@ -122,40 +126,72 @@ arg ::=
         :};
 
 cuerpo ::=
-        sentencia:st PUNTO_Y_COMA:pyc lst_sentencia:lst_st {:
-            RESULT = String.join(" ", st, pyc, lst_st);
-            System.out.println("REGLA 2.1: sentencia PUNTO_Y_COMA lst_sentencia (" + RESULT + ") -> cuerpo");
+        sentencia:st PUNTO_Y_COMA:pyc cuerpo:cuerpo {:
+            RESULT = String.join(" ", st, pyc, cuerpo);
+            System.out.println("REGLA 2.1: sentencia cuerpo (" + RESULT + ") -> cuerpo");
         :} |
         sentencia:st PUNTO_Y_COMA:pyc {:
             RESULT = String.join(" ", st, pyc);
-            System.out.println("REGLA 2.2: sentencia PUNTO_Y_COMA (" + RESULT + ") -> cuerpo");
+            System.out.println("REGLA 2.2: sentencia (" + RESULT + ") -> cuerpo");
         :};
 
-// TODO: agregar funciones, por ej. writeln("...")
 // TODO: agregar las estructuras de control e iteración que definamos
 sentencia ::=
         estructura_condicional_if:estruc_if {:
             RESULT = String.join(" ", estruc_if);
             System.out.println("REGLA 2.3.1: estructura_condicional_if (" + RESULT + ") -> sentencia");
         :} |
+        estructura_condicional_if_else:estruc_if_else {:
+            RESULT = String.join(" ", estruc_if_else);
+            System.out.println("REGLA 2.3.2: estructura_condicional_if_else (" + RESULT + ") -> sentencia");
+        :} |
         asignacion:asig {:
             RESULT = String.join(" ", asig);
-            System.out.println("REGLA 2.3.2: asignacion (" + RESULT + ") -> sentencia");
+            System.out.println("REGLA 2.3.3: asignacion (" + RESULT + ") -> sentencia");
+        :} |
+        invocacion_funcion:invo_fun {:
+            RESULT = String.join(" ", invo_fun);
+            System.out.println("REGLA 2.3.4: invocacion_funcion(" + RESULT + ") -> sentencia");
+        :} |
+        estructura_iterativa_while:estruc_while {:
+            RESULT = String.join(" ", estruc_while);
+            System.out.println("REGLA 2.3.5: estructura_iterativa_while (" + RESULT + ") -> sentencia");
         :};
 
 estructura_condicional_if ::=
-        PR_IF:pr_if expresion_logica_or:or PR_THEN:pr_then sentencia:st {:
-            RESULT = String.join(" ", pr_if, or, pr_then, st);
-            System.out.println("REGLA 3.1: PR_IF expresion_logica_or PR_THEN sentencia ("
-            + RESULT + ") -> estructura_condicional_if");
-        :} |
-        PR_IF:pr_if expresion_logica_or:or PR_THEN:pr_then sentencia:st1 PR_ELSE:pr_else sentencia:st2  {:
-            RESULT = String.join(" ", pr_if, or, pr_then, st1, pr_else, st2);
-            System.out.println("REGLA 3.2: PR_IF expresion_logica_or PR_THEN sentencia PR_ELSE sentencia ("
+        PR_IF:pr_if expresion_logica_or:or PR_THEN:pr_then cuerpo:cuerpo PUNTO_Y_COMA:pyc {:
+            RESULT = String.join(" ", pr_if, or, pr_then, cuerpo, pyc);
+            System.out.println("REGLA 3.1: PR_IF expresion_logica_or PR_THEN cuerpo PUNTO_Y_COMA ("
             + RESULT + ") -> estructura_condicional_if");
         :};
 
+estructura_condicional_if_else ::=
+        PR_IF:pr_if expresion_logica_or:or PR_THEN:pr_then cuerpo:cuerpo1 PR_ELSE:pr_else cuerpo:cuerpo2 {:
+            RESULT = String.join(" ", pr_if, or, pr_then, cuerpo1, pr_else, cuerpo2);
+            System.out.println("REGLA 3.2: PR_IF expresion_logica_or PR_THEN cuerpo PR_ELSE cuerpo ("
+            + RESULT + ") -> estructura_condicional_if_else");
+        :};
+
+// 14
+estructura_condicional_when ::=;
+
+// 15
+// while <condición> do <sentencia>;
+estructura_iterativa_while ::=
+        PR_WHILE:pr_while expresion_logica_or:exp_or PR_DO:pr_do cuerpo:cuerpo {:
+            RESULT = String.join(" ", pr_while, exp_or, pr_do, cuerpo);
+            System.out.println("REGLA 15.1: PR_WHILE expresion_logica_or PR_DO sentencia (" + RESULT + ")"
+            + " -> estructura_iterativa_while");
+        :};
+
+// 16
+estructura_iterativa_for ::=;
+
 asignacion ::=
+        IDENTIFICADOR:id IGUAL:igual expresion:expr {:
+            RESULT = String.join(" ", id, igual, expr);
+            System.out.println("REGLA 4: IDENTIFICADOR IGUAL expresion (" + RESULT + ") -> asignacion");
+        :} |
         IDENTIFICADOR:id IGUAL:igual termino:t {:
             RESULT = String.join(" ", id, igual, t);
             System.out.println("REGLA 4: IDENTIFICADOR IGUAL termino (" + RESULT + ") -> asignacion");
@@ -223,7 +259,7 @@ op_aritmetica_producto_division ::=
             System.out.println("REGLA 10.2: op_aritmetica_producto_division -> termino " + tipo_op + " termino (" + RESULT + ") -> op_aritmetica_producto_division");
         :};
 
-// FIXME: el término tmb. puede ser una función que devuelvan un valor
+// FIXME: también agregar strings
 termino ::=
         numero_constante:num {:
             RESULT = num;
@@ -236,6 +272,20 @@ termino ::=
         CTE_BOOLEANA:cte {:
             RESULT = cte;
             System.out.println("REGLA 11.3: CTE_BOOLEANA (" + RESULT + ") -> termino");
+        :} |
+        invocacion_funcion:fun {:
+            RESULT = fun;
+            System.out.println("REGLA 11.4: invocacion_funcion (" + RESULT + ") -> termino");
+        :};
+
+lst_terminos ::=
+        termino:t lst_terminos:lst_t {:
+            RESULT = String.join(" ", t, lst_t);
+            System.out.println("REGLA 12.1: termino lst_terminos (" + RESULT + ") -> lst_terminos");
+        :} |
+        termino:t {:
+            RESULT = String.join(" ", t);
+            System.out.println("REGLA 12.2: termino (" + RESULT + ") -> lst_terminos");
         :};
 
 numero_constante ::=
@@ -246,4 +296,14 @@ numero_constante ::=
         FLOTANTE:num {:
             RESULT = num;
             System.out.println("REGLA 11.1.2: FLOTANTE (" + RESULT + ") -> numero_constante");
+        :};
+
+invocacion_funcion ::=
+        IDENTIFICADOR:id PAR_ABRE:pa PAR_CIERRA:pc {:
+            RESULT = String.join(" ", id, pa, pc);
+            System.out.println("REGLA 13.1: IDENTIFICADOR PAR_ABRE PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
+        :} |
+        IDENTIFICADOR:id PAR_ABRE:pa lst_terminos:lst_ts PAR_CIERRA:pc {:
+            RESULT = String.join(" ", id, pa, lst_ts, pc);
+            System.out.println("REGLA 13.2: IDENTIFICADOR PAR_ABRE lst_terminos PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
         :};
