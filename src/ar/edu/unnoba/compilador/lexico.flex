@@ -43,19 +43,16 @@ import java_cup.sym;
     int string_yyline = 0;
     int string_yycolumn = 0;
 
-    StringBuffer string = new StringBuffer();
+    StringBuffer stringBuffer = new StringBuffer();
 
     enum TipoComentario { LLAVES, PASCAL }
     Stack<TipoComentario> comentariosAbiertos = new Stack<TipoComentario>();
 
     public List<MiToken> tablaDeSimbolos = new ArrayList<>();
 
-    /* sirven para algo los tokens con valor null??? */
-    /*
     private MiToken token(String nombre) {
         return new MiToken(nombre, this.yyline, this.yycolumn);
     }
-    */
 
     private MiToken token(String nombre, Object valor) {
         return new MiToken(nombre, this.yyline, this.yycolumn, valor);
@@ -74,16 +71,13 @@ import java_cup.sym;
 FinDeLinea      = \r|\n|\r\n
 EspacioEnBlanco = \s
 
-DigitoSinCero   =  [1-9]
-Digito          =  \d /*[0-9]*/
 /* Los Identificadores tendrían que soportar números y letras como superscript o subscript... Ej: x²
  * https://en.wikipedia.org/wiki/Unicode_subscripts_and_superscripts#Superscripts_and_subscripts_block */
 DigitoScript    = [\u2070\u00B9\u00B2\u00B3\u2074-\u2079\u2080-\u2089]
 LetraScript     = [\u2071\u207F\u2090-\u209C]
 Id              = ([:letter:]|_|{LetraScript})[\w{LetraScript}{DigitoScript}]*\??
-Entero          = 0|{DigitoSinCero}{Digito}*  /* FIXME: pasa similar a 10variable, toma 001 como 0 y 01... */
-Flotante        = ({Entero}\.{Digito}*|\.{Digito}*)
-
+Entero          = \d*
+Flotante        = \d*\.\d*
 
 OpAritSumaYResta    = \+|-
 OpAritProdYDiv      = \*|\/
@@ -91,17 +85,17 @@ OpComparacion       = ==|\!=|\>|\>=|\<|\<=
 TiposDeDato         = boolean|integer|float
 CtesBooleanas       = true|false
 
-// TODO: cadenas de caracteres
 // TODO: palabras reservadas para when, while, for y otros
 
-ComentarioUnaLinea  = #.*{FinDeLinea}            // TODO: Bloques de comentarios
+ComentarioUnaLinea  = #.*{FinDeLinea}
 
 %state COMENT_LLAVES COMENT_PASCAL STRING
 
 %%
 
 <YYINITIAL> {
-    \"                  { string.setLength(0); yybegin(STRING);
+    \"                  { stringBuffer.setLength(0); yybegin(STRING);
+                          /* guardar posición inicial para dejarla bien en el lexema */
                           string_yyline = this.yyline; string_yycolumn = this.yycolumn; }
     "main is"           { return token("PR_MAIN_IS", yytext()); }
     "end."              { return token("PR_END_PUNTO", yytext()); }
@@ -192,11 +186,12 @@ ComentarioUnaLinea  = #.*{FinDeLinea}            // TODO: Bloques de comentarios
 <STRING> {
     \"                  {   /* fin del string */
                             yybegin(YYINITIAL);
-                            return token("STRING", string_yyline, string_yycolumn, string.toString());
+                            return token("STRING", string_yyline, string_yycolumn, stringBuffer.toString());
                         }
-    {FinDeLinea}        { string.append('\n'); }
-    [^]                 { string.append( yytext() ); }
-    /* TODO ver si hace falta \t, \n, etc */
+    {FinDeLinea}        { stringBuffer.append('\n'); }
+    \\\"                { stringBuffer.append('"'); }           // comillas dobles escapadas (\")
+    /* FIXME \\                  { stringBuffer.append('\'); } */
+    [^]                 { stringBuffer.append( yytext() ); }
 }
 
 /* probarrrr:: 10variable
