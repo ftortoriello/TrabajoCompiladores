@@ -310,6 +310,11 @@ factor ::=
             RESULT = fun;
             System.out.println("REGLA 11.5: invocacion_funcion (" + RESULT + ") -> factor");
         :};
+        // TODO parentesis
+        //PAR_ABRE:pa operacion:op PAR_CIERRA:pc {:
+        //    RESULT = String.join(" ", pa, op, pc);
+        //    System.out.println("REGLA 11.6: PA_ABRE operacion PA_CIERRA (" + RESULT + ") -> factor");
+        //:};
 
 lst_args ::=
         factor:f PR_COMA:pr_coma lst_args:lst {:

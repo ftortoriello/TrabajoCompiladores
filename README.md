@@ -37,10 +37,10 @@ Completos los dos.
   * Revisar la precedencia y asociatividad en operadores aritméticos, comparadores y lógicos.
 * Expresiones: Completo?
 * Definición de variables: Las globales están, falta agregar las locales una vez que estén los bloques begin/end.
-* Asignaciones: Está.
+* Asignaciones: Completo.
 * Funciones:
-  * Llamadas: ver lista de parámetros.
-  * read_...(), writeln/write(expresion o "cadena"): Limitar cantidad de parámetros.
+  * Llamadas: Completo.
+  * read_...(), writeln/write(expresion o "cadena"): Completo.
 * Declaración de funciones: Falta.
 * Estructura general del programa: (declaraciones, main is, cuerpo, end): Completo.
 
