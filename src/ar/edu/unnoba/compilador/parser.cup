@@ -40,7 +40,7 @@ nonterminal String programa, cuerpo,
     estructura_condicional_if, estructura_condicional_if_else, estructura_condicional_when,
     estructura_iterativa_while, estructura_iterativa_for,
     sentencia, asignacion, operacion,
-    invocacion_funcion, id_funcion, lst_terminos, factor,
+    invocacion_funcion, lst_terminos, factor,
     expresion_logica_or, expresion_logica_and, expresion_logica_not, expresion_logica_basica,
     op_aritmetica_suma_resta, op_aritmetica_producto_division,
     numero_constante;
@@ -72,7 +72,7 @@ programa ::=
         :} |
         lst_decs_vars_y_funcs:lst PR_MAIN_IS:is PR_END_PUNTO:end {:
             // programa con declaraciones pero sin cuerpo principal
-            RESULT = String.join(" ", is, end);
+            RESULT = String.join(" ", lst, is, end);
             System.out.println("REGLA 0.3 -> lst_decs_vars_y_funcs PR_MAIN_IS PR_END_PUNTO (" + RESULT + ") -> programa");
         :} |
         PR_MAIN_IS:is PR_END_PUNTO:end {:
@@ -207,10 +207,6 @@ asignacion ::=
         IDENTIFICADOR:id IGUAL:igual operacion:operacion {:
             RESULT = String.join(" ", id, igual, operacion);
             System.out.println("REGLA 4: IDENTIFICADOR IGUAL operacion (" + RESULT + ") -> asignacion");
-        :} |
-        IDENTIFICADOR:id IGUAL:igual factor:f {:
-            RESULT = String.join(" ", id, igual, f);
-            System.out.println("REGLA 4: IDENTIFICADOR IGUAL factor (" + RESULT + ") -> asignacion");
         :};
 
 operacion ::=
@@ -224,14 +220,14 @@ operacion ::=
         :};
 
 expresion_logica_or ::=
-        expresion_logica_or:resto OP_LOG_BIN_OR:op_or expresion_logica_and:expr_and{:
+        expresion_logica_or:resto OP_LOG_BIN_OR:op_or expresion_logica_and:expr_and {:
             RESULT = String.join(" ", resto, op_or, expr_and);
             System.out.println("REGLA 6.1: expresion_logica_or OP_LOG_BIN_OR expresion_logica_and (" + RESULT +") -> expresion_logica_or");
         :} |
         expresion_logica_and:expr {:
             RESULT = expr;
             System.out.println("REGLA 6.2: expresion_logica_and (" + RESULT + ") -> expresion_logica_or");
-        :} |;
+        :};
 
 expresion_logica_and ::=
         expresion_logica_and:resto OP_LOG_BIN_AND:op_and expresion_logica_not:expr_not {:
@@ -306,9 +302,9 @@ factor ::=
             RESULT = cte;
             System.out.println("REGLA 11.3: CTE_BOOLEANA (" + RESULT + ") -> factor");
         :} |
-        CADENA:s {:
-            RESULT = s;
-            System.out.println("REGLA 11.4: CADENA (" + RESULT + ") -> termino");
+        CADENA:c {:
+            RESULT = c;
+            System.out.println("REGLA 11.4: CADENA (" + RESULT + ") -> factor");
         :} |
         invocacion_funcion:fun {:
             RESULT = fun;
@@ -336,38 +332,31 @@ numero_constante ::=
         :};
 
 invocacion_funcion ::=
-        id_funcion:id PAR_ABRE:pa PAR_CIERRA:pc {:
+        PR_WRITELN:writeln PAR_ABRE:pa operacion:op PAR_CIERRA:pc {:
+            RESULT = String.join(" ", writeln, pa, op, pc);
+            System.out.println("REGLA 13.1: PR_WRITELN PAR_ABRE operacion PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
+        :} |
+        PR_WRITE:write PAR_ABRE:pa operacion:op PAR_CIERRA:pc {:
+            RESULT = String.join(" ", write, pa, op, pc);
+            System.out.println("REGLA 13.2: PR_WRITE PAR_ABRE operacion PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
+        :} |
+        PR_READ_INTEGER:read_integer PAR_ABRE:pa PAR_CIERRA:pc {:
+            RESULT = String.join(read_integer, pa, pc);
+            System.out.println("REGLA 13.3: PR_READ_INTEGER PAR_ABRE PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
+        :} |
+        PR_READ_FLOAT:read_float PAR_ABRE:pa PAR_CIERRA:pc {:
+            RESULT = String.join(read_float, pa, pc);
+            System.out.println("REGLA 13.4: PR_READ_FLOAT PAR_ABRE PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
+        :} |
+        PR_READ_BOOLEAN:read_boolean PAR_ABRE:pa PAR_CIERRA:pc {:
+            RESULT = String.join(read_boolean, pa, pc);
+            System.out.println("REGLA 13.5: PR_READ_BOOLEAN PAR_ABRE PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
+        :} |
+        IDENTIFICADOR:id PAR_ABRE:pa PAR_CIERRA:pc {:
             RESULT = String.join(" ", id, pa, pc);
-            System.out.println("REGLA 13.1: id_funcion PAR_ABRE PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
+            System.out.println("REGLA 13.6: IDENTIFICADOR PAR_ABRE PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
         :} |
-        id_funcion:id PAR_ABRE:pa lst_args:lst_args PAR_CIERRA:pc {:
+        IDENTIFICADOR:id PAR_ABRE:pa lst_args:lst_args PAR_CIERRA:pc {:
             RESULT = String.join(" ", id, pa, lst_args, pc);
-            System.out.println("REGLA 13.2: id_funcion PAR_ABRE lst_terminos PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
-        :};
-
-// TODO no se si esta bien poner identificador aca o conviene duplicar las reglas de invocacion_funcion...
-id_funcion ::=
-        PR_WRITELN:writeln {:
-            RESULT = writeln;
-            System.out.println("REGLA 17.1: PR_WRITELN (" + RESULT + ") -> id_funcion");
-        :} |
-        PR_WRITE:write {:
-            RESULT = write;
-            System.out.println("REGLA 17.2: PR_WRITE (" + RESULT + ") -> id_funcion");
-        :} |
-        PR_READ_INTEGER:read_integer {:
-            RESULT = read_integer;
-            System.out.println("REGLA 17.3: PR_READ_INTEGER (" + RESULT + ") -> id_funcion");
-        :} |
-        PR_READ_FLOAT:read_float {:
-            RESULT = read_float;
-            System.out.println("REGLA 17.4: PR_READ_FLOAT (" + RESULT + ") -> id_funcion");
-        :} |
-        PR_READ_BOOLEAN:read_boolean {:
-            RESULT = read_boolean;
-            System.out.println("REGLA 17.5: PR_READ_BOOLEAN (" + RESULT + ") -> id_funcion");
-        :} |
-        IDENTIFICADOR:id {:
-            RESULT = id;
-            System.out.println("REGLA 17.6: IDENTIFICADOR (" + RESULT + ") -> id_funcion");
+            System.out.println("REGLA 13.7: IDENTIFICADOR PAR_ABRE lst_terminos PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
         :};

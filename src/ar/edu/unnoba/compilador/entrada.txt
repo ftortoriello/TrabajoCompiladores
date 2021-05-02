@@ -5,6 +5,7 @@
 variable X is float;
 
 main is
+    X = read_float();
     writeln("HOLA CHEE!");
     while getUno() == 1 do
         if radio < 0 then
