@@ -35,7 +35,7 @@ Completos los dos.
   * Falta la resta unaria.
   * Agregar paréntesis.
   * Revisar la precedencia y asociatividad en operadores aritméticos, comparadores y lógicos.
-* Expresiones: Completo?
+* Expresiones: Completo.
 * Definición de variables: Las globales están, falta agregar las **locales** una vez que estén los bloques begin/end.
 * Asignaciones: Completo.
 * Funciones:
