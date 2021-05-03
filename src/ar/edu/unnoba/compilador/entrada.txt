@@ -4,11 +4,11 @@
 
 variable X is float;
 
-function doble(n is integer) return integer
-begin
-    variable resultado is integer = n * 2;
-    return resultado;
-end;
+function factorial(n is integer) return integer
+if n > 1 then
+return n * factorial(n + 1)
+else
+return 1;
 
 main is
     X = read_float();

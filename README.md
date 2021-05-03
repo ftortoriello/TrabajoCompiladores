@@ -41,7 +41,7 @@ Completos los dos.
 * Funciones:
   * Llamadas: Completo.
   * read_...(), writeln/write(expresion o "cadena"): Completo.
-* Declaración de funciones: **Falta**.
+* Declaración de funciones: Completo.
 * Estructura general del programa: (declaraciones, main is, cuerpo, end): Completo.
 
 Otros:
