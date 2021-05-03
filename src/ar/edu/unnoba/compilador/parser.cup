@@ -141,15 +141,24 @@ arg ::=
         :};
 
 cuerpo_fun ::=
-        PR_RETURN:ret operacion:op {:
-            RESULT = String.join(" ", ret, op);
-            System.out.println("REGLA 18.1: PR_RETURN operacion (" + RESULT + ") -> cuerpo_fun");
+        PR_RETURN:ret operacion:op PUNTO_Y_COMA:pyc {:
+            RESULT = String.join(" ", ret, op, pyc);
+            System.out.println("REGLA 18.1: PR_RETURN operacion PUNTO_Y_COMA (" + RESULT + ") -> cuerpo_fun");
         :} |
-        PR_BEGIN:begin lst_sentencias_fun:sentencias PR_END:end {:
-            RESULT = String.join(" ", begin, sentencias, end);
-            System.out.println("REGLA 18.2: PR_BEGIN lst_sentencias_fun PR_END (" + RESULT + ") -> cuerpo_fun");
+        // TODO Considerar sentencias que no sean return porque pueden ser por ejemplo un if con returns adentro...
+        // Si no tenemos que agregar cada estructura posible acá también
+        // TODO Peeero en los ifs y demás también hay que considerar los returns, ahhhhhhhg
+        // O permitir return en cualquier parte del código...
+        sentencia:sent PUNTO_Y_COMA:pyc {:
+            RESULT = String.join(" ", sent, pyc);
+            System.out.println("REGLA 18.2: sentencia PUNTO_Y_COMA (" + RESULT + ") -> lst_sentencias_fun");
+        :} |
+        PR_BEGIN:begin lst_sentencias_fun:sentencias PR_END:end PUNTO_Y_COMA:pyc {:
+            RESULT = String.join(" ", begin, sentencias, end, pyc);
+            System.out.println("REGLA 18.3: PR_BEGIN lst_sentencias_fun PR_END PUNTO_Y_COMA:pyc (" + RESULT + ") -> cuerpo_fun");
         :};
 
+// TODO no creo que haga falta acá ver que por lo menos haya un return...
 lst_sentencias_fun ::=
         sentencia:sent PUNTO_Y_COMA:pyc lst_sentencias_fun:sentencias {:
             RESULT = String.join(" ", sent, pyc, sentencias);

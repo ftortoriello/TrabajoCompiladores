@@ -4,10 +4,11 @@
 
 variable X is float;
 
-{
-function getAncho() return integer
-return 0;
-}
+function doble(n is integer) return integer
+begin
+    variable resultado is integer = n * 2;
+    return resultado;
+end;
 
 main is
     X = read_float();
