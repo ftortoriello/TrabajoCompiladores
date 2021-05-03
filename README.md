@@ -20,29 +20,32 @@ Completos los dos.
 ### Análisis sintáctico
 
 #### Una expresión de selección
-* if: Casi está (faltarían los bloques de sentencias y ver bien cuando van los punto y coma)
-* when: TODO
+* if: Casi está (faltaría terminar bien los **bloques de sentencias**)
+* when: **Falta**
 
 #### Una expresión de iteración
 * while: ídem if
-* for: TODO
+* for: **Falta**
 
 ### Otras consideraciones del lenguaje
 * Comentarios: Completos los tres tipos.
 * Identificadores: Completo.
 * Tipos de datos y constantes literales booleanas, numéricas y strings: Completo.
-* Operadores:
+* **Operadores**:
   * Falta la resta unaria.
   * Agregar paréntesis.
   * Revisar la precedencia y asociatividad en operadores aritméticos, comparadores y lógicos.
 * Expresiones: Completo?
-* Definición de variables: Las globales están, falta agregar las locales una vez que estén los bloques begin/end.
+* Definición de variables: Las globales están, falta agregar las **locales** una vez que estén los bloques begin/end.
 * Asignaciones: Completo.
 * Funciones:
   * Llamadas: Completo.
   * read_...(), writeln/write(expresion o "cadena"): Completo.
-* Declaración de funciones: Falta.
+* Declaración de funciones: **Falta**.
 * Estructura general del programa: (declaraciones, main is, cuerpo, end): Completo.
+
+Otros:
+* **Renumerar** reglas cuando terminemos.
 
 
 ## 2da Etapa: Analizador semántico con generación del AST

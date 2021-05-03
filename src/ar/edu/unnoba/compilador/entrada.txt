@@ -9,13 +9,12 @@ main is
     writeln("HOLA CHEE!");
     while getUno() == 1 do
         if radio < 0 then
+        begin
             X = .55;
             altura = 10 - 10 + 20 * 4 / 2;
             ancho = getAncho();
             imprimir(msj);
-        else
-            estoNoVaAFuncionar();
-            funca = 5 == 1;;; { xD }
+        end;;
 end.
 
 (* (x and y) or not z *)
