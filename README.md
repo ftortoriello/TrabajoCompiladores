@@ -36,7 +36,7 @@ Completos los dos.
   * Agregar paréntesis.
   * Revisar la precedencia y asociatividad en operadores aritméticos, comparadores y lógicos.
 * Expresiones: Completo.
-* Definición de variables: Las globales están, falta agregar las **locales** una vez que estén los bloques begin/end.
+* Definición de variables: Completo.
 * Asignaciones: Completo.
 * Funciones:
   * Llamadas: Completo.
