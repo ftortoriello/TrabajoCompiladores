@@ -35,7 +35,7 @@ terminal String PR_MAIN_IS, PR_END_PUNTO, PR_VARIABLE, PR_IS, PR_FUNCTION,
     IDENTIFICADOR, FLOTANTE, ENTERO,
     CADENA;
 
-nonterminal String programa, lst_sentencias, cuerpo,
+nonterminal String programa, lst_sentencias, lst_sentencias_fun, cuerpo, cuerpo_fun,
     lst_decs_vars_y_funcs, dec_var, dec_fun, lst_args, arg,
     estructura_condicional_if, estructura_condicional_if_else, estructura_condicional_when,
     estructura_iterativa_while, estructura_iterativa_for,
@@ -108,15 +108,15 @@ dec_var ::=
         :};
 
 dec_fun ::=
-        PR_FUNCTION:funcion IDENTIFICADOR:id PAR_ABRE:pa PAR_CIERRA:pc PR_RETURN:ret TIPO_DE_DATO:td {:
-            RESULT = String.join(" ", funcion, id, pa, pc, ret, td);
+        PR_FUNCTION:funcion IDENTIFICADOR:id PAR_ABRE:pa PAR_CIERRA:pc PR_RETURN:ret TIPO_DE_DATO:td cuerpo_fun:cuerpo {:
+            RESULT = String.join(" ", funcion, id, pa, pc, ret, td, cuerpo);
             System.out.println("REGLA 1.4.1: PR_FUNCTION IDENTIFICADOR PAR_ABRE PAR_CIERRA PR_RETURN " +
-                                "TIPO_DE_DATO (" + RESULT + ") -> dec_var");
+                                "TIPO_DE_DATO cuerpo_fun (" + RESULT + ") -> dec_fun");
         :} |
-        PR_FUNCTION:funcion IDENTIFICADOR:id PAR_ABRE:pa lst_args:args PAR_CIERRA:pc PR_RETURN:ret TIPO_DE_DATO:td {:
-            RESULT = String.join(" ", funcion, id, pa, args, pc, ret, td);
+        PR_FUNCTION:funcion IDENTIFICADOR:id PAR_ABRE:pa lst_args:args PAR_CIERRA:pc PR_RETURN:ret TIPO_DE_DATO:td cuerpo_fun:cuerpo {:
+            RESULT = String.join(" ", funcion, id, pa, args, pc, ret, td, cuerpo);
             System.out.println("REGLA 1.4.2: PR_FUNCTION IDENTIFICADOR PAR_ABRE lst_args PAR_CIERRA " +
-                                "PR_RETURN TIPO_DE_DATO (" + RESULT + ") -> dec_var");
+                                "PR_RETURN TIPO_DE_DATO cuerpo_fun (" + RESULT + ") -> dec_fun");
         :};
 
 lst_args ::=
@@ -140,25 +140,54 @@ arg ::=
             "IGUAL operacion (" + RESULT + ") -> arg");
         :};
 
-lst_sentencias ::=
-        sentencia:sent PUNTO_Y_COMA:pyc lst_sentencias:sentencias {:
+cuerpo_fun ::=
+        PR_RETURN:ret operacion:op {:
+            RESULT = String.join(" ", ret, op);
+            System.out.println("REGLA 18.1: PR_RETURN operacion (" + RESULT + ") -> cuerpo_fun");
+        :} |
+        PR_BEGIN:begin lst_sentencias_fun:sentencias PR_END:end {:
+            RESULT = String.join(" ", begin, sentencias, end);
+            System.out.println("REGLA 18.2: PR_BEGIN lst_sentencias_fun PR_END (" + RESULT + ") -> cuerpo_fun");
+        :};
+
+lst_sentencias_fun ::=
+        sentencia:sent PUNTO_Y_COMA:pyc lst_sentencias_fun:sentencias {:
             RESULT = String.join(" ", sent, pyc, sentencias);
-            System.out.println("REGLA 2.1: sentencia lst_sentencias (" + RESULT + ") -> lst_sentencias");
+            System.out.println("REGLA 19.1: sentencia PUNTO_Y_COMA lst_sentencias_fun (" + RESULT + ") -> lst_sentencias_fun");
         :} |
         sentencia:sent PUNTO_Y_COMA:pyc {:
             RESULT = String.join(" ", sent, pyc);
-            System.out.println("REGLA 2.2: sentencia (" + RESULT + ") -> lst_sentencias");
+            System.out.println("REGLA 19.2: sentencia PUNTO_Y_COMA (" + RESULT + ") -> lst_sentencias_fun");
+        :} |
+        PR_RETURN:ret operacion:op PUNTO_Y_COMA:pyc lst_sentencias_fun:sentencias {:
+            RESULT = String.join(" ", ret, pyc, sentencias);
+            System.out.println("REGLA 19.3: PR_RETURN operacion PUNTO_Y_COMA lst_sentencias_fun (" + RESULT + ") -> lst_sentencias_fun");
+        :} |
+        PR_RETURN:ret operacion:op PUNTO_Y_COMA:pyc {:
+            RESULT = String.join(" ", ret, op, pyc);
+            System.out.println("REGLA 19.4: PR_RETURN PUNTO_Y_COMA (" + RESULT + ") -> lst_sentencias_fun");
         :};
 
+lst_sentencias ::=
+        sentencia:sent PUNTO_Y_COMA:pyc lst_sentencias:sentencias {:
+            RESULT = String.join(" ", sent, pyc, sentencias);
+            System.out.println("REGLA 2.1: sentencia PUNTO_Y_COMA lst_sentencias (" + RESULT + ") -> lst_sentencias");
+        :} |
+        sentencia:sent PUNTO_Y_COMA:pyc {:
+            RESULT = String.join(" ", sent, pyc);
+            System.out.println("REGLA 2.2: sentencia PUNTO_Y_COMA (" + RESULT + ") -> lst_sentencias");
+        :};
+
+// sentencia simple o bloque begin/end para estructuras if, while, etc.
 cuerpo ::=
         // no ponemos punto y coma acá porque puede venir el "else" de un "if"
         sentencia:sent {:
             RESULT = String.join(" ", sent);
-            System.out.println("REGLA 14.1: sentencia (" + RESULT + ") -> cuerpo");
+            System.out.println("REGLA 17.1: sentencia (" + RESULT + ") -> cuerpo");
         :} |
         PR_BEGIN:begin lst_sentencias:sentencias PR_END:end {:
             RESULT = String.join(" ", begin, sentencias, end);
-            System.out.println("REGLA 14.2: PR_BEGIN lst_sentencias PR_END (" + RESULT + ") -> cuerpo");
+            System.out.println("REGLA 17.2: PR_BEGIN lst_sentencias PR_END (" + RESULT + ") -> cuerpo");
         :};
 
 // TODO: agregar las estructuras de control e iteración que definamos
@@ -182,6 +211,11 @@ sentencia ::=
         estructura_iterativa_while:estruc_while {:
             RESULT = estruc_while;
             System.out.println("REGLA 2.3.5: estructura_iterativa_while (" + RESULT + ") -> sentencia");
+        :} |
+        // "Las variables se pueden definir en cualquier punto del programa"
+        PR_VARIABLE:pr_var arg:arg {:
+            RESULT = String.join(" ", pr_var, arg);
+            System.out.println("REGLA 2.3.6: PR_VARIABLE arg (" + RESULT + ") -> sentencia");
         :};
 
 // TODO terminar de ver el tema de los dos puntos si hay una estructura dentro de otra

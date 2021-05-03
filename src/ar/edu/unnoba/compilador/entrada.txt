@@ -1,8 +1,13 @@
-# Este ejemplo anduvo pero hay que ponerle tres punto y coma al final (porque de la
-# forma que está hecho ahora, el while, el if y funca = false son todas "sentencias",
+# Este ejemplo anduvo, pero en ciertos casos hay que poner varios punto y coma al final
+# (porque de la forma que está hecho ahora, el while y el if son "sentencias",
 # y las sentencias estan diseñadas para llevar siempre punto y coma.)
 
 variable X is float;
+
+{
+function getAncho() return integer
+return 0;
+}
 
 main is
     X = read_float();
@@ -10,6 +15,7 @@ main is
     while getUno() == 1 do
         if radio < 0 then
         begin
+            variable ancho is integer;
             X = .55;
             altura = 10 - 10 + 20 * 4 / 2;
             ancho = getAncho();
