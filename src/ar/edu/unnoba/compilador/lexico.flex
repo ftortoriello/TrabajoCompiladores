@@ -78,7 +78,8 @@ Id                  = ([:letter:]|_|{LetraScript})[\w{LetraScript}{DigitoScript}
 Entero              = \d+
 Flotante            = \d*\.\d*
 
-OpAritSumaYResta    = \+|-
+OpAritSuma          = \+
+OpAritResta         = -
 OpAritProdYDiv      = \*|\/
 OpComparacion       = ==|\!=|\>|\>=|\<|\<=
 TiposDeDato         = boolean|integer|float // que raro que no vaya un tipo "string"...
@@ -130,7 +131,8 @@ ComentarioUnaLinea = #.*{FinDeLinea}
     {CtesBooleanas}     { return token("CTE_BOOLEANA", yytext()); }
   
     /* operadores */
-    {OpAritSumaYResta}  { return token("OP_ARIT_SUMA_O_RESTA", yytext()); }
+    {OpAritSuma}        { return token("OP_ARIT_SUMA", yytext()); }
+    {OpAritResta}       { return token("OP_ARIT_RESTA", yytext()); }
     {OpAritProdYDiv}    { return token("OP_ARIT_PROD_O_DIV", yytext()); }
 
     {OpComparacion}     { return token("OP_COMPARACION", yytext()); }

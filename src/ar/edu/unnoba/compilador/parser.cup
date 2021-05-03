@@ -28,7 +28,7 @@ terminal String PR_MAIN_IS, PR_END_PUNTO, PR_VARIABLE, PR_IS, PR_FUNCTION,
     PR_FOR, PR_FROM, PR_TO, PR_BY, PR_DO, PR_BREAK, PR_CONTINUE,
     PR_WRITELN, PR_WRITE, PR_READ_INTEGER, PR_READ_FLOAT, PR_READ_BOOLEAN,
     TIPO_DE_DATO, CTE_BOOLEANA,
-    OP_ARIT_SUMA_O_RESTA, OP_ARIT_PROD_O_DIV, OP_COMPARACION,
+    OP_ARIT_SUMA, OP_ARIT_RESTA, OP_ARIT_PROD_O_DIV, OP_COMPARACION,
     OP_LOG_BIN_OR, OP_LOG_BIN_AND, OP_LOG_UNA_NOT,
     PAR_ABRE, PAR_CIERRA,
     PR_COMA, PUNTO_Y_COMA, IGUAL,
@@ -42,22 +42,16 @@ nonterminal String programa, lst_sentencias, cuerpo,
     sentencia, asignacion, operacion,
     invocacion_funcion, lst_terminos, factor,
     expresion_logica_or, expresion_logica_and, expresion_logica_not, expresion_logica_basica,
-    op_aritmetica_suma_resta, op_aritmetica_producto_division,
+    op_aritmetica_suma_resta, op_aritmetica_producto_division, op_aritmetica_negacion,
     numero_constante;
 
 // Precedencia de operadores. Ni idea si está bien así, todavía no lo puedo probar
-// FIXME: operador unario "-", ¿cómo diferenciarlo de la resta?
-precedence left OP_LOG_BIN_OR, OP_ARIT_SUMA_O_RESTA;
+precedence left OP_LOG_BIN_OR, OP_ARIT_SUMA, OP_ARIT_RESTA;
 precedence left OP_LOG_BIN_AND, OP_ARIT_PROD_O_DIV;
 precedence left OP_LOG_UNA_NOT;
 
-// Hay un conflicto de shift/reduce en el if porque es ambiguo.
-// Con esto hace el shift (busca leer lo máx. posible, o sea el else).
-// FIXME: ver si se puede encontrar una regla no ambigua.
-// precedence nonassoc PR_ELSE;
-
-start with programa;
-//start with expresion_logica_or;
+//start with programa;
+start with op_aritmetica_suma_resta;
 
 // TODO: ver si se puede encontrar una forma coherente de numerar las reglas...
 programa ::=
@@ -287,27 +281,43 @@ expresion_logica_basica ::=
 // FIXME: modificar precedencia mediante paréntesis
 // FIXME: revisar precedencia, me parece que hace primero lo de la derecha? (ej: 10 - 5 + 20 = -15)
 op_aritmetica_suma_resta ::=
-        factor:f1 OP_ARIT_SUMA_O_RESTA:tipo_op op_aritmetica_suma_resta:terminos_restantes {:
-            RESULT = String.join(" ", f1, tipo_op, terminos_restantes);
-            System.out.println("REGLA 20.1: factor " + tipo_op + " op_aritmetica_suma_resta (" + RESULT + ") -> op_aritmetica_suma_resta");
+        op_aritmetica_suma_resta:terminos_restantes OP_ARIT_SUMA:op_suma factor:f1 {:
+            RESULT = String.join(" ", f1, op_suma, terminos_restantes);
+            System.out.println("REGLA 20.1: factor OP_ARIT_SUMA op_aritmetica_suma_resta (" + RESULT + ") -> op_aritmetica_suma_resta");
         :} |
-        factor:f1 OP_ARIT_SUMA_O_RESTA:tipo_op factor:f2 {:
-            RESULT = String.join(" ", f1, tipo_op, f2);
-            System.out.println("REGLA 20.2: factor " + tipo_op + " factor (" + RESULT + ") -> op_aritmetica_suma_resta");
+        op_aritmetica_suma_resta:terminos_restantes OP_ARIT_RESTA:op_resta factor:f1   {:
+            RESULT = String.join(" ", f1, op_resta, terminos_restantes);
+            System.out.println("REGLA 20.2: factor OP_ARIT_RESTA op_aritmetica_suma_resta (" + RESULT + ") -> op_aritmetica_suma_resta");
+        :} |
+        factor:f1 OP_ARIT_SUMA:op_suma factor:f2 {:
+            RESULT = String.join(" ", f1, op_suma, f2);
+            System.out.println("REGLA 20.3: factor OP_ARIT_SUMA factor (" + RESULT + ") -> op_aritmetica_suma_resta");
+        :} |
+        factor:f1 OP_ARIT_RESTA:op_resta factor:f2 {:
+            RESULT = String.join(" ", f1, op_resta, f2);
+            System.out.println("REGLA 20.4: factor OP_ARIT_RESTA factor (" + RESULT + ") -> op_aritmetica_suma_resta");
         :} |
         op_aritmetica_producto_division:terminos_restantes {:
             RESULT = terminos_restantes;
-            System.out.println("REGLA 20.3: op_aritmetica_producto_division (" + RESULT + ") -> op_aritmetica_suma_resta");
+            System.out.println("REGLA 20.5: op_aritmetica_producto_division (" + RESULT + ") -> op_aritmetica_suma_resta");
         :};
 
 op_aritmetica_producto_division ::=
-        factor:f1 OP_ARIT_PROD_O_DIV:tipo_op op_aritmetica_producto_division:terminos_restantes {:
-            RESULT = String.join(" ", f1, tipo_op, terminos_restantes);
-            System.out.println("REGLA 21.1: factor " + tipo_op + " op_aritmetica_producto_division (" + RESULT + ") -> op_aritmetica_producto_division");
+        op_aritmetica_producto_division:terminos_restantes OP_ARIT_PROD_O_DIV:tipo_op factor:f1   {:
+            RESULT = String.join(" ", terminos_restantes, tipo_op, f1);
+            System.out.println("REGLA 21.1: op_aritmetica_producto_division " + tipo_op + " factor (" + RESULT + ") -> op_aritmetica_producto_division");
         :} |
         factor:f1 OP_ARIT_PROD_O_DIV:tipo_op factor:f2 {:
             RESULT = String.join(" ", f1, tipo_op, f2);
             System.out.println("REGLA 21.2: op_aritmetica_producto_division -> factor " + tipo_op + " factor (" + RESULT + ") -> op_aritmetica_producto_division");
+        :} |
+        op_aritmetica_negacion:neg {:
+            RESULT = neg;
+            System.out.println("REGLA 21.3: op_aritmetica_negacion (" + RESULT + ") -> op_aritmetica_producto_division");
+        :} |
+        PAR_ABRE:pa op_aritmetica_suma_resta:suma PAR_CIERRA:pc {:
+            RESULT = String.join(" ", pa, suma, pc);
+            System.out.println("REGLA 21.4: PAR_ABRE expresion_logica_or PAR_CIERRA (" + RESULT + ") -> op_aritmetica_producto_division");
         :};
 
 factor ::=
@@ -330,12 +340,16 @@ factor ::=
         invocacion_funcion:fun {:
             RESULT = fun;
             System.out.println("REGLA 11.5: invocacion_funcion (" + RESULT + ") -> factor");
-        :};
+        :} |
         // TODO parentesis
         //PAR_ABRE:pa operacion:op PAR_CIERRA:pc {:
         //    RESULT = String.join(" ", pa, op, pc);
         //    System.out.println("REGLA 11.6: PA_ABRE operacion PA_CIERRA (" + RESULT + ") -> factor");
-        //:};
+        //:} |
+        OP_ARIT_RESTA:op_negacion numero_constante:num {:
+            RESULT = op_negacion + num;
+            System.out.println("REGLA 11.7: OP_ARIT_RESTA numero_constante (" + RESULT + ") -> factor");
+        :};
 
 lst_args ::=
         operacion:o PR_COMA:pr_coma lst_args:args {:

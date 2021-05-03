@@ -2,6 +2,7 @@
 # (porque de la forma que está hecho ahora, el while y el if son "sentencias",
 # y las sentencias estan diseñadas para llevar siempre punto y coma.)
 
+(*
 variable X is float;
 
 function factorial(n is integer) return integer
@@ -24,4 +25,8 @@ main is
         end;;
 end.
 
-(* (x and y) or not z *)
+(x and y) or not z
+
+*)
+
+-55.5 / ( 8 + 13)
