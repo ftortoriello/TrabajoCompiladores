@@ -20,11 +20,11 @@ Completos los dos.
 ### Análisis sintáctico
 
 #### Una expresión de selección
-* if: Casi está (faltaría terminar bien los **bloques de sentencias**)
-* when: **Falta**
+* if: Completo.
+* when: Completo.
 
 #### Una expresión de iteración
-* while: ídem if
+* while: Completo.
 * for: **Falta**
 
 ### Otras consideraciones del lenguaje

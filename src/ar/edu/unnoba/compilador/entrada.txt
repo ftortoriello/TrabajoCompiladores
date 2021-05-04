@@ -1,32 +1,25 @@
-# Este ejemplo anduvo, pero en ciertos casos hay que poner varios punto y coma al final
-# (porque de la forma que está hecho ahora, el while y el if son "sentencias",
-# y las sentencias estan diseñadas para llevar siempre punto y coma.)
-
-(*
-variable X is float;
-
-function factorial(n is integer) return integer
-if n > 1 then
-return n * factorial(n + 1)
-else
-return 1;
-
 main is
-    X = read_float();
-    writeln("HOLA CHEE!");
-    while getUno() == 1 do
-        if radio < 0 then
+    if x == 1 then
+        writeln("Uno")
+    else if x == 2 then
+        writeln("Dó")
+    else
+        writeln("Etcétera");
+    
+    when x
+        is == 1 then writeln("Uno")
+        is == 2 then writeln("Dó")
+        is >= 3 then writeln("Tré o má")
+        else
         begin
-            variable ancho is integer;
-            X = .55;
-            altura = 10 - 10 + 20 * 4 / 2;
-            ancho = getAncho();
-            imprimir(msj);
-        end;;
+            writeln("No se");
+            a = 3;
+        end;
+
+# (x and y) or not z
+
+# TODO revisar operadores, estos casos no funcan:
+#ancho = 10 + 20 * 4 / 2;
+#X = -55.5 / (8 + 13);
+
 end.
-
-(x and y) or not z
-
-*)
-
--55.5 / ( 8 + 13)

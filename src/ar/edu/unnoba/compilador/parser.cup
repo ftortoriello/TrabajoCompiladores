@@ -36,41 +36,46 @@ terminal String PR_MAIN_IS, PR_END_PUNTO, PR_VARIABLE, PR_IS, PR_FUNCTION,
     CADENA;
 
 nonterminal String programa, lst_sentencias, cuerpo,
-    lst_decs_vars_y_funcs, dec_var, dec_fun, lst_args, arg,
-    estructura_condicional_if, estructura_condicional_if_else, estructura_condicional_when,
-    estructura_iterativa_while, estructura_iterativa_for,
+    lst_decs_vars_y_funcs, dec_var, dec_fun, lst_args, arg, bloque_when_is,
     sentencia, asignacion, operacion,
     invocacion_funcion, lst_terminos, factor,
     expresion_logica_or, expresion_logica_and, expresion_logica_not, expresion_logica_basica,
     op_aritmetica_suma_resta, op_aritmetica_producto_division, op_aritmetica_negacion,
     numero_constante;
 
-// Precedencia de operadores. Ni idea si está bien así, todavía no lo puedo probar
+// TODO Precedencia de operadores. Ni idea si está bien así, todavía no lo puedo probar
 precedence left OP_LOG_BIN_OR, OP_ARIT_SUMA, OP_ARIT_RESTA;
 precedence left OP_LOG_BIN_AND, OP_ARIT_PROD_O_DIV;
 precedence left OP_LOG_UNA_NOT;
 
-//start with programa;
-start with op_aritmetica_suma_resta;
+// "Todo else se asociará implícitamente al último if"
+// TODO parece que no cambia nada si se pone left acá... Igual funciona como debería
+precedence right PR_ELSE;
+
+// TODO está bien?
+precedence left PR_IS;
+
+start with programa;
+//start with op_aritmetica_suma_resta;
 
 // TODO: ver si se puede encontrar una forma coherente de numerar las reglas...
 programa ::=
-        lst_decs_vars_y_funcs:decs PR_MAIN_IS:is lst_sentencias:sentencias PR_END_PUNTO:end {:
-            RESULT = String.join(" ", decs, is, sentencias, end);
+        lst_decs_vars_y_funcs:decs PR_MAIN_IS:pr_mainis lst_sentencias:sentencias PR_END_PUNTO:pr_end {:
+            RESULT = String.join(" ", decs, pr_mainis, sentencias, pr_end);
             System.out.println("REGLA 0.1 -> lst_decs_vars_y_funcs PR_MAIN_IS lst_sentencias PR_END_PUNTO (" + RESULT + ") -> programa");
         :} |
-        PR_MAIN_IS:is lst_sentencias:sentencias PR_END_PUNTO:end {:
-            RESULT = String.join(" ", is, sentencias, end);
+        PR_MAIN_IS:pr_mainis lst_sentencias:sentencias PR_END_PUNTO:pr_end {:
+            RESULT = String.join(" ", pr_mainis, sentencias, pr_end);
             System.out.println("REGLA 0.2 -> PR_MAIN_IS lst_sentencias PR_END_PUNTO (" + RESULT + ") -> programa");
         :} |
-        lst_decs_vars_y_funcs:decs PR_MAIN_IS:is PR_END_PUNTO:end {:
+        lst_decs_vars_y_funcs:decs PR_MAIN_IS:pr_mainis PR_END_PUNTO:pr_end {:
             // programa con declaraciones pero sin cuerpo principal
-            RESULT = String.join(" ", decs, is, end);
+            RESULT = String.join(" ", decs, pr_mainis, pr_end);
             System.out.println("REGLA 0.3 -> lst_decs_vars_y_funcs PR_MAIN_IS PR_END_PUNTO (" + RESULT + ") -> programa");
         :} |
-        PR_MAIN_IS:is PR_END_PUNTO:end {:
+        PR_MAIN_IS:pr_mainis PR_END_PUNTO:pr_end {:
             // programa "nulo"
-            RESULT = String.join(" ", is, end);
+            RESULT = String.join(" ", pr_mainis, pr_end);
             System.out.println("REGLA 0.4 -> PR_MAIN_IS PR_END_PUNTO (" + RESULT + ") -> programa");
         :};
 
@@ -110,7 +115,7 @@ dec_fun ::=
         PR_FUNCTION:funcion IDENTIFICADOR:id PAR_ABRE:pa lst_args:args PAR_CIERRA:pc PR_RETURN:ret TIPO_DE_DATO:td cuerpo:cuerpo PUNTO_Y_COMA:pyc {:
             RESULT = String.join(" ", funcion, id, pa, args, pc, ret, td, cuerpo, pyc);
             System.out.println("REGLA 1.4.2: PR_FUNCTION IDENTIFICADOR PAR_ABRE lst_args PAR_CIERRA " +
-                                "PR_RETURN TIPO_DE_DATO cuerpo  PUNTO_Y_COMA:pyc (" + RESULT + ") -> dec_fun");
+                                "PR_RETURN TIPO_DE_DATO cuerpo PUNTO_Y_COMA:pyc (" + RESULT + ") -> dec_fun");
         :};
 
 lst_args ::=
@@ -124,12 +129,12 @@ lst_args ::=
         :};
 
 arg ::=
-        IDENTIFICADOR:id PR_IS:is TIPO_DE_DATO:td  {:
-            RESULT = String.join(" ", id, is, td);
+        IDENTIFICADOR:id PR_IS:pr_is TIPO_DE_DATO:td  {:
+            RESULT = String.join(" ", id, pr_is, td);
             System.out.println("REGLA 1.3.2.1: IDENTIFICADOR PR_IS TIPO_DE_DATO (" + RESULT + ") -> arg");
         :} |
-        IDENTIFICADOR:id PR_IS:is TIPO_DE_DATO:td IGUAL:igual operacion:exp {:
-            RESULT = String.join(" ", id, is, td, igual, exp);
+        IDENTIFICADOR:id PR_IS:pr_is TIPO_DE_DATO:td IGUAL:igual operacion:exp {:
+            RESULT = String.join(" ", id, pr_is, td, igual, exp);
             System.out.println("REGLA 1.3.2.2: IDENTIFICADOR PR_IS TIPO_DE_DATO " +
             "IGUAL operacion (" + RESULT + ") -> arg");
         :};
@@ -144,15 +149,15 @@ lst_sentencias ::=
             System.out.println("REGLA 2.2: sentencia PUNTO_Y_COMA (" + RESULT + ") -> lst_sentencias");
         :};
 
-// sentencia simple o bloque begin/end para estructuras if, while, etc.
+// sentencia simple o bloque begin/end para estructuras de selección e iteración
 cuerpo ::=
         // no ponemos punto y coma acá porque puede venir el "else" de un "if"
         sentencia:sent {:
             RESULT = String.join(" ", sent);
             System.out.println("REGLA 17.1: sentencia (" + RESULT + ") -> cuerpo");
         :} |
-        PR_BEGIN:begin lst_sentencias:sentencias PR_END:end {:
-            RESULT = String.join(" ", begin, sentencias, end);
+        PR_BEGIN:begin lst_sentencias:sentencias PR_END:pr_end {:
+            RESULT = String.join(" ", begin, sentencias, pr_end);
             System.out.println("REGLA 17.2: PR_BEGIN lst_sentencias PR_END (" + RESULT + ") -> cuerpo");
         :};
 
@@ -171,52 +176,48 @@ sentencia ::=
             RESULT = String.join(" ", pr_var, arg);
             System.out.println("REGLA 2.3.3: PR_VARIABLE arg (" + RESULT + ") -> sentencia");
         :} |
-        estructura_condicional_if:estruc_if {:
-            RESULT = estruc_if;
-            System.out.println("REGLA 2.3.4: estructura_condicional_if (" + RESULT + ") -> sentencia");
+        PR_IF:pr_if expresion_logica_or:ex PR_THEN:pr_then cuerpo:cuerpo {:
+            RESULT = String.join(" ", pr_if, ex, pr_then, cuerpo);
+            System.out.println("REGLA 2.3.4: PR_IF expresion_logica_or PR_THEN cuerpo ("
+            + RESULT + ") -> sentencia");
         :} |
-        estructura_condicional_if_else:estruc_if_else {:
-            RESULT = estruc_if_else;
-            System.out.println("REGLA 2.3.5: estructura_condicional_if_else (" + RESULT + ") -> sentencia");
+        PR_IF:pr_if expresion_logica_or:ex PR_THEN:pr_then cuerpo:cuerpo1 PR_ELSE:pr_else cuerpo:cuerpo2 {:
+            RESULT = String.join(" ", pr_if, ex, pr_then, cuerpo1, pr_else, cuerpo2);
+            System.out.println("REGLA 2.3.5: PR_IF expresion_logica_or PR_THEN cuerpo PR_ELSE cuerpo ("
+            + RESULT + ") -> sentencia");
         :} |
-        estructura_iterativa_while:estruc_while {:
-            RESULT = estruc_while;
-            System.out.println("REGLA 2.3.6: estructura_iterativa_while (" + RESULT + ") -> sentencia");
+        PR_WHEN:when expresion_logica_or:or bloque_when_is:bloque_is {:
+            RESULT = String.join(" ", when, or, when, bloque_is);
+            System.out.println("REGLA 2.3.6: PR_WHEN expresion_logica_or bloque_when_is ("
+            + RESULT + ") -> sentencia");
         :} |
-        PR_RETURN:ret operacion:op {:
-            RESULT = String.join(" ", ret, op);
-            System.out.println("REGLA 2.3.7: PR_RETURN operacion (" + RESULT + ") -> sentencia");
-        :};
-
-// TODO terminar de ver el tema de los dos puntos si hay una estructura dentro de otra
-estructura_condicional_if ::=
-        PR_IF:pr_if expresion_logica_or:or PR_THEN:pr_then cuerpo:cuerpo PUNTO_Y_COMA:pyc {:
-            RESULT = String.join(" ", pr_if, or, pr_then, cuerpo, pyc);
-            System.out.println("REGLA 3.1: PR_IF expresion_logica_or PR_THEN cuerpo PUNTO_Y_COMA ("
-            + RESULT + ") -> estructura_condicional_if");
-        :};
-
-estructura_condicional_if_else ::=
-        PR_IF:pr_if expresion_logica_or:or PR_THEN:pr_then cuerpo:cuerpo1 PR_ELSE:pr_else cuerpo:cuerpo2 {:
-            RESULT = String.join(" ", pr_if, or, pr_then, cuerpo1, pr_else, cuerpo2);
-            System.out.println("REGLA 3.2: PR_IF expresion_logica_or PR_THEN cuerpo PR_ELSE cuerpo ("
-            + RESULT + ") -> estructura_condicional_if_else");
-        :};
-
-// 14
-estructura_condicional_when ::=;
-
-// 15
-// while <condición> do <sentencia>;
-estructura_iterativa_while ::=
+        PR_WHEN:when expresion_logica_or:or bloque_when_is:bloque_is PR_ELSE:pr_else cuerpo:cuerpo {:
+            RESULT = String.join(" ", when, or, when, bloque_is, pr_else, cuerpo);
+            System.out.println("REGLA 2.3.7: PR_WHEN expresion_logica_or bloque_when_is PR_ELSE cuerpo ("
+            + RESULT + ") -> sentencia");
+        :} |
         PR_WHILE:pr_while expresion_logica_or:exp_or PR_DO:pr_do cuerpo:cuerpo {:
             RESULT = String.join(" ", pr_while, exp_or, pr_do, cuerpo);
-            System.out.println("REGLA 15.1: PR_WHILE expresion_logica_or PR_DO sentencia (" + RESULT + ")"
-            + " -> estructura_iterativa_while");
+            System.out.println("REGLA 2.3.8: PR_WHILE expresion_logica_or PR_DO sentencia (" + RESULT + ")"
+            + " -> sentencia");
+        :} |
+        // TODO for
+        PR_RETURN:ret operacion:op {:
+            RESULT = String.join(" ", ret, op);
+            System.out.println("REGLA 2.3.9: PR_RETURN operacion (" + RESULT + ") -> sentencia");
         :};
 
-// 16
-estructura_iterativa_for ::=;
+bloque_when_is ::=
+        PR_IS:pr_is OP_COMPARACION:comp factor:f PR_THEN:pr_then cuerpo:cuerpo {:
+            RESULT = String.join(" ", pr_is, comp, f, pr_then, cuerpo);
+            System.out.println("REGLA 3.1: PR_IS OP_COMPARACION factor PR_THEN cuerpo ("
+            + RESULT + ") -> bloque_when_is");
+        :} |
+        PR_IS:pr_is OP_COMPARACION:comp factor:f PR_THEN:pr_then cuerpo:cuerpo bloque_when_is:bloque {:
+            RESULT = String.join(" ", pr_is, comp, f, pr_then, cuerpo, bloque);
+            System.out.println("REGLA 3.2: PR_IS OP_COMPARACION factor PR_THEN cuerpo bloque_when_is ("
+            + RESULT + ") -> bloque_when_is");
+        :};
 
 asignacion ::=
         IDENTIFICADOR:id IGUAL:igual operacion:operacion {:
