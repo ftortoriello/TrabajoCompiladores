@@ -2,26 +2,26 @@ package ar.edu.unnoba.compilador;
 
 import java.util.Arrays;
 
-class MiToken extends java_cup.runtime.Symbol{
+class MiToken extends java_cup.runtime.Symbol {
     
     public final String nombre;
     public final int linea;
     public final int columna;
     public final Object valor;
 
-    MiToken (String nombre) {
+    MiToken(String nombre) {
         this(nombre, null);
     }
 
-    MiToken (String nombre, Object valor) {
+    MiToken(String nombre, Object valor) {
         this(nombre, -1, -1, valor);
     }
 
-    MiToken (String nombre, int linea, int columna) {
+    MiToken(String nombre, int linea, int columna) {
         this(nombre, linea, columna, null);
     }
 
-    MiToken (String nombre, int linea, int columna, Object valor) {
+    MiToken(String nombre, int linea, int columna, Object valor) {
         super(Arrays.asList(MiParserSym.terminalNames).indexOf(nombre), linea, columna, valor);
         this.nombre = nombre;
         this.valor = valor;

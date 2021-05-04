@@ -42,7 +42,10 @@ Completos los dos.
 * Declaración de funciones: Completo.
 * Estructura general del programa: (declaraciones, main is, cuerpo, end): Completo.
 
-Otros:
+## Revisar
+### parser.cup
+* precedence right PR_ELSE;: parece que no cambia nada si se pone left acá... Igual funciona como debería
+* precedence left PR_IS;: está bien así?
 * **Renumerar** reglas cuando terminemos.
 
 

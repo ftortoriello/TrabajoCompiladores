@@ -1,15 +1,6 @@
 main is
-    for i from 1 to 10 by 2
-    do
-        write(i);
-        write(" ");
-    end;
-    writeln(" ");
-
-# (x and y) or not z
-
 # TODO revisar operadores, estos casos no funcan:
 #ancho = 10 + 20 * 4 / 2;
-#X = -55.5 / (8 + 13);
+X = -55.5 / (8 + 13);
 
 end.
