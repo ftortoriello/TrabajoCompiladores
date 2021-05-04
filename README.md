@@ -25,15 +25,13 @@ Completos los dos.
 
 #### Una expresión de iteración
 * while: Completo.
-* for: **Falta**
+* for: Completo.
 
 ### Otras consideraciones del lenguaje
 * Comentarios: Completos los tres tipos.
 * Identificadores: Completo.
 * Tipos de datos y constantes literales booleanas, numéricas y strings: Completo.
 * **Operadores**:
-  * Falta la resta unaria.
-  * Agregar paréntesis.
   * Revisar la precedencia y asociatividad en operadores aritméticos, comparadores y lógicos.
 * Expresiones: Completo.
 * Definición de variables: Completo.

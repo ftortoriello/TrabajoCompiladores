@@ -1,20 +1,10 @@
 main is
-    if x == 1 then
-        writeln("Uno")
-    else if x == 2 then
-        writeln("Dó")
-    else
-        writeln("Etcétera");
-    
-    when x
-        is == 1 then writeln("Uno")
-        is == 2 then writeln("Dó")
-        is >= 3 then writeln("Tré o má")
-        else
-        begin
-            writeln("No se");
-            a = 3;
-        end;
+    for i from 1 to 10 by 2
+    do
+        write(i);
+        write(" ");
+    end;
+    writeln(" ");
 
 # (x and y) or not z
 

@@ -176,35 +176,52 @@ sentencia ::=
             RESULT = String.join(" ", pr_var, arg);
             System.out.println("REGLA 2.3.3: PR_VARIABLE arg (" + RESULT + ") -> sentencia");
         :} |
-        PR_IF:pr_if expresion_logica_or:ex PR_THEN:pr_then cuerpo:cuerpo {:
-            RESULT = String.join(" ", pr_if, ex, pr_then, cuerpo);
+        PR_IF:pr_if expresion_logica_or:exp PR_THEN:pr_then cuerpo:cuerpo {:
+            RESULT = String.join(" ", pr_if, exp, pr_then, cuerpo);
             System.out.println("REGLA 2.3.4: PR_IF expresion_logica_or PR_THEN cuerpo ("
             + RESULT + ") -> sentencia");
         :} |
-        PR_IF:pr_if expresion_logica_or:ex PR_THEN:pr_then cuerpo:cuerpo1 PR_ELSE:pr_else cuerpo:cuerpo2 {:
-            RESULT = String.join(" ", pr_if, ex, pr_then, cuerpo1, pr_else, cuerpo2);
+        PR_IF:pr_if expresion_logica_or:exp PR_THEN:pr_then cuerpo:cuerpo1 PR_ELSE:pr_else cuerpo:cuerpo2 {:
+            RESULT = String.join(" ", pr_if, exp, pr_then, cuerpo1, pr_else, cuerpo2);
             System.out.println("REGLA 2.3.5: PR_IF expresion_logica_or PR_THEN cuerpo PR_ELSE cuerpo ("
             + RESULT + ") -> sentencia");
         :} |
-        PR_WHEN:when expresion_logica_or:or bloque_when_is:bloque_is {:
-            RESULT = String.join(" ", when, or, when, bloque_is);
+        PR_WHEN:when expresion_logica_or:exp bloque_when_is:bloque_is {:
+            RESULT = String.join(" ", when, exp, when, bloque_is);
             System.out.println("REGLA 2.3.6: PR_WHEN expresion_logica_or bloque_when_is ("
             + RESULT + ") -> sentencia");
         :} |
-        PR_WHEN:when expresion_logica_or:or bloque_when_is:bloque_is PR_ELSE:pr_else cuerpo:cuerpo {:
-            RESULT = String.join(" ", when, or, when, bloque_is, pr_else, cuerpo);
+        PR_WHEN:when expresion_logica_or:exp bloque_when_is:bloque_is PR_ELSE:pr_else cuerpo:cuerpo {:
+            RESULT = String.join(" ", when, exp, when, bloque_is, pr_else, cuerpo);
             System.out.println("REGLA 2.3.7: PR_WHEN expresion_logica_or bloque_when_is PR_ELSE cuerpo ("
             + RESULT + ") -> sentencia");
         :} |
-        PR_WHILE:pr_while expresion_logica_or:exp_or PR_DO:pr_do cuerpo:cuerpo {:
-            RESULT = String.join(" ", pr_while, exp_or, pr_do, cuerpo);
+        PR_WHILE:pr_while expresion_logica_or:exp PR_DO:pr_do cuerpo:cuerpo {:
+            RESULT = String.join(" ", pr_while, exp, pr_do, cuerpo);
             System.out.println("REGLA 2.3.8: PR_WHILE expresion_logica_or PR_DO sentencia (" + RESULT + ")"
             + " -> sentencia");
         :} |
-        // TODO for
+        PR_FOR:pr_for IDENTIFICADOR:id PR_FROM:pr_from ENTERO:num_ini PR_TO:pr_to ENTERO:num_fin PR_DO:pr_do cuerpo:cuerpo {:
+            RESULT = String.join(" ", pr_for, id, pr_from, num_ini, pr_to, num_fin, pr_do, cuerpo);
+            System.out.println("REGLA 2.3.9: PR_FOR IDENTIFICADOR PR_FROM ENTERO PR_TO ENTERO PR_DO cuerpo ("
+                + RESULT + ")" + " -> sentencia");
+        :} |
+        PR_FOR:pr_for IDENTIFICADOR:id PR_FROM:pr_from ENTERO:num_ini PR_TO:pr_to ENTERO:num_fin PR_BY:pr_by ENTERO:salto PR_DO:pr_do cuerpo:cuerpo {:
+            RESULT = String.join(" ", pr_for, id, pr_from, num_ini, pr_to, num_fin, pr_by, salto, pr_do, cuerpo);
+            System.out.println("REGLA 2.3.10: PR_FOR IDENTIFICADOR PR_FROM ENTERO PR_TO ENTERO PR_DO cuerpo ("
+                + RESULT + ")" + " -> sentencia");
+        :} |
         PR_RETURN:ret operacion:op {:
             RESULT = String.join(" ", ret, op);
-            System.out.println("REGLA 2.3.9: PR_RETURN operacion (" + RESULT + ") -> sentencia");
+            System.out.println("REGLA 2.3.11: PR_RETURN operacion (" + RESULT + ") -> sentencia");
+        :} |
+        PR_BREAK:pr_break {:
+            RESULT = pr_break;
+            System.out.println("REGLA 2.3.12: PR_BREAK (" + RESULT + ") -> sentencia");
+        :} |
+        PR_CONTINUE:pr_cont {:
+            RESULT = pr_cont;
+            System.out.println("REGLA 2.3.13: PR_CONTINUE (" + RESULT + ") -> sentencia");
         :};
 
 bloque_when_is ::=
