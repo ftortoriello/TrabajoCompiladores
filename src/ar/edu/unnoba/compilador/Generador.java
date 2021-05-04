@@ -23,7 +23,7 @@ public class Generador {
     public static void generarLexer(String path){
         File file = new File(path);
         
-        //UTILIZAR JFLEX 1.8, la próxima línea no funciona para las versiones previas
+        // La siguiente línea requiere como mínimo JFlex 1.8
         jflex.generator.LexGenerator generator = new jflex.generator.LexGenerator(file);
         generator.generate();
     }
