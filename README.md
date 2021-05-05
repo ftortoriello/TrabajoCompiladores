@@ -5,7 +5,7 @@ Trabajo para la asignatura "Compiladores" - UNNOBA - 2021
 
 ## 1ra Etapa: Analizador léxico y sintáctico
 
-Fecha de entrega: 04/05/2021 inclusive?
+Fecha de entrega: 04/05/2021 inclusive
 
 Requisitos obligatorios:
 
