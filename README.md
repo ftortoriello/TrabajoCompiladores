@@ -46,7 +46,6 @@ Completos los dos.
 ### parser.cup
 * precedence right PR_ELSE;: parece que no cambia nada si se pone left acá... Igual funciona como debería
 * precedence left PR_IS;: está bien así?
-* **Renumerar** reglas cuando terminemos.
 
 
 ## 2da Etapa: Analizador semántico con generación del AST

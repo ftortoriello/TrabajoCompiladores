@@ -1,8 +1,6 @@
-(* TODO revisar operadores, estos casos no funcan:
+(* TODO revisar operadores, estos casos no funcionan:
 ancho = 10 + 20 * 4 - 2;
-#X = (-55.5 / 5) * (3 + 4);
-#X = -funcion();
-#j = -X;
+X = (-55.5 / 5) * (3 + 4);
 *)
 
 (* Ejemplo de un programa completo dado en la consigna *)
