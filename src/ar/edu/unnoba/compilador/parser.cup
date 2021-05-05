@@ -41,7 +41,7 @@ nonterminal String programa, lst_sentencias, cuerpo,
     invocacion_funcion, factor,
     expresion_logica_or, expresion_logica_and, expresion_logica_not, expresion_logica_basica,
     op_aritmetica_suma_resta, op_aritmetica_producto_division,
-    numero;
+    numero, factor_producto;
 
 precedence left OP_LOG_BIN_OR, OP_ARIT_SUMA, OP_ARIT_RESTA;
 precedence left OP_LOG_BIN_AND, OP_ARIT_PROD_O_DIV;
@@ -268,11 +268,11 @@ expresion_logica_basica ::=
 
 op_aritmetica_suma_resta ::=
         op_aritmetica_suma_resta:terminos_restantes OP_ARIT_SUMA:op_suma op_aritmetica_producto_division:termino {:
-            RESULT = String.join(" ", terminos_restantes, op_suma, terminos);
+            RESULT = String.join(" ", terminos_restantes, op_suma, termino);
             System.out.println("REGLA 9.1: op_aritmetica_suma_resta OP_ARIT_SUMA op_aritmetica_producto_division (" + RESULT + ") -> op_aritmetica_suma_resta");
         :} |
         op_aritmetica_suma_resta:terminos_restantes OP_ARIT_RESTA:op_resta op_aritmetica_producto_division:termino   {:
-            RESULT = String.join(" ", terminos_restantes, op_resta, terminos);
+            RESULT = String.join(" ", terminos_restantes, op_resta, termino);
             System.out.println("REGLA 9.2: op_aritmetica_suma_resta OP_ARIT_RESTA op_aritmetica_producto_division (" + RESULT + ") -> op_aritmetica_suma_resta");
         :} |
         op_aritmetica_producto_division:terminos_restantes {:
@@ -285,7 +285,7 @@ op_aritmetica_producto_division ::=
             RESULT = String.join(" ", factores_restantes, op, f);
             System.out.println("REGLA 10.1: op_aritmetica_producto_division OP_ARIT_PROD_O_DIV factor (" + RESULT + ") -> op_aritmetica_producto_division");
         :} |
-        factor:f {:
+        factor_producto:f {:
             RESULT = f;
             System.out.println("REGLA 10.2: factor (" + RESULT + ") -> op_aritmetica_producto_division");
         :};
