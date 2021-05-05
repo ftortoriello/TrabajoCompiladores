@@ -41,7 +41,7 @@ nonterminal String programa, lst_sentencias, cuerpo,
     invocacion_funcion, factor,
     expresion_logica_or, expresion_logica_and, expresion_logica_not, expresion_logica_basica,
     op_aritmetica_suma_resta, op_aritmetica_producto_division, op_aritmetica_negacion,
-    numero_constante;
+    numero;
 
 precedence left OP_LOG_BIN_OR, OP_ARIT_SUMA, OP_ARIT_RESTA;
 precedence left OP_LOG_BIN_AND, OP_ARIT_PROD_O_DIV;
@@ -267,7 +267,7 @@ expresion_logica_basica ::=
         :};
 
 op_aritmetica_suma_resta ::=
-        op_aritmetica_suma_resta:terminos_restantes OP_ARIT_SUMA:op_suma factor:f1 {:
+        op_aritmetica_suma_resta:terminos_restantes OP_ARIT_SUMA:op_suma op_aritmetica_producto_division:f1 {:
             RESULT = String.join(" ", f1, op_suma, terminos_restantes);
             System.out.println("REGLA 9.1: factor OP_ARIT_SUMA op_aritmetica_suma_resta (" + RESULT + ") -> op_aritmetica_suma_resta");
         :} |
@@ -297,19 +297,20 @@ op_aritmetica_producto_division ::=
             RESULT = String.join(" ", f1, tipo_op, f2);
             System.out.println("REGLA 10.2: op_aritmetica_producto_division -> factor " + tipo_op + " factor (" + RESULT + ") -> op_aritmetica_producto_division");
         :} |
-        op_aritmetica_negacion:neg {:
+        numero:num {:
             RESULT = neg;
             System.out.println("REGLA 10.3: op_aritmetica_negacion (" + RESULT + ") -> op_aritmetica_producto_division");
         :};
 
 factor ::=
-        numero_constante:num {:
+        numero:num {:
             RESULT = num;
-            System.out.println("REGLA 11.1: numero_constante (" + RESULT + ") -> factor");
+            System.out.println("REGLA 11.1: numero (" + RESULT + ") -> factor");
         :} |
-        IDENTIFICADOR:id {:
-            RESULT = id;
-            System.out.println("REGLA 11.2: IDENTIFICADOR (" + RESULT + ") -> factor");
+        // resta unaria
+        OP_ARIT_RESTA:menos numero:num {:
+            RESULT = String.join(" ", menos, num);
+            System.out.println("REGLA 11.7: OP_ARIT_RESTA numero (" + RESULT + ") -> factor");
         :} |
         CTE_BOOLEANA:cte {:
             RESULT = cte;
@@ -319,36 +320,27 @@ factor ::=
             RESULT = c;
             System.out.println("REGLA 11.4: CADENA (" + RESULT + ") -> factor");
         :} |
-        invocacion_funcion:fun {:
-            RESULT = fun;
-            System.out.println("REGLA 11.5: invocacion_funcion (" + RESULT + ") -> factor");
-        :} |
         PAR_ABRE:pa operacion:op PAR_CIERRA:pc {:
             RESULT = String.join(" ", pa, op, pc);
             System.out.println("REGLA 11.6: PA_ABRE operacion PA_CIERRA (" + RESULT + ") -> factor");
-        :} |
-        // resta unaria
-        OP_ARIT_RESTA:menos numero_constante:num {:
-            RESULT = String.join(" ", menos, num);
-            System.out.println("REGLA 11.7: OP_ARIT_RESTA numero_constante (" + RESULT + ") -> factor");
-        :} |
-        OP_ARIT_RESTA:menos IDENTIFICADOR:id {:
-            RESULT = String.join(" ", menos, id);
-            System.out.println("REGLA 11.8: OP_ARIT_RESTA IDENTIFICADOR (" + RESULT + ") -> factor");
-        :} |
-        OP_ARIT_RESTA:menos invocacion_funcion:fun {:
-            RESULT = String.join(" ", menos, fun);
-            System.out.println("REGLA 11.9: OP_ARIT_RESTA invocacion_funcion (" + RESULT + ") -> factor");
         :};
 
-numero_constante ::=
+numero ::=
         ENTERO:num {:
             RESULT = num;
-            System.out.println("REGLA 11.1.1: ENTERO (" + RESULT + ") -> numero_constante");
+            System.out.println("REGLA 11.1.1: ENTERO (" + RESULT + ") -> numero");
         :} |
         FLOTANTE:num {:
             RESULT = num;
-            System.out.println("REGLA 11.1.2: FLOTANTE (" + RESULT + ") -> numero_constante");
+            System.out.println("REGLA 11.1.2: FLOTANTE (" + RESULT + ") -> numero");
+        :} |
+        IDENTIFICADOR:id {:
+            RESULT = id;
+            System.out.println("REGLA 11.2: IDENTIFICADOR (" + RESULT + ") -> factor");
+        :} |
+        invocacion_funcion:fun {:
+            RESULT = fun;
+            System.out.println("REGLA 11.5: invocacion_funcion (" + RESULT + ") -> factor");
         :};
 
 // sentencia simple o bloque begin/end para implementación de funciones y estructuras de selección e iteración
