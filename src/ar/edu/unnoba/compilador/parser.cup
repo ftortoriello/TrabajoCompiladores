@@ -267,40 +267,27 @@ expresion_logica_basica ::=
         :};
 
 op_aritmetica_suma_resta ::=
-        // TODO acomodar nombres y salidas
-        op_aritmetica_suma_resta:terminos_restantes OP_ARIT_SUMA:op_suma op_aritmetica_producto_division:f1 {:
-            RESULT = String.join(" ", f1, op_suma, terminos_restantes);
-            System.out.println("REGLA 9.1: factor OP_ARIT_SUMA op_aritmetica_suma_resta (" + RESULT + ") -> op_aritmetica_suma_resta");
+        op_aritmetica_suma_resta:terminos_restantes OP_ARIT_SUMA:op_suma op_aritmetica_producto_division:termino {:
+            RESULT = String.join(" ", terminos_restantes, op_suma, terminos);
+            System.out.println("REGLA 9.1: op_aritmetica_suma_resta OP_ARIT_SUMA op_aritmetica_producto_division (" + RESULT + ") -> op_aritmetica_suma_resta");
         :} |
-        op_aritmetica_suma_resta:terminos_restantes OP_ARIT_RESTA:op_resta op_aritmetica_producto_division:f1   {:
-            RESULT = String.join(" ", f1, op_resta, terminos_restantes);
-            System.out.println("REGLA 9.2: factor OP_ARIT_RESTA op_aritmetica_suma_resta (" + RESULT + ") -> op_aritmetica_suma_resta");
-        :} |
-        op_aritmetica_producto_division:f1 OP_ARIT_SUMA:op_suma op_aritmetica_producto_division:f2 {:
-            RESULT = String.join(" ", f1, op_suma, f2);
-            System.out.println("REGLA 9.3: factor OP_ARIT_SUMA factor (" + RESULT + ") -> op_aritmetica_suma_resta");
-        :} |
-        op_aritmetica_producto_division:f1 OP_ARIT_RESTA:op_resta op_aritmetica_producto_division:f2 {:
-            RESULT = String.join(" ", f1, op_resta, f2);
-            System.out.println("REGLA 9.4: factor OP_ARIT_RESTA factor (" + RESULT + ") -> op_aritmetica_suma_resta");
+        op_aritmetica_suma_resta:terminos_restantes OP_ARIT_RESTA:op_resta op_aritmetica_producto_division:termino   {:
+            RESULT = String.join(" ", terminos_restantes, op_resta, terminos);
+            System.out.println("REGLA 9.2: op_aritmetica_suma_resta OP_ARIT_RESTA op_aritmetica_producto_division (" + RESULT + ") -> op_aritmetica_suma_resta");
         :} |
         op_aritmetica_producto_division:terminos_restantes {:
             RESULT = terminos_restantes;
-            System.out.println("REGLA 9.5: op_aritmetica_producto_division (" + RESULT + ") -> op_aritmetica_suma_resta");
+            System.out.println("REGLA 9.3: op_aritmetica_producto_division (" + RESULT + ") -> op_aritmetica_suma_resta");
         :};
 
 op_aritmetica_producto_division ::=
-        op_aritmetica_producto_division:terminos_restantes OP_ARIT_PROD_O_DIV:tipo_op factor:f1   {:
-            RESULT = String.join(" ", terminos_restantes, tipo_op, f1);
-            System.out.println("REGLA 10.1: op_aritmetica_producto_division " + tipo_op + " factor (" + RESULT + ") -> op_aritmetica_producto_division");
+        op_aritmetica_producto_division:factores_restantes OP_ARIT_PROD_O_DIV:op factor:f {:
+            RESULT = String.join(" ", factores_restantes, op, f);
+            System.out.println("REGLA 10.1: op_aritmetica_producto_division OP_ARIT_PROD_O_DIV factor (" + RESULT + ") -> op_aritmetica_producto_division");
         :} |
-        factor:f1 OP_ARIT_PROD_O_DIV:tipo_op factor:f2 {:
-            RESULT = String.join(" ", f1, tipo_op, f2);
-            System.out.println("REGLA 10.2: op_aritmetica_producto_division -> factor " + tipo_op + " factor (" + RESULT + ") -> op_aritmetica_producto_division");
-        :} |
-        factor:num {:
-            RESULT = neg;
-            System.out.println("REGLA 10.3: op_aritmetica_negacion (" + RESULT + ") -> op_aritmetica_producto_division");
+        factor:f {:
+            RESULT = f;
+            System.out.println("REGLA 10.2: factor (" + RESULT + ") -> op_aritmetica_producto_division");
         :};
 
 factor ::=
@@ -311,7 +298,7 @@ factor ::=
         // resta unaria
         OP_ARIT_RESTA:menos numero:num {:
             RESULT = String.join(" ", menos, num);
-            System.out.println("REGLA 11.7: OP_ARIT_RESTA numero (" + RESULT + ") -> factor");
+            System.out.println("REGLA 11.2: OP_ARIT_RESTA numero (" + RESULT + ") -> factor");
         :} |
         CTE_BOOLEANA:cte {:
             RESULT = cte;
@@ -323,7 +310,7 @@ factor ::=
         :} |
         PAR_ABRE:pa operacion:op PAR_CIERRA:pc {:
             RESULT = String.join(" ", pa, op, pc);
-            System.out.println("REGLA 11.6: PA_ABRE operacion PA_CIERRA (" + RESULT + ") -> factor");
+            System.out.println("REGLA 11.5: PA_ABRE operacion PA_CIERRA (" + RESULT + ") -> factor");
         :};
 
 numero ::=
@@ -337,11 +324,11 @@ numero ::=
         :} |
         IDENTIFICADOR:id {:
             RESULT = id;
-            System.out.println("REGLA 11.2: IDENTIFICADOR (" + RESULT + ") -> factor");
+            System.out.println("REGLA 11.1.3: IDENTIFICADOR (" + RESULT + ") -> factor");
         :} |
         invocacion_funcion:fun {:
             RESULT = fun;
-            System.out.println("REGLA 11.5: invocacion_funcion (" + RESULT + ") -> factor");
+            System.out.println("REGLA 11.1.4: invocacion_funcion (" + RESULT + ") -> factor");
         :};
 
 // sentencia simple o bloque begin/end para implementación de funciones y estructuras de selección e iteración
