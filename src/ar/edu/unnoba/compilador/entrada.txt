@@ -1,6 +1,9 @@
 main is
 # TODO revisar operadores, estos casos no funcan:
-#ancho = 10 + 20 * 4 / 2;
-X = -55.5 / (8 + 13);
+ancho = 10 + 20 * 4 - 2;
+#X = (-55.5 / 5) * (3 + 4);
+#X = -funcion();
+#j = -X;
 
 end.
+

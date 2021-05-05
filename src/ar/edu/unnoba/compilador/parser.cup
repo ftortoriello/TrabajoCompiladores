@@ -264,10 +264,6 @@ expresion_logica_basica ::=
         factor:f1 {:
             RESULT = f1;
             System.out.println("REGLA 8.2: factor (" + RESULT + ") -> expresion_logica_basica");
-        :} |
-        PAR_ABRE:pa expresion_logica_or:expr_or PAR_CIERRA:pc {:
-            RESULT = String.join(" ", pa, expr_or, pc);
-            System.out.println("REGLA 8.3: PAR_ABRE expresion_logica_or PAR_CIERRA (" + RESULT + ") -> expresion_logica_basica");
         :};
 
 op_aritmetica_suma_resta ::=
@@ -304,10 +300,6 @@ op_aritmetica_producto_division ::=
         op_aritmetica_negacion:neg {:
             RESULT = neg;
             System.out.println("REGLA 10.3: op_aritmetica_negacion (" + RESULT + ") -> op_aritmetica_producto_division");
-        :} |
-        PAR_ABRE:pa op_aritmetica_suma_resta:suma PAR_CIERRA:pc {:
-            RESULT = String.join(" ", pa, suma, pc);
-            System.out.println("REGLA 10.4: PAR_ABRE expresion_logica_or PAR_CIERRA (" + RESULT + ") -> op_aritmetica_producto_division");
         :};
 
 factor ::=
@@ -331,14 +323,22 @@ factor ::=
             RESULT = fun;
             System.out.println("REGLA 11.5: invocacion_funcion (" + RESULT + ") -> factor");
         :} |
-        // TODO parentesis
-        //PAR_ABRE:pa operacion:op PAR_CIERRA:pc {:
-        //    RESULT = String.join(" ", pa, op, pc);
-        //    System.out.println("REGLA 11.6: PA_ABRE operacion PA_CIERRA (" + RESULT + ") -> factor");
-        //:} |
-        OP_ARIT_RESTA:op_negacion numero_constante:num {:
-            RESULT = op_negacion + num;
+        PAR_ABRE:pa operacion:op PAR_CIERRA:pc {:
+            RESULT = String.join(" ", pa, op, pc);
+            System.out.println("REGLA 11.6: PA_ABRE operacion PA_CIERRA (" + RESULT + ") -> factor");
+        :} |
+        // resta unaria
+        OP_ARIT_RESTA:menos numero_constante:num {:
+            RESULT = String.join(" ", menos, num);
             System.out.println("REGLA 11.7: OP_ARIT_RESTA numero_constante (" + RESULT + ") -> factor");
+        :} |
+        OP_ARIT_RESTA:menos IDENTIFICADOR:id {:
+            RESULT = String.join(" ", menos, id);
+            System.out.println("REGLA 11.8: OP_ARIT_RESTA IDENTIFICADOR (" + RESULT + ") -> factor");
+        :} |
+        OP_ARIT_RESTA:menos invocacion_funcion:fun {:
+            RESULT = String.join(" ", menos, fun);
+            System.out.println("REGLA 11.9: OP_ARIT_RESTA invocacion_funcion (" + RESULT + ") -> factor");
         :};
 
 numero_constante ::=
