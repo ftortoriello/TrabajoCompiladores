@@ -10,6 +10,7 @@ Fecha de entrega: 04/05/2021
 Requisitos obligatorios:
 
 ### Análisis léxico
+Estado: :white_check_mark:, menos casos raros (00, 10variable, etc.) que tratamos en la parte sintáctica.
 
 ### Comentarios balanceados o Procesamiento de strings con códigos de escape
 Estado: :white_check_mark:	
