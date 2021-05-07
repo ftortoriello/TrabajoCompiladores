@@ -287,11 +287,11 @@ constante ::=
         :} |
         CTE_BOOLEANA:bool {:
             RESULT = bool;
-            System.out.println("REGLA 6.3: CTE_BOOLEANA (" + RESULT + ") -> constante");
+            System.out.println("REGLA 7.2: CTE_BOOLEANA (" + RESULT + ") -> constante");
         :} |
         CADENA:c {:
             RESULT = c;
-            System.out.println("REGLA 6.4: CADENA (" + RESULT + ") -> factor");
+            System.out.println("REGLA 7.3: CADENA (" + RESULT + ") -> factor");
         :} |
         invocacion_funcion:fun {:
             RESULT = fun;
@@ -301,15 +301,15 @@ constante ::=
 constante_num ::=
         ENTERO:num {:
             RESULT = num;
-            System.out.println("REGLA 7.1: ENTERO (" + RESULT + ") -> constante");
+            System.out.println("REGLA 8.1: ENTERO (" + RESULT + ") -> constante_num");
         :} |
         FLOTANTE:num {:
             RESULT = num;
-            System.out.println("REGLA 7.2: FLOTANTE (" + RESULT + ") -> constante");
+            System.out.println("REGLA 8.2: FLOTANTE (" + RESULT + ") -> constante_num");
         :} |
         IDENTIFICADOR:id {:
             RESULT = id;
-            System.out.println("REGLA 7.3: IDENTIFICADOR (" + RESULT + ") -> constante");
+            System.out.println("REGLA 8.3: IDENTIFICADOR (" + RESULT + ") -> constante_num");
         :};
 
 invocacion_funcion ::=

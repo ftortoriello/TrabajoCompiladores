@@ -11,6 +11,8 @@ variable superficie₁ is float = 0;
 { Una función }
 function superficie_círculo(radio is float = 1) return float
 begin
+    ancho = 10 + 20 * 4 - 2;
+    X = (-55.5 / 5) * (3 + 4);
     writeln("Dentro de función superficie_círculo()");
     # Definición de una variable local.
     if radio < 0 then
