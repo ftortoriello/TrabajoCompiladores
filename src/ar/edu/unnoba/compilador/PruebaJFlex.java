@@ -10,10 +10,14 @@ public class PruebaJFlex {
         MiLexico lexico = new MiLexico(new InputStreamReader(System.in));
         System.out.printf("Análisis léxico iniciado: %nIngrese por teclado:%n");
         while (true) {
-            Symbol token = lexico.next_token();
-            if (token == null)
-                break;
-            System.out.println("Token: " + token.toString());
+            try {
+                Symbol token = lexico.next_token();
+                if (token == null)
+                    break;
+                System.out.println("Token: " + token.toString());
+            } catch (java.lang.Error e) {
+                System.out.println(e);
+            }
         }
         lexico.tablaDeSimbolos.stream().map((simbolo) -> {
             System.out.println(simbolo.nombre);

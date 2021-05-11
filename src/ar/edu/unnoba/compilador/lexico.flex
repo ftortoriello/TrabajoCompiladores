@@ -65,11 +65,7 @@ import java_cup.sym;
 
 EspacioEnBlanco     = \s
 
-/* Los Identificadores tendrían que soportar números y letras como superscript o subscript... Ej: x²
- * https://en.wikipedia.org/wiki/Unicode_subscripts_and_superscripts#Superscripts_and_subscripts_block */
-DigitoScript        = [\u2070\u00B9\u00B2\u00B3\u2074-\u2079\u2080-\u2089]
-LetraScript         = [\u2071\u207F\u2090-\u209C]
-Id                  = ([:letter:]|_|{LetraScript})[\w{LetraScript}{DigitoScript}]*\??
+Id                  = [\p{L}_][\p{L}\p{N}_]*\??
 
 /* FIXME: 10id ni 0.123.4 tendrían que ser aceptado como dos tokens distintos.
  * Podría solucionarse agregando \b a las regex, pero no funciona en JFlex :(
@@ -153,6 +149,7 @@ ComentarioUnaLinea = #.*{FinDeLinea}
     {Entero}            { return token("ENTERO", yytext()); }
 }
 
+/* TODO se puede combinar en un estado? */
 <COMENT_LLAVES> {
     "}"                 {
                             if (comentariosAbiertos.pop() == TipoComentario.LLAVES) {
@@ -185,7 +182,7 @@ ComentarioUnaLinea = #.*{FinDeLinea}
                                     /* se cerraron todos los comentarios */
                                     yybegin(YYINITIAL);
                                 } else if (comentariosAbiertos.peek() == TipoComentario.LLAVES) {
-                                    yybegin(COMENT_PASCAL);
+                                    yybegin(COMENT_LLAVES);
                                 }
                             } else {
                                 errorLexico("Error del programador al cerrar un bloque de comentario de tipo Pascal. Esto no debería ocurrir...");
