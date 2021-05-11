@@ -65,9 +65,10 @@ import java_cup.sym;
 
 EspacioEnBlanco     = \s
 
+// \p{L}: letras Unicode - \p{N}: números Unicode
 Id                  = [\p{L}_][\p{L}\p{N}_]*\??
 
-/* FIXME: 10id ni 0.123.4 tendrían que ser aceptado como dos tokens distintos.
+/* 10id ni 0.123.4 tendrían que ser aceptado como dos tokens distintos.
  * Podría solucionarse agregando \b a las regex, pero no funciona en JFlex :(
  * Igualmente en esos casos tiene que fallar el análisis sintáctico.
  */
@@ -78,13 +79,13 @@ OpAritSuma          = \+
 OpAritResta         = -
 OpAritProdYDiv      = \*|\/
 OpComparacion       = ==|\!=|\>|\>=|\<|\<=
-TiposDeDato         = boolean|integer|float // que raro que no vaya un tipo "string"...
+TiposDeDato         = boolean|integer|float
 CtesBooleanas       = true|false
 
 FinDeLinea         = \r|\n|\r\n
 ComentarioUnaLinea = #.*{FinDeLinea}
 
-%state COMENT_LLAVES COMENT_PASCAL CADENA
+%state BLOQUE_COMENT CADENA
 
 %%
 
@@ -92,8 +93,8 @@ ComentarioUnaLinea = #.*{FinDeLinea}
     \"                  { stringBuffer.setLength(0); yybegin(CADENA);
                           /* guardar posición inicial para dejarla bien en el lexema */
                           cadena_yyline = this.yyline; cadena_yycolumn = this.yycolumn; }
-    "{"                 { comentariosAbiertos.push(TipoComentario.LLAVES); yybegin(COMENT_LLAVES); }
-    "(*"                { comentariosAbiertos.push(TipoComentario.PASCAL); yybegin(COMENT_PASCAL); }
+    "{"                 { comentariosAbiertos.push(TipoComentario.LLAVES); yybegin(BLOQUE_COMENT); }
+    "(*"                { comentariosAbiertos.push(TipoComentario.PASCAL); yybegin(BLOQUE_COMENT); }
     (\}|\*\))           { errorLexico("Cierre de comentario inesperado"); }
     {ComentarioUnaLinea} { /* ignorar */ }
 
@@ -149,51 +150,30 @@ ComentarioUnaLinea = #.*{FinDeLinea}
     {Entero}            { return token("ENTERO", yytext()); }
 }
 
-/* TODO se puede combinar en un estado? */
-<COMENT_LLAVES> {
+<BLOQUE_COMENT> {
+                        /* comentarios anidados */
+    "{"                 { comentariosAbiertos.push(TipoComentario.LLAVES); }
+    "(*"                { comentariosAbiertos.push(TipoComentario.PASCAL); }
+
     "}"                 {
                             if (comentariosAbiertos.pop() == TipoComentario.LLAVES) {
-                                /* se cerro un comentario de llaves */
                                 if (comentariosAbiertos.empty()) {
-                                    /* se cerraron todos los comentarios */
                                     yybegin(YYINITIAL);
-                                } else if (comentariosAbiertos.peek() == TipoComentario.PASCAL) {
-                                    yybegin(COMENT_PASCAL);
                                 }
                             } else {
-                                errorLexico("Error del programador al cerrar un bloque de comentario de llaves. Esto no debería ocurrir...");
+                                errorLexico("Cierre inesperado de bloque de comentario de llaves");
                             }
                         }
 
-                        /* comentarios anidados */
-    "{"                 { comentariosAbiertos.push(TipoComentario.LLAVES); }    // seguir en este estado
-    "(*"                { comentariosAbiertos.push(TipoComentario.PASCAL); yybegin(COMENT_PASCAL); }
-
-    "*)"                { errorLexico("Se esperaba un cierre de comentario de llaves, no de tipo Pascal"); }
-
-    [^]                 { /* ignorar todo lo demás */ }
-}
-
-<COMENT_PASCAL> {
     "*)"                {
                             if (comentariosAbiertos.pop() == TipoComentario.PASCAL) {
-                                /* se cerro un comentario tipo Pascal */
                                 if (comentariosAbiertos.empty()) {
-                                    /* se cerraron todos los comentarios */
                                     yybegin(YYINITIAL);
-                                } else if (comentariosAbiertos.peek() == TipoComentario.LLAVES) {
-                                    yybegin(COMENT_LLAVES);
                                 }
                             } else {
-                                errorLexico("Error del programador al cerrar un bloque de comentario de tipo Pascal. Esto no debería ocurrir...");
+                                errorLexico("Cierre inesperado de bloque de comentario de tipo Pascal");
                             }
                         }
-
-                        /* comentarios anidados */
-    "(*"                { comentariosAbiertos.push(TipoComentario.PASCAL); }    // seguir en este estado
-    "{"                 { comentariosAbiertos.push(TipoComentario.LLAVES); yybegin(COMENT_LLAVES); }
-
-    "}"                 { errorLexico("Se esperaba un cierre de comentario de tipo Pascal, no de llaves"); }
 
     [^]                 { /* ignorar todo lo demás */ }
 }
