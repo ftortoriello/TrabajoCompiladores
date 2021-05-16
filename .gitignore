@@ -39,3 +39,8 @@ out/
 /src/ar/edu/unnoba/compilador/MiLexico.java
 /src/ar/edu/unnoba/compilador/MiParser.java
 /src/ar/edu/unnoba/compilador/MiParserSym.java
+/src/ar/edu/unnoba/compilador/Lexico/Lexer.java
+/src/ar/edu/unnoba/compilador/Sintaxis/Parser.java
+/src/ar/edu/unnoba/compilador/Sintaxis/ParserSym.java
+./arbol.dot
+./arbol.png

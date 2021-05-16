@@ -1,10 +1,12 @@
-package ar.edu.unnoba.compilador;
+package ar.edu.unnoba.compilador.lexico;
 
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Stack;
 import java_cup.runtime.*;
 import java_cup.sym;
+
+import ar.edu.unnoba.compilador.token.Token;
 
 /* Implementación del analizador léxico */
 
@@ -13,7 +15,7 @@ import java_cup.sym;
 /* visibilidad de la clase generada */
 %public
 /* nombre de la clase generada */
-%class MiLexico
+%class Lexer
 /* nombre de la clase para representar tokens (objetos retornados por yylex) */
 //%type MiToken
 /* finalizar la lectura cuando se encuentra EOF */
@@ -34,7 +36,7 @@ import java_cup.sym;
     * Código a copiar textualmente como parte de la definición de la clase
     *  del analizador léxico.
     *************************************************************************/
-    
+
     int cadena_yyline = 0;
     int cadena_yycolumn = 0;
 
@@ -43,18 +45,18 @@ import java_cup.sym;
     enum TipoComentario { LLAVES, PASCAL }
     Stack<TipoComentario> comentariosAbiertos = new Stack<TipoComentario>();
 
-    public List<MiToken> tablaDeSimbolos = new ArrayList<>();
+    public List<Token> tablaDeSimbolos = new ArrayList<>();
 
-    private MiToken token(String nombre) {
-        return new MiToken(nombre, this.yyline, this.yycolumn);
+    private Token token(String nombre) {
+        return new Token(nombre, this.yyline, this.yycolumn);
     }
 
-    private MiToken token(String nombre, Object valor) {
-        return new MiToken(nombre, this.yyline, this.yycolumn, valor);
+    private Token token(String nombre, Object valor) {
+        return new Token(nombre, this.yyline, this.yycolumn, valor);
     }
 
-    private MiToken token(String nombre, int line, int column, Object valor) {
-        return new MiToken(nombre, line, column, valor);
+    private Token token(String nombre, int line, int column, Object valor) {
+        return new Token(nombre, line, column, valor);
     }
 
     /* unificar formato de mensajes de error */

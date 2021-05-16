@@ -5,18 +5,18 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Generador {
+public class GenerarLexerYParser {
 
     public static void main(String[] args) {
-        String path = "src/ar/edu/unnoba/compilador/lexico.flex";
+        String path = "src/ar/edu/unnoba/compilador/lexico/lexico.flex";
         generarLexer(path);
         
         String[] param = new String[5];
         param[0] = "-destdir";
-        param[1] = "src/ar/edu/unnoba/compilador/";
+        param[1] = "src/ar/edu/unnoba/compilador/sintaxis";
         param[2] = "-parser";
-        param[3] = "MiParser";
-        param[4] = "src/ar/edu/unnoba/compilador/parser.cup";
+        param[3] = "Parser";
+        param[4] = "src/ar/edu/unnoba/compilador/sintaxis/parser.cup";
         generarParser(param);
     }
 
@@ -32,9 +32,9 @@ public class Generador {
         try {
             java_cup.Main.main(param);
         } catch (IOException ex) {
-            Logger.getLogger(Generador.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GenerarLexerYParser.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex) {
-            Logger.getLogger(Generador.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GenerarLexerYParser.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

@@ -1,4 +1,4 @@
-package ar.edu.unnoba.compilador;
+package ar.edu.unnoba.compilador.sintaxis;
 
 import java_cup.runtime.*;
 import java.util.ArrayList;
@@ -7,7 +7,12 @@ import java.io.FileReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-class MiParser;
+import ar.edu.unnoba.compilador.token.Token;
+
+import ar.edu.unnoba.compilador.ast.base.Programa;
+// import ar.edu.unnoba.compilador.ast.base.Bloque;
+
+class Parser;
 
 parser code
 {:
@@ -34,10 +39,14 @@ terminal String PR_MAIN_IS, PR_END_PUNTO,
     IDENTIFICADOR, TIPO_DE_DATO,
     CTE_BOOLEANA, FLOTANTE, ENTERO, CADENA;
 
-nonterminal String programa,
-    lst_decs_vars_y_funcs, dec_var, dec_fun,
+// TODO: cambiar los no terminales de String a sus tipos correspondientes
+nonterminal Programa programa;
+
+// nonterminal Constante constante;
+
+nonterminal String lst_decs_vars_y_funcs, dec_var, dec_fun,
     arg_dec, arg_dec_default, lst_args_dec, lst_args_dec_default,
-    cuerpo, lst_sentencias, sentencia, bloque_when_is,
+    bloque, lst_sentencias, sentencia, bloque_when_is,
     expresion, termino, factor, constante, constante_num,
     invocacion_funcion, lst_args_invocacion;
 
@@ -54,23 +63,29 @@ start with programa;
 
 programa ::=
         lst_decs_vars_y_funcs:decs PR_MAIN_IS:pr_mainis lst_sentencias:sentencias PR_END_PUNTO:pr_end {:
-            RESULT = String.join(" ", decs, pr_mainis, sentencias, pr_end);
-            System.out.println("REGLA 0.1 -> lst_decs_vars_y_funcs PR_MAIN_IS lst_sentencias PR_END_PUNTO (" + RESULT + ") -> programa");
-        :} |
-        PR_MAIN_IS:pr_mainis lst_sentencias:sentencias PR_END_PUNTO:pr_end {:
-            RESULT = String.join(" ", pr_mainis, sentencias, pr_end);
-            System.out.println("REGLA 0.2 -> PR_MAIN_IS lst_sentencias PR_END_PUNTO (" + RESULT + ") -> programa");
-        :} |
-        lst_decs_vars_y_funcs:decs PR_MAIN_IS:pr_mainis PR_END_PUNTO:pr_end {:
-            // programa con declaraciones pero sin cuerpo principal
-            RESULT = String.join(" ", decs, pr_mainis, pr_end);
-            System.out.println("REGLA 0.3 -> lst_decs_vars_y_funcs PR_MAIN_IS PR_END_PUNTO (" + RESULT + ") -> programa");
-        :} |
-        PR_MAIN_IS:pr_mainis PR_END_PUNTO:pr_end {:
-            // programa mínimo, sin cuerpo
-            RESULT = String.join(" ", pr_mainis, pr_end);
-            System.out.println("REGLA 0.4 -> PR_MAIN_IS PR_END_PUNTO (" + RESULT + ") -> programa");
-        :};
+            // RESULT = String.join(" ", decs, pr_mainis, sentencias, pr_end);
+            // System.out.println("REGLA 0.1 -> lst_decs_vars_y_funcs PR_MAIN_IS lst_sentencias PR_END_PUNTO (" + RESULT + ") -> programa");
+            RESULT = new Programa("Test");
+        :}
+//        |
+//        PR_MAIN_IS:pr_mainis lst_sentencias:sentencias PR_END_PUNTO:pr_end {:
+//            // RESULT = String.join(" ", pr_mainis, sentencias, pr_end);
+//            // System.out.println("REGLA 0.2 -> PR_MAIN_IS lst_sentencias PR_END_PUNTO (" + RESULT + ") -> programa");
+//            RESULT = new Programa(new Bloque());
+//        :} |
+//        lst_decs_vars_y_funcs:decs PR_MAIN_IS:pr_mainis PR_END_PUNTO:pr_end {:
+//            // programa con declaraciones pero sin cuerpo principal
+//            // RESULT = String.join(" ", decs, pr_mainis, pr_end);
+//            // System.out.println("REGLA 0.3 -> lst_decs_vars_y_funcs PR_MAIN_IS PR_END_PUNTO (" + RESULT + ") -> programa");
+//            RESULT = new Programa(new Bloque());
+//        :} |
+//        PR_MAIN_IS:pr_mainis PR_END_PUNTO:pr_end {:
+//            // programa mínimo, sin cuerpo
+//            // RESULT = String.join(" ", pr_mainis, pr_end);
+//            // System.out.println("REGLA 0.4 -> PR_MAIN_IS PR_END_PUNTO (" + RESULT + ") -> programa");
+//            RESULT = new Programa(new Bloque());
+//        :}
+        ;
 
 lst_decs_vars_y_funcs ::=
         dec_var:dec_var PUNTO_Y_COMA:pyc lst_decs_vars_y_funcs:decs {:
@@ -114,15 +129,15 @@ arg_dec_default ::=
         :};
 
 dec_fun ::=
-        PR_FUNCTION:pr_funcion IDENTIFICADOR:id PAR_ABRE:pa PAR_CIERRA:pc PR_RETURN:ret TIPO_DE_DATO:td cuerpo:cuerpo PUNTO_Y_COMA:pyc {:
-            RESULT = String.join(" ", pr_funcion, id, pa, pc, ret, td, cuerpo, pyc);
+        PR_FUNCTION:pr_funcion IDENTIFICADOR:id PAR_ABRE:pa PAR_CIERRA:pc PR_RETURN:ret TIPO_DE_DATO:td bloque:bloque PUNTO_Y_COMA:pyc {:
+            RESULT = String.join(" ", pr_funcion, id, pa, pc, ret, td, bloque, pyc);
             System.out.println("REGLA 1.4.1: PR_FUNCTION IDENTIFICADOR PAR_ABRE PAR_CIERRA PR_RETURN " +
-                               "TIPO_DE_DATO cuerpo PUNTO_Y_COMA:pyc (" + RESULT + ") -> dec_fun");
+                               "TIPO_DE_DATO bloque PUNTO_Y_COMA:pyc (" + RESULT + ") -> dec_fun");
         :} |
-        PR_FUNCTION:pr_funcion IDENTIFICADOR:id PAR_ABRE:pa lst_args_dec:args PAR_CIERRA:pc PR_RETURN:ret TIPO_DE_DATO:td cuerpo:cuerpo PUNTO_Y_COMA:pyc {:
-            RESULT = String.join(" ", pr_funcion, id, pa, args, pc, ret, td, cuerpo, pyc);
+        PR_FUNCTION:pr_funcion IDENTIFICADOR:id PAR_ABRE:pa lst_args_dec:args PAR_CIERRA:pc PR_RETURN:ret TIPO_DE_DATO:td bloque:bloque PUNTO_Y_COMA:pyc {:
+            RESULT = String.join(" ", pr_funcion, id, pa, args, pc, ret, td, bloque, pyc);
             System.out.println("REGLA 1.4.2: PR_FUNCTION IDENTIFICADOR PAR_ABRE lst_args_dec PAR_CIERRA " +
-                               "PR_RETURN TIPO_DE_DATO cuerpo PUNTO_Y_COMA:pyc (" + RESULT + ") -> dec_fun");
+                               "PR_RETURN TIPO_DE_DATO bloque PUNTO_Y_COMA:pyc (" + RESULT + ") -> dec_fun");
         :};
 
 lst_args_dec ::=
@@ -155,14 +170,14 @@ lst_args_dec_default ::=
 
 
 // sentencia simple o bloque begin/end para implementación de funciones y estructuras de selección e iteración
-cuerpo ::=
+bloque ::=
         sentencia:sent {:
             RESULT = String.join(" ", sent);
-            System.out.println("REGLA 2.1: sentencia (" + RESULT + ") -> cuerpo");
+            System.out.println("REGLA 2.1: sentencia (" + RESULT + ") -> bloque");
         :} |
         PR_BEGIN:begin lst_sentencias:sentencias PR_END:pr_end {:
             RESULT = String.join(" ", begin, sentencias, pr_end);
-            System.out.println("REGLA 2.2: PR_BEGIN lst_sentencias PR_END (" + RESULT + ") -> cuerpo");
+            System.out.println("REGLA 2.2: PR_BEGIN lst_sentencias PR_END (" + RESULT + ") -> bloque");
         :};
 
 lst_sentencias ::=
@@ -190,14 +205,14 @@ sentencia ::=
             RESULT = dec_var;
             System.out.println("REGLA 4.3: dec_var (" + RESULT + ") -> sentencia");
         :} |
-        PR_IF:pr_if expresion:exp PR_THEN:pr_then cuerpo:cuerpo {:
-            RESULT = String.join(" ", pr_if, exp, pr_then, cuerpo);
-            System.out.println("REGLA 4.4: PR_IF expresion PR_THEN cuerpo ("
+        PR_IF:pr_if expresion:exp PR_THEN:pr_then bloque:bloque {:
+            RESULT = String.join(" ", pr_if, exp, pr_then, bloque);
+            System.out.println("REGLA 4.4: PR_IF expresion PR_THEN bloque ("
             + RESULT + ") -> sentencia");
         :} |
-        PR_IF:pr_if expresion:exp PR_THEN:pr_then cuerpo:cuerpo1 PR_ELSE:pr_else cuerpo:cuerpo2 {:
-            RESULT = String.join(" ", pr_if, exp, pr_then, cuerpo1, pr_else, cuerpo2);
-            System.out.println("REGLA 4.5: PR_IF expresion PR_THEN cuerpo PR_ELSE cuerpo ("
+        PR_IF:pr_if expresion:exp PR_THEN:pr_then bloque:bloque1 PR_ELSE:pr_else bloque:bloque2 {:
+            RESULT = String.join(" ", pr_if, exp, pr_then, bloque1, pr_else, bloque2);
+            System.out.println("REGLA 4.5: PR_IF expresion PR_THEN bloque PR_ELSE bloque ("
             + RESULT + ") -> sentencia");
         :} |
         PR_WHEN:when expresion:exp bloque_when_is:bloque_is {:
@@ -205,24 +220,24 @@ sentencia ::=
             System.out.println("REGLA 4.6: PR_WHEN expresion bloque_when_is ("
             + RESULT + ") -> sentencia");
         :} |
-        PR_WHEN:when expresion:exp bloque_when_is:bloque_is PR_ELSE:pr_else cuerpo:cuerpo {:
-            RESULT = String.join(" ", when, exp, when, bloque_is, pr_else, cuerpo);
-            System.out.println("REGLA 4.7: PR_WHEN expresion bloque_when_is PR_ELSE cuerpo ("
+        PR_WHEN:when expresion:exp bloque_when_is:bloque_is PR_ELSE:pr_else bloque:bloque {:
+            RESULT = String.join(" ", when, exp, when, bloque_is, pr_else, bloque);
+            System.out.println("REGLA 4.7: PR_WHEN expresion bloque_when_is PR_ELSE bloque ("
             + RESULT + ") -> sentencia");
         :} |
-        PR_WHILE:pr_while expresion:exp PR_DO:pr_do cuerpo:cuerpo {:
-            RESULT = String.join(" ", pr_while, exp, pr_do, cuerpo);
+        PR_WHILE:pr_while expresion:exp PR_DO:pr_do bloque:bloque {:
+            RESULT = String.join(" ", pr_while, exp, pr_do, bloque);
             System.out.println("REGLA 4.8: PR_WHILE expresion PR_DO sentencia (" + RESULT + ")"
             + " -> sentencia");
         :} |
-        PR_FOR:pr_for IDENTIFICADOR:id PR_FROM:pr_from ENTERO:num_ini PR_TO:pr_to ENTERO:num_fin PR_DO:pr_do cuerpo:cuerpo {:
-            RESULT = String.join(" ", pr_for, id, pr_from, num_ini, pr_to, num_fin, pr_do, cuerpo);
-            System.out.println("REGLA 4.9: PR_FOR IDENTIFICADOR PR_FROM ENTERO PR_TO ENTERO PR_DO cuerpo ("
+        PR_FOR:pr_for IDENTIFICADOR:id PR_FROM:pr_from ENTERO:num_ini PR_TO:pr_to ENTERO:num_fin PR_DO:pr_do bloque:bloque {:
+            RESULT = String.join(" ", pr_for, id, pr_from, num_ini, pr_to, num_fin, pr_do, bloque);
+            System.out.println("REGLA 4.9: PR_FOR IDENTIFICADOR PR_FROM ENTERO PR_TO ENTERO PR_DO bloque ("
                 + RESULT + ")" + " -> sentencia");
         :} |
-        PR_FOR:pr_for IDENTIFICADOR:id PR_FROM:pr_from ENTERO:num_ini PR_TO:pr_to ENTERO:num_fin PR_BY:pr_by ENTERO:salto PR_DO:pr_do cuerpo:cuerpo {:
-            RESULT = String.join(" ", pr_for, id, pr_from, num_ini, pr_to, num_fin, pr_by, salto, pr_do, cuerpo);
-            System.out.println("REGLA 4.10: PR_FOR IDENTIFICADOR PR_FROM ENTERO PR_TO ENTERO PR_DO cuerpo ("
+        PR_FOR:pr_for IDENTIFICADOR:id PR_FROM:pr_from ENTERO:num_ini PR_TO:pr_to ENTERO:num_fin PR_BY:pr_by ENTERO:salto PR_DO:pr_do bloque:bloque {:
+            RESULT = String.join(" ", pr_for, id, pr_from, num_ini, pr_to, num_fin, pr_by, salto, pr_do, bloque);
+            System.out.println("REGLA 4.10: PR_FOR IDENTIFICADOR PR_FROM ENTERO PR_TO ENTERO PR_DO bloque ("
                 + RESULT + ")" + " -> sentencia");
         :} |
         PR_RETURN:ret expresion:expr {:
@@ -239,14 +254,14 @@ sentencia ::=
         :};
 
 bloque_when_is ::=
-        PR_IS:pr_is OP_COMPARACION:comp expresion:exp PR_THEN:pr_then cuerpo:cuerpo {:
-            RESULT = String.join(" ", pr_is, comp, exp, pr_then, cuerpo);
-            System.out.println("REGLA 4.6.1: PR_IS OP_COMPARACION expresion:exp PR_THEN cuerpo ("
+        PR_IS:pr_is OP_COMPARACION:comp expresion:exp PR_THEN:pr_then bloque:bloque {:
+            RESULT = String.join(" ", pr_is, comp, exp, pr_then, bloque);
+            System.out.println("REGLA 4.6.1: PR_IS OP_COMPARACION expresion:exp PR_THEN bloque ("
             + RESULT + ") -> bloque_when_is");
         :} |
-        PR_IS:pr_is OP_COMPARACION:comp expresion:exp PR_THEN:pr_then cuerpo:cuerpo bloque_when_is:bloque {:
-            RESULT = String.join(" ", pr_is, comp, exp, pr_then, cuerpo, bloque);
-            System.out.println("REGLA 4.6.2: PR_IS OP_COMPARACION expresion PR_THEN cuerpo bloque_when_is ("
+        PR_IS:pr_is OP_COMPARACION:comp expresion:exp PR_THEN:pr_then bloque:bloque bloque_when_is:bloque_when {:
+            RESULT = String.join(" ", pr_is, comp, exp, pr_then, bloque, bloque_when);
+            System.out.println("REGLA 4.6.2: PR_IS OP_COMPARACION expresion PR_THEN bloque bloque_when_is ("
             + RESULT + ") -> bloque_when_is");
         :};
 

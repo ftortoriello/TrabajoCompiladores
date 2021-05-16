@@ -1,13 +1,13 @@
-package ar.edu.unnoba.compilador;
+package ar.edu.unnoba.compilador.lexico;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java_cup.runtime.Symbol;
 
-public class PruebaJFlex {
+public class PruebaLexer {
 
     public static void main(String[] args) throws IOException {
-        MiLexico lexico = new MiLexico(new InputStreamReader(System.in));
+        Lexer lexico = new Lexer(new InputStreamReader(System.in));
         System.out.printf("Análisis léxico iniciado: %nIngrese por teclado:%n");
         while (true) {
             try {
