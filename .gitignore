@@ -42,5 +42,5 @@ out/
 /src/ar/edu/unnoba/compilador/Lexico/Lexer.java
 /src/ar/edu/unnoba/compilador/Sintaxis/Parser.java
 /src/ar/edu/unnoba/compilador/Sintaxis/ParserSym.java
-./arbol.dot
-./arbol.png
+arbol.dot
+arbol.png
