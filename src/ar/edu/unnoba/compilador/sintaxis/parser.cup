@@ -329,13 +329,9 @@ constante ::=
             RESULT = bool;
             System.out.println("REGLA 8.2: CTE_BOOLEANA (" + RESULT + ") -> constante");
         :} |
-        CADENA:c {:
-            RESULT = c;
-            System.out.println("REGLA 8.3: CADENA (" + RESULT + ") -> factor");
-        :} |
         invocacion_funcion:fun {:
             RESULT = fun;
-            System.out.println("REGLA 8.4: invocacion_funcion (" + RESULT + ") -> constante");
+            System.out.println("REGLA 8.3: invocacion_funcion (" + RESULT + ") -> constante");
         :};
 
 constante_num ::=
@@ -357,37 +353,45 @@ invocacion_funcion ::=
             RESULT = String.join(" ", writeln, pa, op, pc);
             System.out.println("REGLA 10.1: PR_WRITELN PAR_ABRE expresion PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
         :} |
+        PR_WRITELN:writeln PAR_ABRE:pa CADENA:c PAR_CIERRA:pc {:
+            RESULT = String.join(" ", writeln, pa, c, pc);
+            System.out.println("REGLA 10.2: PR_WRITELN PAR_ABRE CADENA PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
+        :} |
         PR_WRITE:write PAR_ABRE:pa expresion:op PAR_CIERRA:pc {:
             RESULT = String.join(" ", write, pa, op, pc);
-            System.out.println("REGLA 10.2: PR_WRITE PAR_ABRE expresion PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
+            System.out.println("REGLA 10.3: PR_WRITE PAR_ABRE expresion PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
+        :} |
+        PR_WRITE:write PAR_ABRE:pa CADENA:c PAR_CIERRA:pc {:
+            RESULT = String.join(" ", write, pa, c, pc);
+            System.out.println("REGLA 10.4: PR_WRITE PAR_ABRE CADENA PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
         :} |
         PR_READ_INTEGER:read_integer PAR_ABRE:pa PAR_CIERRA:pc {:
             RESULT = String.join(read_integer, pa, pc);
-            System.out.println("REGLA 10.3: PR_READ_INTEGER PAR_ABRE PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
+            System.out.println("REGLA 10.5: PR_READ_INTEGER PAR_ABRE PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
         :} |
         PR_READ_FLOAT:read_float PAR_ABRE:pa PAR_CIERRA:pc {:
             RESULT = String.join(read_float, pa, pc);
-            System.out.println("REGLA 10.4: PR_READ_FLOAT PAR_ABRE PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
+            System.out.println("REGLA 10.6: PR_READ_FLOAT PAR_ABRE PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
         :} |
         PR_READ_BOOLEAN:read_boolean PAR_ABRE:pa PAR_CIERRA:pc {:
             RESULT = String.join(read_boolean, pa, pc);
-            System.out.println("REGLA 10.5: PR_READ_BOOLEAN PAR_ABRE PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
+            System.out.println("REGLA 10.7: PR_READ_BOOLEAN PAR_ABRE PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
         :} |
         IDENTIFICADOR:id PAR_ABRE:pa PAR_CIERRA:pc {:
             RESULT = String.join(" ", id, pa, pc);
-            System.out.println("REGLA 10.6: IDENTIFICADOR PAR_ABRE PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
+            System.out.println("REGLA 10.8: IDENTIFICADOR PAR_ABRE PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
         :} |
         IDENTIFICADOR:id PAR_ABRE:pa lst_args_invocacion:args PAR_CIERRA:pc {:
             RESULT = String.join(" ", id, pa, args, pc);
-            System.out.println("REGLA 10.7: IDENTIFICADOR PAR_ABRE lst_args_invocacion PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
+            System.out.println("REGLA 10.9: IDENTIFICADOR PAR_ABRE lst_args_invocacion PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
         :};
 
 lst_args_invocacion ::=
         expresion:op PR_COMA:pr_coma lst_args_invocacion:args {:
             RESULT = String.join(" ", op, pr_coma, args);
-            System.out.println("REGLA 10.7.1: expresion lst (" + RESULT + ") -> lst_args_invocacion");
+            System.out.println("REGLA 10.9.1: expresion lst (" + RESULT + ") -> lst_args_invocacion");
         :} |
         expresion:op {:
             RESULT = op;
-            System.out.println("REGLA 10.7.2: expresion (" + RESULT + ") -> lst_args_invocacion");
+            System.out.println("REGLA 10.9.2: expresion (" + RESULT + ") -> lst_args_invocacion");
         :};

@@ -1,7 +1,7 @@
 variable radio is float = 1.5;
 
 main is
-x = 4 + 3 * 8.2;
+    if x == 1 then if y == 2 then writeln("algo");
 end.
 
 {

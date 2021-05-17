@@ -43,9 +43,12 @@ Estado: :white_check_mark:, pero hay cuestiones pendientes con los operadores (v
 
 ## Revisar
 ### parser.cup
-* precedence right PR_ELSE;: parece que no cambia nada si se pone left acá... Igual funciona como debería
 * precedence left PR_IS;: está bien así?
-* El análisis falla si el programa comienza directamente con "main is" :exclamation:
+* precedence right PR_ELSE;: parece que no cambia nada si se pone left acá... Igual funciona como debería
+* La asociatividad del IF debería ser LEFT.
+  Es decir, en "if x == 1 then if y == 2 then writeln("algo");" tendría que evaluarse primero "if x == 1" ?
+* Los WHEN deberían admitir una expresión lógica en la condición.
+* Lo mismo en los casos del IS.
 
 ## 2da Etapa: Analizador semántico con generación del AST
 
