@@ -1,2 +1,2 @@
 #!/bin/sh
-./_clean.sh && ./_run.sh Generador && ./_run.sh PruebaJavaCup
+./_clean.sh && ./_run.sh GenerarLexerYParser && ./_run.sh sintaxis/PruebaParser
