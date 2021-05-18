@@ -49,6 +49,7 @@ Estado: :white_check_mark:, pero hay cuestiones pendientes con los operadores (v
   Es decir, en "if x == 1 then if y == 2 then writeln("algo");" tendría que evaluarse primero "if x == 1" ?
 * Los WHEN deberían admitir una expresión lógica en la condición.
 * Lo mismo en los casos del IS.
+* Por qué no admite local_al_then = local_al_then – 1; en entrada.txt?
 
 ## 2da Etapa: Analizador semántico con generación del AST
 
@@ -63,6 +64,19 @@ Requisitos:
   * parámetros
 * Opcional: Conversiones implícitas de tipo
 * Verificación de ámbito de las variables y funciones
+
+* Adminir variables globales definidas despues de la definicion de una funcion. Por ejemplo:
+``
+function mayor(x is integer)
+    x = aux;
+    return x;
+
+int aux = 10;
+
+main is
+    mayor(10);
+end.
+``
 
 
 ## 3ra Etapa: Generador de código ejecutable a partir del AST

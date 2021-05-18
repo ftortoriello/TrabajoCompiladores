@@ -84,7 +84,8 @@ OpComparacion       = ==|\!=|\>|\>=|\<|\<=
 TiposDeDato         = boolean|integer|float
 CtesBooleanas       = true|false
 
-ComentarioUnaLinea = #.*
+FinDeLinea         = \r|\n|\r\n
+ComentarioUnaLinea = #.*{FinDeLinea}?
 
 %state BLOQUE_COMENT CADENA
 
