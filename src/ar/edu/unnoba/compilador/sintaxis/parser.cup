@@ -11,6 +11,8 @@ import ar.edu.unnoba.compilador.token.Token;
 
 import ar.edu.unnoba.compilador.ast.base.Programa;
 // import ar.edu.unnoba.compilador.ast.base.Bloque;
+import ar.edu.unnoba.compilador.ast.base.Constante;
+import ar.edu.unnoba.compilador.ast.base.Tipo;
 
 class Parser;
 
@@ -47,7 +49,7 @@ nonterminal Programa programa;
 nonterminal String lst_decs_vars_y_funcs, dec_var, dec_fun,
     arg_dec, arg_dec_default, lst_args_dec, lst_args_dec_default,
     bloque, lst_sentencias, sentencia, bloque_when_is,
-    expresion, termino, factor, constante, constante_num,
+    expresion, termino, factor, constante,
     invocacion_funcion, lst_args_invocacion;
 
 precedence left OP_LOG_BIN_OR, OP_ARIT_SUMA, OP_ARIT_RESTA;
@@ -321,31 +323,23 @@ factor ::=
         :};
 
 constante ::=
-        constante_num:num {:
-            RESULT = num;
-            System.out.println("REGLA 8.1: constante_num (" + RESULT + ") -> constante");
+        ENTERO:num_int {:
+            RESULT = new Constante(num_int, Tipo.INTEGER);
         :} |
-        CTE_BOOLEANA:bool {:
-            RESULT = bool;
-            System.out.println("REGLA 8.2: CTE_BOOLEANA (" + RESULT + ") -> constante");
+        FLOTANTE:num_float {:
+            RESULT = new Constante(num_float, Tipo.FLOAT);
+        :} |
+        CTE_BOOLEANA:cte_booleana {:
+            RESULT = new Constante(cte_booleana, Tipo.BOOL);
+        :} |
+        IDENTIFICADOR:id {:
+            // TODO: No sé si es correcto que el identificador y la llamada estén acá, no son "constantes"?
+            // Más allá de eso, los tipos del identificador y la invocación a función serían desconocidos
+            // en la primera pasada, y se obtienen en una posterior mediante el transformer?
+            RESULT = new Constante(id, Tipo.UNKNOWN);
         :} |
         invocacion_funcion:fun {:
             RESULT = fun;
-            System.out.println("REGLA 8.3: invocacion_funcion (" + RESULT + ") -> constante");
-        :};
-
-constante_num ::=
-        ENTERO:num {:
-            RESULT = num;
-            System.out.println("REGLA 9.1: ENTERO (" + RESULT + ") -> constante_num");
-        :} |
-        FLOTANTE:num {:
-            RESULT = num;
-            System.out.println("REGLA 9.2: FLOTANTE (" + RESULT + ") -> constante_num");
-        :} |
-        IDENTIFICADOR:id {:
-            RESULT = id;
-            System.out.println("REGLA 9.3: IDENTIFICADOR (" + RESULT + ") -> constante_num");
         :};
 
 invocacion_funcion ::=
