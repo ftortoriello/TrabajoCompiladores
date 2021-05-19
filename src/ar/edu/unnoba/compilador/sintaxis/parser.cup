@@ -12,6 +12,7 @@ import ar.edu.unnoba.compilador.token.Token;
 import ar.edu.unnoba.compilador.ast.base.Programa;
 // import ar.edu.unnoba.compilador.ast.base.Bloque;
 import ar.edu.unnoba.compilador.ast.base.Constante;
+// import ar.edu.unnoba.compilador.ast.base.Identificador;
 import ar.edu.unnoba.compilador.ast.base.Tipo;
 
 class Parser;
@@ -43,12 +44,13 @@ terminal String PR_MAIN_IS, PR_END_PUNTO,
 
 // TODO: cambiar los no terminales de String a sus tipos correspondientes
 nonterminal Programa programa;
+// TODO: cambiar de Constante a Expresion cuando sea posible
 nonterminal Constante constante;
 
 nonterminal String lst_decs_vars_y_funcs, dec_var, dec_fun,
     arg_dec, arg_dec_default, lst_args_dec, lst_args_dec_default,
     bloque, lst_sentencias, sentencia, bloque_when_is,
-    expresion, termino, factor,
+    expresion, conjuncion, negacion_logica, relacion, adicion, termino, negacion_aritmetica, factor,
     invocacion_funcion, lst_args_invocacion;
 
 precedence left OP_LOG_BIN_OR, OP_ARIT_SUMA, OP_ARIT_RESTA;
@@ -267,59 +269,89 @@ bloque_when_is ::=
         :};
 
 expresion ::=
-        expresion:expr OP_ARIT_SUMA:op_suma termino:termino {:
-            RESULT = String.join(" ", expr, op_suma, termino);
-            System.out.println("REGLA 5.1: expresion OP_ARIT_SUMA termino (" + RESULT + ") -> expresion");
+        expresion:expresion OP_LOG_BIN_OR:op_or conjuncion:conjuncion {:
+            RESULT = String.join(" ", expresion, op_or, conjuncion);
+            System.out.println("REGLA: expresion OP_LOG_BIN_OR conjuncion (" + RESULT +") -> expresion");
         :} |
-        expresion:expr OP_ARIT_RESTA:op_resta termino:termino   {:
-            RESULT = String.join(" ", expr, op_resta, termino);
-            System.out.println("REGLA 5.2: expresion OP_ARIT_RESTA termino (" + RESULT + ") -> expresion");
+        conjuncion:conjuncion {:
+            RESULT = conjuncion;
+            System.out.println("REGLA: conjuncion (" + RESULT + ") -> expresion");
+        :};
+
+conjuncion ::=
+       conjuncion:conjuncion OP_LOG_BIN_AND:op_and negacion_logica:negacion_logica {:
+           RESULT = String.join(" ", conjuncion, op_and, negacion_logica);
+           System.out.println("REGLA: conjuncion OP_LOG_BIN_AND negacion_logica (" + RESULT + ") -> conjuncion");
+       :} |
+       negacion_logica:negacion_logica {:
+           RESULT = negacion_logica;
+           System.out.println("REGLA: negacion_logica (" + RESULT + ") -> conjuncion");
+       :};
+
+negacion_logica ::=
+        OP_LOG_UNA_NOT:op_not relacion:relacion {:
+            RESULT = String.join(" ", op_not, relacion);
         :} |
-        expresion:expr OP_LOG_BIN_OR:op_or termino:expr_and {:
-            RESULT = String.join(" ", expr, op_or, expr_and);
-            System.out.println("REGLA 5.3: expresion_logica_or OP_LOG_BIN_OR termino (" + RESULT +") -> expresion");
+        relacion:relacion {:
+            RESULT = relacion;
+        :};
+
+relacion ::=
+        relacion:relacion OP_COMPARACION:op_comp adicion:adicion {:
+            RESULT = String.join(" ", relacion, op_comp, adicion);
         :} |
-        termino:expr {:
-            RESULT = expr;
-            System.out.println("REGLA 5.4: termino (" + RESULT + ") -> expresion");
+        adicion:adicion {:
+            RESULT = adicion;
+        :};
+
+adicion ::=
+        adicion:adicion OP_ARIT_SUMA:op_suma termino:termino {:
+            RESULT = String.join(" ", adicion, op_suma, termino);
+            System.out.println("REGLA: adicion OP_ARIT_SUMA termino (" + RESULT + ") -> adicion");
+        :} |
+        adicion:adicion OP_ARIT_RESTA:op_resta termino:termino   {:
+            RESULT = String.join(" ", adicion, op_resta, termino);
+            System.out.println("REGLA: adicion OP_ARIT_RESTA termino (" + RESULT + ") -> adicion");
+        :} |
+        termino:termino {:
+            RESULT = termino;
+            System.out.println("REGLA: termino (" + RESULT + ") -> adicion");
         :};
 
 termino ::=
-        termino:termino OP_ARIT_PROD_O_DIV:op_prod_div factor:factor {:
-            RESULT = String.join(" ", termino, op_prod_div, factor);
-            System.out.println("REGLA 6.1: termino OP_ARIT_PROD_O_DIV factor (" + RESULT + ") -> termino");
+        termino:termino OP_ARIT_PROD_O_DIV:op_prod_div negacion_aritmetica:negacion_aritmetica {:
+            RESULT = String.join(" ", termino, op_prod_div, negacion_aritmetica);
+            System.out.println("REGLA: termino OP_ARIT_PROD_O_DIV negacion_aritmetica (" + RESULT + ") -> termino");
         :} |
-        termino:termino OP_LOG_BIN_AND:op_and factor:factor {:
-            RESULT = String.join(" ", termino, op_and, factor);
-            System.out.println("REGLA 6.2: termino OP_LOG_BIN_AND factor (" + RESULT + ") -> termino");
+        negacion_aritmetica:negacion_aritmetica {:
+            RESULT = negacion_aritmetica;
+            System.out.println("REGLA: negacion_aritmetica (" + RESULT + ") -> termino");
+        :};
+
+negacion_aritmetica ::=
+        OP_ARIT_RESTA:menos factor:factor {:
+            RESULT = String.join(" ", menos, factor);
         :} |
         factor:factor {:
             RESULT = factor;
-            System.out.println("REGLA 6.3: factor (" + RESULT + ") -> termino");
         :};
 
 factor ::=
-        // TODO: le pongo getValor porque factor tiene que ser String y cte ahora es tipo Nodo, ver cómo acomodar
+        // TODO: sacar getValor cuando sea posible crear este nodo,
+        // está ahí para que devuelva un String y se pueda compilar
         constante:cte {:
             RESULT = cte.getValor();
-            System.out.println("REGLA 7.1: constante (" + RESULT + ") -> factor");
         :} |
-        // resta unaria
-        OP_ARIT_RESTA:menos constante:cte {:
-            RESULT = String.join(" ", menos, cte.getValor());
-            System.out.println("REGLA 7.2: OP_ARIT_RESTA constante (" + RESULT + ") -> factor");
+        IDENTIFICADOR:id {:
+            // TODO: Usar nodo Invocacion
+            RESULT = id;
         :} |
-        factor:factor OP_COMPARACION:op_comp constante:cte {:
-            RESULT = String.join(" ", factor, op_comp, cte.getValor());
-            System.out.println("REGLA 7.3: factor OP_COMPARACION constante (" + RESULT + ") -> factor");
-        :} |
-        OP_LOG_UNA_NOT:op_not factor:factor {:
-            RESULT = String.join(" ", op_not, factor);
-            System.out.println("REGLA 7.4: OP_LOG_UNA_NOT constante (" + RESULT + ") -> factor");
+        invocacion_funcion:fun {:
+            // TODO: Armar nodo de tipo invocación?
+            RESULT = fun;
         :} |
         PAR_ABRE:pa expresion:exp PAR_CIERRA:pc {:
-            RESULT = String.join(" ", pa, exp, pc);
-            System.out.println("REGLA 7.5: PA_ABRE expresion PA_CIERRA (" + RESULT + ") -> factor");
+            RESULT = exp;
         :};
 
 constante ::=
@@ -331,12 +363,6 @@ constante ::=
         :} |
         CTE_BOOLEANA:cte_booleana {:
             RESULT = new Constante(cte_booleana, Tipo.BOOL);
-        :} |
-        IDENTIFICADOR:id {:
-            RESULT = new Constante(id, Tipo.UNKNOWN);
-        :} |
-        invocacion_funcion:fun {:
-            RESULT = new Constante(fun, Tipo.UNKNOWN);
         :};
 
 invocacion_funcion ::=
