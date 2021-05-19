@@ -25,7 +25,7 @@ public class Constante extends Expresion {
         this.valor = valor;
     }
 
-    public Object getValor() {
+    public String getValor() {
         return valor;
     }
 

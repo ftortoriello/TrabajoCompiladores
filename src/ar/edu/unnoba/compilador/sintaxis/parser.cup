@@ -43,13 +43,12 @@ terminal String PR_MAIN_IS, PR_END_PUNTO,
 
 // TODO: cambiar los no terminales de String a sus tipos correspondientes
 nonterminal Programa programa;
-
-// nonterminal Constante constante;
+nonterminal Constante constante;
 
 nonterminal String lst_decs_vars_y_funcs, dec_var, dec_fun,
     arg_dec, arg_dec_default, lst_args_dec, lst_args_dec_default,
     bloque, lst_sentencias, sentencia, bloque_when_is,
-    expresion, termino, factor, constante,
+    expresion, termino, factor,
     invocacion_funcion, lst_args_invocacion;
 
 precedence left OP_LOG_BIN_OR, OP_ARIT_SUMA, OP_ARIT_RESTA;
@@ -300,17 +299,18 @@ termino ::=
         :};
 
 factor ::=
+        // TODO: le pongo getValor porque factor tiene que ser String y cte ahora es tipo Nodo, ver cómo acomodar
         constante:cte {:
-            RESULT = cte;
+            RESULT = cte.getValor();
             System.out.println("REGLA 7.1: constante (" + RESULT + ") -> factor");
         :} |
         // resta unaria
         OP_ARIT_RESTA:menos constante:cte {:
-            RESULT = String.join(" ", menos, cte);
+            RESULT = String.join(" ", menos, cte.getValor());
             System.out.println("REGLA 7.2: OP_ARIT_RESTA constante (" + RESULT + ") -> factor");
         :} |
         factor:factor OP_COMPARACION:op_comp constante:cte {:
-            RESULT = String.join(" ", factor, op_comp, cte);
+            RESULT = String.join(" ", factor, op_comp, cte.getValor());
             System.out.println("REGLA 7.3: factor OP_COMPARACION constante (" + RESULT + ") -> factor");
         :} |
         OP_LOG_UNA_NOT:op_not factor:factor {:
@@ -333,13 +333,10 @@ constante ::=
             RESULT = new Constante(cte_booleana, Tipo.BOOL);
         :} |
         IDENTIFICADOR:id {:
-            // TODO: No sé si es correcto que el identificador y la llamada estén acá, no son "constantes"?
-            // Más allá de eso, los tipos del identificador y la invocación a función serían desconocidos
-            // en la primera pasada, y se obtienen en una posterior mediante el transformer?
             RESULT = new Constante(id, Tipo.UNKNOWN);
         :} |
         invocacion_funcion:fun {:
-            RESULT = fun;
+            RESULT = new Constante(fun, Tipo.UNKNOWN);
         :};
 
 invocacion_funcion ::=
