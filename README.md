@@ -81,9 +81,7 @@ end.
 ### Revisar
 
 #### parser.cup
-* En regla constante:
-  * ¿Está bien que el identificador y la llamada a función estén ahí? Ver si conviene moverlos o cambiarle el nombre a la regla (porque no son constantes). 
-  * Más allá de eso, para estos dos casos generamos un nodo con tipo desconocido, con la intención de asignárselo en una pasada posterior mediante el transformer, ¿está bien planteado así?
+...
 
 ## 3ra Etapa: Generador de código ejecutable a partir del AST
 
