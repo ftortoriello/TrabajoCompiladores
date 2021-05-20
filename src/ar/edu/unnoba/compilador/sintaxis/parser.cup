@@ -287,17 +287,21 @@ conjuncion ::=
 negacion_logica ::=
         OP_LOG_UNA_NOT:op_not relacion:relacion {:
             RESULT = String.join(" ", op_not, relacion);
+            System.out.println("REGLA: OP_LOG_UNA_NOT relacion (" + RESULT + ") -> negacion_logica");
         :} |
         relacion:relacion {:
             RESULT = relacion;
+            System.out.println("REGLA: relacion (" + RESULT + ") -> negacion_logica");
         :};
 
 relacion ::=
-        relacion:relacion OP_COMPARACION:op_comp adicion:adicion {:
-            RESULT = String.join(" ", relacion, op_comp, adicion);
+        adicion:adicion1 OP_COMPARACION:op_comp adicion:adicion2 {:
+            RESULT = String.join(" ", adicion1, op_comp, adicion2);
+            System.out.println("REGLA: adicion OP_COMPARACION adicion (" + RESULT + ") -> relacion");
         :} |
         adicion:adicion {:
             RESULT = adicion;
+            System.out.println("REGLA: adicion (" + RESULT + ") -> relacion");
         :};
 
 adicion ::=
