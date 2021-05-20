@@ -53,12 +53,8 @@ nonterminal String lst_decs_vars_y_funcs, dec_var, dec_fun,
     expresion, conjuncion, negacion_logica, relacion, adicion, termino, negacion_aritmetica, factor,
     invocacion_funcion, lst_args_invocacion;
 
-precedence left OP_LOG_BIN_OR, OP_ARIT_SUMA, OP_ARIT_RESTA;
-precedence left OP_LOG_BIN_AND, OP_ARIT_PROD_O_DIV;
-precedence left OP_LOG_UNA_NOT;
-
 // los "else" se asocian implícitamente al último "if"
-precedence right PR_ELSE;
+precedence left PR_ELSE;
 
 precedence left PR_IS;
 
@@ -119,7 +115,7 @@ dec_var ::=
         :};
 
 arg_dec ::=
-        IDENTIFICADOR:id PR_IS:pr_is TIPO_DE_DATO:td  {:
+        IDENTIFICADOR:id PR_IS:pr_is TIPO_DE_DATO:td {:
             RESULT = String.join(" ", id, pr_is, td);
             System.out.println("REGLA 1.3.1.1: IDENTIFICADOR PR_IS TIPO_DE_DATO (" + RESULT + ") -> arg_dec");
         :};
@@ -259,7 +255,7 @@ sentencia ::=
 bloque_when_is ::=
         PR_IS:pr_is OP_COMPARACION:comp expresion:exp PR_THEN:pr_then bloque:bloque {:
             RESULT = String.join(" ", pr_is, comp, exp, pr_then, bloque);
-            System.out.println("REGLA 4.6.1: PR_IS OP_COMPARACION expresion:exp PR_THEN bloque ("
+            System.out.println("REGLA 4.6.1: PR_IS OP_COMPARACION expresion PR_THEN bloque ("
             + RESULT + ") -> bloque_when_is");
         :} |
         PR_IS:pr_is OP_COMPARACION:comp expresion:exp PR_THEN:pr_then bloque:bloque bloque_when_is:bloque_when {:
@@ -309,7 +305,7 @@ adicion ::=
             RESULT = String.join(" ", adicion, op_suma, termino);
             System.out.println("REGLA: adicion OP_ARIT_SUMA termino (" + RESULT + ") -> adicion");
         :} |
-        adicion:adicion OP_ARIT_RESTA:op_resta termino:termino   {:
+        adicion:adicion OP_ARIT_RESTA:op_resta termino:termino {:
             RESULT = String.join(" ", adicion, op_resta, termino);
             System.out.println("REGLA: adicion OP_ARIT_RESTA termino (" + RESULT + ") -> adicion");
         :} |

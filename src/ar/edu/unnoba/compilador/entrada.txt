@@ -1,10 +1,8 @@
-{
 variable radio is float = 1.5;
 
 main is
-    if x == 1 then if y == 2 then writeln("algo");
+    if mostrar == true then if x > 1 then writeln("Varios") else writeln("Uno");
 end.
-}
 
 {
 (* Ejemplo de un programa completo dado en la consigna *)
@@ -62,6 +60,7 @@ main is
 end.
 }
 
+{
 { Ejemplo de ambitos }
 function ejemplo() return boolean
 begin
@@ -72,7 +71,7 @@ begin
         while local_al_then > 5 do
         begin
             # TODO por qué no acepta esta línea?
-            #local_al_then = local_al_then – 1;
+            local_al_then = local_al_then - 1;
             variable local_al_while is float = local_al_then * 1.5;
             writeln(local_al_while);
         end;
@@ -93,3 +92,4 @@ main is
     else
         ejemplo();
 end.
+}
