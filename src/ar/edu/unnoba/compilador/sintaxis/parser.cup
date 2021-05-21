@@ -9,25 +9,53 @@ import java.util.logging.Logger;
 
 import ar.edu.unnoba.compilador.token.Token;
 
+import ar.edu.unnoba.compilador.ast.base.Nodo;
 import ar.edu.unnoba.compilador.ast.base.Programa;
 // import ar.edu.unnoba.compilador.ast.base.Bloque;
-import ar.edu.unnoba.compilador.ast.base.Constante;
-// import ar.edu.unnoba.compilador.ast.base.Identificador;
+// import ar.edu.unnoba.compilador.ast.base.Encabezado;
+import ar.edu.unnoba.compilador.ast.base.Expresion;
+
+
+import ar.edu.unnoba.compilador.ast.operaciones.binarias.logicas.Disyuncion;
+import ar.edu.unnoba.compilador.ast.operaciones.binarias.logicas.Conjuncion;
+import ar.edu.unnoba.compilador.ast.operaciones.unarias.logicas.NegacionLogica;
+
+import ar.edu.unnoba.compilador.ast.operaciones.binarias.relaciones.Desigualdad;
+import ar.edu.unnoba.compilador.ast.operaciones.binarias.relaciones.Igualdad;
+import ar.edu.unnoba.compilador.ast.operaciones.binarias.relaciones.Mayor;
+import ar.edu.unnoba.compilador.ast.operaciones.binarias.relaciones.MayorIgual;
+import ar.edu.unnoba.compilador.ast.operaciones.binarias.relaciones.Menor;
+import ar.edu.unnoba.compilador.ast.operaciones.binarias.relaciones.MenorIgual;
+
+import ar.edu.unnoba.compilador.ast.operaciones.binarias.aritmeticas.Suma;
+import ar.edu.unnoba.compilador.ast.operaciones.binarias.aritmeticas.Resta;
+import ar.edu.unnoba.compilador.ast.operaciones.binarias.aritmeticas.Multiplicacion;
+import ar.edu.unnoba.compilador.ast.operaciones.binarias.aritmeticas.Division;
+import ar.edu.unnoba.compilador.ast.operaciones.unarias.aritmeticas.NegacionAritmetica;
+
 import ar.edu.unnoba.compilador.ast.base.Tipo;
+import ar.edu.unnoba.compilador.ast.base.Identificador;
+import ar.edu.unnoba.compilador.ast.base.Constante;
+import ar.edu.unnoba.compilador.ast.base.InvocacionFuncion;
 
 class Parser;
 
 parser code
 {:
     public void syntax_error(Symbol s) {
-        System.out.println("Error en la línea "+ (s.left+1)+ " Columna "+ s.right+ ". Símbolo '"
-        +s.value+"'. Símbolo n° "+s.sym+ " no reconocido." );
+        System.out.println("Error en la línea "+ (s.left+1) + " Columna "+ s.right + ". Símbolo '"
+        + s.value + "'. Símbolo n° " + s.sym + " no reconocido.");
     }
 
     public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception {
-        System.out.println("Error en la línea "+ (s.left+1)+ " Columna "+ s.right+ ". Símbolo '"
-        +s.value+"'. Símbolo n° "+s.sym+ " no reconocido." );
+        System.out.println("Error en la línea "+ (s.left+1) + " Columna " + s.right + ". Símbolo '"
+        + s.value + "'. Símbolo n° " + s.sym + " no reconocido." );
     }
+
+    public void imprimirEtiqueta(Nodo nodo) {
+        System.out.println("Se creó el nodo " + nodo.getEtiqueta());
+    }
+
 :};
 
 terminal String PR_MAIN_IS, PR_END_PUNTO,
@@ -36,22 +64,28 @@ terminal String PR_MAIN_IS, PR_END_PUNTO,
     PR_IF, PR_THEN, PR_ELSE, PR_WHEN, PR_WHILE,
     PR_FOR, PR_FROM, PR_TO, PR_BY, PR_DO, PR_BREAK, PR_CONTINUE,
     PR_WRITELN, PR_WRITE, PR_READ_INTEGER, PR_READ_FLOAT, PR_READ_BOOLEAN,
-    OP_ARIT_SUMA, OP_ARIT_RESTA, OP_ARIT_PROD_O_DIV, OP_COMPARACION,
+    OP_ARIT_SUMA, OP_ARIT_RESTA, OP_ARIT_PROD, OP_ARIT_DIV,
+    OP_CMP_IGUALDAD, OP_CMP_DESIGUALDAD, OP_CMP_MAYOR, OP_CMP_MAYOR_IGUAL, OP_CMP_MENOR, OP_CMP_MENOR_IGUAL,
     OP_LOG_BIN_OR, OP_LOG_BIN_AND, OP_LOG_UNA_NOT,
     PAR_ABRE, PAR_CIERRA, PR_COMA, PUNTO_Y_COMA, IGUAL,
     IDENTIFICADOR, TIPO_DE_DATO,
     CTE_BOOLEANA, FLOTANTE, ENTERO, CADENA;
 
 // TODO: cambiar los no terminales de String a sus tipos correspondientes
-nonterminal Programa programa;
-// TODO: cambiar de Constante a Expresion cuando sea posible
-nonterminal Constante constante;
+// nonterminal Programa programa;
+
+nonterminal Expresion expresion, conjuncion, negacion_logica,
+    relacion,
+    adicion, termino, negacion_aritmetica,
+    factor, constante, invocacion_funcion;
+
+nonterminal List<Expresion> lista_args;
+
+nonterminal String programa;
 
 nonterminal String lst_decs_vars_y_funcs, dec_var, dec_fun,
     arg_dec, arg_dec_default, lst_args_dec, lst_args_dec_default,
-    bloque, lst_sentencias, sentencia, bloque_when_is,
-    expresion, conjuncion, negacion_logica, relacion, adicion, termino, negacion_aritmetica, factor,
-    invocacion_funcion, lst_args_invocacion;
+    bloque, lst_sentencias, sentencia, bloque_when_is, operador_cmp;
 
 precedence left PR_ELSE, PR_IS;
 
@@ -59,353 +93,380 @@ start with programa;
 
 programa ::=
         lst_decs_vars_y_funcs:decs PR_MAIN_IS:pr_mainis lst_sentencias:sentencias PR_END_PUNTO:pr_end {:
-            // RESULT = String.join(" ", decs, pr_mainis, sentencias, pr_end);
-            // System.out.println("REGLA 0.1 -> lst_decs_vars_y_funcs PR_MAIN_IS lst_sentencias PR_END_PUNTO (" + RESULT + ") -> programa");
-            RESULT = new Programa("Test");
+             RESULT = String.join(" ", decs, pr_mainis, sentencias, pr_end);
+            //RESULT = new Programa("Test");
         :}
-//        |
-//        PR_MAIN_IS:pr_mainis lst_sentencias:sentencias PR_END_PUNTO:pr_end {:
-//            // RESULT = String.join(" ", pr_mainis, sentencias, pr_end);
-//            // System.out.println("REGLA 0.2 -> PR_MAIN_IS lst_sentencias PR_END_PUNTO (" + RESULT + ") -> programa");
+        |
+        PR_MAIN_IS:pr_mainis lst_sentencias:sentencias PR_END_PUNTO:pr_end {:
+             RESULT = String.join(" ", pr_mainis, sentencias, pr_end);
 //            RESULT = new Programa(new Bloque());
-//        :} |
-//        lst_decs_vars_y_funcs:decs PR_MAIN_IS:pr_mainis PR_END_PUNTO:pr_end {:
-//            // programa con declaraciones pero sin cuerpo principal
-//            // RESULT = String.join(" ", decs, pr_mainis, pr_end);
-//            // System.out.println("REGLA 0.3 -> lst_decs_vars_y_funcs PR_MAIN_IS PR_END_PUNTO (" + RESULT + ") -> programa");
+        :} |
+        lst_decs_vars_y_funcs:decs PR_MAIN_IS:pr_mainis PR_END_PUNTO:pr_end {:
+            // programa con declaraciones pero sin cuerpo principal
+             RESULT = String.join(" ", decs, pr_mainis, pr_end);
 //            RESULT = new Programa(new Bloque());
-//        :} |
-//        PR_MAIN_IS:pr_mainis PR_END_PUNTO:pr_end {:
-//            // programa mínimo, sin cuerpo
-//            // RESULT = String.join(" ", pr_mainis, pr_end);
-//            // System.out.println("REGLA 0.4 -> PR_MAIN_IS PR_END_PUNTO (" + RESULT + ") -> programa");
-//            RESULT = new Programa(new Bloque());
-//        :}
-        ;
+        :} |
+        PR_MAIN_IS:pr_mainis PR_END_PUNTO:pr_end {:
+            // programa mínimo, sin cuerpo
+             RESULT = String.join(" ", pr_mainis, pr_end);
+            // RESULT = new Programa(new Bloque());
+        :};
 
 lst_decs_vars_y_funcs ::=
         dec_var:dec_var PUNTO_Y_COMA:pyc lst_decs_vars_y_funcs:decs {:
              RESULT = String.join(" ", dec_var, pyc, decs);
-             System.out.println("REGLA 1.1: dec_var (" + RESULT + ") -> lst_decs_vars_y_funcs");
         :} |
         dec_fun:dec_fun lst_decs_vars_y_funcs:decs {:
             RESULT = String.join(" ", dec_fun, decs);
-            System.out.println("REGLA 1.2: dec_fun (" + RESULT + ") -> lst_decs_vars_y_funcs");
         :} |
         dec_var:dec_var PUNTO_Y_COMA:pyc {:
             RESULT = String.join(" ", dec_var, pyc);
-            System.out.println("REGLA 1.3: dec_var (" + RESULT + ") -> lst_decs_vars_y_funcs");
         :} |
         dec_fun:dec_fun {:
             RESULT = dec_fun;
-            System.out.println("REGLA 1.4: dec_fun (" + RESULT + ") -> lst_decs_vars_y_funcs");
         :};
 
 dec_var ::=
         PR_VARIABLE:pr_var arg_dec:arg_dec {:
              RESULT = String.join(" ", pr_var, arg_dec);
-             System.out.println("REGLA 1.3.1: PR_VARIABLE arg_dec PUNTO_Y_COMA (" + RESULT + ") -> dec_var");
         :} |
         PR_VARIABLE:pr_var arg_dec_default:arg_dec_default {:
              RESULT = String.join(" ", pr_var, arg_dec_default);
-             System.out.println("REGLA 1.3.2: PR_VARIABLE arg_dec_default PUNTO_Y_COMA (" + RESULT + ") -> dec_var");
         :};
 
 arg_dec ::=
         IDENTIFICADOR:id PR_IS:pr_is TIPO_DE_DATO:td {:
             RESULT = String.join(" ", id, pr_is, td);
-            System.out.println("REGLA 1.3.1.1: IDENTIFICADOR PR_IS TIPO_DE_DATO (" + RESULT + ") -> arg_dec");
         :};
 
 arg_dec_default ::=
-        IDENTIFICADOR:id PR_IS:pr_is TIPO_DE_DATO:td IGUAL:igual expresion:exp {:
-            RESULT = String.join(" ", id, pr_is, td, igual, exp);
-            System.out.println("REGLA 1.3.2.1: IDENTIFICADOR PR_IS TIPO_DE_DATO " +
-                               "IGUAL expresion (" + RESULT + ") -> arg_dec_default");
+        IDENTIFICADOR:id PR_IS:pr_is TIPO_DE_DATO:td IGUAL:igual expresion:expr {:
+            RESULT = String.join(" ", id, pr_is, td, igual, expr.getEtiqueta());
         :};
 
 dec_fun ::=
         PR_FUNCTION:pr_funcion IDENTIFICADOR:id PAR_ABRE:pa PAR_CIERRA:pc PR_RETURN:ret TIPO_DE_DATO:td bloque:bloque PUNTO_Y_COMA:pyc {:
-            RESULT = String.join(" ", pr_funcion, id, pa, pc, ret, td, bloque, pyc);
-            System.out.println("REGLA 1.4.1: PR_FUNCTION IDENTIFICADOR PAR_ABRE PAR_CIERRA PR_RETURN " +
-                               "TIPO_DE_DATO bloque PUNTO_Y_COMA:pyc (" + RESULT + ") -> dec_fun");
+            RESULT = String.join(" ", pr_funcion, id, pa, pc, ret, td, bloque);
         :} |
         PR_FUNCTION:pr_funcion IDENTIFICADOR:id PAR_ABRE:pa lst_args_dec:args PAR_CIERRA:pc PR_RETURN:ret TIPO_DE_DATO:td bloque:bloque PUNTO_Y_COMA:pyc {:
-            RESULT = String.join(" ", pr_funcion, id, pa, args, pc, ret, td, bloque, pyc);
-            System.out.println("REGLA 1.4.2: PR_FUNCTION IDENTIFICADOR PAR_ABRE lst_args_dec PAR_CIERRA " +
-                               "PR_RETURN TIPO_DE_DATO bloque PUNTO_Y_COMA:pyc (" + RESULT + ") -> dec_fun");
+            RESULT = String.join(" ", pr_funcion, id, pa, args, pc, ret, td, bloque);
         :};
 
 lst_args_dec ::=
         arg_dec:arg PR_COMA:pr_coma lst_args_dec:args {:
             RESULT = String.join(" ", arg, pr_coma, args);
-            System.out.println("REGLA 1.4.2.1: arg_dec PR_COMA lst_args_dec (" + RESULT + ") -> lst_args_dec");
         :} |
         arg_dec:arg {:
             RESULT = arg;
-            System.out.println("REGLA 1.4.2.2: arg_dec (" + RESULT + ") -> lst_args_dec");
         :} |
         arg_dec_default:arg PR_COMA:pr_coma lst_args_dec_default:args {:
             RESULT = String.join(" ", arg, pr_coma, args);
-            System.out.println("REGLA 1.4.2.3: arg_dec_default PR_COMA lst_args_dec_default (" + RESULT + ") -> lst_args_dec");
         :} |
         arg_dec_default:arg {:
             RESULT = String.join(" ", arg);
-            System.out.println("REGLA 1.4.2.4: arg_dec_default (" + RESULT + ") -> lst_args_dec");
         :};
 
 lst_args_dec_default ::=
         arg_dec_default:arg PR_COMA:pr_coma lst_args_dec_default:args {:
             RESULT = String.join(" ", arg, pr_coma, args);
-            System.out.println("REGLA 1.4.2.3.1: arg_dec_default PR_COMA lst_args_dec_default (" + RESULT + ") -> lst_args_dec_default");
         :} |
         arg_dec_default:arg {:
             RESULT = arg;
-            System.out.println("REGLA 1.4.2.3.2: arg_dec_default (" + RESULT + ") -> lst_args_dec_default");
         :};
-
 
 // sentencia simple o bloque begin/end para implementación de funciones y estructuras de selección e iteración
 bloque ::=
         sentencia:sent {:
             RESULT = String.join(" ", sent);
-            System.out.println("REGLA 2.1: sentencia (" + RESULT + ") -> bloque");
+            // System.out.println("REGLA: sentencia (" + RESULT + ") -> bloque");
         :} |
         PR_BEGIN:begin lst_sentencias:sentencias PR_END:pr_end {:
             RESULT = String.join(" ", begin, sentencias, pr_end);
-            System.out.println("REGLA 2.2: PR_BEGIN lst_sentencias PR_END (" + RESULT + ") -> bloque");
+            // System.out.println("REGLA: begin sentencias end (" + RESULT + ") -> bloque");
         :};
 
 lst_sentencias ::=
         sentencia:sent PUNTO_Y_COMA:pyc lst_sentencias:sentencias {:
             RESULT = String.join(" ", sent, pyc, sentencias);
-            System.out.println("REGLA 3.1: sentencia PUNTO_Y_COMA lst_sentencias (" + RESULT + ") -> lst_sentencias");
+            // System.out.println("REGLA: sentencia, lst_sentencias (" + RESULT + ") -> lst_sentencias");
         :} |
         sentencia:sent PUNTO_Y_COMA:pyc {:
             RESULT = String.join(" ", sent, pyc);
-            System.out.println("REGLA 3.2: sentencia PUNTO_Y_COMA (" + RESULT + ") -> lst_sentencias");
+            // System.out.println("REGLA: sentencia (" + RESULT + ") -> lst_sentencias");
         :};
 
 sentencia ::=
         // asignación
         IDENTIFICADOR:id IGUAL:igual expresion:expr {:
-            RESULT = String.join(" ", id, igual, expr);
-            System.out.println("REGLA 4.1: IDENTIFICADOR IGUAL expresion (" + RESULT + ") -> sentencia");
+            RESULT = String.join(" ", id, igual, expr.getEtiqueta());
         :} |
         invocacion_funcion:invo_fun {:
-            RESULT = invo_fun;
-            System.out.println("REGLA 4.2: invocacion_funcion(" + RESULT + ") -> sentencia");
+            RESULT = invo_fun.getEtiqueta();
         :} |
         // las variables se pueden definir en cualquier punto del programa
         dec_var:dec_var {:
             RESULT = dec_var;
-            System.out.println("REGLA 4.3: dec_var (" + RESULT + ") -> sentencia");
         :} |
-        PR_IF:pr_if expresion:exp PR_THEN:pr_then bloque:bloque {:
-            RESULT = String.join(" ", pr_if, exp, pr_then, bloque);
-            System.out.println("REGLA 4.4: PR_IF expresion PR_THEN bloque ("
-            + RESULT + ") -> sentencia");
+        PR_IF:pr_if expresion:expr PR_THEN:pr_then bloque:bloque {:
+            RESULT = String.join(" ", pr_if, expr.getEtiqueta(), pr_then, bloque);
         :} |
-        PR_IF:pr_if expresion:exp PR_THEN:pr_then bloque:bloque1 PR_ELSE:pr_else bloque:bloque2 {:
-            RESULT = String.join(" ", pr_if, exp, pr_then, bloque1, pr_else, bloque2);
-            System.out.println("REGLA 4.5: PR_IF expresion PR_THEN bloque PR_ELSE bloque ("
-            + RESULT + ") -> sentencia");
+        PR_IF:pr_if expresion:expr PR_THEN:pr_then bloque:bloque1 PR_ELSE:pr_else bloque:bloque2 {:
+            RESULT = String.join(" ", pr_if, expr.getEtiqueta(), pr_then, bloque1, pr_else, bloque2);
         :} |
-        PR_WHEN:when expresion:exp bloque_when_is:bloque_is {:
-            RESULT = String.join(" ", when, exp, bloque_is);
-            System.out.println("REGLA 4.6: PR_WHEN expresion bloque_when_is ("
-            + RESULT + ") -> sentencia");
+        PR_WHEN:when expresion:expr bloque_when_is:bloque_is {:
+            RESULT = String.join(" ", when, expr.getEtiqueta(), bloque_is);
         :} |
-        PR_WHEN:when expresion:exp bloque_when_is:bloque_is PR_ELSE:pr_else bloque:bloque {:
-            RESULT = String.join(" ", when, exp, bloque_is, pr_else, bloque);
-            System.out.println("REGLA 4.7: PR_WHEN expresion bloque_when_is PR_ELSE bloque ("
-            + RESULT + ") -> sentencia");
+        PR_WHEN:when expresion:expr bloque_when_is:bloque_is PR_ELSE:pr_else bloque:bloque {:
+            RESULT = String.join(" ", when, expr.getEtiqueta(), bloque_is, pr_else, bloque);
         :} |
-        PR_WHILE:pr_while expresion:exp PR_DO:pr_do bloque:bloque {:
-            RESULT = String.join(" ", pr_while, exp, pr_do, bloque);
-            System.out.println("REGLA 4.8: PR_WHILE expresion PR_DO sentencia (" + RESULT + ")"
-            + " -> sentencia");
+        PR_WHILE:pr_while expresion:expr PR_DO:pr_do bloque:bloque {:
+            RESULT = String.join(" ", pr_while, expr.getEtiqueta(), pr_do, bloque);
         :} |
         PR_FOR:pr_for IDENTIFICADOR:id PR_FROM:pr_from ENTERO:num_ini PR_TO:pr_to ENTERO:num_fin PR_DO:pr_do bloque:bloque {:
             RESULT = String.join(" ", pr_for, id, pr_from, num_ini, pr_to, num_fin, pr_do, bloque);
-            System.out.println("REGLA 4.9: PR_FOR IDENTIFICADOR PR_FROM ENTERO PR_TO ENTERO PR_DO bloque ("
-                + RESULT + ")" + " -> sentencia");
         :} |
         PR_FOR:pr_for IDENTIFICADOR:id PR_FROM:pr_from ENTERO:num_ini PR_TO:pr_to ENTERO:num_fin PR_BY:pr_by ENTERO:salto PR_DO:pr_do bloque:bloque {:
             RESULT = String.join(" ", pr_for, id, pr_from, num_ini, pr_to, num_fin, pr_by, salto, pr_do, bloque);
-            System.out.println("REGLA 4.10: PR_FOR IDENTIFICADOR PR_FROM ENTERO PR_TO ENTERO PR_DO bloque ("
-                + RESULT + ")" + " -> sentencia");
         :} |
         PR_RETURN:ret expresion:expr {:
-            RESULT = String.join(" ", ret, expr);
-            System.out.println("REGLA 4.11: PR_RETURN expresion (" + RESULT + ") -> sentencia");
+            RESULT = String.join(" ", ret, expr.getEtiqueta());
         :} |
         PR_BREAK:pr_break {:
             RESULT = pr_break;
-            System.out.println("REGLA 4.12: PR_BREAK (" + RESULT + ") -> sentencia");
         :} |
         PR_CONTINUE:pr_cont {:
             RESULT = pr_cont;
-            System.out.println("REGLA 4.13: PR_CONTINUE (" + RESULT + ") -> sentencia");
         :};
 
 bloque_when_is ::=
-        PR_IS:pr_is OP_COMPARACION:comp expresion:exp PR_THEN:pr_then bloque:bloque {:
-            RESULT = String.join(" ", pr_is, comp, exp, pr_then, bloque);
-            System.out.println("REGLA 4.6.1: PR_IS OP_COMPARACION expresion PR_THEN bloque ("
-            + RESULT + ") -> bloque_when_is");
+        PR_IS:pr_is operador_cmp:comp expresion:expr PR_THEN:pr_then bloque:bloque {:
+            RESULT = String.join(" ", pr_is, comp, expr.getEtiqueta(), pr_then, bloque);
         :} |
-        PR_IS:pr_is OP_COMPARACION:comp expresion:exp PR_THEN:pr_then bloque:bloque bloque_when_is:bloque_when {:
-            RESULT = String.join(" ", pr_is, comp, exp, pr_then, bloque, bloque_when);
-            System.out.println("REGLA 4.6.2: PR_IS OP_COMPARACION expresion PR_THEN bloque bloque_when_is ("
-            + RESULT + ") -> bloque_when_is");
+        PR_IS:pr_is operador_cmp:comp expresion:expr PR_THEN:pr_then bloque:bloque bloque_when_is:bloque_when {:
+            RESULT = String.join(" ", pr_is, comp, expr.getEtiqueta(), pr_then, bloque, bloque_when);
+        :};
+
+// Tuve que armar esto porque desarmé el lexema que teníamos antes, que agrupaba a todos los operadores,
+// para que quede más prolijo abajo en las relaciones, pero me olvidé que se usaba acá tmb.
+// TODO: ver si se puede acomodar sin tener que replicar la regla 12 veces (2 por cada operador)
+operador_cmp ::=
+        OP_CMP_IGUALDAD:igual {:
+        :} |
+        OP_CMP_DESIGUALDAD:distinto {:
+        :} |
+        OP_CMP_MAYOR:mayor {:
+        :} |
+        OP_CMP_MAYOR_IGUAL:mayor_igual {:
+        :} |
+        OP_CMP_MENOR:menor {:
+        :} |
+        OP_CMP_MENOR_IGUAL:menor_igual {:
         :};
 
 expresion ::=
-        expresion:expresion OP_LOG_BIN_OR:op_or conjuncion:conjuncion {:
-            RESULT = String.join(" ", expresion, op_or, conjuncion);
-            System.out.println("REGLA: expresion OP_LOG_BIN_OR conjuncion (" + RESULT +") -> expresion");
+        expresion:expr OP_LOG_BIN_OR:op_or conjuncion:con {:
+            Disyuncion dis = new Disyuncion(expr, con);
+            imprimirEtiqueta(dis);
+            RESULT = dis;
+            // System.out.println("REGLA: expresion or conjuncion (" + RESULT + ") -> expresion");
         :} |
-        conjuncion:conjuncion {:
-            RESULT = conjuncion;
-            System.out.println("REGLA: conjuncion (" + RESULT + ") -> expresion");
+        conjuncion:con {:
+            RESULT = con;
+            // System.out.println("REGLA: conjuncion (" + RESULT + ") -> expresion");
         :};
 
 conjuncion ::=
-       conjuncion:conjuncion OP_LOG_BIN_AND:op_and negacion_logica:negacion_logica {:
-           RESULT = String.join(" ", conjuncion, op_and, negacion_logica);
-           System.out.println("REGLA: conjuncion OP_LOG_BIN_AND negacion_logica (" + RESULT + ") -> conjuncion");
+       conjuncion:con OP_LOG_BIN_AND:op_and negacion_logica:neg_log {:
+            Conjuncion conjun = new Conjuncion(con, neg_log);
+            imprimirEtiqueta(conjun);
+            RESULT = conjun;
        :} |
-       negacion_logica:negacion_logica {:
-           RESULT = negacion_logica;
-           System.out.println("REGLA: negacion_logica (" + RESULT + ") -> conjuncion");
+       negacion_logica:neg_log {:
+            RESULT = neg_log;
        :};
 
 negacion_logica ::=
-        OP_LOG_UNA_NOT:op_not relacion:relacion {:
-            RESULT = String.join(" ", op_not, relacion);
-            System.out.println("REGLA: OP_LOG_UNA_NOT relacion (" + RESULT + ") -> negacion_logica");
+        OP_LOG_UNA_NOT:op_not relacion:rel {:
+            NegacionLogica negLog = new NegacionLogica(rel);
+            imprimirEtiqueta(negLog);
+            RESULT = negLog;
         :} |
         relacion:relacion {:
             RESULT = relacion;
-            System.out.println("REGLA: relacion (" + RESULT + ") -> negacion_logica");
         :};
 
 relacion ::=
-        adicion:adicion1 OP_COMPARACION:op_comp adicion:adicion2 {:
-            RESULT = String.join(" ", adicion1, op_comp, adicion2);
-            System.out.println("REGLA: adicion OP_COMPARACION adicion (" + RESULT + ") -> relacion");
+        adicion:adicion1 OP_CMP_IGUALDAD:igual adicion:adicion2 {:
+            Igualdad rel = new Igualdad(adicion1, adicion2);
+            imprimirEtiqueta(rel);
+            RESULT = rel;
+        :} |
+        adicion:adicion1 OP_CMP_DESIGUALDAD:desigual adicion:adicion2 {:
+            Desigualdad rel = new Desigualdad(adicion1, adicion2);
+            imprimirEtiqueta(rel);
+            RESULT = rel;
+        :} |
+        adicion:adicion1 OP_CMP_MAYOR:mayor adicion:adicion2 {:
+            Mayor rel = new Mayor(adicion1, adicion2);
+            imprimirEtiqueta(rel);
+            RESULT = rel;
+        :} |
+        adicion:adicion1 OP_CMP_MAYOR_IGUAL:mayor_igual adicion:adicion2 {:
+            MayorIgual rel = new MayorIgual(adicion1, adicion2);
+            imprimirEtiqueta(rel);
+            RESULT = rel;
+        :} |
+        adicion:adicion1 OP_CMP_MENOR:menor adicion:adicion2 {:
+            Menor rel = new Menor(adicion1, adicion2);
+            imprimirEtiqueta(rel);
+            RESULT = rel;
+        :} |
+        adicion:adicion1 OP_CMP_MENOR_IGUAL:menor_igual adicion:adicion2 {:
+            MenorIgual rel = new MenorIgual(adicion1, adicion2);
+            imprimirEtiqueta(rel);
+            RESULT = rel;
         :} |
         adicion:adicion {:
             RESULT = adicion;
-            System.out.println("REGLA: adicion (" + RESULT + ") -> relacion");
         :};
 
 adicion ::=
         adicion:adicion OP_ARIT_SUMA:op_suma termino:termino {:
-            RESULT = String.join(" ", adicion, op_suma, termino);
-            System.out.println("REGLA: adicion OP_ARIT_SUMA termino (" + RESULT + ") -> adicion");
+            Suma suma = new Suma(adicion, termino);
+            imprimirEtiqueta(suma);
+            RESULT = suma;
         :} |
         adicion:adicion OP_ARIT_RESTA:op_resta termino:termino {:
-            RESULT = String.join(" ", adicion, op_resta, termino);
-            System.out.println("REGLA: adicion OP_ARIT_RESTA termino (" + RESULT + ") -> adicion");
+            Resta resta = new Resta(adicion, termino);
+            imprimirEtiqueta(resta);
+            RESULT = resta;
         :} |
         termino:termino {:
             RESULT = termino;
-            System.out.println("REGLA: termino (" + RESULT + ") -> adicion");
         :};
 
 termino ::=
-        termino:termino OP_ARIT_PROD_O_DIV:op_prod_div negacion_aritmetica:negacion_aritmetica {:
-            RESULT = String.join(" ", termino, op_prod_div, negacion_aritmetica);
-            System.out.println("REGLA: termino OP_ARIT_PROD_O_DIV negacion_aritmetica (" + RESULT + ") -> termino");
+        termino:termino OP_ARIT_PROD:op_prod negacion_aritmetica:negacion_aritmetica {:
+            Multiplicacion multi = new Multiplicacion(termino, negacion_aritmetica);
+            imprimirEtiqueta(multi);
+            RESULT = multi;
+        :} |
+        termino:termino OP_ARIT_DIV:op_div negacion_aritmetica:negacion_aritmetica {:
+            Division divi = new Division(termino, negacion_aritmetica);
+            imprimirEtiqueta(divi);
+            RESULT = divi;
         :} |
         negacion_aritmetica:negacion_aritmetica {:
             RESULT = negacion_aritmetica;
-            System.out.println("REGLA: negacion_aritmetica (" + RESULT + ") -> termino");
         :};
 
 negacion_aritmetica ::=
         OP_ARIT_RESTA:menos factor:factor {:
-            RESULT = String.join(" ", menos, factor);
+            NegacionAritmetica negArit = new NegacionAritmetica(factor);
+            imprimirEtiqueta(negArit);
+            RESULT = negArit;
         :} |
         factor:factor {:
             RESULT = factor;
         :};
 
 factor ::=
-        // TODO: sacar getValor cuando sea posible crear este nodo,
-        // está ahí para que devuelva un String y se pueda compilar
         constante:cte {:
-            RESULT = cte.getValor();
+            RESULT = cte;
         :} |
         IDENTIFICADOR:id {:
-            // TODO: Usar nodo Invocacion
-            RESULT = id;
+            Identificador ident = new Identificador(id);
+            imprimirEtiqueta(ident);
+            RESULT = new Identificador(id);
         :} |
-        invocacion_funcion:fun {:
-            // TODO: Armar nodo de tipo invocación?
-            RESULT = fun;
+        invocacion_funcion:invo {:
+            RESULT = invo;
         :} |
-        PAR_ABRE:pa expresion:exp PAR_CIERRA:pc {:
-            RESULT = exp;
+        PAR_ABRE:pa expresion:expr PAR_CIERRA:pc {:
+            RESULT = expr;
         :};
 
 constante ::=
-        ENTERO:num_int {:
-            RESULT = new Constante(num_int, Tipo.INTEGER);
+        ENTERO:lit_int {:
+            Constante cte = new Constante(lit_int, Tipo.INTEGER);
+            imprimirEtiqueta(cte);
+            RESULT = cte;
         :} |
-        FLOTANTE:num_float {:
-            RESULT = new Constante(num_float, Tipo.FLOAT);
+        FLOTANTE:lit_float {:
+            Constante cte = new Constante(lit_float, Tipo.FLOAT);
+            imprimirEtiqueta(cte);
+            RESULT = cte;
         :} |
-        CTE_BOOLEANA:cte_booleana {:
-            RESULT = new Constante(cte_booleana, Tipo.BOOL);
+        CTE_BOOLEANA:lit_bool {:
+            Constante cte = new Constante(lit_bool, Tipo.BOOL);
+            imprimirEtiqueta(cte);
+            RESULT = cte;
         :};
 
 invocacion_funcion ::=
-        PR_WRITELN:writeln PAR_ABRE:pa expresion:op PAR_CIERRA:pc {:
-            RESULT = String.join(" ", writeln, pa, op, pc);
-            System.out.println("REGLA 10.1: PR_WRITELN PAR_ABRE expresion PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
+        PR_WRITELN:nombre_fun PAR_ABRE:pa expresion:expr PAR_CIERRA:pc {:
+            List<Expresion> args = new ArrayList<>();
+            args.add(expr);
+            RESULT = new InvocacionFuncion(nombre_fun, args);
         :} |
-        PR_WRITELN:writeln PAR_ABRE:pa CADENA:c PAR_CIERRA:pc {:
-            RESULT = String.join(" ", writeln, pa, c, pc);
-            System.out.println("REGLA 10.2: PR_WRITELN PAR_ABRE CADENA PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
+        PR_WRITELN:nombre_fun PAR_ABRE:pa CADENA:c PAR_CIERRA:pc {:
+            // TODO: ver esto, nuestro tipo Cadena supuestamente no es Expresion...
+            List<Expresion> args = new ArrayList<>();
+            args.add(new Constante(c));
+            RESULT = new InvocacionFuncion(nombre_fun, args);
         :} |
-        PR_WRITE:write PAR_ABRE:pa expresion:op PAR_CIERRA:pc {:
-            RESULT = String.join(" ", write, pa, op, pc);
-            System.out.println("REGLA 10.3: PR_WRITE PAR_ABRE expresion PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
+        PR_WRITE:nombre_fun PAR_ABRE:pa expresion:expr PAR_CIERRA:pc {:
+            List<Expresion> args = new ArrayList<>();
+            args.add(expr);
+            RESULT = new InvocacionFuncion(nombre_fun, args);
         :} |
-        PR_WRITE:write PAR_ABRE:pa CADENA:c PAR_CIERRA:pc {:
-            RESULT = String.join(" ", write, pa, c, pc);
-            System.out.println("REGLA 10.4: PR_WRITE PAR_ABRE CADENA PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
+        PR_WRITE:nombre_fun PAR_ABRE:pa CADENA:c PAR_CIERRA:pc {:
+            // TODO: ver esto, nuestro tipo Cadena supuestamente no es Expresion...
+            List<Expresion> args = new ArrayList<>();
+            args.add(new Constante(c));
+            RESULT = new InvocacionFuncion(nombre_fun, args);
         :} |
-        PR_READ_INTEGER:read_integer PAR_ABRE:pa PAR_CIERRA:pc {:
-            RESULT = String.join(read_integer, pa, pc);
-            System.out.println("REGLA 10.5: PR_READ_INTEGER PAR_ABRE PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
+        PR_READ_INTEGER:nombre_fun PAR_ABRE:pa PAR_CIERRA:pc {:
+            InvocacionFuncion invo = new InvocacionFuncion(nombre_fun, Tipo.INTEGER);
+            imprimirEtiqueta(invo);
+            RESULT = invo;
         :} |
-        PR_READ_FLOAT:read_float PAR_ABRE:pa PAR_CIERRA:pc {:
-            RESULT = String.join(read_float, pa, pc);
-            System.out.println("REGLA 10.6: PR_READ_FLOAT PAR_ABRE PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
+        PR_READ_FLOAT:nombre_fun PAR_ABRE:pa PAR_CIERRA:pc {:
+            InvocacionFuncion invo = new InvocacionFuncion(nombre_fun, Tipo.FLOAT);
+            imprimirEtiqueta(invo);
+            RESULT = invo;
         :} |
-        PR_READ_BOOLEAN:read_boolean PAR_ABRE:pa PAR_CIERRA:pc {:
-            RESULT = String.join(read_boolean, pa, pc);
-            System.out.println("REGLA 10.7: PR_READ_BOOLEAN PAR_ABRE PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
+        PR_READ_BOOLEAN:nombre_fun PAR_ABRE:pa PAR_CIERRA:pc {:
+            InvocacionFuncion invo = new InvocacionFuncion(nombre_fun, Tipo.BOOL);
+            imprimirEtiqueta(invo);
+            RESULT = invo;
         :} |
-        IDENTIFICADOR:id PAR_ABRE:pa PAR_CIERRA:pc {:
-            RESULT = String.join(" ", id, pa, pc);
-            System.out.println("REGLA 10.8: IDENTIFICADOR PAR_ABRE PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
+        IDENTIFICADOR:nombre_fun PAR_ABRE:pa PAR_CIERRA:pc {:
+            InvocacionFuncion invo = new InvocacionFuncion(nombre_fun);
+            imprimirEtiqueta(invo);
+            RESULT = invo;
         :} |
-        IDENTIFICADOR:id PAR_ABRE:pa lst_args_invocacion:args PAR_CIERRA:pc {:
-            RESULT = String.join(" ", id, pa, args, pc);
-            System.out.println("REGLA 10.9: IDENTIFICADOR PAR_ABRE lst_args_invocacion PAR_CIERRA (" + RESULT + ") -> invocacion_funcion");
+        IDENTIFICADOR:nombre_fun PAR_ABRE:pa expresion:arg PAR_CIERRA:pc {:
+            List<Expresion> args = new ArrayList<>();
+            args.add(arg);
+            InvocacionFuncion invo = new InvocacionFuncion(nombre_fun, args, Tipo.UNKNOWN);
+            imprimirEtiqueta(invo);
+            RESULT = invo;
         :};
 
-lst_args_invocacion ::=
-        expresion:op PR_COMA:pr_coma lst_args_invocacion:args {:
-            RESULT = String.join(" ", op, pr_coma, args);
-            System.out.println("REGLA 10.9.1: expresion lst (" + RESULT + ") -> lst_args_invocacion");
-        :} |
-        expresion:op {:
-            RESULT = op;
-            System.out.println("REGLA 10.9.2: expresion (" + RESULT + ") -> lst_args_invocacion");
-        :};
+//lista_args ::=
+//        lista_args:args PR_COMA:pr_coma expresion:arg {:
+//            args.add(arg);
+//            System.out.println("Se agregó " + arg.getEtiqueta() + " en args(List<Expresion>)");
+//            RESULT = args;
+//        :} |
+//        expresion:arg {:
+//            List<Expresion> args = new ArrayList<>();
+//            System.out.println("Se crea args(List<Expresion>) con un único arg");
+//            args.add(arg);
+//            RESULT = args;
+//        :} | {:
+//            List<Expresion> args = new ArrayList<>();
+//            System.out.println("Se creó args(List<Expresion>) vacía");
+//            RESULT = args;
+//        :};

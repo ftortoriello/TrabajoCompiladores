@@ -1,9 +1,10 @@
-package ar.edu.unnoba.compilador.ast.operaciones.unarias;
+package ar.edu.unnoba.compilador.ast.operaciones.unarias.conversiones;
 
 import ar.edu.unnoba.compilador.ast.base.Expresion;
 import ar.edu.unnoba.compilador.ast.base.Tipo;
+import ar.edu.unnoba.compilador.ast.operaciones.unarias.OperacionUnaria;
 
-public abstract class OperacionConversion extends OperacionUnaria{
+public abstract class OperacionConversion extends OperacionUnaria {
 
     public OperacionConversion(Expresion expresion) {
         super(expresion);

@@ -6,6 +6,7 @@ import java.util.List;
 
 
 import ar.edu.unnoba.compilador.ast.base.*;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.instrucciones.Asignacion;
 import ar.edu.unnoba.compilador.ast.instrucciones.DeclaracionVariable;
 import ar.edu.unnoba.compilador.ast.operaciones.binarias.OperacionBinaria;
@@ -109,6 +110,17 @@ public class ASTGraphviz extends Visitor<String>{
         parents.pop();
         return resultado.toString();
     }
+
+    @Override
+    public String visit(InvocacionFuncion invo) {
+        StringBuilder resultado = new StringBuilder();
+        current_id = this.getID();
+        resultado.append(this.procesarNodo(invo));
+        parents.push(current_id);
+        parents.pop();
+        return resultado.toString();
+    }
+
 
     @Override
     protected String procesarBloque(Bloque b, List<String> sentencias) {

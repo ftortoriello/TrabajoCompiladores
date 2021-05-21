@@ -3,14 +3,20 @@ package ar.edu.unnoba.compilador.visitor;
 import java.util.ArrayList;
 
 import ar.edu.unnoba.compilador.ast.base.*;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.ast.instrucciones.*;
 import ar.edu.unnoba.compilador.ast.operaciones.binarias.*;
-import ar.edu.unnoba.compilador.ast.operaciones.unarias.*;
+import ar.edu.unnoba.compilador.ast.operaciones.binarias.aritmeticas.Division;
+import ar.edu.unnoba.compilador.ast.operaciones.binarias.aritmeticas.Multiplicacion;
+import ar.edu.unnoba.compilador.ast.operaciones.binarias.aritmeticas.Resta;
+import ar.edu.unnoba.compilador.ast.operaciones.binarias.aritmeticas.Suma;
+import ar.edu.unnoba.compilador.ast.operaciones.unarias.conversiones.EnteroAFlotante;
+import ar.edu.unnoba.compilador.ast.operaciones.unarias.conversiones.FlotanteAEntero;
 
 
 public abstract class Transformer {
 
-    public Programa transform(Programa p) throws ExcepcionDeTipos{
+    public Programa transform(Programa p) throws ExcepcionDeTipos {
         // p.setCuerpo(p.getCuerpo().accept_transfomer(this));
         return p;
     }

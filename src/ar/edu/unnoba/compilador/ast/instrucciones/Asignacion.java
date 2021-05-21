@@ -1,8 +1,8 @@
 package ar.edu.unnoba.compilador.ast.instrucciones;
 
 
-import ar.edu.unnoba.compilador.ast.base.ExcepcionDeAlcance;
-import ar.edu.unnoba.compilador.ast.base.ExcepcionDeTipos;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.ast.base.Expresion;
 import ar.edu.unnoba.compilador.ast.base.Identificador;
 import ar.edu.unnoba.compilador.visitor.Transformer;

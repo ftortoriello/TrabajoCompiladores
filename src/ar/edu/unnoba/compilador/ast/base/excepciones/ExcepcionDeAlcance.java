@@ -1,4 +1,4 @@
-package ar.edu.unnoba.compilador.ast.base;
+package ar.edu.unnoba.compilador.ast.base.excepciones;
 
 public class ExcepcionDeAlcance extends Exception{
 

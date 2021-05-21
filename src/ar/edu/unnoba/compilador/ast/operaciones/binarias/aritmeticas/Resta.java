@@ -1,9 +1,10 @@
-package ar.edu.unnoba.compilador.ast.operaciones.binarias;
+package ar.edu.unnoba.compilador.ast.operaciones.binarias.aritmeticas;
 
-import ar.edu.unnoba.compilador.ast.base.ExcepcionDeAlcance;
-import ar.edu.unnoba.compilador.ast.base.ExcepcionDeTipos;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.ast.base.Expresion;
 import ar.edu.unnoba.compilador.ast.base.Tipo;
+import ar.edu.unnoba.compilador.ast.operaciones.binarias.OperacionBinaria;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 

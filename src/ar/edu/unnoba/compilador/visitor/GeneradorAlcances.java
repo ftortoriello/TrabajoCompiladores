@@ -3,6 +3,7 @@ package ar.edu.unnoba.compilador.visitor;
 import java.util.List;
 
 import ar.edu.unnoba.compilador.ast.base.*;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.instrucciones.Asignacion;
 import ar.edu.unnoba.compilador.ast.instrucciones.DeclaracionVariable;
 import ar.edu.unnoba.compilador.ast.operaciones.binarias.OperacionBinaria;
@@ -25,7 +26,7 @@ public class GeneradorAlcances extends Visitor<Void> {
     }
 
     @Override
-    public Void visit(DeclaracionVariable dv) throws ExcepcionDeAlcance{
+    public Void visit(DeclaracionVariable dv) throws ExcepcionDeAlcance {
         Variable var = new Variable(dv);
         Object result = this.agregarSimbolo(var.getDeclaracion().getId().getNombre(), dv);
         if(result!=null){

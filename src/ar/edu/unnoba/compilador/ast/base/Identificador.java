@@ -1,5 +1,6 @@
 package ar.edu.unnoba.compilador.ast.base;
 
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 
@@ -14,7 +15,7 @@ public class Identificador extends Expresion {
 
     @Override
     public String getEtiqueta() {
-        return String.format(String.format("Ident %s %s", this.getNombre(), this.getTipo()));
+        return String.format(String.format("Identificador[%s](%s)", this.getTipo(), this.getNombre()));
     }
 
     @Override
@@ -23,7 +24,7 @@ public class Identificador extends Expresion {
     }
 
     @Override
-    public Identificador accept_transfomer(Transformer t) throws ExcepcionDeTipos{
+    public Identificador accept_transfomer(Transformer t) throws ExcepcionDeTipos {
         return t.transform(this);
     }
 }

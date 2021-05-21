@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ar.edu.unnoba.compilador.ast.base.*;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.instrucciones.*;
 import ar.edu.unnoba.compilador.ast.operaciones.binarias.*;
 import ar.edu.unnoba.compilador.ast.operaciones.unarias.*;
@@ -31,6 +32,10 @@ public abstract class Visitor<T> {
 
     public T visit(Identificador i) {
         return procesarNodo(i);
+    }
+
+    public T visit(InvocacionFuncion invo) {
+        return procesarNodo(invo);
     }
 
     public <T> T visit(Variable v) {

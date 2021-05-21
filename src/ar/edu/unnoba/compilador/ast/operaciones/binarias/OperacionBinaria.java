@@ -7,7 +7,6 @@ public abstract class OperacionBinaria extends Expresion {
     private Expresion izquierda;
     private Expresion derecha;
 
-
     public OperacionBinaria(Expresion izquierda, Expresion derecha) {
         super(Tipo.UNKNOWN);
         this.izquierda = izquierda;
@@ -50,10 +49,9 @@ public abstract class OperacionBinaria extends Expresion {
 
     @Override
     public String getEtiqueta() {
-        if(this.getTipo() != null){
-            return String.format("%s %s", this.getNombre(), this.getTipo());
-        }
-        return String.format("%s", this.getNombre());
+        return String.format(String.format("%s[%s](%s, %s)",
+                this.getClass().getSimpleName(), this.getTipo(),
+                this.getIzquierda().getEtiqueta(), this.getDerecha().getEtiqueta()));
     }
 
 }

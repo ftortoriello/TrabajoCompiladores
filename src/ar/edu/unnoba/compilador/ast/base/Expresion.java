@@ -28,4 +28,9 @@ public abstract class Expresion extends Nodo{
         this.tipo = tipo;
     }
 
+    @Override
+    public String toString() {
+        return this.getEtiqueta();
+    }
+
 }

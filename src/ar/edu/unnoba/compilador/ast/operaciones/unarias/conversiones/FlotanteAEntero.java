@@ -1,15 +1,15 @@
-package ar.edu.unnoba.compilador.ast.operaciones.unarias;
+package ar.edu.unnoba.compilador.ast.operaciones.unarias.conversiones;
 
-import ar.edu.unnoba.compilador.ast.base.ExcepcionDeAlcance;
-import ar.edu.unnoba.compilador.ast.base.ExcepcionDeTipos;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.ast.base.Expresion;
 import ar.edu.unnoba.compilador.ast.base.Tipo;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
-public class FlotanteAEntero extends  OperacionConversion {
+public class FlotanteAEntero extends OperacionConversion {
     public FlotanteAEntero(Expresion expresion) {
-        super("flotante a entero", expresion, Tipo.INTEGER);
+        super("Flotante a entero", expresion, Tipo.INTEGER);
     }
 
     @Override

@@ -77,10 +77,6 @@ Id                  = [\p{L}_][\p{L}\p{N}_]*\??
 Entero              = \d+
 Flotante            = \d*\.\d*
 
-OpAritSuma          = \+
-OpAritResta         = -
-OpAritProdYDiv      = \*|\/
-OpComparacion       = ==|\!=|\>|\>=|\<|\<=
 TiposDeDato         = boolean|integer|float
 CtesBooleanas       = true|false
 
@@ -130,15 +126,23 @@ ComentarioUnaLinea = #.*{FinDeLinea}?
     {CtesBooleanas}     { return token("CTE_BOOLEANA", yytext()); }
   
     /* operadores */
-    {OpAritSuma}        { return token("OP_ARIT_SUMA", yytext()); }
-    {OpAritResta}       { return token("OP_ARIT_RESTA", yytext()); }
-    {OpAritProdYDiv}    { return token("OP_ARIT_PROD_O_DIV", yytext()); }
+    "+"                 { return token("OP_ARIT_SUMA", yytext()); }
+    "-"                 { return token("OP_ARIT_RESTA", yytext()); }
+    "*"                 { return token("OP_ARIT_PROD", yytext()); }
+    "/"                 { return token("OP_ARIT_DIV", yytext()); }
 
-    {OpComparacion}     { return token("OP_COMPARACION", yytext()); }
+    "=="                { return token("OP_CMP_IGUALDAD", yytext()); }
+    "!="                { return token("OP_CMP_DESIGUALDAD", yytext()); }
+    ">"                 { return token("OP_CMP_MAYOR", yytext()); }
+    ">="                { return token("OP_CMP_MAYOR_IGUAL", yytext()); }
+    "<"                 { return token("OP_CMP_MENOR", yytext()); }
+    "<="                { return token("OP_CMP_MENOR_IGUAL", yytext()); }
+
     "or"                { return token("OP_LOG_BIN_OR", yytext()); }
     "and"               { return token("OP_LOG_BIN_AND", yytext()); }
     "not"               { return token("OP_LOG_UNA_NOT", yytext()); }
- 
+
+    /* otros símbolos del lenguaje */
     "("                 { return token("PAR_ABRE", yytext()); }
     ")"                 { return token("PAR_CIERRA", yytext()); }
 
@@ -147,6 +151,8 @@ ComentarioUnaLinea = #.*{FinDeLinea}?
     "="                 { return token("IGUAL", yytext()); }
 
     {EspacioEnBlanco}   { /* ignorar */ }
+
+    /* literales */
     {Id}                { return token("IDENTIFICADOR", yytext()); }
     {Flotante}          { return token("FLOTANTE", yytext()); }
     {Entero}            { return token("ENTERO", yytext()); }

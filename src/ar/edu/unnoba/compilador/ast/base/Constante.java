@@ -31,7 +31,7 @@ public class Constante extends Expresion {
 
     @Override
     public String getEtiqueta() {
-        return String.format(String.format("Const %s %s", getValor(), this.getTipo()));
+        return String.format(String.format("Constante[%s](%s)", this.getTipo(), getValor()));
     }
 
     @Override
