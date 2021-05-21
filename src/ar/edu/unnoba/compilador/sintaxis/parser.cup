@@ -53,10 +53,7 @@ nonterminal String lst_decs_vars_y_funcs, dec_var, dec_fun,
     expresion, conjuncion, negacion_logica, relacion, adicion, termino, negacion_aritmetica, factor,
     invocacion_funcion, lst_args_invocacion;
 
-// los "else" se asocian implícitamente al último "if"
-precedence left PR_ELSE;
-
-precedence left PR_IS;
+precedence left PR_ELSE, PR_IS;
 
 start with programa;
 
@@ -215,12 +212,12 @@ sentencia ::=
             + RESULT + ") -> sentencia");
         :} |
         PR_WHEN:when expresion:exp bloque_when_is:bloque_is {:
-            RESULT = String.join(" ", when, exp, when, bloque_is);
+            RESULT = String.join(" ", when, exp, bloque_is);
             System.out.println("REGLA 4.6: PR_WHEN expresion bloque_when_is ("
             + RESULT + ") -> sentencia");
         :} |
         PR_WHEN:when expresion:exp bloque_when_is:bloque_is PR_ELSE:pr_else bloque:bloque {:
-            RESULT = String.join(" ", when, exp, when, bloque_is, pr_else, bloque);
+            RESULT = String.join(" ", when, exp, bloque_is, pr_else, bloque);
             System.out.println("REGLA 4.7: PR_WHEN expresion bloque_when_is PR_ELSE bloque ("
             + RESULT + ") -> sentencia");
         :} |
