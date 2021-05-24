@@ -12,6 +12,7 @@ import ar.edu.unnoba.compilador.ast.operaciones.binarias.aritmeticas.Resta;
 import ar.edu.unnoba.compilador.ast.operaciones.binarias.aritmeticas.Suma;
 import ar.edu.unnoba.compilador.ast.operaciones.unarias.conversiones.EnteroAFlotante;
 import ar.edu.unnoba.compilador.ast.operaciones.unarias.conversiones.FlotanteAEntero;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
 
 
 public abstract class Transformer {

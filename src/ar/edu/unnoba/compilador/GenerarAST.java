@@ -20,20 +20,27 @@ public class GenerarAST {
         Parser parser = new Parser(lexico);
         Programa programa = (Programa) parser.parse().value;
         try {
+            // Ejecución de visitor graficador
             PrintWriter pw = new PrintWriter(new FileWriter("arbol.dot"));
             ASTGraphviz graficador = new ASTGraphviz();
             pw.println(graficador.visit(programa));
             pw.close();
             String cmd = "dot -Tpng arbol.dot -o arbol.png";
             Runtime.getRuntime().exec(cmd);
+            // ----------
 
             /*
+            // Ejecución de visitor generador de alcances
             GeneradorAlcances ga = new GeneradorAlcances();
             ga.procesar(programa);
             System.out.println("Alcances procesados");
+            // ----------
+
+            // Ejecución de visitor validador de tipos
             ValidadorTipos vt = new ValidadorTipos();
             vt.procesar(programa);
             System.out.println("Tipos validados");
+            // ----------
             */
 
         } catch(Exception e){

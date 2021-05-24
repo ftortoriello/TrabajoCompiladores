@@ -72,11 +72,12 @@ end.
 
 #### En general
 * Tratar de normalizar los nombres de las variables, por ej. el atributo Identificador a veces es "id", otras "ident" y así.
+* Ojo en entrada.txt con la declaración de superficie₁. Por ahora funciona, pero a 0 (la Expresión) lo estamos tomando como INTEGER, y superficie (el Identificador) es FLOAT.
+
 
 #### parser.cup
 * Los Strings no tienen un tipo (y eso está bien, no deberían), y ahora mismo se crean como si fueran Constante. ¿Hace falta crearles una clase específica?
 * La *producción* sentencia no es de *tipo* sentencia porque tiene en su interior a invocacion_funcion, que es de tipo expresion. Entonces la producción sentencia está forzada a ser de tipo nodo...
-* Me parece que la producción de invocación a funciones podría reducirse de dos a una regla por cada función, creando una regla que contemple los casos en los que lleva argumentos como los que no, pero tengo que ver si funciona.
 * En la parte de declaración de variables ahora mismo tenemos: dec_var, arg_dec, arg_dec_default, lst_args_dec, lst_args_dec_default, ... tal vez pueda simplificarse.
 * Tuve que definir dos precedencias nuevas: para IDENTIFICADOR y para OP_ARIT_RESTA, pero antes no hacían falta. Ver de eliminar la ambigüedad generada al modificar el parser.
 

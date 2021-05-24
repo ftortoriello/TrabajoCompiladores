@@ -2,32 +2,27 @@ package ar.edu.unnoba.compilador.ast.base;
 
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.Declaracion;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
+import java.util.List;
 
-public class Programa extends Nodo {
+public class Encabezado extends Nodo {
 
-    private Encabezado encabezado;
-    private Bloque cuerpo;
+    List<Declaracion> declaraciones;
 
-    public Programa(String nombre, Encabezado encabezado, Bloque cuerpo) {
-        super(nombre);
-        this.cuerpo = cuerpo;
-        this.encabezado = encabezado;
+    public Encabezado(List<Declaracion> declaraciones) {
+        super("Encabezado");
+        this.declaraciones = declaraciones;
     }
 
-    public Encabezado getEncabezado() {
-        return this.encabezado;
+    public List<Declaracion> getDeclaraciones() {
+        return declaraciones;
     }
 
-    public Bloque getCuerpo() {
-        return this.cuerpo;
-    }
-
-    @Override
-    public String toString() {
-        return this.getEtiqueta();
+    public void setDeclaraciones(List<Declaracion> declaraciones) {
+        this.declaraciones = declaraciones;
     }
 
     @Override
@@ -37,7 +32,6 @@ public class Programa extends Nodo {
 
     @Override
     public <R> R accept_transfomer(Transformer t) throws ExcepcionDeTipos {
-        // TODO: Sin implementar
         return null;
     }
 }

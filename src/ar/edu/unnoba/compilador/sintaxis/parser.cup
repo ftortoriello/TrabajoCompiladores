@@ -11,14 +11,17 @@ import ar.edu.unnoba.compilador.token.Token;
 
 import ar.edu.unnoba.compilador.ast.base.Nodo;
 import ar.edu.unnoba.compilador.ast.base.Programa;
+import ar.edu.unnoba.compilador.ast.base.Encabezado;
 import ar.edu.unnoba.compilador.ast.base.Bloque;
 import ar.edu.unnoba.compilador.ast.base.CasoCuando;
 
 import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
-import ar.edu.unnoba.compilador.ast.sentencias.DecFuncion;
-import ar.edu.unnoba.compilador.ast.sentencias.DecVar;
-import ar.edu.unnoba.compilador.ast.sentencias.DecVarInicializada;
+
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.Declaracion;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFuncion;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarInicializada;
 
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntonces;
@@ -110,7 +113,7 @@ parser code
         // Recibe el lexema TIPO (en forma de cadena) y devuelve el enum Tipo correspondiente
         Tipo tipo;
 
-        switch (tipoStr) {
+        switch (tipoStr.toUpperCase()) {
             case "BOOL":
                 tipo = Tipo.BOOL;
                 break;
@@ -173,7 +176,7 @@ terminal String PR_MAIN_IS, PR_END_PUNTO,
     CTE_BOOLEANA, FLOTANTE, ENTERO, CADENA;
 
 nonterminal Programa programa;
-nonterminal List<Sentencia> encabezado;
+nonterminal List<Declaracion> encabezado;
 nonterminal Bloque cuerpo_programa, bloque;
 nonterminal List<CasoCuando> bloque_cuando;
 
@@ -195,58 +198,59 @@ nonterminal DecFuncion dec_fun;
 nonterminal List<DecVar> lst_args_dec, lst_args_dec_default;
 nonterminal DecVar dec_var, arg_dec, arg_dec_default;
 
-precedence left PR_ELSE, PR_IS, IDENTIFICADOR;
-// TODO: antes no hacían falta estas precedencias, con los cambios que hice en el Parser sí, ¿ver de eliminar ambigüedad?
-precedence right OP_ARIT_RESTA;
+// Antes no hacían falta las precedencias de IDENTIFICADOR y OP_ARIT_RESTA, con los cambios que hice en el Parser sí
+// TODO: ¿ver de eliminar ambigüedad?
+precedence left PR_ELSE, PR_IS;
+precedence right IDENTIFICADOR, OP_ARIT_RESTA, PR_VARIABLE, PR_FUNCTION;
 
 start with programa;
 
 programa ::=
         encabezado:decs cuerpo_programa:cpo_prog {:
-            Programa prog = new Programa("Programa con encabezado", decs, cpo_prog);
-            imprimirEtiqueta(prog);
-            RESULT = prog;
-        :} |
-        cuerpo_programa:cpo_prog {:
-            Programa prog = new Programa("Programa sin encabezado", cpo_prog);
+            Encabezado enc = new Encabezado(decs);
+            Programa prog = new Programa("Programa", enc, cpo_prog);
             imprimirEtiqueta(prog);
             RESULT = prog;
         :};
 
 cuerpo_programa ::=
         PR_MAIN_IS:pr_main_is lst_sentencias:sentencias PR_END_PUNTO:pr_end {:
-            Bloque cuerpoPrograma = new Bloque("Programa con cuerpo definido", sentencias, true);
+            Bloque cuerpoPrograma = new Bloque("Cuerpo principal definido", sentencias, true);
             imprimirEtiqueta(cuerpoPrograma);
             RESULT = cuerpoPrograma;
         :} |
         PR_MAIN_IS:pr_main_is PR_END_PUNTO:pr_end {:
-            Bloque cuerpoPrograma = new Bloque("Programa con cuerpo vacío", true);
+            Bloque cuerpoPrograma = new Bloque("Cuerpo principal sin definir", true);
             imprimirEtiqueta(cuerpoPrograma);
             RESULT = cuerpoPrograma;
         :};
 
 encabezado ::=
-        dec_var:dec_var PUNTO_Y_COMA:pyc encabezado:decs {:
+        encabezado:decs dec_var:dec_var PUNTO_Y_COMA:pyc{:
             decs.add(dec_var);
             imprimirEtiqueta(dec_var);
             RESULT = decs;
         :} |
-        dec_fun:dec_fun encabezado:decs {:
+        encabezado:decs dec_fun:dec_fun {:
             decs.add(dec_fun);
             imprimirEtiqueta(dec_fun);
             RESULT = decs;
         :} |
         dec_var:dec_var PUNTO_Y_COMA:pyc {:
-            List<Sentencia> decs = new ArrayList<Sentencia>();
+            List<Declaracion> decs = new ArrayList<Declaracion>();
             decs.add(dec_var);
             imprimirEtiqueta(dec_var);
             RESULT = decs;
         :} |
         dec_fun:dec_fun {:
-            List<Sentencia> decs = new ArrayList<Sentencia>();
+            List<Declaracion> decs = new ArrayList<Declaracion>();
             decs.add(dec_fun);
             imprimirEtiqueta(dec_fun);
             RESULT = decs;
+        :} |
+        {:
+            // Encabezado vacío
+            RESULT = new ArrayList<Declaracion>();
         :};
 
 dec_var ::=
@@ -260,7 +264,7 @@ dec_var ::=
 arg_dec ::=
         IDENTIFICADOR:id PR_IS:pr_is TIPO_DE_DATO:td {:
             Identificador ident = new Identificador(id, getTipoDato(td));
-            DecVar decVar = new DecVar(ident);
+            DecVar decVar = new DecVar("Variable sin inicializar", ident);
             imprimirEtiqueta(decVar);
             RESULT = decVar;
         :};
@@ -268,7 +272,7 @@ arg_dec ::=
 arg_dec_default ::=
         IDENTIFICADOR:id PR_IS:pr_is TIPO_DE_DATO:td IGUAL:igual expresion:expr {:
             Identificador ident = new Identificador(id, getTipoDato(td));
-            DecVarInicializada decVar = new DecVarInicializada(ident, expr);
+            DecVarInicializada decVar = new DecVarInicializada("Variable inicializada", ident, expr);
             imprimirEtiqueta(decVar);
             RESULT = decVar;
         :};
@@ -616,12 +620,6 @@ invocacion_funcion ::=
             imprimirEtiqueta(invo);
             RESULT = invo;
         :} |
-        // TODO: ver si sigue aceptando la función sin argumentos solo con la producción de abajo
-//        IDENTIFICADOR:nombre_fun PAR_ABRE:pa PAR_CIERRA:pc {:
-//            InvocacionFuncion invo = new InvocacionFuncion(nombre_fun);
-//            imprimirEtiqueta(invo);
-//            RESULT = invo;
-//        :} |
         IDENTIFICADOR:nombre_fun PAR_ABRE:pa lista_exprs:args PAR_CIERRA:pc {:
             InvocacionFuncion invo = new InvocacionFuncion(nombre_fun, args, Tipo.UNKNOWN);
             imprimirEtiqueta(invo);
@@ -632,16 +630,15 @@ invocacion_funcion ::=
 lista_exprs ::=
         lista_exprs:args PR_COMA:pr_coma expresion:arg {:
             args.add(arg);
-            System.out.println("Se agregó " + arg.getEtiqueta() + " en args(List<Expresion>)");
             RESULT = args;
         :} |
         expresion:arg {:
             List<Expresion> args = new ArrayList<Expresion>();
             args.add(arg);
-            System.out.println("Se agregó " + arg.getEtiqueta() + " en args(List<Expresion>)");
             RESULT = args;
         :} | {:
+            // Para que acepte la producción cuando no se pasa ningún argumento,
+            // y a la vez genere una lista vacía para pasarle al constructor.
             List<Expresion> args = new ArrayList<>();
-            System.out.println("Se creó args(List<Expresion>) vacía");
             RESULT = args;
         :};

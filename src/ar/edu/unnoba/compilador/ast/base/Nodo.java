@@ -25,9 +25,7 @@ public abstract class Nodo {
         if (this.nombre != null) {
             return this.getNombre();
         }
-        final String name = this.getClass().getName();
-        final int pos = name.lastIndexOf('.') + 1;
-        return name.substring(pos);
+        return this.getClass().getSimpleName();
     }
 
     public abstract <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance;

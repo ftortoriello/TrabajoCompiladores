@@ -1,6 +1,6 @@
 package ar.edu.unnoba.compilador.ast.base;
 
-import ar.edu.unnoba.compilador.ast.sentencias.DecVar;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 

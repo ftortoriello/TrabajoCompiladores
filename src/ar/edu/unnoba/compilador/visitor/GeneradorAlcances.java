@@ -5,7 +5,7 @@ import java.util.List;
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
-import ar.edu.unnoba.compilador.ast.sentencias.DecVar;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
 import ar.edu.unnoba.compilador.ast.operaciones.binarias.OperacionBinaria;
 
 public class GeneradorAlcances extends Visitor<Void> {
@@ -27,12 +27,17 @@ public class GeneradorAlcances extends Visitor<Void> {
     @Override
     public Void visit(DecVar dv) throws ExcepcionDeAlcance {
         Variable var = new Variable(dv);
-        Object result = this.agregarSimbolo(var.getDeclaracion().getId().getNombre(), dv);
+        Object result = this.agregarSimbolo(var.getDeclaracion().getIdent().getNombre(), dv);
         if(result!=null){
             throw new ExcepcionDeAlcance(
                     String.format("El nombre de la variable %1$s de tipo %2$s fue utilizado previamente\"]\n",
-                            dv.getId().getNombre(), dv.getTipo() ));
+                            dv.getIdent().getNombre(), dv.getTipo() ));
         }
+        return null;
+    }
+
+    @Override
+    protected Void procesarEncabezado(Encabezado encabezado, List<Void> sentencias) {
         return null;
     }
 
