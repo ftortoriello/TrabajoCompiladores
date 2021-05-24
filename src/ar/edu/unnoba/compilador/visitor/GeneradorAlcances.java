@@ -4,8 +4,8 @@ import java.util.List;
 
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
-import ar.edu.unnoba.compilador.ast.instrucciones.Asignacion;
-import ar.edu.unnoba.compilador.ast.instrucciones.DeclaracionVariable;
+import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
+import ar.edu.unnoba.compilador.ast.sentencias.DecVar;
 import ar.edu.unnoba.compilador.ast.operaciones.binarias.OperacionBinaria;
 
 public class GeneradorAlcances extends Visitor<Void> {
@@ -13,20 +13,19 @@ public class GeneradorAlcances extends Visitor<Void> {
     private Alcance alcance_actual;
     private Alcance alcance_global;
 
-    /*
+
     public void procesar(Programa programa) throws ExcepcionDeAlcance{
         programa.getCuerpo().setAlcance(new Alcance("global"));
         alcance_global = alcance_actual = programa.getCuerpo().getAlcance();
         this.visit(programa);
     }
-    */
 
     private Object agregarSimbolo(String nombre, Object s){
         return this.alcance_actual.putIfAbsent(nombre, s);
     }
 
     @Override
-    public Void visit(DeclaracionVariable dv) throws ExcepcionDeAlcance {
+    public Void visit(DecVar dv) throws ExcepcionDeAlcance {
         Variable var = new Variable(dv);
         Object result = this.agregarSimbolo(var.getDeclaracion().getId().getNombre(), dv);
         if(result!=null){

@@ -1,4 +1,4 @@
-package ar.edu.unnoba.compilador.ast.instrucciones;
+package ar.edu.unnoba.compilador.ast.sentencias;
 
 import ar.edu.unnoba.compilador.ast.base.Nodo;
 

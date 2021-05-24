@@ -4,7 +4,7 @@ import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.visitor.*;
 
-public abstract class Nodo{
+public abstract class Nodo {
     private String nombre;
 
     public Nodo() {}

@@ -77,6 +77,7 @@ Id                  = [\p{L}_][\p{L}\p{N}_]*\??
 Entero              = \d+
 Flotante            = \d*\.\d*
 
+OpComparacion       = ==|\!=|\>|\>=|\<|\<=
 TiposDeDato         = boolean|integer|float
 CtesBooleanas       = true|false
 
@@ -131,12 +132,7 @@ ComentarioUnaLinea = #.*{FinDeLinea}?
     "*"                 { return token("OP_ARIT_PROD", yytext()); }
     "/"                 { return token("OP_ARIT_DIV", yytext()); }
 
-    "=="                { return token("OP_CMP_IGUALDAD", yytext()); }
-    "!="                { return token("OP_CMP_DESIGUALDAD", yytext()); }
-    ">"                 { return token("OP_CMP_MAYOR", yytext()); }
-    ">="                { return token("OP_CMP_MAYOR_IGUAL", yytext()); }
-    "<"                 { return token("OP_CMP_MENOR", yytext()); }
-    "<="                { return token("OP_CMP_MENOR_IGUAL", yytext()); }
+    {OpComparacion}     { return token("OP_COMPARACION", yytext()); }
 
     "or"                { return token("OP_LOG_BIN_OR", yytext()); }
     "and"               { return token("OP_LOG_BIN_AND", yytext()); }

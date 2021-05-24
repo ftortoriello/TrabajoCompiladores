@@ -1,5 +1,4 @@
-package ar.edu.unnoba.compilador.ast.instrucciones;
-
+package ar.edu.unnoba.compilador.ast.sentencias;
 
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
@@ -39,7 +38,9 @@ public class Asignacion extends Sentencia {
 
     @Override
     public String getEtiqueta() {
-        return String.format("%s", this.getNombreOperacion());
+        return String.format(String.format("%s[%s](%s = %s)",
+                this.getClass().getSimpleName(), this.getIdentificador().getTipo(),
+                this.getIdentificador().getEtiqueta(), this.getExpresion().getEtiqueta()));
     }
 
     @Override

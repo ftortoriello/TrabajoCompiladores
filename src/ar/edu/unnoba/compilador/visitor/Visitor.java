@@ -5,7 +5,7 @@ import java.util.List;
 
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
-import ar.edu.unnoba.compilador.ast.instrucciones.*;
+import ar.edu.unnoba.compilador.ast.sentencias.*;
 import ar.edu.unnoba.compilador.ast.operaciones.binarias.*;
 import ar.edu.unnoba.compilador.ast.operaciones.unarias.*;
 
@@ -20,14 +20,8 @@ public abstract class Visitor<T> {
 
     // TODO: implementar la visita por cada tipo de nodo que la necesite
 
-    // TODO: dejar la visita a Programa como estaba
-    /*
     public T visit(Programa p) throws ExcepcionDeAlcance{
-        // return p.getCuerpo();
         return p.getCuerpo().accept(this);
-    }*/
-    public String visit(Programa p) throws ExcepcionDeAlcance {
-        return p.getCuerpo();
     }
 
     public T visit(Identificador i) {
@@ -60,13 +54,13 @@ public abstract class Visitor<T> {
         return this.procesarAsignacion(a, identificador, expresion);
     }
 
-    public T visit(DeclaracionVariable dv) throws ExcepcionDeAlcance{
+    public T visit(DecVar dv) throws ExcepcionDeAlcance{
         return dv.getId().accept(this);
     }
 
     public T visit(Bloque b) throws ExcepcionDeAlcance{
         List<T> result = new ArrayList<>();
-        for (Sentencia sentencia : b.getSentencias()){
+        for (Nodo sentencia : b.getSentencias()){
             result.add(sentencia.accept(this));
         }
         return procesarBloque(b, result);

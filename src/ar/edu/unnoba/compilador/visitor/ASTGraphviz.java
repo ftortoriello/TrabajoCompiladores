@@ -7,8 +7,8 @@ import java.util.List;
 
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
-import ar.edu.unnoba.compilador.ast.instrucciones.Asignacion;
-import ar.edu.unnoba.compilador.ast.instrucciones.DeclaracionVariable;
+import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
+import ar.edu.unnoba.compilador.ast.sentencias.DecVar;
 import ar.edu.unnoba.compilador.ast.operaciones.binarias.OperacionBinaria;
 
 public class ASTGraphviz extends Visitor<String>{
@@ -66,7 +66,7 @@ public class ASTGraphviz extends Visitor<String>{
     }
 
     @Override
-    public String visit(DeclaracionVariable dv) throws ExcepcionDeAlcance{
+    public String visit(DecVar dv) throws ExcepcionDeAlcance{
         StringBuilder resultado = new StringBuilder();
         current_id = this.getID();
         resultado.append(this.procesarNodo(dv));

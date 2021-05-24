@@ -1,6 +1,6 @@
 package ar.edu.unnoba.compilador.ast.base;
 
-public abstract class Expresion extends Nodo{
+public abstract class Expresion extends Nodo {
     private Tipo tipo;
 
     public Expresion(Tipo tipo) {

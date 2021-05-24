@@ -8,13 +8,9 @@ import ar.edu.unnoba.compilador.ast.operaciones.binarias.OperacionBinaria;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
-public class Resta extends OperacionBinaria {
+public class Resta extends Adicion {
     public Resta(Expresion izquierda, Expresion derecha) {
-        super(izquierda, derecha, "-");
-    }
-
-    public Resta(Expresion izquierda, Expresion derecha, Tipo tipo) {
-        super(izquierda, derecha, tipo, "-");
+        super(izquierda, derecha, Tipo.UNKNOWN, "Resta");
     }
 
     @Override

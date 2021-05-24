@@ -1,22 +1,22 @@
 package ar.edu.unnoba.compilador.ast.base;
 
-import ar.edu.unnoba.compilador.ast.instrucciones.DeclaracionVariable;
+import ar.edu.unnoba.compilador.ast.sentencias.DecVar;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
 public class Variable extends Expresion {
 
-    private DeclaracionVariable declaracion;
+    private DecVar declaracion;
 
-    public Variable(DeclaracionVariable declaracion){
+    public Variable(DecVar declaracion){
         this.declaracion = declaracion;
     }
 
-    public DeclaracionVariable getDeclaracion() {
+    public DecVar getDeclaracion() {
         return declaracion;
     }
 
-    public void setDeclaracion(DeclaracionVariable declaracion) {
+    public void setDeclaracion(DecVar declaracion) {
         this.declaracion = declaracion;
     }
 

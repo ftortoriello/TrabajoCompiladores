@@ -1,18 +1,16 @@
-package ar.edu.unnoba.compilador.ast.instrucciones;
+package ar.edu.unnoba.compilador.ast.sentencias;
 
+import ar.edu.unnoba.compilador.ast.base.Tipo;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.base.Identificador;
-import ar.edu.unnoba.compilador.ast.base.Tipo;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
-public class DeclaracionVariable extends Sentencia {
+public class DecVar extends Sentencia {
     private Identificador id;
-    private Tipo tipo;
 
-    public DeclaracionVariable(Identificador id, Tipo tipo){
+    public DecVar(Identificador id){
         this.id = id;
-        this.tipo = tipo;
     }
 
     public Identificador getId() {
@@ -24,11 +22,14 @@ public class DeclaracionVariable extends Sentencia {
     }
 
     public Tipo getTipo() {
-        return tipo;
+        return this.getId().getTipo();
     }
 
-    public void setTipo(Tipo tipo) {
-        this.tipo = tipo;
+    @Override
+    public String getEtiqueta() {
+        return String.format(String.format("%s[%s](%s)",
+                this.getClass().getSimpleName(), this.getId().getTipo(),
+                this.getId().getEtiqueta()));
     }
 
     @Override
@@ -37,7 +38,7 @@ public class DeclaracionVariable extends Sentencia {
     }
 
     @Override
-    public DeclaracionVariable accept_transfomer(Transformer t) {
+    public DecVar accept_transfomer(Transformer t) {
         return t.transform(this);
     }
 }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
-import ar.edu.unnoba.compilador.ast.instrucciones.*;
+import ar.edu.unnoba.compilador.ast.sentencias.*;
 import ar.edu.unnoba.compilador.ast.operaciones.binarias.*;
 import ar.edu.unnoba.compilador.ast.operaciones.binarias.aritmeticas.Division;
 import ar.edu.unnoba.compilador.ast.operaciones.binarias.aritmeticas.Multiplicacion;
@@ -34,8 +34,8 @@ public abstract class Transformer {
     }
 
     public Bloque transform(Bloque b) throws ExcepcionDeTipos {
-        ArrayList<Sentencia> result = new ArrayList<>();
-        for (Sentencia sentencia : b.getSentencias()){
+        ArrayList<Nodo> result = new ArrayList<>();
+        for (Nodo sentencia : b.getSentencias()){
             result.add(sentencia.accept_transfomer(this));
         }
         b.setSentencias(result);
@@ -50,7 +50,7 @@ public abstract class Transformer {
         return a;
     }
 
-    public DeclaracionVariable transform(DeclaracionVariable dv) {
+    public DecVar transform(DecVar dv) {
         return dv;
     }
 

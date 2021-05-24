@@ -4,7 +4,7 @@ Trabajo para la asignatura "Compiladores" - UNNOBA - 2021
 
 # Progreso
 
-## 1ra Etapa: Analizador léxico y sintáctico
+## 1.ª Etapa: Analizador léxico y sintáctico
 
 Fecha de entrega: 04/05/2021
 
@@ -41,7 +41,7 @@ Estado: :white_check_mark:, pero hay cuestiones pendientes con los operadores (v
 * Declaración de funciones: :white_check_mark:
 * Estructura general del programa: (declaraciones, main is, cuerpo, end): :white_check_mark:
 
-## 2da Etapa: Analizador semántico con generación del AST
+## 2.ª Etapa: Analizador semántico con generación del AST
 
 Fecha de entrega: 31/05/2021
 
@@ -55,7 +55,7 @@ Requisitos:
 * Opcional: Conversiones implícitas de tipo
 * Verificación de ámbito de las variables y funciones
 
-* Adminir variables globales definidas despues de la definicion de una funcion. Por ejemplo:
+* Admitir variables globales definidas después de la definición de una función. Por ejemplo:
 ```
 function mayor(x is integer)
     x = aux;
@@ -70,10 +70,19 @@ end.
 
 ### Revisar
 
-#### parser.cup
-...
+#### En general
+* Tratar de normalizar los nombres de las variables, por ej. el atributo Identificador a veces es "id", otras "ident" y así.
 
-## 3ra Etapa: Generador de código ejecutable a partir del AST
+#### parser.cup
+* Los Strings no tienen un tipo (y eso está bien, no deberían), y ahora mismo se crean como si fueran Constante. ¿Hace falta crearles una clase específica?
+* La *producción* sentencia no es de *tipo* sentencia porque tiene en su interior a invocacion_funcion, que es de tipo expresion. Entonces la producción sentencia está forzada a ser de tipo nodo...
+* Me parece que la producción de invocación a funciones podría reducirse de dos a una regla por cada función, creando una regla que contemple los casos en los que lleva argumentos como los que no, pero tengo que ver si funciona.
+* En la parte de declaración de variables ahora mismo tenemos: dec_var, arg_dec, arg_dec_default, lst_args_dec, lst_args_dec_default, ... tal vez pueda simplificarse.
+* Tuve que definir dos precedencias nuevas: para IDENTIFICADOR y para OP_ARIT_RESTA, pero antes no hacían falta. Ver de eliminar la ambigüedad generada al modificar el parser.
+
+
+
+## 3.ª Etapa: Generador de código ejecutable a partir del AST
 
 Fecha de entrega: A definirse
 

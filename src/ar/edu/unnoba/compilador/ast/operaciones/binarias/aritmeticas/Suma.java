@@ -4,17 +4,13 @@ import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.ast.base.Expresion;
 import ar.edu.unnoba.compilador.ast.base.Tipo;
-import ar.edu.unnoba.compilador.ast.operaciones.binarias.OperacionBinaria;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
-public class Suma extends OperacionBinaria {
-    public Suma(Expresion izquierda, Expresion derecha) {
-        super(izquierda, derecha, "+");
-    }
+public class Suma extends Adicion {
 
-    public Suma(Expresion izquierda, Expresion derecha, Tipo tipo) {
-        super(izquierda, derecha, tipo, "+");
+    public Suma(Expresion izquierda, Expresion derecha) {
+        super(izquierda, derecha, Tipo.UNKNOWN, "Suma");
     }
 
     @Override
