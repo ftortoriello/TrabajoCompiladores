@@ -5,13 +5,11 @@ import java.util.List;
 
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
-import ar.edu.unnoba.compilador.ast.operaciones.binarias.logicas.Disyuncion;
 import ar.edu.unnoba.compilador.ast.sentencias.*;
 import ar.edu.unnoba.compilador.ast.operaciones.binarias.*;
 import ar.edu.unnoba.compilador.ast.operaciones.unarias.*;
-import ar.edu.unnoba.compilador.ast.sentencias.control.Continuar;
+import ar.edu.unnoba.compilador.ast.sentencias.control.Control;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
-import ar.edu.unnoba.compilador.ast.sentencias.control.Salir;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFuncion;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarInicializada;
@@ -54,6 +52,9 @@ public abstract class Visitor<T> {
         return procesarBloque(b, result);
     }
 
+    public T visit(CasoCuando cc) throws ExcepcionDeAlcance {
+        return procesarNodo(cc);
+    }
     public T visit(Constante c) throws ExcepcionDeAlcance {
         return procesarNodo(c);
     }
@@ -126,14 +127,11 @@ public abstract class Visitor<T> {
         return procesarSiEntoncesSino(cond, blqSi, blqSino);
     }
 
-    public T visit(Continuar c) throws ExcepcionDeAlcance {
-        return null;
+    public T visit(Control c) throws ExcepcionDeAlcance {
+        return procesarNodo(c);
     }
     public T visit(Retorno r) throws ExcepcionDeAlcance {
-        return null;
-    }
-    public T visit(Salir s) throws ExcepcionDeAlcance {
-        return null;
+        return procesarRetorno(r, r.getExpr().accept(this));
     }
     // ----------
 
@@ -148,5 +146,6 @@ public abstract class Visitor<T> {
     protected abstract T procesarDecFuncion(List<T> args, T cuerpo);
     protected abstract T procesarSiEntonces(T cond, T blq);
     protected abstract T procesarSiEntoncesSino(T cond, T blqSi, T blqSino);
+    protected abstract T procesarRetorno(Retorno r, T expr);
     // ----------
 }

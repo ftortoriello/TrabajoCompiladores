@@ -1,7 +1,9 @@
 package ar.edu.unnoba.compilador.ast.sentencias.control;
 
 import ar.edu.unnoba.compilador.ast.base.Alcance;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
+import ar.edu.unnoba.compilador.visitor.Visitor;
 
 public abstract class Control extends Sentencia {
     private Alcance alcance;
@@ -25,8 +27,12 @@ public abstract class Control extends Sentencia {
 
     @Override
     public String getEtiqueta() {
-        return String.format(String.format("%s(%s)",
-                this.getClass().getSimpleName(), this.getNombre()));
+        return String.format(String.format("%s", getNombre()));
+    }
+
+    @Override
+    public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
+        return v.visit(this);
     }
 }
 

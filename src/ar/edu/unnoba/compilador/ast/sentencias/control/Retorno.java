@@ -13,12 +13,12 @@ public class Retorno extends Control {
     Expresion expr;
 
     public Retorno (Expresion expr) {
-        super("Sentencia RETURN");
+        super("RETURN");
         this.expr = expr;
     }
 
     public Retorno (Expresion expr, Alcance alcance) {
-        super("Sentencia RETURN", alcance);
+        super("RETURN", alcance);
         this.expr = expr;
     }
 

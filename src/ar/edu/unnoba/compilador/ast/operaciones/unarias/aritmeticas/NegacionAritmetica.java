@@ -10,12 +10,8 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 public class NegacionAritmetica extends OperacionUnaria {
 
     public NegacionAritmetica(Expresion expresion) {
+        // TODO: se guarda la expresión pero no el menos, debería realizarse la conversion acá?
         super("Negacion aritmética", expresion);
-    }
-
-    @Override
-    public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
-        return null;
     }
 
     @Override

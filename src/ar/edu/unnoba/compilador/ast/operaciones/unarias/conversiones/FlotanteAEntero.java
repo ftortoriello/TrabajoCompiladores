@@ -13,11 +13,6 @@ public class FlotanteAEntero extends OperacionConversion {
     }
 
     @Override
-    public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
-        return v.visit(this);
-    }
-
-    @Override
     public FlotanteAEntero accept_transfomer(Transformer t) throws ExcepcionDeTipos {
         return t.transform(this);
     }

@@ -1,6 +1,6 @@
 (* Ejemplo de un programa completo dado en la consigna *)
 (* Se definen (* algunas *) variables globales *)
-variable radio is float = 1.5;
+variable radio is float = -1.5;
 
 # Ojo con esta declaración de abajo, por ahora funciona, pero a 0 (la Expresión)
 # lo estamos tomando como INTEGER, y superficie (el Identificador) es FLOAT.
@@ -17,7 +17,6 @@ begin
             writeln("Else");
 
     ancho = 10 + 20 * 4 - 2;
-    {
     X = (-55.5 / 5) * (3 + 4);
     writeln("Dentro de función superficie_círculo()");
     # Definición de una variable local.
@@ -27,14 +26,13 @@ begin
         variable radio² is float = cuadrado(radio);
         return 3.14 * radio²;
     end;
-    }
 end;
 
 (* Otra función pero con una única sentencia *)
 function cuadrado(valor is float) return float
     return valor * valor;
 
-function get10() return integer
+function get10(x is integer) return integer
     return 10;
 
 { Otra variable global (esta vez, sin inicialización explícita) }

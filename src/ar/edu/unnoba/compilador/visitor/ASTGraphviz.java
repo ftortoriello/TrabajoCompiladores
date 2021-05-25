@@ -8,6 +8,7 @@ import java.util.List;
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
+import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFuncion;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
 import ar.edu.unnoba.compilador.ast.operaciones.binarias.OperacionBinaria;
@@ -184,6 +185,15 @@ public class ASTGraphviz extends Visitor<String>{
         parents.pop();
         return resultado.toString();
     }
+    public String visit(Retorno r) throws ExcepcionDeAlcance {
+        StringBuilder resultado = new StringBuilder();
+        current_id = this.getID();
+        resultado.append(this.procesarNodo(r));
+        parents.push(current_id);
+        resultado.append(super.visit(r));
+        parents.pop();
+        return resultado.toString();
+    }
     // ----------
     // --------------------
 
@@ -252,6 +262,10 @@ public class ASTGraphviz extends Visitor<String>{
     @Override
     protected String procesarVarInicializada(String ident, String expr) {
         return ident + expr;
+    }
+    @Override
+    protected String procesarRetorno(Retorno r, String expr) {
+        return expr;
     }
     // ----------
     // --------------------

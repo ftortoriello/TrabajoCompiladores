@@ -2,6 +2,8 @@ package ar.edu.unnoba.compilador.ast.operaciones.unarias;
 
 import ar.edu.unnoba.compilador.ast.base.Expresion;
 import ar.edu.unnoba.compilador.ast.base.Tipo;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
+import ar.edu.unnoba.compilador.visitor.Visitor;
 
 public abstract class OperacionUnaria extends Expresion{
     private Expresion expresion;
@@ -41,4 +43,8 @@ public abstract class OperacionUnaria extends Expresion{
                 this.getExpresion().getEtiqueta()));
     }
 
+    @Override
+    public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
+        return v.visit(this);
+    }
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
+import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
 import ar.edu.unnoba.compilador.ast.operaciones.binarias.OperacionBinaria;
 
@@ -83,6 +84,11 @@ public class GeneradorAlcances extends Visitor<Void> {
 
     @Override
     protected Void procesarSiEntoncesSino(Void cond, Void blqSi, Void blqSino) {
+        return null;
+    }
+
+    @Override
+    protected Void procesarRetorno(Retorno r, Void expr) {
         return null;
     }
 }

@@ -9,16 +9,11 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 public class Salir extends Control{
 
     public Salir() {
-        super("Sentencia BREAK");
+        super("BREAK");
     }
 
     public Salir(Alcance alcance) {
-        super("Sentencia BREAK", alcance);
-    }
-
-    @Override
-    public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
-        return v.visit(this);
+        super("BREAK", alcance);
     }
 
     @Override

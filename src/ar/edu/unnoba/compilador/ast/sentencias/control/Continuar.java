@@ -9,16 +9,11 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 public class Continuar extends Control {
 
     public Continuar() {
-        super("Sentencia CONTINUE");
+        super("CONTINUE");
     }
 
     public Continuar(Alcance alcance) {
-        super("Sentencia CONTINUE", alcance);
-    }
-
-    @Override
-    public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
-        return v.visit(this);
+        super("CONTINUE", alcance);
     }
 
     @Override
