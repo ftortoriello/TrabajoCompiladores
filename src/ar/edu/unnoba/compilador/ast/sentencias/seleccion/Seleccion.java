@@ -18,4 +18,6 @@ public abstract class Seleccion extends Sentencia {
     public void setCondicion(Expresion condicion) {
         this.condicion = condicion;
     }
+
+
 }

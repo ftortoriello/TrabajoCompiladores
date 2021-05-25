@@ -14,11 +14,6 @@ public class Desigualdad extends OperacionBinaria {
     }
 
     @Override
-    public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
-        return null;
-    }
-
-    @Override
     public <R> R accept_transfomer(Transformer t) throws ExcepcionDeTipos {
         return null;
     }

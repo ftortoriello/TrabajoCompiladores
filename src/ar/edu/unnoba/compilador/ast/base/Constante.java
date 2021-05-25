@@ -1,5 +1,6 @@
 package ar.edu.unnoba.compilador.ast.base;
 
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 
@@ -31,11 +32,11 @@ public class Constante extends Expresion {
 
     @Override
     public String getEtiqueta() {
-        return String.format(String.format("Constante[%s](%s)", this.getTipo(), getValor()));
+        return String.format("%s (%s)", getValor(), getTipo());
     }
 
     @Override
-    public <T> T accept(Visitor<T> v) {
+    public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
         return v.visit(this);
     }
 

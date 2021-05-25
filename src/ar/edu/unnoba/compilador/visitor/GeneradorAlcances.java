@@ -52,12 +52,37 @@ public class GeneradorAlcances extends Visitor<Void> {
     }
 
     @Override
+    protected Void procesarVarInicializada(Void ident, Void expr) {
+        return null;
+    }
+
+    @Override
     protected Void procesarNodo(Nodo n) {
         return null;
     }
 
     @Override
+    protected Void procesarPrograma(Programa p, Void enc, Void blq) {
+        return null;
+    }
+
+    @Override
     protected Void procesarAsignacion(Asignacion a, Void identificador, Void expresion) {
+        return null;
+    }
+
+    @Override
+    protected Void procesarDecFuncion(List<Void> args, Void cuerpo) {
+        return null;
+    }
+
+    @Override
+    protected Void procesarSiEntonces(Void cond, Void blq) {
+        return null;
+    }
+
+    @Override
+    protected Void procesarSiEntoncesSino(Void cond, Void blqSi, Void blqSino) {
         return null;
     }
 }

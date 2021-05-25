@@ -8,38 +8,23 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 import java.util.Collections;
 import java.util.List;
 
-public class InvocacionFuncion extends Expresion {
-    List<Expresion> argumentos;
+public class InvocacionFuncion<T> extends Expresion {
+    // Pongo tipo genérico porque los argumentos pueden ser expresiones o strings
+    List<T> argumentos;
 
-    public InvocacionFuncion(String nombre, List<Expresion> argumentos, Tipo tipo) {
+    public InvocacionFuncion(String nombre, List<T> argumentos, Tipo tipo) {
         super(tipo, nombre);
         this.argumentos = argumentos;
-    }
-
-    public InvocacionFuncion(String nombre, List<Expresion> argumentos) {
-        super(nombre);
-        this.argumentos = argumentos;
-    }
-
-    public InvocacionFuncion(String nombre, Tipo tipo) {
-        super(tipo, nombre);
-        this.argumentos = Collections.emptyList();
-    }
-
-    public InvocacionFuncion(String nombre) {
-        super(nombre);
-        this.argumentos = Collections.emptyList();
     }
 
     @Override
     public String getEtiqueta() {
-        return String.format(String.format("InvocacionFuncion[%s](%s, %s)",
-                this.getTipo(), this.getNombre(), this.argumentos.toString()));
+        return String.format("%s (%s)", getNombre(), this.argumentos.toString().replace("[", "").replace("]", ""));
     }
 
     @Override
     public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
-        return null;
+        return v.visit(this);
     }
 
     @Override

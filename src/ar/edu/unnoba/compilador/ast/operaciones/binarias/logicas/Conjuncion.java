@@ -14,7 +14,7 @@ public class Conjuncion extends OperacionBinaria {
 
     @Override
     public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
-        return null;
+        return v.visit(this);
     }
 
     @Override

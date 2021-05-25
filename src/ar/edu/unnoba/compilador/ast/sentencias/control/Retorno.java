@@ -32,7 +32,7 @@ public class Retorno extends Control {
 
     @Override
     public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
-        return null;
+        return v.visit(this);
     }
 
     @Override

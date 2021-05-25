@@ -32,17 +32,6 @@ public class Asignacion extends Sentencia {
         return expresion;
     }
 
-    protected String getNombreOperacion() {
-        return "=";
-    }
-
-    @Override
-    public String getEtiqueta() {
-        return String.format(String.format("%s[%s](%s = %s)",
-                this.getClass().getSimpleName(), this.getIdentificador().getTipo(),
-                this.getIdentificador().getEtiqueta(), this.getExpresion().getEtiqueta()));
-    }
-
     @Override
     public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
         return v.visit(this);

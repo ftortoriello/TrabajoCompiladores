@@ -17,6 +17,8 @@ public class DecFuncion extends Declaracion {
 
     public DecFuncion(Identificador id, List<DecVar> args, Bloque bloque) {
         super("Declaración de función con argumentos", id);
+        // Invierto el orden de los argumentos porque debido a la forma de las reglas los lee al revés
+        Collections.reverse(args);
         this.args = args;
         this.bloque = bloque;
     }
@@ -37,6 +39,11 @@ public class DecFuncion extends Declaracion {
 
     public void setBloque(Bloque bloque) {
         this.bloque = bloque;
+    }
+
+    @Override
+    public String getEtiqueta() {
+        return String.format("%s %s", getClass().getSimpleName(), getIdent().getEtiqueta());
     }
 
     @Override

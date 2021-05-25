@@ -15,7 +15,7 @@ public class NegacionLogica extends OperacionUnaria {
 
     @Override
     public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
-        return null;
+        return v.visit(this);
     }
 
     @Override

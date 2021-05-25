@@ -215,12 +215,14 @@ programa ::=
 
 cuerpo_programa ::=
         PR_MAIN_IS:pr_main_is lst_sentencias:sentencias PR_END_PUNTO:pr_end {:
-            Bloque cuerpoPrograma = new Bloque("Cuerpo principal definido", sentencias, true);
+            boolean esBloquePrincipal = true;
+            Bloque cuerpoPrograma = new Bloque("Bloque principal", sentencias, esBloquePrincipal);
             imprimirEtiqueta(cuerpoPrograma);
             RESULT = cuerpoPrograma;
         :} |
         PR_MAIN_IS:pr_main_is PR_END_PUNTO:pr_end {:
-            Bloque cuerpoPrograma = new Bloque("Cuerpo principal sin definir", true);
+            boolean esBloquePrincipal = true;
+            Bloque cuerpoPrograma = new Bloque("Bloque principal (vacío)", new ArrayList<Nodo>(), esBloquePrincipal);
             imprimirEtiqueta(cuerpoPrograma);
             RESULT = cuerpoPrograma;
         :};
@@ -292,6 +294,7 @@ dec_fun ::=
         :};
 
 lst_args_dec ::=
+        // TODO: creo que rompí lo de los valores por defecto
         arg_dec:arg PR_COMA:pr_coma lst_args_dec:args {:
             args.add(arg);
             imprimirEtiqueta(arg);
@@ -308,7 +311,6 @@ lst_args_dec ::=
             imprimirEtiqueta(arg);
             RESULT = args;
         :} |
-        // TODO: ¿Hace falta esta regla? Probar si alcanza con la que está en lst_args_dec_default
         arg_dec_default:arg {:
             List<DecVar> args = new ArrayList<DecVar>();
             args.add(arg);
@@ -333,16 +335,18 @@ bloque ::=
         sentencia:sent {:
             List<Nodo> sentencias = new ArrayList<Nodo>();
             sentencias.add(sent);
-            Bloque bloque = new Bloque("Bloque simple (una sentencia)", sentencias);
+            boolean esBloquePrincipal = false;
+            Bloque bloque = new Bloque("Bloque simple (una sentencia)", sentencias, esBloquePrincipal);
             RESULT = bloque;
         :} |
         PR_BEGIN:begin lst_sentencias:sentencias PR_END:pr_end {:
-            Bloque bloque = new Bloque("Bloque compuesto (múltiples sentencias)", sentencias);
+            boolean esBloquePrincipal = false;
+            Bloque bloque = new Bloque("Bloque compuesto (múltiples sentencias)", sentencias, esBloquePrincipal);
             RESULT = bloque;
         :};
 
 lst_sentencias ::=
-        sentencia:sent PUNTO_Y_COMA:pyc lst_sentencias:sentencias {:
+        lst_sentencias:sentencias sentencia:sent PUNTO_Y_COMA:pyc {:
             sentencias.add(sent);
             RESULT = sentencias;
         :} |
@@ -586,37 +590,35 @@ invocacion_funcion ::=
         PR_WRITELN:nombre_fun PAR_ABRE:pa expresion:expr PAR_CIERRA:pc {:
             List<Expresion> args = new ArrayList<>();
             args.add(expr);
-            RESULT = new InvocacionFuncion(nombre_fun, args);
+            RESULT = new InvocacionFuncion(nombre_fun, args, Tipo.UNKNOWN);
         :} |
         PR_WRITELN:nombre_fun PAR_ABRE:pa CADENA:c PAR_CIERRA:pc {:
-            // TODO: ver esto, nuestro tipo Cadena supuestamente no es Expresion...
-            List<Expresion> args = new ArrayList<>();
-            args.add(new Constante(c));
-            RESULT = new InvocacionFuncion(nombre_fun, args);
+            List<String> args = new ArrayList<>();
+            args.add("\\\"" + c + "\\\"");
+            RESULT = new InvocacionFuncion(nombre_fun, args, Tipo.UNKNOWN);
         :} |
         PR_WRITE:nombre_fun PAR_ABRE:pa expresion:expr PAR_CIERRA:pc {:
             List<Expresion> args = new ArrayList<>();
             args.add(expr);
-            RESULT = new InvocacionFuncion(nombre_fun, args);
+            RESULT = new InvocacionFuncion(nombre_fun, args, Tipo.UNKNOWN);
         :} |
         PR_WRITE:nombre_fun PAR_ABRE:pa CADENA:c PAR_CIERRA:pc {:
-            // TODO: ver esto, nuestro tipo Cadena supuestamente no es Expresion...
-            List<Expresion> args = new ArrayList<>();
-            args.add(new Constante(c));
-            RESULT = new InvocacionFuncion(nombre_fun, args);
+            List<String> args = new ArrayList<>();
+            args.add("\\\"" + c + "\\\"");
+            RESULT = new InvocacionFuncion(nombre_fun, args, Tipo.UNKNOWN);
         :} |
         PR_READ_INTEGER:nombre_fun PAR_ABRE:pa PAR_CIERRA:pc {:
-            InvocacionFuncion invo = new InvocacionFuncion(nombre_fun, Tipo.INTEGER);
+            InvocacionFuncion invo = new InvocacionFuncion(nombre_fun, new ArrayList<Expresion>(), Tipo.INTEGER);
             imprimirEtiqueta(invo);
             RESULT = invo;
         :} |
         PR_READ_FLOAT:nombre_fun PAR_ABRE:pa PAR_CIERRA:pc {:
-            InvocacionFuncion invo = new InvocacionFuncion(nombre_fun, Tipo.FLOAT);
+            InvocacionFuncion invo = new InvocacionFuncion(nombre_fun, new ArrayList<Expresion>(), Tipo.FLOAT);
             imprimirEtiqueta(invo);
             RESULT = invo;
         :} |
         PR_READ_BOOLEAN:nombre_fun PAR_ABRE:pa PAR_CIERRA:pc {:
-            InvocacionFuncion invo = new InvocacionFuncion(nombre_fun, Tipo.BOOL);
+            InvocacionFuncion invo = new InvocacionFuncion(nombre_fun, new ArrayList<Expresion>(), Tipo.BOOL);
             imprimirEtiqueta(invo);
             RESULT = invo;
         :} |

@@ -12,7 +12,7 @@ public class SiEntonces extends Seleccion {
     Bloque bloqueSiEntonces;
 
     public SiEntonces(String nombre, Expresion condicion, Bloque bloqueSiEntonces) {
-        super("Bloque IF-THEN", condicion);
+        super(nombre, condicion);
         this.bloqueSiEntonces = bloqueSiEntonces;
     }
 
@@ -30,15 +30,8 @@ public class SiEntonces extends Seleccion {
     }
 
     @Override
-    public String getEtiqueta() {
-        return String.format(String.format("%s(%s, %s)",
-                this.getClass().getSimpleName(), this.getCondicion().getEtiqueta(),
-                this.getBloqueSiEntonces().getEtiqueta()));
-    }
-
-    @Override
     public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
-        return null;
+        return v.visit(this);
     }
 
     @Override

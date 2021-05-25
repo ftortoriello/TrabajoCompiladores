@@ -12,11 +12,12 @@ begin
 
     if mostrar == true then
         if x > 1 then
-            writeln("Varios")
+            writeln("Then")
         else
-            writeln("Uno");
+            writeln("Else");
 
     ancho = 10 + 20 * 4 - 2;
+    {
     X = (-55.5 / 5) * (3 + 4);
     writeln("Dentro de función superficie_círculo()");
     # Definición de una variable local.
@@ -26,6 +27,7 @@ begin
         variable radio² is float = cuadrado(radio);
         return 3.14 * radio²;
     end;
+    }
 end;
 
 (* Otra función pero con una única sentencia *)

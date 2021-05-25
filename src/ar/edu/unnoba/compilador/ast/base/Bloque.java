@@ -5,6 +5,7 @@ import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -12,41 +13,25 @@ public class Bloque extends Nodo {
 
     private Alcance alcance;
     private List<Nodo> sentencias;
-    private boolean esProgramaPrincipal = false;
-
-    public Bloque(String nombre) {
-        super(nombre);
-        this.sentencias = Collections.emptyList();
-    }
-
-    public Bloque(String nombre, boolean esProgramaPrincipal) {
-        super(nombre);
-        this.esProgramaPrincipal = esProgramaPrincipal;
-        this.sentencias = Collections.emptyList();
-    }
-
-    public Bloque(String nombre, List<Nodo> sentencias) {
-        super(nombre);
-        this.sentencias = sentencias;
-    }
-
-    public Bloque(String nombre, List<Nodo> sentencias, Alcance alcance) {
-        super(nombre);
-        this.alcance = alcance;
-        this.sentencias = sentencias;
-    }
+    private boolean esProgramaPrincipal;
 
     public Bloque(String nombre, List<Nodo> sentencias, boolean esProgramaPrincipal) {
         super(nombre);
+        this.sentencias = sentencias;
         this.esProgramaPrincipal = esProgramaPrincipal;
+    }
+
+    public Boolean esCompuesto() {
+        return this.sentencias.size() > 1;
+    }
+
+    public void setSentencias(List<Nodo> sentencias) {
         this.sentencias = sentencias;
     }
 
     public Bloque(String nombre, List<Nodo> sentencias, boolean esProgramaPrincipal, Alcance alcance) {
-        super(nombre);
+        this(nombre, sentencias, esProgramaPrincipal);
         this.alcance = alcance;
-        this.esProgramaPrincipal = esProgramaPrincipal;
-        this.sentencias = sentencias;
     }
 
     public Alcance getAlcance() {
@@ -61,21 +46,13 @@ public class Bloque extends Nodo {
         return esProgramaPrincipal;
     }
 
-    public void setEsProgramaPrincipal(boolean esProgramaPrincipal) {
-        this.esProgramaPrincipal = esProgramaPrincipal;
-    }
-
     public List<Nodo> getSentencias() {
         return sentencias;
     }
 
-    public void setSentencias(List<Nodo> sentencias) {
-        this.sentencias = sentencias;
-    }
-
     @Override
     public String getEtiqueta() {
-        return this.sentencias.toString();
+        return this.getNombre();
     }
 
     @Override

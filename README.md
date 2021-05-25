@@ -72,7 +72,7 @@ end.
 
 #### En general
 * Tratar de normalizar los nombres de las variables, por ej. el atributo Identificador a veces es "id", otras "ident" y así.
-* Ojo en entrada.txt con la declaración de superficie₁. Por ahora funciona, pero a 0 (la Expresión) lo estamos tomando como INTEGER, y superficie (el Identificador) es FLOAT.
+* Ojo en entrada.txt con la declaración de superficie₁. Por ahora funciona, pero a 0 (la Expresión) lo estamos tomando como INTEGER, y superficie (el Identificador) es FLOAT. La idea de esto es que se solucione cuando implementemos las conversiones.
 
 
 #### parser.cup

@@ -1,5 +1,10 @@
 package ar.edu.unnoba.compilador.ast.base;
 
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
+import ar.edu.unnoba.compilador.visitor.Transformer;
+import ar.edu.unnoba.compilador.visitor.Visitor;
+
 public abstract class Expresion extends Nodo {
     private Tipo tipo;
 
@@ -29,8 +34,12 @@ public abstract class Expresion extends Nodo {
     }
 
     @Override
+    public String getEtiqueta() {
+        return String.format("%s (%s)", this.getClass().getSimpleName(), this.getTipo());
+    }
+
+    @Override
     public String toString() {
         return this.getEtiqueta();
     }
-
 }

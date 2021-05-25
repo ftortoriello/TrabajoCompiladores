@@ -25,15 +25,8 @@ public class SiEntoncesSino extends SiEntonces {
     }
 
     @Override
-    public String getEtiqueta() {
-        return String.format(String.format("%s(%s, %s)",
-                this.getClass().getSimpleName(), this.getCondicion().getEtiqueta(),
-                this.getBloqueSiEntonces().getEtiqueta(), this.getBloqueSino().getEtiqueta()));
-    }
-
-    @Override
     public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
-        return null;
+        return v.visit(this);
     }
 
     @Override

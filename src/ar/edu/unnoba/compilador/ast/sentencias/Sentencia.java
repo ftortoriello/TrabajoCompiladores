@@ -9,4 +9,6 @@ public abstract class Sentencia extends Nodo {
     public Sentencia(String nombre) {
         super(nombre);
     }
+
+
 }

@@ -12,7 +12,6 @@ public class DecVarInicializada extends DecVar {
     public DecVarInicializada(String nombre, Identificador id, Expresion expr) {
         super(nombre, id);
         this.expresion = expr;
-        // TODO: ¿Y si el tipo del Identificador es distinto al de la Expresión?
         }
 
     public Expresion getExpresion() {
@@ -21,6 +20,11 @@ public class DecVarInicializada extends DecVar {
 
     public void setExpresion(Expresion expresion) {
         this.expresion = expresion;
+    }
+
+    @Override
+    public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
+        return v.visit(this);
     }
 
 }

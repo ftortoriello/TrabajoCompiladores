@@ -37,7 +37,7 @@ public class Mientras extends Sentencia {
 
     @Override
     public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
-        return null;
+        return v.visit(this);
     }
 
     @Override

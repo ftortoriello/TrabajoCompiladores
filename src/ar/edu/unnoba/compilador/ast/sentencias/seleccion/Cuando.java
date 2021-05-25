@@ -18,7 +18,6 @@ public class Cuando extends Seleccion {
     public Cuando(Expresion expr, List<CasoCuando> bloqueCuando) {
         super("Bloque WHEN", expr);
         this.bloqueCuando = bloqueCuando;
-        this.bloqueElse = new Bloque("Bloque vacío");
     }
 
     public Cuando(Expresion expr, List<CasoCuando> bloqueCuando, Bloque bloqueElse) {
@@ -52,7 +51,7 @@ public class Cuando extends Seleccion {
 
     @Override
     public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
-        return null;
+        return v.visit(this);
     }
 
     @Override
