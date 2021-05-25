@@ -53,7 +53,9 @@ public abstract class Visitor<T> {
     }
 
     public T visit(CasoCuando cc) throws ExcepcionDeAlcance {
-        return procesarNodo(cc);
+        T expr = cc.getExpr().accept(this);
+        T blq = cc.getBloque().accept(this);
+        return procesarCasoCuando(cc, expr, blq);
     }
     public T visit(Constante c) throws ExcepcionDeAlcance {
         return procesarNodo(c);
@@ -105,16 +107,6 @@ public abstract class Visitor<T> {
         return procesarDecFuncion(args, cuerpo);
     }
 
-    public T visit(Mientras m) throws ExcepcionDeAlcance {
-        return null;
-    }
-    public T visit(Para p) throws ExcepcionDeAlcance {
-        return null;
-    }
-
-    public T visit(Cuando c) throws ExcepcionDeAlcance {
-        return null;
-    }
     public T visit(SiEntonces se) throws ExcepcionDeAlcance {
         T cond = se.getCondicion().accept(this);
         T blqSi = se.getBloqueSiEntonces().accept(this);
@@ -126,6 +118,23 @@ public abstract class Visitor<T> {
         T blqSino = ses.getBloqueSino().accept(this);
         return procesarSiEntoncesSino(cond, blqSi, blqSino);
     }
+    public T visit(Cuando c) throws ExcepcionDeAlcance {
+        T expr = c.getCondicion().accept(this);
+        // TODO
+        // T blq = c.getCasos().;
+        return null;
+    }
+
+    public T visit(Mientras m) throws ExcepcionDeAlcance {
+        T expr = m.getCondicion().accept(this);
+        T blq = m.getBloqueSentencias().accept(this);
+        return procesarMientras(m, expr, blq);
+    }
+    public T visit(Para p) throws ExcepcionDeAlcance {
+        // TODO
+        return null;
+    }
+
 
     public T visit(Control c) throws ExcepcionDeAlcance {
         return procesarNodo(c);
@@ -138,14 +147,18 @@ public abstract class Visitor<T> {
     // Procesos implementados en los visitors específicos
     protected abstract T procesarNodo(Nodo n);
     protected abstract T procesarPrograma(Programa p, T enc, T blq);
+
     protected abstract T procesarBloque(Bloque bloque, List<T> sentencias);
     protected abstract T procesarEncabezado(Encabezado encabezado, List<T> sentencias);
+
     protected abstract T procesarOperacionBinaria(OperacionBinaria ob, T ei, T ed);
     protected abstract T procesarVarInicializada(T ident, T expr);
     protected abstract T procesarAsignacion(Asignacion a, T identificador, T expresion);
     protected abstract T procesarDecFuncion(List<T> args, T cuerpo);
     protected abstract T procesarSiEntonces(T cond, T blq);
     protected abstract T procesarSiEntoncesSino(T cond, T blqSi, T blqSino);
+    protected abstract T procesarCasoCuando(CasoCuando cc, T expr, T blq);
+    protected abstract T procesarMientras(Mientras m, T expr, T blq);
     protected abstract T procesarRetorno(Retorno r, T expr);
     // ----------
 }

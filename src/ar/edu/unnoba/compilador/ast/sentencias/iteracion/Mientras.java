@@ -30,12 +30,6 @@ public class Mientras extends Sentencia {
     }
 
     @Override
-    public String getEtiqueta() {
-        return String.format(String.format("%s(COND.: %s)",
-                this.getClass().getSimpleName(), this.getCondicion().getEtiqueta()));
-    }
-
-    @Override
     public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
         return v.visit(this);
     }

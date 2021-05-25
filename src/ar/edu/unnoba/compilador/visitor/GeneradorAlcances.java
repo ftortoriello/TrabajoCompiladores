@@ -8,6 +8,7 @@ import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
 import ar.edu.unnoba.compilador.ast.operaciones.binarias.OperacionBinaria;
+import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 
 public class GeneradorAlcances extends Visitor<Void> {
 
@@ -84,6 +85,16 @@ public class GeneradorAlcances extends Visitor<Void> {
 
     @Override
     protected Void procesarSiEntoncesSino(Void cond, Void blqSi, Void blqSino) {
+        return null;
+    }
+
+    @Override
+    protected Void procesarCasoCuando(CasoCuando cc, Void expr, Void blq) {
+        return null;
+    }
+
+    @Override
+    protected Void procesarMientras(Mientras m, Void expr, Void blq) {
         return null;
     }
 

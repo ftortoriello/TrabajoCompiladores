@@ -13,6 +13,7 @@ import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFuncion;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
 import ar.edu.unnoba.compilador.ast.operaciones.binarias.OperacionBinaria;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarInicializada;
+import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntonces;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
 
@@ -185,6 +186,15 @@ public class ASTGraphviz extends Visitor<String>{
         parents.pop();
         return resultado.toString();
     }
+    public String visit(Mientras m) throws ExcepcionDeAlcance {
+        StringBuilder resultado = new StringBuilder();
+        current_id = this.getID();
+        resultado.append(this.procesarNodo(m));
+        parents.push(current_id);
+        resultado.append(super.visit(m));
+        parents.pop();
+        return resultado.toString();
+    }
     public String visit(Retorno r) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
         current_id = this.getID();
@@ -258,6 +268,15 @@ public class ASTGraphviz extends Visitor<String>{
     @Override
     protected String procesarSiEntoncesSino(String cond, String blqSi, String blqSino) {
         return cond + blqSi + blqSino;
+    }
+    @Override
+    protected String procesarCasoCuando(CasoCuando cc, String expr, String blq) {
+        return expr + blq;
+    }
+
+    @Override
+    protected String procesarMientras(Mientras m, String expr, String blq) {
+        return expr + blq;
     }
     @Override
     protected String procesarVarInicializada(String ident, String expr) {

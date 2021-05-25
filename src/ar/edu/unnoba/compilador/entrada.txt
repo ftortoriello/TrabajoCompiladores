@@ -40,6 +40,12 @@ variable superficie₂ is float;
 
 # Procedimiento principal
 main is
+    while local_al_then > 5 do
+        begin
+            local_al_then = local_al_then - 1;
+            variable local_al_while is float = local_al_then * 1.5;
+            writeln(local_al_while);
+        end;
     writeln("Inicio del programa");
     writeln(superficie₁);
     writeln(superficie₂);
