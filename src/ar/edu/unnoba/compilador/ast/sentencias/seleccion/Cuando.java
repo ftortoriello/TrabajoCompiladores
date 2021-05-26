@@ -8,6 +8,8 @@ import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Cuando extends Seleccion {
@@ -18,10 +20,11 @@ public class Cuando extends Seleccion {
     public Cuando(Expresion expr, List<CasoCuando> bloqueCuando) {
         super("Bloque WHEN", expr);
         this.bloqueCuando = bloqueCuando;
+        this.bloqueElse = new Bloque("Bloque vacío", false);
     }
 
     public Cuando(Expresion expr, List<CasoCuando> bloqueCuando, Bloque bloqueElse) {
-        super("Bloque WHEN", expr);
+        super("Bloque WHEN-ELSE", expr);
         this.bloqueCuando = bloqueCuando;
         this.bloqueElse = bloqueElse;
     }
@@ -40,13 +43,6 @@ public class Cuando extends Seleccion {
 
     public void setBloqueElse(Bloque bloqueElse) {
         this.bloqueElse = bloqueElse;
-    }
-
-    @Override
-    public String getEtiqueta() {
-        return String.format(String.format("%s(%s, %s, %s)",
-                this.getClass().getSimpleName(), this.getCondicion().getEtiqueta(),
-                this.getCasos(), this.getBloqueElse()));
     }
 
     @Override

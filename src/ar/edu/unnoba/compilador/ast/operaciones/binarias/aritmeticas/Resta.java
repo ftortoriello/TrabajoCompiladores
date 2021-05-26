@@ -10,7 +10,7 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 
 public class Resta extends Adicion {
     public Resta(Expresion izquierda, Expresion derecha) {
-        super(izquierda, derecha, Tipo.UNKNOWN, "Resta");
+        super(izquierda, derecha, Tipo.UNKNOWN, "-");
     }
 
     @Override

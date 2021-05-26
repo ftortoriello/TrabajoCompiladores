@@ -10,7 +10,7 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 public class Suma extends Adicion {
 
     public Suma(Expresion izquierda, Expresion derecha) {
-        super(izquierda, derecha, Tipo.UNKNOWN, "Suma");
+        super(izquierda, derecha, Tipo.UNKNOWN, "+");
     }
 
     @Override

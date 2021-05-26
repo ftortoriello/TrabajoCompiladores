@@ -19,7 +19,7 @@ public class InvocacionFuncion<T> extends Expresion {
 
     @Override
     public String getEtiqueta() {
-        return String.format("%s (%s)", getNombre(), this.argumentos.toString().replace("[", "").replace("]", ""));
+        return String.format("%s(%s)", getNombre(), this.argumentos.toString().replace("[", "").replace("]", ""));
     }
 
     @Override

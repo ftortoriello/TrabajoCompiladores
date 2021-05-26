@@ -9,7 +9,7 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 
 public class Conjuncion extends OperacionBinaria {
     public Conjuncion(Expresion izquierda, Expresion derecha) {
-        super(izquierda, derecha, "Conjuncion(y)");
+        super(izquierda, derecha, "AND");
     }
 
     @Override

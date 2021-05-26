@@ -16,7 +16,7 @@ public class Identificador extends Expresion {
 
     @Override
     public String getEtiqueta() {
-        return String.format("%s (%s)", getNombre(), getTipo());
+        return String.format("%s %s", getTipo(), getNombre());
     }
 
     @Override

@@ -14,6 +14,8 @@ import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
 import ar.edu.unnoba.compilador.ast.operaciones.binarias.OperacionBinaria;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarInicializada;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
+import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
+import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntonces;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
 
@@ -43,8 +45,9 @@ public class ASTGraphviz extends Visitor<String>{
                 "]");
          */
 
-        resultado.append("graph cluster_" + getID() + " {" +
-                "    label=\"Programa\";");
+        // resultado.append("graph cluster_" + getID() + " {" +
+        //                  "    label=\"Programa\";");
+        resultado.append("graph Programa {");
         current_id = this.getID();
         resultado.append(this.procesarNodo(p));
         parents.push(current_id);
@@ -88,8 +91,6 @@ public class ASTGraphviz extends Visitor<String>{
         StringBuilder resultado = new StringBuilder();
         current_id = this.getID();
         resultado.append(this.procesarNodo(c));
-        parents.push(current_id);
-        parents.pop();
         return resultado.toString();
     }
     @Override
@@ -97,8 +98,6 @@ public class ASTGraphviz extends Visitor<String>{
         StringBuilder resultado = new StringBuilder();
         current_id = this.getID();
         resultado.append(this.procesarNodo(i));
-        parents.push(current_id);
-        parents.pop();
         return resultado.toString();
     }
     @Override
@@ -106,8 +105,6 @@ public class ASTGraphviz extends Visitor<String>{
         StringBuilder resultado = new StringBuilder();
         current_id = this.getID();
         resultado.append(this.procesarNodo(invo));
-        parents.push(current_id);
-        parents.pop();
         return resultado.toString();
     }
     // ----------
@@ -186,6 +183,27 @@ public class ASTGraphviz extends Visitor<String>{
         parents.pop();
         return resultado.toString();
     }
+    @Override
+    public String visit(Cuando c) throws ExcepcionDeAlcance {
+        StringBuilder resultado = new StringBuilder();
+        current_id = this.getID();
+        resultado.append(this.procesarNodo(c));
+        parents.push(current_id);
+        resultado.append(super.visit(c));
+        parents.pop();
+        return resultado.toString();
+    }
+    @Override
+    public String visit(CasoCuando cc) throws ExcepcionDeAlcance {
+        StringBuilder resultado = new StringBuilder();
+        current_id = this.getID();
+        resultado.append(this.procesarNodo(cc));
+        parents.push(current_id);
+        resultado.append(super.visit(cc));
+        parents.pop();
+        return resultado.toString();
+    }
+    @Override
     public String visit(Mientras m) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
         current_id = this.getID();
@@ -195,6 +213,17 @@ public class ASTGraphviz extends Visitor<String>{
         parents.pop();
         return resultado.toString();
     }
+    @Override
+    public String visit(Para p) throws ExcepcionDeAlcance {
+        StringBuilder resultado = new StringBuilder();
+        current_id = this.getID();
+        resultado.append(this.procesarNodo(p));
+        parents.push(current_id);
+        resultado.append(super.visit(p));
+        parents.pop();
+        return resultado.toString();
+    }
+    @Override
     public String visit(Retorno r) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
         current_id = this.getID();
@@ -268,6 +297,13 @@ public class ASTGraphviz extends Visitor<String>{
     @Override
     protected String procesarSiEntoncesSino(String cond, String blqSi, String blqSino) {
         return cond + blqSi + blqSino;
+    }
+    @Override
+    protected String procesarCuando(Cuando cc, String expr, List<String> casosCuando, String blqElse) {
+        StringBuilder strCasos = new StringBuilder();
+        casosCuando.forEach(c -> strCasos.append(c));
+
+        return expr + strCasos + blqElse;
     }
     @Override
     protected String procesarCasoCuando(CasoCuando cc, String expr, String blq) {

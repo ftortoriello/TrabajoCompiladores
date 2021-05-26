@@ -21,6 +21,12 @@ public class Bloque extends Nodo {
         this.esProgramaPrincipal = esProgramaPrincipal;
     }
 
+    public Bloque(String nombre, boolean esProgramaPrincipal) {
+        super(nombre);
+        this.sentencias = new ArrayList<Nodo>();
+        this.esProgramaPrincipal = esProgramaPrincipal;
+    }
+
     public Boolean esCompuesto() {
         return this.sentencias.size() > 1;
     }

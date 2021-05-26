@@ -20,6 +20,7 @@ public class DecVar extends Declaracion {
         this.getIdent().setTipo(tipo);
     }
 
+
     @Override
     public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
         return v.visit(this);

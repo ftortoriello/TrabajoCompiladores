@@ -120,9 +120,15 @@ public abstract class Visitor<T> {
     }
     public T visit(Cuando c) throws ExcepcionDeAlcance {
         T expr = c.getCondicion().accept(this);
-        // TODO
-        // T blq = c.getCasos().;
-        return null;
+
+        List<T> casosCuando = new ArrayList<>();
+        for (CasoCuando caso : c.getCasos()){
+            casosCuando.add(caso.accept(this));
+        }
+
+        T blqElse = c.getBloqueElse().accept(this);
+
+        return procesarCuando(c, expr, casosCuando, blqElse);
     }
 
     public T visit(Mientras m) throws ExcepcionDeAlcance {
@@ -131,10 +137,8 @@ public abstract class Visitor<T> {
         return procesarMientras(m, expr, blq);
     }
     public T visit(Para p) throws ExcepcionDeAlcance {
-        // TODO
-        return null;
+        return p.getBloqueSentencias().accept(this);
     }
-
 
     public T visit(Control c) throws ExcepcionDeAlcance {
         return procesarNodo(c);
@@ -157,6 +161,7 @@ public abstract class Visitor<T> {
     protected abstract T procesarDecFuncion(List<T> args, T cuerpo);
     protected abstract T procesarSiEntonces(T cond, T blq);
     protected abstract T procesarSiEntoncesSino(T cond, T blqSi, T blqSino);
+    protected abstract T procesarCuando(Cuando cc, T expr, List<T> casosCuando, T blqElse);
     protected abstract T procesarCasoCuando(CasoCuando cc, T expr, T blq);
     protected abstract T procesarMientras(Mientras m, T expr, T blq);
     protected abstract T procesarRetorno(Retorno r, T expr);

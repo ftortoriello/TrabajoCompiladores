@@ -10,7 +10,7 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 public class Disyuncion extends OperacionBinaria {
 
     public Disyuncion(Expresion izquierda, Expresion derecha) {
-        super(izquierda, derecha, "Disyuncion(o)");
+        super(izquierda, derecha, "OR");
     }
 
     @Override

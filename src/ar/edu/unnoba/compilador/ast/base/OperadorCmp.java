@@ -6,5 +6,25 @@ public enum OperadorCmp {
     MAYOR,
     MAYOR_IGUAL,
     MENOR,
-    MENOR_IGUAL
+    MENOR_IGUAL;
+
+    public static String getStrOp(OperadorCmp op) {
+        switch (op) {
+            case IGUALDAD:
+                return "==";
+            case DESIGUALDAD:
+                return "!=";
+            case MAYOR:
+                return ">";
+            case MAYOR_IGUAL:
+                return ">=";
+            case MENOR:
+                return "<";
+            default:
+                return "<=";
+        }
+    }
+
 }
+
+

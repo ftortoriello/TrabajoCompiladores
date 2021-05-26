@@ -51,9 +51,8 @@ public class Para extends Sentencia {
 
     @Override
     public String getEtiqueta() {
-        return String.format("%s(VAR.: %s, V. INI.:%s, V. FIN.: %s, SALTO: %s)",
-                this.getClass().getSimpleName(), this.getIdent().getEtiqueta(),
-                this.getValorInicial(), this.getValorFinal(), this.getSalto());
+        return String.format("Bloque FOR (%s: %s => %s, salto: %s)",
+                this.getIdent().getNombre(), this.getValorInicial(), this.getValorFinal(), this.getSalto());
     }
 
     @Override

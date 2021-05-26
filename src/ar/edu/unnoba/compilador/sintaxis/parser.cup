@@ -222,7 +222,7 @@ cuerpo_programa ::=
         :} |
         PR_MAIN_IS:pr_main_is PR_END_PUNTO:pr_end {:
             boolean esBloquePrincipal = true;
-            Bloque cuerpoPrograma = new Bloque("Bloque principal (vacío)", new ArrayList<Nodo>(), esBloquePrincipal);
+            Bloque cuerpoPrograma = new Bloque("Bloque principal (vacío)", esBloquePrincipal);
             imprimirEtiqueta(cuerpoPrograma);
             RESULT = cuerpoPrograma;
         :};

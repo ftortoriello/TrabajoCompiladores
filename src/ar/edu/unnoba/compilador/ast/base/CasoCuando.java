@@ -44,8 +44,7 @@ public class CasoCuando extends Nodo {
 
     @Override
     public String getEtiqueta() {
-        return String.format("%s(%s, %s, %s)", this.getClass().getSimpleName(), this.getOp(),
-                this.getExpr().getEtiqueta(), this.getBloque().getEtiqueta());
+        return OperadorCmp.getStrOp(op);
     }
 
     @Override

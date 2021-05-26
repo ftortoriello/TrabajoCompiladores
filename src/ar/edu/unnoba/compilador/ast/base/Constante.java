@@ -32,7 +32,7 @@ public class Constante extends Expresion {
 
     @Override
     public String getEtiqueta() {
-        return String.format("%s (%s)", getValor(), getTipo());
+        return String.format("%s %s", getTipo(), getValor());
     }
 
     @Override

@@ -12,6 +12,7 @@ public class Asignacion extends Sentencia {
     private Expresion expresion;
 
     public Asignacion(Identificador id, Expresion e){
+        super("=");
         this.identificador = id;
         this.expresion = e;
     }

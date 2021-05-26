@@ -1,3 +1,4 @@
+
 (* Ejemplo de un programa completo dado en la consigna *)
 (* Se definen (* algunas *) variables globales *)
 variable radio is float = -1.5;
@@ -40,12 +41,15 @@ variable superficie₂ is float;
 
 # Procedimiento principal
 main is
+
+
     while local_al_then > 5 do
         begin
             local_al_then = local_al_then - 1;
             variable local_al_while is float = local_al_then * 1.5;
             writeln(local_al_while);
         end;
+
     writeln("Inicio del programa");
     writeln(superficie₁);
     writeln(superficie₂);
@@ -55,6 +59,7 @@ main is
     superficie₂ = superficie_círculo(radio);
     writeln(superficie₂);
     variable justo is boolean = false;
+
     when superficie_círculo()
         is < 100 then writeln("Es pequeño")
         is == 100 then begin
@@ -62,13 +67,16 @@ main is
             justo = true;
         end
         else writeln("Es grande");
+
     write("Acertó: "); writeln(justo);
 
     variable i is integer;
     for i from 5 to 1 do begin
         write("Se acaba en "); writeln(i);
     end;
+
     writeln("Se acabó\n\nFin!");
+
 end.
 
 {

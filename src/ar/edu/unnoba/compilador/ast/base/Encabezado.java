@@ -13,7 +13,7 @@ public class Encabezado extends Nodo {
     List<Declaracion> declaraciones;
 
     public Encabezado(List<Declaracion> declaraciones) {
-        super("Encabezado");
+        super(declaraciones.size() == 0 ? "Encabezado (vacío)" : "Encabezado");
         this.declaraciones = declaraciones;
     }
 
