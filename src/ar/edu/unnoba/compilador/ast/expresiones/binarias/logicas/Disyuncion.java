@@ -1,27 +1,16 @@
-package ar.edu.unnoba.compilador.ast.sentencias.seleccion;
+package ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas;
 
-import ar.edu.unnoba.compilador.ast.base.Bloque;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
-public class SiEntoncesSino extends SiEntonces {
+public class Disyuncion extends OperacionBinaria {
 
-    Bloque bloqueSino;
-
-    public SiEntoncesSino(Expresion condicion, Bloque bloqueSiEntonces, Bloque bloqueSino) {
-        super("Bloque IF-THEN-ELSE", condicion, bloqueSiEntonces);
-        this.bloqueSino = bloqueSino;
-    }
-
-    public Bloque getBloqueSino() {
-        return bloqueSino;
-    }
-
-    public void setBloqueSino(Bloque bloqueSino) {
-        this.bloqueSino = bloqueSino;
+    public Disyuncion(Expresion izquierda, Expresion derecha) {
+        super(izquierda, derecha, "OR");
     }
 
     @Override

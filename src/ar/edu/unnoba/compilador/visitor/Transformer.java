@@ -4,14 +4,18 @@ import java.util.ArrayList;
 
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
-import ar.edu.unnoba.compilador.ast.sentencias.*;
-import ar.edu.unnoba.compilador.ast.operaciones.binarias.*;
-import ar.edu.unnoba.compilador.ast.operaciones.binarias.aritmeticas.Division;
-import ar.edu.unnoba.compilador.ast.operaciones.binarias.aritmeticas.Multiplicacion;
-import ar.edu.unnoba.compilador.ast.operaciones.binarias.aritmeticas.Resta;
-import ar.edu.unnoba.compilador.ast.operaciones.binarias.aritmeticas.Suma;
-import ar.edu.unnoba.compilador.ast.operaciones.unarias.conversiones.EnteroAFlotante;
-import ar.edu.unnoba.compilador.ast.operaciones.unarias.conversiones.FlotanteAEntero;
+import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Constante;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Variable;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.*;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Division;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Multiplicacion;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Resta;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Suma;
+import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.EnteroAFlotante;
+import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.FlotanteAEntero;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
 
 
@@ -44,9 +48,9 @@ public abstract class Transformer {
     }
 
     public Asignacion transform(Asignacion a) throws ExcepcionDeTipos{
-        Identificador id = a.getIdentificador().accept_transfomer(this);
+        Identificador id = a.getIdent().accept_transfomer(this);
         Expresion e = a.getExpresion().accept_transfomer(this);
-        a.setIdentificador(id);
+        a.setIdent(id);
         a.setExpresion(e);
         return a;
     }

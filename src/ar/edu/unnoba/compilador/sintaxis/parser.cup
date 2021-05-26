@@ -13,17 +13,17 @@ import ar.edu.unnoba.compilador.ast.base.Nodo;
 import ar.edu.unnoba.compilador.ast.base.Programa;
 import ar.edu.unnoba.compilador.ast.base.Encabezado;
 import ar.edu.unnoba.compilador.ast.base.Bloque;
-import ar.edu.unnoba.compilador.ast.base.CasoCuando;
 
 import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
-import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.Declaracion;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFuncion;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarInicializada;
 
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
+import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntonces;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
 
@@ -35,32 +35,32 @@ import ar.edu.unnoba.compilador.ast.sentencias.control.Salir;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Continuar;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 
-import ar.edu.unnoba.compilador.ast.base.Expresion;
+import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 
-import ar.edu.unnoba.compilador.ast.operaciones.binarias.logicas.Disyuncion;
-import ar.edu.unnoba.compilador.ast.operaciones.binarias.logicas.Conjuncion;
-import ar.edu.unnoba.compilador.ast.operaciones.unarias.logicas.NegacionLogica;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.Disyuncion;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.Conjuncion;
+import ar.edu.unnoba.compilador.ast.expresiones.unarias.logicas.NegacionLogica;
 
-import ar.edu.unnoba.compilador.ast.operaciones.binarias.relaciones.Desigualdad;
-import ar.edu.unnoba.compilador.ast.operaciones.binarias.relaciones.Igualdad;
-import ar.edu.unnoba.compilador.ast.operaciones.binarias.relaciones.Mayor;
-import ar.edu.unnoba.compilador.ast.operaciones.binarias.relaciones.MayorIgual;
-import ar.edu.unnoba.compilador.ast.operaciones.binarias.relaciones.Menor;
-import ar.edu.unnoba.compilador.ast.operaciones.binarias.relaciones.MenorIgual;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Desigualdad;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Igualdad;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Mayor;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.MayorIgual;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Menor;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.MenorIgual;
 
-import ar.edu.unnoba.compilador.ast.operaciones.binarias.OperacionBinaria;
-import ar.edu.unnoba.compilador.ast.operaciones.binarias.aritmeticas.Adicion;
-import ar.edu.unnoba.compilador.ast.operaciones.binarias.aritmeticas.Suma;
-import ar.edu.unnoba.compilador.ast.operaciones.binarias.aritmeticas.Resta;
-import ar.edu.unnoba.compilador.ast.operaciones.binarias.aritmeticas.Multiplicacion;
-import ar.edu.unnoba.compilador.ast.operaciones.binarias.aritmeticas.Division;
-import ar.edu.unnoba.compilador.ast.operaciones.unarias.aritmeticas.NegacionAritmetica;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Adicion;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Suma;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Resta;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Multiplicacion;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Division;
+import ar.edu.unnoba.compilador.ast.expresiones.unarias.aritmeticas.NegacionAritmetica;
 
-import ar.edu.unnoba.compilador.ast.base.Tipo;
-import ar.edu.unnoba.compilador.ast.base.OperadorCmp;
-import ar.edu.unnoba.compilador.ast.base.Identificador;
-import ar.edu.unnoba.compilador.ast.base.Constante;
-import ar.edu.unnoba.compilador.ast.base.InvocacionFuncion;
+import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
+import ar.edu.unnoba.compilador.ast.expresiones.OperadorCmp;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Constante;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
 
 class Parser;
 

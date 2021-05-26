@@ -1,6 +1,6 @@
 package ar.edu.unnoba.compilador.ast.sentencias.seleccion;
 
-import ar.edu.unnoba.compilador.ast.base.Expresion;
+import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
 
 public abstract class Seleccion extends Sentencia {

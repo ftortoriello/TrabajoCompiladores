@@ -5,16 +5,22 @@ import java.util.List;
 
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Constante;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Variable;
 import ar.edu.unnoba.compilador.ast.sentencias.*;
-import ar.edu.unnoba.compilador.ast.operaciones.binarias.*;
-import ar.edu.unnoba.compilador.ast.operaciones.unarias.*;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.*;
+import ar.edu.unnoba.compilador.ast.expresiones.unarias.*;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Control;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFuncion;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarInicializada;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
+import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntonces;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
@@ -84,7 +90,7 @@ public abstract class Visitor<T> {
 
     // Visit Sentencias
     public T visit(Asignacion a) throws ExcepcionDeAlcance {
-        T identificador = a.getIdentificador().accept(this);
+        T identificador = a.getIdent().accept(this);
         T expresion = a.getExpresion().accept(this);
         return this.procesarAsignacion(a, identificador, expresion);
     }
