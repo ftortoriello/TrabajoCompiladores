@@ -7,8 +7,6 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 
 public class DecVarInicializada extends DecVar {
 
-    // TODO: eliminar esta clase y dejar todo en DecVar
-
     private Expresion expresion;
 
     public DecVarInicializada(String nombre, Identificador id, Expresion expr) {

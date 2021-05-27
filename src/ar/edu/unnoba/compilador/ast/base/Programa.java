@@ -25,6 +25,10 @@ public class Programa extends Nodo {
         return this.cuerpo;
     }
 
+    public void setCuerpo(Bloque cuerpo) {
+        this.cuerpo = cuerpo;
+    }
+
     @Override
     public String toString() {
         return this.getEtiqueta();

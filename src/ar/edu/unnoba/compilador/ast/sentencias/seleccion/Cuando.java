@@ -7,6 +7,7 @@ import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
+import java.util.Collections;
 import java.util.List;
 
 public class Cuando extends Seleccion {
@@ -16,12 +17,14 @@ public class Cuando extends Seleccion {
 
     public Cuando(Expresion expr, List<CasoCuando> bloqueCuando) {
         super("Bloque WHEN", expr);
+        Collections.reverse(bloqueCuando);
         this.bloqueCuando = bloqueCuando;
         this.bloqueElse = new Bloque("Bloque vacío", false);
     }
 
     public Cuando(Expresion expr, List<CasoCuando> bloqueCuando, Bloque bloqueElse) {
         super("Bloque WHEN-ELSE", expr);
+        Collections.reverse(bloqueCuando);
         this.bloqueCuando = bloqueCuando;
         this.bloqueElse = bloqueElse;
     }

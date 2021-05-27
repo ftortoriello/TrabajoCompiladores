@@ -38,9 +38,7 @@ public abstract class OperacionUnaria extends Expresion{
 
     @Override
     public String getEtiqueta() {
-        return String.format(String.format("%s[%s](%s)",
-                this.getClass().getSimpleName(), this.getTipo(),
-                this.getExpresion().getEtiqueta()));
+        return getNombre();
     }
 
     @Override

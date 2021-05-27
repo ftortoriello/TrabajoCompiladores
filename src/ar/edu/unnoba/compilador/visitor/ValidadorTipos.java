@@ -1,13 +1,28 @@
 package ar.edu.unnoba.compilador.visitor;
 
 import ar.edu.unnoba.compilador.ast.base.Alcance;
+import ar.edu.unnoba.compilador.ast.base.Programa;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
+import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
+import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Division;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Multiplicacion;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Resta;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Suma;
+import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
+import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.EnteroAFlotante;
+import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.FlotanteAEntero;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Variable;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.Asignacion;
+
 
 public class ValidadorTipos extends Transformer{
 
     private Alcance alcance_actual;
 
-    /*
-    public Programa procesar(Programa programa) throws ExcepcionDeTipos{
+    public Programa procesar(Programa programa) throws ExcepcionDeTipos {
         this.alcance_actual = programa.getCuerpo().getAlcance();
         return programa.accept_transfomer(this);
     }
@@ -44,7 +59,7 @@ public class ValidadorTipos extends Transformer{
     @Override
     public Asignacion transform(Asignacion a) throws ExcepcionDeTipos{
         Asignacion asignacion = super.transform(a);
-        asignacion.setExpresion(convertir_a_tipo(asignacion.getExpresion(), asignacion.getIdentificador().getTipo()));
+        asignacion.setExpresion(convertir_a_tipo(asignacion.getExpresion(), asignacion.getIdent().getTipo()));
         return asignacion;
     }
 
@@ -111,8 +126,8 @@ public class ValidadorTipos extends Transformer{
     public Identificador transform(Identificador identificador) throws ExcepcionDeTipos{
         Object elemento = alcance_actual.resolver(identificador.getNombre());
         Tipo tipo = Tipo.UNKNOWN;
-        if(elemento instanceof DeclaracionVariable){
-            tipo = ((DeclaracionVariable) elemento).getTipo();
+        if(elemento instanceof Variable){
+            tipo = ((Variable) elemento).getTipo();
         }
         if (tipo != Tipo.UNKNOWN){
             identificador.setTipo(tipo);
@@ -120,6 +135,5 @@ public class ValidadorTipos extends Transformer{
         }
         throw new ExcepcionDeTipos(String.format("No se declaró el nombre %1$s\n", identificador.getNombre()));
     }
-    */
 
 }

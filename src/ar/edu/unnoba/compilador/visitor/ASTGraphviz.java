@@ -7,7 +7,7 @@ import java.util.List;
 
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Constante;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.Asignacion;
@@ -91,7 +91,7 @@ public class ASTGraphviz extends Visitor<String>{
     }
 
     @Override
-    public String visit(Constante c) throws ExcepcionDeAlcance {
+    public String visit(Literal c) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
         current_id = this.getID();
         resultado.append(this.procesarNodo(c));

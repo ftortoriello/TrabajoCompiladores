@@ -27,6 +27,16 @@ public class DecVar extends Declaracion {
     }
 
     @Override
+    public String getEtiqueta() {
+        return getClass().getSimpleName();
+    }
+
+    @Override
+    public String toString() {
+        return getIdent().getNombre();
+    }
+
+    @Override
     public DecVar accept_transfomer(Transformer t) {
         return t.transform(this);
     }

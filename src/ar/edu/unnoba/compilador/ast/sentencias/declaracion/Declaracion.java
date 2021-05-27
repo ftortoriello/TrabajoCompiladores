@@ -20,8 +20,5 @@ public abstract class Declaracion extends Sentencia {
         this.ident = ident;
     }
 
-    @Override
-    public String getEtiqueta() {
-        return String.format("%s", this.getClass().getSimpleName());
-    }
+
 }

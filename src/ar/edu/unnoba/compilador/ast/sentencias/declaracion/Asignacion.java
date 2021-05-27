@@ -24,6 +24,11 @@ public class Asignacion extends Declaracion {
     }
 
     @Override
+    public String getEtiqueta() {
+        return getNombre();
+    }
+
+    @Override
     public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
         return v.visit(this);
     }

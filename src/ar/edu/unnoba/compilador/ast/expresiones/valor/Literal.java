@@ -2,14 +2,13 @@ package ar.edu.unnoba.compilador.ast.expresiones.valor;
 
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
-import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 
-public class Constante extends Valor {
+public class Literal extends Valor {
     private final String valor;
 
-    public Constante(String valor, Tipo tipo, String nombre) {
+    public Literal(String valor, Tipo tipo, String nombre) {
         super(tipo, nombre);
         this.valor = valor;
     }
@@ -20,7 +19,7 @@ public class Constante extends Valor {
 
     @Override
     public String getEtiqueta() {
-        return String.format("%s %s", getTipo(), getValor());
+        return String.format("%s\n<%s>", getValor(), getTipo());
     }
 
     @Override
@@ -29,7 +28,7 @@ public class Constante extends Valor {
     }
 
     @Override
-    public Constante accept_transfomer(Transformer t) {
+    public Literal accept_transfomer(Transformer t) {
         return t.transform(this);
     }
 }

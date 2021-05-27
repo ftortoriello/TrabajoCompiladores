@@ -3,7 +3,6 @@ package ar.edu.unnoba.compilador.ast.expresiones;
 import ar.edu.unnoba.compilador.ast.base.Nodo;
 
 public abstract class Expresion extends Nodo {
-    // TODO: renombrar operaciones por "expresiones", mover esta clase para allá
     private Tipo tipo;
 
     public Expresion(Tipo tipo) {
@@ -33,11 +32,12 @@ public abstract class Expresion extends Nodo {
 
     @Override
     public String getEtiqueta() {
-        return String.format("%s", this.getNombre());
+        return String.format("%s\n<%s>", getNombre(), getTipo());
     }
 
     @Override
     public String toString() {
-        return this.getEtiqueta();
+        return getNombre();
     }
+
 }

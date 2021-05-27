@@ -5,7 +5,7 @@ import java.util.List;
 
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Constante;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Variable;
@@ -63,7 +63,7 @@ public abstract class Visitor<T> {
         T blq = cc.getBloque().accept(this);
         return procesarCasoCuando(cc, expr, blq);
     }
-    public T visit(Constante c) throws ExcepcionDeAlcance {
+    public T visit(Literal c) throws ExcepcionDeAlcance {
         return procesarNodo(c);
     }
     public T visit(Identificador i) throws ExcepcionDeAlcance {
@@ -107,7 +107,6 @@ public abstract class Visitor<T> {
         for (DecVar arg : df.getArgs()){
             args.add(arg.accept(this));
         }
-
         T cuerpo = df.getBloque().accept(this);
 
         return procesarDecFuncion(args, cuerpo);

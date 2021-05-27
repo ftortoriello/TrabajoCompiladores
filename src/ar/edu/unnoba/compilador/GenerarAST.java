@@ -29,7 +29,6 @@ public class GenerarAST {
             Runtime.getRuntime().exec(cmd);
             // ----------
 
-            /*
             // Ejecución de visitor generador de alcances
             GeneradorAlcances ga = new GeneradorAlcances();
             ga.procesar(programa);
@@ -41,7 +40,6 @@ public class GenerarAST {
             vt.procesar(programa);
             System.out.println("Tipos validados");
             // ----------
-            */
 
         } catch(Exception e){
             System.out.println(e);

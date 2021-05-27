@@ -59,7 +59,7 @@ import ar.edu.unnoba.compilador.ast.expresiones.unarias.aritmeticas.NegacionArit
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.OperadorCmp;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Constante;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
 
 class Parser;
@@ -77,7 +77,7 @@ parser code
     }
 
     public void imprimirEtiqueta(Nodo nodo) {
-        System.out.println("Se creó el nodo " + nodo.getEtiqueta());
+        System.out.println("Se creó el nodo " + nodo.getClass().getSimpleName());
     }
 
     public OperacionBinaria getClaseRel(OperadorCmp op, Expresion expr1, Expresion expr2) {
@@ -171,9 +171,9 @@ terminal String PR_MAIN_IS, PR_END_PUNTO,
     OP_LOG_BIN_OR, OP_LOG_BIN_AND, OP_LOG_UNA_NOT,
     OP_COMPARACION,
     OP_ARIT_SUMA, OP_ARIT_RESTA, OP_ARIT_PROD, OP_ARIT_DIV,
-    PAR_ABRE, PAR_CIERRA, PR_COMA, PUNTO_Y_COMA, IGUAL,
+    PAR_ABRE, PAR_CIERRA, COMA, PUNTO_Y_COMA, IGUAL,
     IDENTIFICADOR, TIPO_DE_DATO,
-    CTE_BOOLEANA, FLOTANTE, ENTERO, CADENA;
+    LIT_BOOLEANO, LIT_FLOTANTE, LIT_ENTERO, CADENA;
 
 nonterminal Programa programa;
 nonterminal List<Declaracion> encabezado;
@@ -186,9 +186,9 @@ nonterminal List<CasoCuando> bloque_cuando;
 nonterminal List<Nodo> lst_sentencias;
 nonterminal Nodo sentencia;
 
-nonterminal Expresion expresion, conjuncion, negacion_logica,
+nonterminal Expresion disyuncion, conjuncion, negacion_logica,
     relacion, adicion, termino, negacion_aritmetica,
-    factor, constante, invocacion_funcion;
+    factor, literal, invocacion_funcion;
 
 nonterminal List<Expresion> lista_exprs;
 
@@ -198,8 +198,6 @@ nonterminal DecFuncion dec_fun;
 nonterminal List<DecVar> lst_args_dec, lst_args_dec_default;
 nonterminal DecVar dec_var, arg_dec, arg_dec_default;
 
-// Antes no hacían falta las precedencias de IDENTIFICADOR y OP_ARIT_RESTA, con los cambios que hice en el Parser sí
-// TODO: ¿ver de eliminar ambigüedad?
 precedence left PR_ELSE, PR_IS;
 precedence right IDENTIFICADOR, OP_ARIT_RESTA, PR_VARIABLE, PR_FUNCTION;
 
@@ -272,9 +270,9 @@ arg_dec ::=
         :};
 
 arg_dec_default ::=
-        IDENTIFICADOR:id PR_IS:pr_is TIPO_DE_DATO:td IGUAL:igual expresion:expr {:
+        IDENTIFICADOR:id PR_IS:pr_is TIPO_DE_DATO:td IGUAL:igual disyuncion:disy {:
             Identificador ident = new Identificador(id, getTipoDato(td));
-            DecVarInicializada decVar = new DecVarInicializada("Variable inicializada", ident, expr);
+            DecVarInicializada decVar = new DecVarInicializada("Variable inicializada", ident, disy);
             imprimirEtiqueta(decVar);
             RESULT = decVar;
         :};
@@ -294,8 +292,7 @@ dec_fun ::=
         :};
 
 lst_args_dec ::=
-        // TODO: creo que rompí lo de los valores por defecto
-        arg_dec:arg PR_COMA:pr_coma lst_args_dec:args {:
+        arg_dec:arg COMA:coma lst_args_dec:args {:
             args.add(arg);
             imprimirEtiqueta(arg);
             RESULT = args;
@@ -306,7 +303,7 @@ lst_args_dec ::=
             imprimirEtiqueta(arg);
             RESULT = args;
         :} |
-        arg_dec_default:arg PR_COMA:pr_coma lst_args_dec_default:args {:
+        arg_dec_default:arg COMA:coma lst_args_dec_default:args {:
             args.add(arg);
             imprimirEtiqueta(arg);
             RESULT = args;
@@ -319,7 +316,7 @@ lst_args_dec ::=
         :};
 
 lst_args_dec_default ::=
-        arg_dec_default:arg PR_COMA:pr_coma lst_args_dec_default:args {:
+        arg_dec_default:arg COMA:coma lst_args_dec_default:args {:
             args.add(arg);
             imprimirEtiqueta(arg);
             RESULT = args;
@@ -384,56 +381,54 @@ sentencia ::=
         :};
 
 asignacion ::=
-        IDENTIFICADOR:id IGUAL:igual expresion:expr {:
+        IDENTIFICADOR:id IGUAL:igual disyuncion:disy {:
             Identificador ident = new Identificador(id);
-            Asignacion asig = new Asignacion(ident, expr);
+            Asignacion asig = new Asignacion(ident, disy);
             imprimirEtiqueta(asig);
             RESULT = asig;
        :};
 
 si_entonces ::=
-        PR_IF:pr_if expresion:expr PR_THEN:pr_then bloque:bloque {:
-            SiEntonces se = new SiEntonces(expr, bloque);
+        PR_IF:pr_if disyuncion:disy PR_THEN:pr_then bloque:bloque {:
+            SiEntonces se = new SiEntonces(disy, bloque);
             imprimirEtiqueta(se);
             RESULT = se;
         :} |
-        PR_IF:pr_if expresion:expr PR_THEN:pr_then bloque:bloque1 PR_ELSE:pr_else bloque:bloque2 {:
-            SiEntoncesSino se = new SiEntoncesSino(expr, bloque1, bloque2);
+        PR_IF:pr_if disyuncion:disy PR_THEN:pr_then bloque:bloque1 PR_ELSE:pr_else bloque:bloque2 {:
+            SiEntoncesSino se = new SiEntoncesSino(disy, bloque1, bloque2);
             imprimirEtiqueta(se);
             RESULT = se;
         :};
 
 cuando ::=
-        PR_WHEN:when expresion:expr bloque_cuando:bloque_cuando {:
-            Cuando cuando = new Cuando(expr, bloque_cuando);
+        PR_WHEN:when disyuncion:disy bloque_cuando:bloque_cuando {:
+            Cuando cuando = new Cuando(disy, bloque_cuando);
             imprimirEtiqueta(cuando);
             RESULT = cuando;
         :} |
-        PR_WHEN:when expresion:expr bloque_cuando:bloque_cuando PR_ELSE:pr_else bloque:bloque {:
-            Cuando cuando = new Cuando(expr, bloque_cuando);
+        PR_WHEN:when disyuncion:disy bloque_cuando:bloque_cuando PR_ELSE:pr_else bloque:bloque_else {:
+            Cuando cuando = new Cuando(disy, bloque_cuando, bloque_else);
             imprimirEtiqueta(cuando);
             RESULT = cuando;
         :};
 
 bloque_cuando ::=
-        PR_IS:pr_is OP_COMPARACION:op expresion:expr PR_THEN:pr_then bloque:bloque {:
+        PR_IS:pr_is OP_COMPARACION:op disyuncion:disy PR_THEN:pr_then bloque:bloque {:
             List<CasoCuando> bloqueCuando = new ArrayList<CasoCuando>();
-            CasoCuando caso = new CasoCuando(getTipoOpCmp(op), expr, bloque);
+            CasoCuando caso = new CasoCuando(getTipoOpCmp(op), disy, bloque);
             imprimirEtiqueta(caso);
             bloqueCuando.add(caso);
             RESULT = bloqueCuando;
         :} |
-        PR_IS:pr_is OP_COMPARACION:op expresion:expr PR_THEN:pr_then bloque:bloque bloque_cuando:bloqueCuando {:
-            CasoCuando caso = new CasoCuando(getTipoOpCmp(op), expr, bloque);
+        PR_IS:pr_is OP_COMPARACION:op disyuncion:disy PR_THEN:pr_then bloque:bloque bloque_cuando:bloqueCuando {:
+            CasoCuando caso = new CasoCuando(getTipoOpCmp(op), disy, bloque);
             imprimirEtiqueta(caso);
             bloqueCuando.add(caso);
             RESULT = bloqueCuando;
         :};
 
 para ::=
-        PR_FOR:pr_for IDENTIFICADOR:id PR_FROM:pr_from ENTERO:num_ini PR_TO:pr_to ENTERO:num_fin PR_DO:pr_do bloque:bloque {:
-            // TODO: El identificador utilizado en el FOR ya tendría que haber sido definido (y además ser Entero)
-            // ¿De dónde lo saco si lo único que tengo acá es el lexema?
+        PR_FOR:pr_for IDENTIFICADOR:id PR_FROM:pr_from LIT_ENTERO:num_ini PR_TO:pr_to LIT_ENTERO:num_fin PR_DO:pr_do bloque:bloque {:
             int saltoPorDefecto = 1;
             Identificador ident = new Identificador(id);
             Para para = new Para("Bloque FOR con salto sin definir", ident, Integer.parseInt(num_ini),
@@ -441,7 +436,7 @@ para ::=
             imprimirEtiqueta(para);
             RESULT = para;
         :} |
-        PR_FOR:pr_for IDENTIFICADOR:id PR_FROM:pr_from ENTERO:num_ini PR_TO:pr_to ENTERO:num_fin PR_BY:pr_by ENTERO:salto PR_DO:pr_do bloque:bloque {:
+        PR_FOR:pr_for IDENTIFICADOR:id PR_FROM:pr_from LIT_ENTERO:num_ini PR_TO:pr_to LIT_ENTERO:num_fin PR_BY:pr_by LIT_ENTERO:salto PR_DO:pr_do bloque:bloque {:
             Identificador ident = new Identificador(id);
             Para para = new Para("Bloque FOR con salto definido", ident, Integer.parseInt(num_ini),
                                 Integer.parseInt(num_fin), Integer.parseInt(salto), bloque);
@@ -450,32 +445,32 @@ para ::=
         :};
 
 mientras ::=
-        PR_WHILE:pr_while expresion:expr PR_DO:pr_do bloque:bloque {:
-            Mientras mientras = new Mientras(expr, bloque);
+        PR_WHILE:pr_while disyuncion:disy PR_DO:pr_do bloque:bloque {:
+            Mientras mientras = new Mientras(disy, bloque);
             imprimirEtiqueta(mientras);
             RESULT = mientras;
         :};
 
 control ::=
-        PR_RETURN:pr_ret expresion:expr {:
-            Retorno ret = new Retorno(expr);
+        PR_RETURN:pr_ret disyuncion:disy {:
+            Retorno ret = new Retorno(disy);
             imprimirEtiqueta(ret);
             RESULT = ret;
         :} |
-        PR_BREAK:pr_break {:
+        PR_BREAK:pr_brk {:
             Salir brk = new Salir();
             imprimirEtiqueta(brk);
             RESULT = brk;
         :} |
-        PR_CONTINUE:pr_cont {:
+        PR_CONTINUE:pr_cnt {:
             Continuar ctn = new Continuar();
             imprimirEtiqueta(ctn);
             RESULT = ctn;
         :};
 
-expresion ::=
-        expresion:expr OP_LOG_BIN_OR:op_or conjuncion:con {:
-            Disyuncion dis = new Disyuncion(expr, con);
+disyuncion ::=
+        disyuncion:disy OP_LOG_BIN_OR:op_or conjuncion:con {:
+            Disyuncion dis = new Disyuncion(disy, con);
             imprimirEtiqueta(dis);
             RESULT = dis;
         :} |
@@ -554,8 +549,8 @@ negacion_aritmetica ::=
         :};
 
 factor ::=
-        constante:cte {:
-            RESULT = cte;
+        literal:lit {:
+            RESULT = lit;
         :} |
         IDENTIFICADOR:id {:
             Identificador ident = new Identificador(id);
@@ -565,31 +560,31 @@ factor ::=
         invocacion_funcion:invo {:
             RESULT = invo;
         :} |
-        PAR_ABRE:pa expresion:expr PAR_CIERRA:pc {:
-            RESULT = expr;
+        PAR_ABRE:pa disyuncion:disy PAR_CIERRA:pc {:
+            RESULT = disy;
         :};
 
-constante ::=
-        ENTERO:lit_int {:
-            Constante cte = new Constante(lit_int, Tipo.INTEGER, "Constante INTEGER");
-            imprimirEtiqueta(cte);
-            RESULT = cte;
+literal ::=
+        LIT_ENTERO:lit_int {:
+            Literal lit = new Literal(lit_int, Tipo.INTEGER, "Literal INTEGER");
+            imprimirEtiqueta(lit);
+            RESULT = lit;
         :} |
-        FLOTANTE:lit_float {:
-            Constante cte = new Constante(lit_float, Tipo.FLOAT, "Constante FLOAT");
-            imprimirEtiqueta(cte);
-            RESULT = cte;
+        LIT_FLOTANTE:lit_float {:
+            Literal lit = new Literal(lit_float, Tipo.FLOAT, "Literal FLOAT");
+            imprimirEtiqueta(lit);
+            RESULT = lit;
         :} |
-        CTE_BOOLEANA:lit_bool {:
-            Constante cte = new Constante(lit_bool, Tipo.BOOL, "Constante BOOL");
-            imprimirEtiqueta(cte);
-            RESULT = cte;
+        LIT_BOOLEANO:lit_bool {:
+            Literal lit = new Literal(lit_bool, Tipo.BOOL, "Literal BOOL");
+            imprimirEtiqueta(lit);
+            RESULT = lit;
         :};
 
 invocacion_funcion ::=
-        PR_WRITELN:nombre_fun PAR_ABRE:pa expresion:expr PAR_CIERRA:pc {:
+        PR_WRITELN:nombre_fun PAR_ABRE:pa disyuncion:disy PAR_CIERRA:pc {:
             List<Expresion> args = new ArrayList<>();
-            args.add(expr);
+            args.add(disy);
             RESULT = new InvocacionFuncion(nombre_fun, args, Tipo.UNKNOWN);
         :} |
         PR_WRITELN:nombre_fun PAR_ABRE:pa CADENA:c PAR_CIERRA:pc {:
@@ -597,9 +592,9 @@ invocacion_funcion ::=
             args.add("\\\"" + c + "\\\"");
             RESULT = new InvocacionFuncion(nombre_fun, args, Tipo.UNKNOWN);
         :} |
-        PR_WRITE:nombre_fun PAR_ABRE:pa expresion:expr PAR_CIERRA:pc {:
+        PR_WRITE:nombre_fun PAR_ABRE:pa disyuncion:disy PAR_CIERRA:pc {:
             List<Expresion> args = new ArrayList<>();
-            args.add(expr);
+            args.add(disy);
             RESULT = new InvocacionFuncion(nombre_fun, args, Tipo.UNKNOWN);
         :} |
         PR_WRITE:nombre_fun PAR_ABRE:pa CADENA:c PAR_CIERRA:pc {:
@@ -630,11 +625,11 @@ invocacion_funcion ::=
 
 // Expresiones que se pasan como parámetro a una función
 lista_exprs ::=
-        lista_exprs:args PR_COMA:pr_coma expresion:arg {:
+        lista_exprs:args COMA:coma disyuncion:arg {:
             args.add(arg);
             RESULT = args;
         :} |
-        expresion:arg {:
+        disyuncion:arg {:
             List<Expresion> args = new ArrayList<Expresion>();
             args.add(arg);
             RESULT = args;

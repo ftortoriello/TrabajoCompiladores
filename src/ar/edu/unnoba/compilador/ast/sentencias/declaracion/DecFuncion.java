@@ -16,7 +16,7 @@ public class DecFuncion extends Declaracion {
     Bloque bloque;
 
     public DecFuncion(Identificador id, List<DecVar> args, Bloque bloque) {
-        super("Declaración de función con argumentos", id);
+        super(id.getNombre(), id);
         // Invierto el orden de los argumentos porque debido a la forma de las reglas los lee al revés
         Collections.reverse(args);
         this.args = args;
@@ -24,7 +24,7 @@ public class DecFuncion extends Declaracion {
     }
 
     public DecFuncion(Identificador id, Bloque bloque) {
-        super("Declaración de función sin argumentos", id);
+        super(id.getNombre(), id);
         this.args = Collections.emptyList();
         this.bloque = bloque;
     }
@@ -40,12 +40,7 @@ public class DecFuncion extends Declaracion {
     public void setBloque(Bloque bloque) {
         this.bloque = bloque;
     }
-
-    @Override
-    public String getEtiqueta() {
-        return String.format("%s %s", getClass().getSimpleName(), getIdent().getEtiqueta());
-    }
-
+    
     @Override
     public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
         return v.visit(this);
@@ -55,5 +50,10 @@ public class DecFuncion extends Declaracion {
     public <R> R accept_transfomer(Transformer t) throws ExcepcionDeTipos {
         // TODO: implementar
         return null;
+    }
+
+    @Override
+    public String getEtiqueta() {
+        return String.format("%s %s()", getClass().getSimpleName(), getIdent().getNombre());
     }
 }

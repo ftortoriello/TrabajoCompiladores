@@ -8,7 +8,7 @@ variable radio is float = -1.5;
 variable superficie₁ is float = 0;
 
 { Una función }
-function superficie_círculo(radio is float = 1) return float
+function superficie_círculo(x is float, radio is float = 1) return float
 begin
 
     if mostrar == true then
@@ -42,6 +42,7 @@ variable superficie₂ is float;
 # Procedimiento principal
 main is
 
+    i = 15 + 3 * aux2 / var1 - 8;
 
     while local_al_then > 5 do
         begin

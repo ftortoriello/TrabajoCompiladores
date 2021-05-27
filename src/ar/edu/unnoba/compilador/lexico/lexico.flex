@@ -124,8 +124,7 @@ ComentarioUnaLinea = #.*{FinDeLinea}?
     "read_float"        { return token("PR_READ_FLOAT", yytext()); }
     "read_boolean"      { return token("PR_READ_BOOLEAN", yytext()); }
     {TiposDeDato}       { return token("TIPO_DE_DATO", yytext()); }
-    {CtesBooleanas}     { return token("CTE_BOOLEANA", yytext()); }
-  
+
     /* operadores */
     "+"                 { return token("OP_ARIT_SUMA", yytext()); }
     "-"                 { return token("OP_ARIT_RESTA", yytext()); }
@@ -142,16 +141,18 @@ ComentarioUnaLinea = #.*{FinDeLinea}?
     "("                 { return token("PAR_ABRE", yytext()); }
     ")"                 { return token("PAR_CIERRA", yytext()); }
 
-    ","                 { return token("PR_COMA", yytext()); }
+    ","                 { return token("COMA", yytext()); }
     ";"                 { return token("PUNTO_Y_COMA", yytext()); }
     "="                 { return token("IGUAL", yytext()); }
 
     {EspacioEnBlanco}   { /* ignorar */ }
 
     /* literales */
+    {CtesBooleanas}     { return token("LIT_BOOLEANO", yytext()); }
+    {Flotante}          { return token("LIT_FLOTANTE", yytext()); }
+    {Entero}            { return token("LIT_ENTERO", yytext()); }
+
     {Id}                { return token("IDENTIFICADOR", yytext()); }
-    {Flotante}          { return token("FLOTANTE", yytext()); }
-    {Entero}            { return token("ENTERO", yytext()); }
 }
 
 <BLOQUE_COMENT> {

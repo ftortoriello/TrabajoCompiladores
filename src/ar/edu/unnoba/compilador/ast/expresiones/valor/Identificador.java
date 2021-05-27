@@ -7,8 +7,8 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 
 public class Identificador extends Valor {
-    // TODO: Catalogar cosas que no sabemos si son variables, funciones o qué
-    // TODO: Estos nodos tienen que quedar eliminados del AST cuando se defina qué son
+    // Esta clase sirve para catalogar en la primera cosas que no sabemos si son variables, funciones o qué
+    // TODO: Los nodos Identificador tienen que quedar reemplazados del AST cuando armemos las tablas de símbolos
 
     public Identificador(String nombre){
         super(Tipo.UNKNOWN, nombre);
@@ -20,7 +20,7 @@ public class Identificador extends Valor {
 
     @Override
     public String getEtiqueta() {
-        return String.format("%s %s", getTipo(), getNombre());
+        return String.format("%s\n<%s>", getNombre(), getTipo());
     }
 
     @Override

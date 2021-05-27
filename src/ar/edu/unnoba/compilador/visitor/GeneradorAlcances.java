@@ -18,7 +18,6 @@ public class GeneradorAlcances extends Visitor<Void> {
     private Alcance alcance_actual;
     private Alcance alcance_global;
 
-
     public void procesar(Programa programa) throws ExcepcionDeAlcance{
         programa.getCuerpo().setAlcance(new Alcance("global"));
         alcance_global = alcance_actual = programa.getCuerpo().getAlcance();
@@ -29,8 +28,11 @@ public class GeneradorAlcances extends Visitor<Void> {
         return this.alcance_actual.putIfAbsent(nombre, s);
     }
 
+    // TODO: agregar visit para Programa, Bloque y Asignación
+
     @Override
     public Void visit(DecVar dv) throws ExcepcionDeAlcance {
+        // Agrega la declaración al ámbito en el que se encuentra
         Variable var = new Variable(dv);
         Object result = this.agregarSimbolo(var.getDeclaracion().getIdent().getNombre(), dv);
         if(result!=null){

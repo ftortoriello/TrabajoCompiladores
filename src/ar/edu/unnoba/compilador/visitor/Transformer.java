@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Constante;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Variable;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.*;
@@ -22,7 +22,7 @@ import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
 public abstract class Transformer {
 
     public Programa transform(Programa p) throws ExcepcionDeTipos {
-        // p.setCuerpo(p.getCuerpo().accept_transfomer(this));
+        p.setCuerpo(p.getCuerpo().accept_transfomer(this));
         return p;
     }
 
@@ -34,7 +34,7 @@ public abstract class Transformer {
         return v;
     }
 
-    public Constante transform(Constante c) {
+    public Literal transform(Literal c) {
         return c;
     }
 
