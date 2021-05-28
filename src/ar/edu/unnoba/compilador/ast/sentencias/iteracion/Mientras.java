@@ -16,9 +16,9 @@ public class Mientras extends Sentencia {
     Bloque bloqueSentencias;
 
     public Mientras(Expresion condicion, Bloque bloqueSentencias) {
-        super("Bloque WHILE");
+        super("Bloque\nWHILE");
         this.condicion = condicion;
-        bloqueSentencias.setNombre("Cuerpo WHILE");
+        bloqueSentencias.setNombre("Cuerpo\nWHILE");
         this.bloqueSentencias = bloqueSentencias;
     }
 

@@ -10,7 +10,7 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 public class NegacionLogica extends OperacionUnaria {
 
     public NegacionLogica(Expresion expresion) {
-        super("Negacion lógica", expresion);
+        super("NOT", expresion);
     }
 
     @Override

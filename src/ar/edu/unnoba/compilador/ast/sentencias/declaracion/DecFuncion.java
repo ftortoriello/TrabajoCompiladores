@@ -19,14 +19,14 @@ public class DecFuncion extends Declaracion {
         super(id.getNombre(), id);
         // Invierto el orden de los argumentos porque debido a la forma de las reglas los lee al revés
         Collections.reverse(args);
-        bloque.setNombre("Cuerpo FUNCIÓN");
+        bloque.setNombre("Cuerpo\nFUNCIÓN");
         this.args = args;
         this.bloque = bloque;
     }
 
     public DecFuncion(Identificador id, Bloque bloque) {
         super(id.getNombre(), id);
-        bloque.setNombre("Cuerpo FUNCIÓN");
+        bloque.setNombre("Cuerpo\nFUNCIÓN");
         this.args = Collections.emptyList();
         this.bloque = bloque;
     }
@@ -56,6 +56,7 @@ public class DecFuncion extends Declaracion {
 
     @Override
     public String getEtiqueta() {
-        return String.format("%s %s()", getClass().getSimpleName(), getIdent().getNombre());
+        return String.format("%s %s()\n<%s>", getClass().getSimpleName(),
+                getIdent().getNombre(), getIdent().getTipo());
     }
 }

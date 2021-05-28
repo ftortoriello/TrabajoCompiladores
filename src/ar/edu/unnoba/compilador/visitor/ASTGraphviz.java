@@ -122,6 +122,16 @@ public class ASTGraphviz extends Visitor<String>{
         parents.pop();
         return resultado.toString();
     }
+    @Override
+    public String visit(OperacionUnaria ou) throws ExcepcionDeAlcance {
+        StringBuilder resultado = new StringBuilder();
+        current_id = this.getID();
+        resultado.append(this.procesarNodo(ou));
+        parents.push(current_id);
+        resultado.append(super.visit(ou));
+        parents.pop();
+        return resultado.toString();
+    }
     // ----------
 
     // Sentencias

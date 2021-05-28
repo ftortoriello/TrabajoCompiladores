@@ -18,7 +18,7 @@ public class SiEntonces extends Seleccion {
     }
 
     public SiEntonces(Expresion condicion, Bloque bloqueSiEntonces) {
-        super("Bloque IF-THEN", condicion);
+        super("Bloque\nIF-THEN", condicion);
         bloqueSiEntonces.setNombre("THEN");
         this.bloqueSiEntonces = bloqueSiEntonces;
     }

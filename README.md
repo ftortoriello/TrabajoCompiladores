@@ -45,7 +45,7 @@ Estado: :white_check_mark:, pero hay cuestiones pendientes con los operadores (v
 
 Fecha de entrega: 31/05/2021
 
-![AST](https://i.ibb.co/nmmq5pc/arbol.png)
+![AST](https://i.ibb.co/488D4Xt/arbol.png)
 
 Requisitos:
 * AST, con su visualización mediante graphviz

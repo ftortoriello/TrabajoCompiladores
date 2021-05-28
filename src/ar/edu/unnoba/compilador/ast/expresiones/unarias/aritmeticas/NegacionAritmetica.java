@@ -8,7 +8,7 @@ import ar.edu.unnoba.compilador.visitor.Transformer;
 public class NegacionAritmetica extends OperacionUnaria {
 
     public NegacionAritmetica(Expresion expresion) {
-        super("Negacion aritmética", expresion);
+        super("-", expresion);
     }
 
     @Override

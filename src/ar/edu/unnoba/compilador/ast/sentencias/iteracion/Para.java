@@ -21,12 +21,12 @@ public class Para extends Sentencia {
     int salto;
 
     public Para(String nombre, Identificador ident, int valorInicial, int valorFinal, int salto, Bloque bloqueSentencias) {
-        super("Bloque FOR");
+        super("Bloque\nFOR");
         this.ident = ident;
         this.valorInicial = valorInicial;
         this.valorFinal = valorFinal;
         this.salto = salto;
-        bloqueSentencias.setNombre("Cuerpo FOR");
+        bloqueSentencias.setNombre("Cuerpo\nFOR");
         this.bloqueSentencias = bloqueSentencias;
     }
 
@@ -52,7 +52,7 @@ public class Para extends Sentencia {
 
     @Override
     public String getEtiqueta() {
-        return String.format("Bloque FOR (%s: %s => %s, salto: %s)",
+        return String.format("Bloque FOR\n(%s: %s => %s, salto: %s)",
                 this.getIdent().getNombre(), this.getValorInicial(), this.getValorFinal(), this.getSalto());
     }
 

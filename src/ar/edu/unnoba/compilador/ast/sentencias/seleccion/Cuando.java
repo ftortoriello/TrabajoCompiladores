@@ -16,17 +16,17 @@ public class Cuando extends Seleccion {
     Bloque bloqueElse;
 
     public Cuando(Expresion expr, List<CasoCuando> bloqueCuando) {
-        super("Bloque WHEN", expr);
+        super("Bloque\nWHEN", expr);
         Collections.reverse(bloqueCuando);
         this.bloqueCuando = bloqueCuando;
         this.bloqueElse = new Bloque("Bloque vacío", false);
     }
 
     public Cuando(Expresion expr, List<CasoCuando> bloqueCuando, Bloque bloqueElse) {
-        super("Bloque WHEN-ELSE", expr);
+        super("Bloque\nWHEN-ELSE", expr);
         Collections.reverse(bloqueCuando);
         this.bloqueCuando = bloqueCuando;
-        bloqueElse.setNombre("Cuerpo WHEN-ELSE");
+        bloqueElse.setNombre("ELSE");
         this.bloqueElse = bloqueElse;
     }
 

@@ -334,12 +334,12 @@ bloque ::=
             List<Nodo> sentencias = new ArrayList<Nodo>();
             sentencias.add(sent);
             boolean esBloquePrincipal = false;
-            Bloque bloque = new Bloque("Bloque simple (una sentencia)", sentencias, esBloquePrincipal);
+            Bloque bloque = new Bloque("Bloque simple\n(una sentencia)", sentencias, esBloquePrincipal);
             RESULT = bloque;
         :} |
         PR_BEGIN:begin lst_sentencias:sentencias PR_END:pr_end {:
             boolean esBloquePrincipal = false;
-            Bloque bloque = new Bloque("Bloque compuesto (múltiples sentencias)", sentencias, esBloquePrincipal);
+            Bloque bloque = new Bloque("Bloque compuesto\n(múltiples sentencias)", sentencias, esBloquePrincipal);
             RESULT = bloque;
         :};
 

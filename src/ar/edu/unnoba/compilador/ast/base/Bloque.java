@@ -6,7 +6,6 @@ import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class Bloque extends Nodo {
@@ -23,7 +22,7 @@ public class Bloque extends Nodo {
 
     public Bloque(String nombre, boolean esProgramaPrincipal) {
         super(nombre);
-        this.sentencias = new ArrayList<Nodo>();
+        this.sentencias = new ArrayList<>();
         this.esProgramaPrincipal = esProgramaPrincipal;
     }
 

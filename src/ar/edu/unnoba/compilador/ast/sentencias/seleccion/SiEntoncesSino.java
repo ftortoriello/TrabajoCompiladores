@@ -12,7 +12,7 @@ public class SiEntoncesSino extends SiEntonces {
     Bloque bloqueSino;
 
     public SiEntoncesSino(Expresion condicion, Bloque bloqueSiEntonces, Bloque bloqueSino) {
-        super("Bloque IF-THEN-ELSE", condicion, bloqueSiEntonces);
+        super("Bloque\nIF-THEN-ELSE", condicion, bloqueSiEntonces);
         bloqueSino.setNombre("ELSE");
         this.bloqueSino = bloqueSino;
     }
