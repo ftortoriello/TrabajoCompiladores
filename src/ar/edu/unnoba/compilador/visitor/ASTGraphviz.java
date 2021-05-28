@@ -268,7 +268,7 @@ public class ASTGraphviz extends Visitor<String>{
         } else if (n instanceof OperacionBinaria || n instanceof OperacionUnaria) {
             return armarStrNodo(24, 7, n.getEtiqueta(), idPadre);
         } else if (n instanceof Seleccion || n instanceof Para || n instanceof Mientras) {
-            return armarStrNodo(24, 1, n.getEtiqueta(), idPadre);
+            return armarStrNodo(28, 8, n.getEtiqueta(), idPadre);
         } else if (n instanceof Valor) {
             return armarStrNodo(18, 9, n.getEtiqueta(), idPadre);
         } else if (n instanceof Control) {
