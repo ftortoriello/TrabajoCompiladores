@@ -19,12 +19,14 @@ public class DecFuncion extends Declaracion {
         super(id.getNombre(), id);
         // Invierto el orden de los argumentos porque debido a la forma de las reglas los lee al revés
         Collections.reverse(args);
+        bloque.setNombre("Cuerpo FUNCIÓN");
         this.args = args;
         this.bloque = bloque;
     }
 
     public DecFuncion(Identificador id, Bloque bloque) {
         super(id.getNombre(), id);
+        bloque.setNombre("Cuerpo FUNCIÓN");
         this.args = Collections.emptyList();
         this.bloque = bloque;
     }

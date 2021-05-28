@@ -41,6 +41,7 @@ import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.Disyuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.Conjuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.logicas.NegacionLogica;
 
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Desigualdad;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Igualdad;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Mayor;
@@ -80,10 +81,10 @@ parser code
         System.out.println("Se creó el nodo " + nodo.getClass().getSimpleName());
     }
 
-    public OperacionBinaria getClaseRel(OperadorCmp op, Expresion expr1, Expresion expr2) {
+    public Relacion getClaseRel(OperadorCmp op, Expresion expr1, Expresion expr2) {
         // Crea una clase según sea el operador utilizado
         // Si se utiliza el operador de IGUALDAD, devuelvo una clase Igualdad, etc.
-        OperacionBinaria comp;
+        Relacion comp;
 
         switch (op) {
             case IGUALDAD:

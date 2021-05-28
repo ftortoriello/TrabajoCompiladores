@@ -7,21 +7,24 @@ import java.util.List;
 
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
+import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.Conjuncion;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.Disyuncion;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
+import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
+import ar.edu.unnoba.compilador.ast.expresiones.unarias.logicas.NegacionLogica;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.Asignacion;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Valor;
+import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
+import ar.edu.unnoba.compilador.ast.sentencias.control.Control;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFuncion;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarInicializada;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
-import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
-import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
-import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntonces;
-import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
+import ar.edu.unnoba.compilador.ast.sentencias.seleccion.*;
 
 public class ASTGraphviz extends Visitor<String>{
 
@@ -32,6 +35,12 @@ public class ASTGraphviz extends Visitor<String>{
         this.parents = new ArrayDeque<>();
     }
 
+    private String armarStrNodo(Integer tamañoFuente, Integer color, String etiqueta, Integer idPadre) {
+        // Función auxiliar para armar los nodos en dot
+        return String.format("%1$s [label=\"%2$s\", fontsize=" + tamañoFuente + ", fillcolor=" + color +"]\n" +
+                "%3$s -- %1$s\n", current_id, etiqueta, idPadre);
+    }
+
     // VISITAS
     // TODO: ver si se puede crear un método genérico visit, la mayoría son iguales
     // --------------------
@@ -39,19 +48,17 @@ public class ASTGraphviz extends Visitor<String>{
     @Override
     public String visit(Programa p) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        /*
-        resultado.append("layout=neato\n");
-        resultado.append("node [\n" +
-                "  shape = circle\n" +
-                "  style=\"filled,bold\"\n" +
-                "  color=black\n" +
-                "  fillcolor=\"#F2F2F2\"\n" +
-                "]");
-         */
 
-        // resultado.append("graph cluster_" + getID() + " {" +
-        //                  "    label=\"Programa\";");
-        resultado.append("graph Programa {");
+        resultado.append("graph Programa {" +
+                "label=\"Árbol de sintaxis abstracta (Conti - Tortoriello)\";" +
+                "bgcolor=aliceblue;\n" +
+                "fontsize=60;\n");
+        resultado.append("node [\n" +
+                "  style=\"filled,bold\";\n" +
+                "  color=black;\n" +
+                "  fillcolor=red;\n" +
+                "  colorscheme=set312\n" +
+                "]\n");
         current_id = this.getID();
         resultado.append(this.procesarNodo(p));
         parents.push(current_id);
@@ -63,31 +70,22 @@ public class ASTGraphviz extends Visitor<String>{
     @Override
     public String visit(Encabezado e) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        /*
-        resultado.append("subgraph cluster_" + getID() + " {" +
-                "   label=\"Encabezado\";");
-        */
-        current_id = this.getID();
+        current_id = getID();
         resultado.append(this.procesarNodo(e));
         parents.push(current_id);
         resultado.append(super.visit(e));
         parents.pop();
-        //resultado.append("}");
         return resultado.toString();
     }
     @Override
     public String visit(Bloque b) throws ExcepcionDeAlcance {
-        if (b.esCompuesto() || b.esProgramaPrincipal()) {
-            StringBuilder resultado = new StringBuilder();
-            current_id = this.getID();
-            resultado.append(this.procesarNodo(b));
-            parents.push(current_id);
-            resultado.append(super.visit(b));
-            parents.pop();
-            return resultado.toString();
-        } else {
-            return super.visit(b);
-        }
+        StringBuilder resultado = new StringBuilder();
+        current_id = this.getID();
+        resultado.append(this.procesarNodo(b));
+        parents.push(current_id);
+        resultado.append(super.visit(b));
+        parents.pop();
+        return resultado.toString();
     }
 
     @Override
@@ -246,12 +244,38 @@ public class ASTGraphviz extends Visitor<String>{
     @Override
     protected String procesarNodo(Nodo n) {
         // Define el nodo n en el archivo .dot, y lo conecta a su padre si lo tiene
+
         Integer idPadre = parents.peekFirst();
+
         if(idPadre == null){
-            return String.format("%1$s [label=\"%2$s\"]\n", current_id, n.getEtiqueta());
+            return String.format("%1$s [label=\"%2$s\", fontsize=48, fillcolor=10]\n",
+                    current_id, n.getEtiqueta());
         }
-        // TODO: mejorar el formato de los nodos.
-        return String.format("%1$s [label=\"%2$s\"]\n%3$s -- %1$s\n", current_id, n.getEtiqueta(), idPadre);
+        else if (n instanceof Encabezado) {
+            return armarStrNodo(42, 11, n.getEtiqueta(), idPadre);
+        } else if (n instanceof Bloque) {
+            if (((Bloque) n).esProgramaPrincipal()) {
+                return armarStrNodo(42, 11, n.getEtiqueta(), idPadre);
+            } else {
+                return armarStrNodo(28, 3, n.getEtiqueta(), idPadre);
+            }
+        } else if (n instanceof Declaracion) {
+            return armarStrNodo(28, 1, n.getEtiqueta(), idPadre);
+        } else if (n instanceof Disyuncion || n instanceof Conjuncion || n instanceof NegacionLogica) {
+            return armarStrNodo(28, 5, n.getEtiqueta(), idPadre);
+        } else if (n instanceof Relacion | n instanceof CasoCuando) {
+            return armarStrNodo(26, 6, n.getEtiqueta(), idPadre);
+        } else if (n instanceof OperacionBinaria || n instanceof OperacionUnaria) {
+            return armarStrNodo(24, 7, n.getEtiqueta(), idPadre);
+        } else if (n instanceof Seleccion || n instanceof Para || n instanceof Mientras) {
+            return armarStrNodo(24, 1, n.getEtiqueta(), idPadre);
+        } else if (n instanceof Valor) {
+            return armarStrNodo(18, 9, n.getEtiqueta(), idPadre);
+        } else if (n instanceof Control) {
+            return armarStrNodo(24, 4, n.getEtiqueta(), idPadre);
+        } else {
+            return armarStrNodo(18, 12, n.getEtiqueta(), idPadre);
+        }
     }
     @Override
     protected String procesarPrograma(Programa p, String enc, String blq) {

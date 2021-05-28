@@ -44,3 +44,4 @@ out/
 /src/ar/edu/unnoba/compilador/sintaxis/ParserSym.java
 arbol.dot
 arbol.png
+arbol.svg

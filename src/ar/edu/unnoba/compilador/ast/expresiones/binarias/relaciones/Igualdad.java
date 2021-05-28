@@ -5,7 +5,7 @@ import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 
-public class Igualdad extends OperacionBinaria {
+public class Igualdad extends Relacion {
 
     public Igualdad(Expresion izquierda, Expresion derecha) {
         super(izquierda, derecha, "==");

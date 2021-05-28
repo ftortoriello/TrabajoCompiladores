@@ -13,11 +13,13 @@ public class SiEntonces extends Seleccion {
 
     public SiEntonces(String nombre, Expresion condicion, Bloque bloqueSiEntonces) {
         super(nombre, condicion);
+        bloqueSiEntonces.setNombre("THEN");
         this.bloqueSiEntonces = bloqueSiEntonces;
     }
 
     public SiEntonces(Expresion condicion, Bloque bloqueSiEntonces) {
         super("Bloque IF-THEN", condicion);
+        bloqueSiEntonces.setNombre("THEN");
         this.bloqueSiEntonces = bloqueSiEntonces;
     }
 

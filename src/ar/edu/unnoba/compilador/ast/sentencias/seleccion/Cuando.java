@@ -26,6 +26,7 @@ public class Cuando extends Seleccion {
         super("Bloque WHEN-ELSE", expr);
         Collections.reverse(bloqueCuando);
         this.bloqueCuando = bloqueCuando;
+        bloqueElse.setNombre("Cuerpo WHEN-ELSE");
         this.bloqueElse = bloqueElse;
     }
 

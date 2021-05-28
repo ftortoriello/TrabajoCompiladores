@@ -45,6 +45,8 @@ Estado: :white_check_mark:, pero hay cuestiones pendientes con los operadores (v
 
 Fecha de entrega: 31/05/2021
 
+![AST](https://i.ibb.co/6v9sd7k/arbol.png)
+
 Requisitos:
 * AST, con su visualización mediante graphviz
 * Verificación de tipos de datos. Mostrar error si los tipos son incompatibles (por ejemplo: booleanos y números)

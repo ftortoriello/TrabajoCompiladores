@@ -1,7 +1,12 @@
-
 (* Ejemplo de un programa completo dado en la consigna *)
 (* Se definen (* algunas *) variables globales *)
 variable radio is float = -1.5;
+
+function factorial(n is integer) return integer
+    if n > 1 then
+        return n * factorial(n - 1)
+    else
+        return 1;
 
 # Ojo con esta declaración de abajo, por ahora funciona, pero a 0 (la Expresión)
 # lo estamos tomando como INTEGER, y superficie (el Identificador) es FLOAT.
@@ -33,7 +38,7 @@ end;
 function cuadrado(valor is float) return float
     return valor * valor;
 
-function get10(x is integer) return integer
+function get10(w is integer) return integer
     return 10;
 
 { Otra variable global (esta vez, sin inicialización explícita) }
@@ -43,6 +48,9 @@ variable superficie₂ is float;
 main is
 
     i = 15 + 3 * aux2 / var1 - 8;
+
+    if i > 5 and i < 10 or i / 2 == 0 then
+        writeln("???");
 
     while local_al_then > 5 do
         begin

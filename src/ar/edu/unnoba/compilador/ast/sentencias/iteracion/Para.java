@@ -26,6 +26,7 @@ public class Para extends Sentencia {
         this.valorInicial = valorInicial;
         this.valorFinal = valorFinal;
         this.salto = salto;
+        bloqueSentencias.setNombre("Cuerpo FOR");
         this.bloqueSentencias = bloqueSentencias;
     }
 

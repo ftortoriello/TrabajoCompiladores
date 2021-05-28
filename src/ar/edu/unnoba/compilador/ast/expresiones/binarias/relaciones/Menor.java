@@ -5,7 +5,7 @@ import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 
-public class Menor extends OperacionBinaria {
+public class Menor extends Relacion {
 
     public Menor(Expresion izquierda, Expresion derecha) {
         super(izquierda, derecha, "<");
