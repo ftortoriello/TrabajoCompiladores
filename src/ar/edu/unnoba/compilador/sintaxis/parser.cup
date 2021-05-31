@@ -68,8 +68,8 @@ class Parser;
 parser code
 {:
     public void syntax_error(Symbol s) {
-        System.out.println("Error en la línea "+ (s.left+1) + " Columna "+ s.right + ". Símbolo '"
-        + s.value + "'. Símbolo n° " + s.sym + " no reconocido.");
+        //System.out.println("Error en la línea "+ (s.left+1) + " Columna "+ s.right + ". Símbolo '"
+        //+ s.value + "'. Símbolo n° " + s.sym + " no reconocido.");
     }
 
     public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception {
@@ -115,8 +115,8 @@ parser code
         Tipo tipo;
 
         switch (tipoStr.toUpperCase()) {
-            case "BOOL":
-                tipo = Tipo.BOOL;
+            case "BOOLEAN":
+                tipo = Tipo.BOOLEAN;
                 break;
             case "INTEGER":
                 tipo = Tipo.INTEGER;
@@ -577,7 +577,7 @@ literal ::=
             RESULT = lit;
         :} |
         LIT_BOOLEANO:lit_bool {:
-            Literal lit = new Literal(lit_bool, Tipo.BOOL, "Literal BOOL");
+            Literal lit = new Literal(lit_bool, Tipo.BOOLEAN, "Literal BOOLEAN");
             imprimirEtiqueta(lit);
             RESULT = lit;
         :};
@@ -614,7 +614,7 @@ invocacion_funcion ::=
             RESULT = invo;
         :} |
         PR_READ_BOOLEAN:nombre_fun PAR_ABRE:pa PAR_CIERRA:pc {:
-            InvocacionFuncion invo = new InvocacionFuncion(nombre_fun, new ArrayList<Expresion>(), Tipo.BOOL);
+            InvocacionFuncion invo = new InvocacionFuncion(nombre_fun, new ArrayList<Expresion>(), Tipo.BOOLEAN);
             imprimirEtiqueta(invo);
             RESULT = invo;
         :} |
@@ -634,7 +634,8 @@ lista_exprs ::=
             List<Expresion> args = new ArrayList<Expresion>();
             args.add(arg);
             RESULT = args;
-        :} | {:
+        :} |
+        {:
             // Para que acepte la producción cuando no se pasa ningún argumento,
             // y a la vez genere una lista vacía para pasarle al constructor.
             List<Expresion> args = new ArrayList<>();

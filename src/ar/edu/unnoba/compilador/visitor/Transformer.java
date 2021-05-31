@@ -48,9 +48,9 @@ public abstract class Transformer {
     }
 
     public Asignacion transform(Asignacion a) throws ExcepcionDeTipos{
-        Identificador id = a.getIdent().accept_transfomer(this);
+        Identificador ident = a.getIdent().accept_transfomer(this);
         Expresion e = a.getExpresion().accept_transfomer(this);
-        a.setIdent(id);
+        a.setIdent(ident);
         a.setExpresion(e);
         return a;
     }

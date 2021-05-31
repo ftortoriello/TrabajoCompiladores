@@ -13,13 +13,13 @@ import java.io.PrintWriter;
 
 public class GenerarAST {
     public static void main(String[] args) throws Exception {
-        String ruta = System.getProperty("user.dir") + "\\src\\ar\\edu\\unnoba\\compilador\\entrada.txt";
-
+        String ruta = System.getProperty("user.dir") + "/src/ar/edu/unnoba/compilador/entrada.txt";
         FileReader entrada = new FileReader(ruta);
         Lexer lexico = new Lexer(entrada);
         Parser parser = new Parser(lexico);
-        Programa programa = (Programa) parser.parse().value;
         try {
+            Programa programa = (Programa) parser.parse().value;
+
             // Ejecución de visitor graficador
             PrintWriter pw = new PrintWriter(new FileWriter("arbol.dot"));
             ASTGraphviz graficador = new ASTGraphviz();
@@ -40,8 +40,9 @@ public class GenerarAST {
             vt.procesar(programa);
             System.out.println("Tipos validados");
             // ----------
-
-        } catch(Exception e){
+        } catch (ClassCastException e) {
+            // Error sintáctico
+        } catch(Exception e) {
             System.out.println(e);
         }
     }

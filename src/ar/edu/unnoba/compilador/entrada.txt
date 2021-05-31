@@ -99,7 +99,6 @@ begin
         variable local_al_then is float = global;
         while local_al_then > 5 do
         begin
-            # TODO por qué no acepta esta línea?
             local_al_then = local_al_then - 1;
             variable local_al_while is float = local_al_then * 1.5;
             writeln(local_al_while);

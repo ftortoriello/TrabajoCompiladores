@@ -11,7 +11,6 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 public class Para extends Sentencia {
     // Tiene un nodo "identificador", un nodo numérico "valorInicial", un nodo numérico
     // "valorFinal", estos tres de tipo ENTERO. Luego tiene un nodo "bloque" de sentencias.
-    // TODO: Si valorFinal < valorInicial, se invierte la lógica y se decrementa valorInicial.
     // TODO: asegurarse que Identificador ya esté definido y sea de tipo Entero.
     // Si valorInicial no está definido, su valor por defecto es 1.
 
@@ -25,7 +24,12 @@ public class Para extends Sentencia {
         this.ident = ident;
         this.valorInicial = valorInicial;
         this.valorFinal = valorFinal;
-        this.salto = salto;
+        if (valorInicial <= valorFinal) {
+            this.salto = Math.abs(salto);
+        } else {
+            // Si valorFinal < valorInicial, dejar salto negativo.
+            this.salto = -Math.abs(salto);
+        }
         bloqueSentencias.setNombre("Cuerpo\nFOR");
         this.bloqueSentencias = bloqueSentencias;
     }

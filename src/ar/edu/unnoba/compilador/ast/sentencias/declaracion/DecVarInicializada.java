@@ -9,8 +9,8 @@ public class DecVarInicializada extends DecVar {
 
     private Expresion expresion;
 
-    public DecVarInicializada(String nombre, Identificador id, Expresion expr) {
-        super(nombre, id);
+    public DecVarInicializada(String nombre, Identificador ident, Expresion expr) {
+        super(nombre, ident);
         this.expresion = expr;
         }
 

@@ -1,7 +1,7 @@
 package ar.edu.unnoba.compilador.ast.expresiones;
 
 public enum Tipo {
-    BOOL,
+    BOOLEAN,
     INTEGER,
     FLOAT,
     UNKNOWN

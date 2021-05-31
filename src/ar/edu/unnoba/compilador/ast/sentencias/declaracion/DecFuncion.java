@@ -15,8 +15,8 @@ public class DecFuncion extends Declaracion {
     List<DecVar> args;
     Bloque bloque;
 
-    public DecFuncion(Identificador id, List<DecVar> args, Bloque bloque) {
-        super(id.getNombre(), id);
+    public DecFuncion(Identificador ident, List<DecVar> args, Bloque bloque) {
+        super(ident.getNombre(), ident);
         // Invierto el orden de los argumentos porque debido a la forma de las reglas los lee al revés
         Collections.reverse(args);
         bloque.setNombre("Cuerpo\nFUNCIÓN");
@@ -24,8 +24,8 @@ public class DecFuncion extends Declaracion {
         this.bloque = bloque;
     }
 
-    public DecFuncion(Identificador id, Bloque bloque) {
-        super(id.getNombre(), id);
+    public DecFuncion(Identificador ident, Bloque bloque) {
+        super(ident.getNombre(), ident);
         bloque.setNombre("Cuerpo\nFUNCIÓN");
         this.args = Collections.emptyList();
         this.bloque = bloque;

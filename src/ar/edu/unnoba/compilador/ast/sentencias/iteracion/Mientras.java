@@ -10,7 +10,7 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 
 public class Mientras extends Sentencia {
     // Tiene un nodo "expresion" de tipo booleano (la condición) y un nodo "bloque" de sentencias.
-    // TODO: ¿y si la expresión no puede evaluarse como BOOL?
+    // TODO: ¿y si la expresión no puede evaluarse como BOOLEAN?
 
     Expresion condicion;
     Bloque bloqueSentencias;

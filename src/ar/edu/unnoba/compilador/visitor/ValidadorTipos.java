@@ -123,17 +123,17 @@ public class ValidadorTipos extends Transformer{
     }
 
     @Override
-    public Identificador transform(Identificador identificador) throws ExcepcionDeTipos{
-        Object elemento = alcance_actual.resolver(identificador.getNombre());
+    public Identificador transform(Identificador ident) throws ExcepcionDeTipos{
+        Object elemento = alcance_actual.resolver(ident.getNombre());
         Tipo tipo = Tipo.UNKNOWN;
         if(elemento instanceof Variable){
             tipo = ((Variable) elemento).getTipo();
         }
         if (tipo != Tipo.UNKNOWN){
-            identificador.setTipo(tipo);
-            return identificador;
+            ident.setTipo(tipo);
+            return ident;
         }
-        throw new ExcepcionDeTipos(String.format("No se declaró el nombre %1$s\n", identificador.getNombre()));
+        throw new ExcepcionDeTipos(String.format("No se declaró el nombre %1$s\n", ident.getNombre()));
     }
 
 }

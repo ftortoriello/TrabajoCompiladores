@@ -45,14 +45,14 @@ public abstract class Visitor<T> {
 
     public T visit(Encabezado e) throws ExcepcionDeAlcance {
         List<T> result = new ArrayList<>();
-        for (Sentencia s : e.getDeclaraciones()){
+        for (Sentencia s : e.getDeclaraciones()) {
             result.add(s.accept(this));
         }
         return procesarEncabezado(e, result);
     }
     public T visit(Bloque b) throws ExcepcionDeAlcance {
         List<T> result = new ArrayList<>();
-        for (Nodo sentencia : b.getSentencias()){
+        for (Nodo sentencia : b.getSentencias()) {
             result.add(sentencia.accept(this));
         }
         return procesarBloque(b, result);

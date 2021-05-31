@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class Alcance extends HashMap {
 
-    // El "nombre" del alcance puede ser "GLOBAL", el nombre de la función en la que está incluido, etc...
+    // El "nombre" del alcance puede ser "global", el nombre de la función en la que está incluido, etc...
     private String nombre;
     // Necesitamos el padre porque si una variable no está definida en este ámbito le preguntamos a él
     private Alcance padre;
@@ -37,12 +37,12 @@ public class Alcance extends HashMap {
         this.padre = padre;
     }
 
-    public Object resolver(String name){
+    public Object resolver(String name) {
         Alcance alcance_actual = this;
         Object elemento = null;
-        while(alcance_actual != null){
+        while (alcance_actual != null) {
             elemento = alcance_actual.get(name);
-            if(elemento != null){
+            if (elemento != null) {
                 return elemento;
             }
             alcance_actual = alcance_actual.getPadre();

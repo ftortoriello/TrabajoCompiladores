@@ -18,15 +18,16 @@ public class GeneradorAlcances extends Visitor<Void> {
     private Alcance alcance_actual;
     private Alcance alcance_global;
 
-    public void procesar(Programa programa) throws ExcepcionDeAlcance{
-        programa.getCuerpo().setAlcance(new Alcance("global"));
-        alcance_global = alcance_actual = programa.getCuerpo().getAlcance();
+    public void procesar(Programa programa) throws ExcepcionDeAlcance {
+        alcance_global = alcance_actual = new Alcance("global");
+        programa.getCuerpo().setAlcance(alcance_global);
         this.visit(programa);
     }
 
-    private Object agregarSimbolo(String nombre, Object s){
+    private Object agregarSimbolo(String nombre, Object s) {
         return this.alcance_actual.putIfAbsent(nombre, s);
     }
+
 
     // TODO: agregar visit para Programa, Bloque y Asignación
 
@@ -34,22 +35,27 @@ public class GeneradorAlcances extends Visitor<Void> {
     public Void visit(DecVar dv) throws ExcepcionDeAlcance {
         // Agrega la declaración al ámbito en el que se encuentra
         Variable var = new Variable(dv);
+        //Object result = this.agregarSimbolo(var.getDeclaracion().getIdent().getNombre(), dv);
         Object result = this.agregarSimbolo(var.getDeclaracion().getIdent().getNombre(), dv);
-        if(result!=null){
+        if (result != null) {
             throw new ExcepcionDeAlcance(
-                    String.format("El nombre de la variable %1$s de tipo %2$s fue utilizado previamente\"]\n",
-                            dv.getIdent().getNombre(), dv.getTipo() ));
+                    String.format("El nombre de la variable %1$s de tipo %2$s fue utilizado previamente.",
+                                  dv.getIdent().getNombre(), dv.getTipo() ));
         }
         return null;
     }
 
     @Override
-    protected Void procesarEncabezado(Encabezado encabezado, List<Void> sentencias) {
+    protected Void procesarEncabezado(Encabezado e, List<Void> sentencias) {
         return null;
     }
 
     @Override
-    protected Void procesarBloque(Bloque bloque, List<Void> sentencias) {
+    protected Void procesarBloque(Bloque b, List<Void> sentencias) {
+        System.out.println(b.getNombre());
+        // TODO FIXME poner el nombre de la función?
+        alcance_actual = new Alcance(b.getNombre());
+        b.setAlcance(alcance_actual);
         return null;
     }
 

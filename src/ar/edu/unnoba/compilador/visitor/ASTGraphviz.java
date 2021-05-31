@@ -4,7 +4,6 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 
-
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
@@ -50,7 +49,7 @@ public class ASTGraphviz extends Visitor<String>{
         StringBuilder resultado = new StringBuilder();
 
         resultado.append("graph Programa {" +
-                "label=\"Árbol de sintaxis abstracta (Conti - Tortoriello)\";" +
+                "label=\"Árbol de sintaxis abstracta (Conti - Tortoriello)\";\n" +
                 "bgcolor=aliceblue;\n" +
                 "fontsize=60;\n");
         resultado.append("node [\n" +
@@ -258,7 +257,7 @@ public class ASTGraphviz extends Visitor<String>{
         Integer idPadre = parents.peekFirst();
 
         if(idPadre == null){
-            return String.format("%1$s [label=\"%2$s\", fontsize=48, fillcolor=10]\n",
+            return String.format("%1$s [label=\"%2$s\", fontsize=48, fillcolor=10, penwidth=5]\n",
                     current_id, n.getEtiqueta());
         }
         else if (n instanceof Encabezado) {
@@ -273,7 +272,7 @@ public class ASTGraphviz extends Visitor<String>{
             return armarStrNodo(28, 1, n.getEtiqueta(), idPadre);
         } else if (n instanceof Disyuncion || n instanceof Conjuncion || n instanceof NegacionLogica) {
             return armarStrNodo(28, 5, n.getEtiqueta(), idPadre);
-        } else if (n instanceof Relacion | n instanceof CasoCuando) {
+        } else if (n instanceof Relacion || n instanceof CasoCuando) {
             return armarStrNodo(26, 6, n.getEtiqueta(), idPadre);
         } else if (n instanceof OperacionBinaria || n instanceof OperacionUnaria) {
             return armarStrNodo(24, 7, n.getEtiqueta(), idPadre);
