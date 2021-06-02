@@ -16,6 +16,7 @@ import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.EnteroAFlotante;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.FlotanteAEntero;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Variable;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Control;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
@@ -25,7 +26,6 @@ import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntonces;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
 
-// TODO: terminar de implementar
 public abstract class Transformer {
     // Transforms base
 
@@ -38,7 +38,6 @@ public abstract class Transformer {
     public Encabezado transform(Encabezado e) throws ExcepcionDeTipos {
         List<Declaracion> declaraciones = new ArrayList<>();
         for (Declaracion d : e.getDeclaraciones()) {
-            // FIXME: cast
             declaraciones.add((Declaracion) d.accept(this));
         }
         e.setDeclaraciones(declaraciones);
@@ -46,7 +45,6 @@ public abstract class Transformer {
     }
 
     public Bloque transform(Bloque b) throws ExcepcionDeTipos {
-        // FIXME: ponemos Nodo porque puede ser una llamada a función, de tipo Expresion
         List<Nodo> sentencias = new ArrayList<>();
         for (Nodo sentencia : b.getSentencias()) {
             sentencias.add(sentencia.accept(this));
@@ -56,7 +54,6 @@ public abstract class Transformer {
     }
 
     public CasoCuando transform(CasoCuando cc) throws ExcepcionDeTipos {
-        // FIXME: Casteo Nodo -> Expresion
         cc.setExpr((Expresion) cc.getExpr().accept(this));
         cc.setBloque(cc.getBloque().accept(this));
         return cc;
@@ -68,6 +65,10 @@ public abstract class Transformer {
 
     public Identificador transform(Identificador i) throws ExcepcionDeTipos {
         return i;
+    }
+
+    public Variable transform(Variable v) throws ExcepcionDeTipos {
+        return v;
     }
 
     public InvocacionFuncion transform(InvocacionFuncion invo) throws ExcepcionDeTipos {
@@ -90,7 +91,7 @@ public abstract class Transformer {
     public OperacionBinaria transform(OperacionBinaria ob) throws ExcepcionDeTipos {
         ob.setIzquierda((Expresion) ob.getIzquierda().accept(this));
         ob.setDerecha((Expresion) ob.getDerecha().accept(this));
-        // FIXME No se usa el valor de retorno?
+        // FIXME: No se usa el valor de retorno?
         return ob;
     }
 

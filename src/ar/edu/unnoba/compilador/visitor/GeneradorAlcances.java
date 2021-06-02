@@ -4,6 +4,7 @@ import java.util.List;
 
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Variable;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
@@ -12,9 +13,8 @@ import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 
-// FIXME
+// FIXME: En algún momento rompí todo
 public class GeneradorAlcances extends Visitor<Void> {
-
     private Alcance alcanceActual;
     private Alcance alcanceGlobal;
 
@@ -34,8 +34,6 @@ public class GeneradorAlcances extends Visitor<Void> {
     @Override
     public Void visit(DecVar dv) throws ExcepcionDeAlcance {
         // Agrega la declaración al ámbito en el que se encuentra
-        // TODO
-        /*
         Variable var = new Variable(dv);
         Nodo result = this.agregarSimbolo(var.getDeclaracion().getIdent().getNombre(), dv);
         if (result != null) {
@@ -43,7 +41,6 @@ public class GeneradorAlcances extends Visitor<Void> {
                     String.format("El nombre de la variable %1$s de tipo %2$s fue utilizado previamente.",
                             dv.getIdent().getNombre(), dv.getTipo()));
         }
-        */
         return null;
     }
 

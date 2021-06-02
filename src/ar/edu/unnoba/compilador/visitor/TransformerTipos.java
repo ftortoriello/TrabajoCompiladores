@@ -11,10 +11,13 @@ import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.EnteroAFlotante;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.FlotanteAEntero;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Variable;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.Asignacion;
 
-public class ValidadorTipos extends Transformer {
+public class TransformerTipos extends Transformer {
     private Alcance alcanceActual;
+
+    // Metodos auxiliares
 
     private static Tipo getTipoEnComun(Tipo tipo1, Tipo tipo2) throws ExcepcionDeTipos {
         if (tipo1 == tipo2) {
@@ -46,14 +49,13 @@ public class ValidadorTipos extends Transformer {
     }
 
 
-    // Transforms
-
-    @Override
-    public Programa transform(Programa p) throws ExcepcionDeTipos {
-        super.transform(p);
+    public void procesar(Programa p) throws ExcepcionDeTipos {
         this.alcanceActual = p.getCuerpo().getAlcance();
-        return p;
+        transform(p);
     }
+
+
+    // Transforms
 
     @Override
     public Asignacion transform(Asignacion a) throws ExcepcionDeTipos {
@@ -94,11 +96,9 @@ public class ValidadorTipos extends Transformer {
     public Identificador transform(Identificador ident) throws ExcepcionDeTipos {
         Nodo elemento = alcanceActual.resolver(ident.getNombre());
         Tipo tipo = Tipo.UNKNOWN;
-        /* TODO
         if (elemento instanceof Variable) {
             tipo = ((Variable) elemento).getTipo();
         }
-        */
         if (tipo != Tipo.UNKNOWN) {
             ident.setTipo(tipo);
             return ident;

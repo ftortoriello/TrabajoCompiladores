@@ -10,6 +10,7 @@ import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.*;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.*;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Variable;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Control;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
@@ -59,16 +60,20 @@ public abstract class Visitor<T> {
         return procesarCasoCuando(cc, expr, blq);
     }
 
-    public T visit(Literal c) {
+    public T visit(Literal c) throws ExcepcionDeAlcance {
         return procesarNodo(c);
     }
 
-    public T visit(Identificador i) {
+    public T visit(Identificador i) throws ExcepcionDeAlcance {
         return procesarNodo(i);
     }
 
-    public T visit(InvocacionFuncion invo) {
+    public T visit(InvocacionFuncion invo) throws ExcepcionDeAlcance {
         return procesarNodo(invo);
+    }
+
+    public <T> T visit(Variable v) {
+        throw new UnsupportedOperationException("Operación no soportada.");
     }
 
 

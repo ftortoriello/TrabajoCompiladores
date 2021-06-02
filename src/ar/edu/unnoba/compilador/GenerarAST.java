@@ -5,7 +5,7 @@ import ar.edu.unnoba.compilador.lexico.Lexer;
 import ar.edu.unnoba.compilador.sintaxis.Parser;
 import ar.edu.unnoba.compilador.visitor.ASTGraphviz;
 import ar.edu.unnoba.compilador.visitor.GeneradorAlcances;
-import ar.edu.unnoba.compilador.visitor.ValidadorTipos;
+import ar.edu.unnoba.compilador.visitor.TransformerTipos;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -33,8 +33,8 @@ public class GenerarAST {
             ga.procesar(programa);
             System.out.println("Alcances procesados");
 
-            // Ejecución de visitor validador de tipos
-            ValidadorTipos vt = new ValidadorTipos();
+            // Ejecución de transformer validador de tipos
+            TransformerTipos vt = new TransformerTipos();
             vt.procesar(programa);
             System.out.println("Tipos validados");
         } catch (ClassCastException e) {
