@@ -5,9 +5,7 @@ import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
-
 public class Programa extends Nodo {
-
     private Encabezado encabezado;
     private Bloque cuerpo;
 
@@ -19,6 +17,10 @@ public class Programa extends Nodo {
 
     public Encabezado getEncabezado() {
         return this.encabezado;
+    }
+
+    public void setEncabezado(Encabezado encabezado) {
+        this.encabezado = encabezado;
     }
 
     public Bloque getCuerpo() {
@@ -40,8 +42,7 @@ public class Programa extends Nodo {
     }
 
     @Override
-    public <R> R accept_transfomer(Transformer t) throws ExcepcionDeTipos {
-        // TODO: Sin implementar
-        return null;
+    public Programa accept(Transformer t) throws ExcepcionDeTipos {
+        return t.transform(this);
     }
 }

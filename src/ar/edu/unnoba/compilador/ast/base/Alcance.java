@@ -2,8 +2,7 @@ package ar.edu.unnoba.compilador.ast.base;
 
 import java.util.HashMap;
 
-public class Alcance extends HashMap {
-
+public class Alcance extends HashMap<String, Nodo> {
     // El "nombre" del alcance puede ser "global", el nombre de la función en la que está incluido, etc...
     private String nombre;
     // Necesitamos el padre porque si una variable no está definida en este ámbito le preguntamos a él
@@ -37,17 +36,17 @@ public class Alcance extends HashMap {
         this.padre = padre;
     }
 
-    public Object resolver(String name) {
-        Alcance alcance_actual = this;
-        Object elemento = null;
-        while (alcance_actual != null) {
-            elemento = alcance_actual.get(name);
+    public Nodo resolver(String nombre) {
+        Alcance alcanceActual = this;
+        Nodo elemento = null;
+        while (alcanceActual != null) {
+            elemento = alcanceActual.get(nombre);
             if (elemento != null) {
                 return elemento;
             }
-            alcance_actual = alcance_actual.getPadre();
+            alcanceActual = alcanceActual.getPadre();
         }
-        return elemento;
+        // No se encontró
+        return null;
     }
-
 }

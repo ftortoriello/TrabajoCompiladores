@@ -4,7 +4,6 @@ import java.util.List;
 
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Variable;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
@@ -13,19 +12,20 @@ import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 
+// FIXME
 public class GeneradorAlcances extends Visitor<Void> {
 
-    private Alcance alcance_actual;
-    private Alcance alcance_global;
+    private Alcance alcanceActual;
+    private Alcance alcanceGlobal;
 
     public void procesar(Programa programa) throws ExcepcionDeAlcance {
-        alcance_global = alcance_actual = new Alcance("global");
-        programa.getCuerpo().setAlcance(alcance_global);
+        alcanceGlobal = alcanceActual = new Alcance("global");
+        programa.getCuerpo().setAlcance(alcanceGlobal);
         this.visit(programa);
     }
 
-    private Object agregarSimbolo(String nombre, Object s) {
-        return this.alcance_actual.putIfAbsent(nombre, s);
+    private Nodo agregarSimbolo(String nombre, Nodo s) {
+        return this.alcanceActual.putIfAbsent(nombre, s);
     }
 
 
@@ -34,14 +34,16 @@ public class GeneradorAlcances extends Visitor<Void> {
     @Override
     public Void visit(DecVar dv) throws ExcepcionDeAlcance {
         // Agrega la declaración al ámbito en el que se encuentra
+        // TODO
+        /*
         Variable var = new Variable(dv);
-        //Object result = this.agregarSimbolo(var.getDeclaracion().getIdent().getNombre(), dv);
-        Object result = this.agregarSimbolo(var.getDeclaracion().getIdent().getNombre(), dv);
+        Nodo result = this.agregarSimbolo(var.getDeclaracion().getIdent().getNombre(), dv);
         if (result != null) {
             throw new ExcepcionDeAlcance(
                     String.format("El nombre de la variable %1$s de tipo %2$s fue utilizado previamente.",
-                                  dv.getIdent().getNombre(), dv.getTipo() ));
+                            dv.getIdent().getNombre(), dv.getTipo()));
         }
+        */
         return null;
     }
 
@@ -52,10 +54,9 @@ public class GeneradorAlcances extends Visitor<Void> {
 
     @Override
     protected Void procesarBloque(Bloque b, List<Void> sentencias) {
-        System.out.println(b.getNombre());
-        // TODO FIXME poner el nombre de la función?
-        alcance_actual = new Alcance(b.getNombre());
-        b.setAlcance(alcance_actual);
+        // FIXME: poner el nombre de la función?
+        alcanceActual = new Alcance(String.format("%s-%d", b.getNombre(), this.getID()));
+        b.setAlcance(alcanceActual);
         return null;
     }
 

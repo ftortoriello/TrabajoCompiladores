@@ -5,7 +5,6 @@ import ar.edu.unnoba.compilador.sintaxis.ParserSym;
 import java.util.Arrays;
 
 public class Token extends java_cup.runtime.Symbol {
-    
     public final String nombre;
     public final int linea;
     public final int columna;

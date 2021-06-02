@@ -8,18 +8,7 @@ import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
 public class NegacionLogica extends OperacionUnaria {
-
     public NegacionLogica(Expresion expresion) {
         super("NOT", expresion);
-    }
-
-    @Override
-    public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
-        return v.visit(this);
-    }
-
-    @Override
-    public <R> R accept_transfomer(Transformer t) throws ExcepcionDeTipos {
-        return null;
     }
 }

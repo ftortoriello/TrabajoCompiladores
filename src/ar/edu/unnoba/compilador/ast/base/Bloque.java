@@ -9,10 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Bloque extends Nodo {
-
     private Alcance alcance;
     private List<Nodo> sentencias;
-    private boolean esProgramaPrincipal;
+    private final boolean esProgramaPrincipal;
 
     public Bloque(String nombre, List<Nodo> sentencias, boolean esProgramaPrincipal) {
         super(nombre);
@@ -66,7 +65,7 @@ public class Bloque extends Nodo {
     }
 
     @Override
-    public Bloque accept_transfomer(Transformer t) throws ExcepcionDeTipos {
+    public Bloque accept(Transformer t) throws ExcepcionDeTipos {
         return t.transform(this);
     }
 }

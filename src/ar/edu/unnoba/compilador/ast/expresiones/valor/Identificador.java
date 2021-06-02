@@ -6,15 +6,16 @@ import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 
+/* Clase para catalogar en la primera pasada cosas que no sabemos si son
+ * variables, funciones... */
 public class Identificador extends Valor {
-    // Esta clase sirve para catalogar en la primera cosas que no sabemos si son variables, funciones o qué
     // TODO: Los nodos Identificador tienen que quedar reemplazados del AST cuando armemos las tablas de símbolos
 
-    public Identificador(String nombre){
+    public Identificador(String nombre) {
         super(Tipo.UNKNOWN, nombre);
     }
 
-    public Identificador(String nombre, Tipo tipo){
+    public Identificador(String nombre, Tipo tipo) {
         super(tipo, nombre);
     }
 
@@ -29,7 +30,7 @@ public class Identificador extends Valor {
     }
 
     @Override
-    public Identificador accept_transfomer(Transformer t) throws ExcepcionDeTipos {
+    public Identificador accept(Transformer t) throws ExcepcionDeTipos {
         return t.transform(this);
     }
 }

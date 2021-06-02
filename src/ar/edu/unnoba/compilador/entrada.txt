@@ -46,7 +46,6 @@ variable superficie₂ is float;
 
 # Procedimiento principal
 main is
-
     i = 15 + 3 * aux2 / var1 - 8;
 
     if i > 5 and i < 10 or not i / 2 == 0 then

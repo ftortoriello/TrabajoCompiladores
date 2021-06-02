@@ -8,10 +8,11 @@ import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
-public class Mientras extends Sentencia {
-    // Tiene un nodo "expresion" de tipo booleano (la condición) y un nodo "bloque" de sentencias.
-    // TODO: ¿y si la expresión no puede evaluarse como BOOLEAN?
+/* Tiene un nodo "expresion" de tipo booleano (la condición) y un nodo "bloque"
+ * de sentencias. */
+// TODO: error de compatibilidad si la expresión no puede evaluarse como BOOLEAN
 
+public class Mientras extends Sentencia {
     Expresion condicion;
     Bloque bloqueSentencias;
 
@@ -26,8 +27,16 @@ public class Mientras extends Sentencia {
         return condicion;
     }
 
+    public void setCondicion(Expresion condicion) {
+        this.condicion = condicion;
+    }
+
     public Bloque getBloqueSentencias() {
         return bloqueSentencias;
+    }
+
+    public void setBloqueSentencias(Bloque bloqueSentencias) {
+        this.bloqueSentencias = bloqueSentencias;
     }
 
     @Override
@@ -36,7 +45,7 @@ public class Mientras extends Sentencia {
     }
 
     @Override
-    public <R> R accept_transfomer(Transformer t) throws ExcepcionDeTipos {
-        return null;
+    public Mientras accept(Transformer t) throws ExcepcionDeTipos {
+        return t.transform(this);
     }
 }

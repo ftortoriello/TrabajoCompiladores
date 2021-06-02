@@ -6,13 +6,7 @@ import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 
 public class NegacionAritmetica extends OperacionUnaria {
-
     public NegacionAritmetica(Expresion expresion) {
         super("-", expresion);
-    }
-
-    @Override
-    public <R> R accept_transfomer(Transformer t) throws ExcepcionDeTipos {
-        return null;
     }
 }

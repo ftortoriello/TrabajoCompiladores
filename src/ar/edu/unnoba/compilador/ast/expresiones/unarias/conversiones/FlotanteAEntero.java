@@ -9,9 +9,4 @@ public class FlotanteAEntero extends OperacionConversion {
     public FlotanteAEntero(Expresion expresion) {
         super("Flotante a entero", expresion, Tipo.INTEGER);
     }
-
-    @Override
-    public FlotanteAEntero accept_transfomer(Transformer t) throws ExcepcionDeTipos {
-        return t.transform(this);
-    }
 }

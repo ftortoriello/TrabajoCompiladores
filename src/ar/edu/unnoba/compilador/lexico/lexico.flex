@@ -3,7 +3,6 @@ package ar.edu.unnoba.compilador.lexico;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Stack;
-import java_cup.runtime.*;
 import java_cup.sym;
 
 import ar.edu.unnoba.compilador.token.Token;
@@ -40,12 +39,12 @@ import ar.edu.unnoba.compilador.token.Token;
     int cadena_yyline = 0;
     int cadena_yycolumn = 0;
 
-    StringBuffer stringBuffer = new StringBuffer();
+    final StringBuffer stringBuffer = new StringBuffer();
 
     enum TipoComentario { LLAVES, PASCAL }
-    Stack<TipoComentario> comentariosAbiertos = new Stack<TipoComentario>();
+    final Stack<TipoComentario> comentariosAbiertos = new Stack<>();
 
-    public List<Token> tablaDeSimbolos = new ArrayList<>();
+    final public List<Token> tablaDeSimbolos = new ArrayList<>();
 
     private Token token(String nombre) {
         return new Token(nombre, this.yyline, this.yycolumn);
@@ -198,4 +197,3 @@ ComentarioUnaLinea = #.*{FinDeLinea}?
 }
 
 [^]                     { errorLexico("Entrada no permitida: (" + yytext() + ")"); }
-

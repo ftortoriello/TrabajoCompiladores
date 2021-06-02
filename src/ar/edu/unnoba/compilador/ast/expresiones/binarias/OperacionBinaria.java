@@ -3,7 +3,7 @@ package ar.edu.unnoba.compilador.ast.expresiones.binarias;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.MenorIgual;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
@@ -43,11 +43,11 @@ public abstract class OperacionBinaria extends Expresion {
         this.derecha = derecha;
     }
 
-    public Expresion getIzquierda(){
+    public Expresion getIzquierda() {
         return izquierda;
     }
 
-    public Expresion getDerecha(){
+    public Expresion getDerecha() {
         return derecha;
     }
 
@@ -57,7 +57,7 @@ public abstract class OperacionBinaria extends Expresion {
     }
 
     @Override
-    public <R> R accept_transfomer(Transformer t) throws ExcepcionDeTipos {
-        return null;
+    public OperacionBinaria accept(Transformer t) {
+        return this;
     }
 }

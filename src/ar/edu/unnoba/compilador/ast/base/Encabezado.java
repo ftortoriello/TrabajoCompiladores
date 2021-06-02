@@ -9,7 +9,6 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 import java.util.List;
 
 public class Encabezado extends Nodo {
-
     List<Declaracion> declaraciones;
 
     public Encabezado(List<Declaracion> declaraciones) {
@@ -31,7 +30,7 @@ public class Encabezado extends Nodo {
     }
 
     @Override
-    public <R> R accept_transfomer(Transformer t) throws ExcepcionDeTipos {
-        return null;
+    public Encabezado accept(Transformer t) throws ExcepcionDeTipos {
+        return t.transform(this);
     }
 }

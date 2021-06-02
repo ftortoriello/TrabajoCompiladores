@@ -1,6 +1,7 @@
 package ar.edu.unnoba.compilador.visitor;
 
 import ar.edu.unnoba.compilador.ast.base.Alcance;
+import ar.edu.unnoba.compilador.ast.base.Nodo;
 import ar.edu.unnoba.compilador.ast.base.Programa;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
@@ -14,126 +15,107 @@ import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.EnteroAFlotante;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.FlotanteAEntero;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Variable;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.Asignacion;
 
+public class ValidadorTipos extends Transformer {
+    private Alcance alcanceActual;
 
-public class ValidadorTipos extends Transformer{
-
-    private Alcance alcance_actual;
-
-    public Programa procesar(Programa programa) throws ExcepcionDeTipos {
-        this.alcance_actual = programa.getCuerpo().getAlcance();
-        return programa.accept_transfomer(this);
+    public void procesar(Programa programa) throws ExcepcionDeTipos {
+        this.alcanceActual = programa.getCuerpo().getAlcance();
+        programa.accept(this);
     }
 
-    private static Tipo tipo_comun(Tipo tipo_1, Tipo tipo_2) throws ExcepcionDeTipos{
-        if (tipo_1 == tipo_2){
-            return tipo_1;
+    private static Tipo getTipoEnComun(Tipo tipo1, Tipo tipo2) throws ExcepcionDeTipos {
+        if (tipo1 == tipo2) {
+            return tipo1;
         }
-        if(tipo_1 == Tipo.INTEGER && tipo_2 == Tipo.FLOAT){
-            return tipo_2;
+        if (tipo1 == Tipo.INTEGER && tipo2 == Tipo.FLOAT) {
+            return tipo2;
         }
-        if(tipo_1 == Tipo.FLOAT && tipo_2 == Tipo.INTEGER){
-            return tipo_1;
+        if (tipo1 == Tipo.FLOAT && tipo2 == Tipo.INTEGER) {
+            return tipo1;
         }
         throw new ExcepcionDeTipos(
-                String.format("No existe un tipo común entre %1$s y %2$s\n", tipo_1, tipo_2 ));
+                String.format("No existe un tipo común entre %1$s y %2$s\n", tipo1, tipo2));
     }
 
-    private static Expresion convertir_a_tipo(Expresion expresion, Tipo tipo_destino) throws ExcepcionDeTipos{
-        Tipo tipo_origen = expresion.getTipo();
-        if(tipo_origen == tipo_destino){
+    private static Expresion convertirATipo(Expresion expresion, Tipo tipoDestino) throws ExcepcionDeTipos {
+        Tipo tipoOrigen = expresion.getTipo();
+        if (tipoOrigen == tipoDestino) {
             return expresion;
         }
-        if(tipo_origen == Tipo.INTEGER && tipo_destino == Tipo.FLOAT){
+        if (tipoOrigen == Tipo.INTEGER && tipoDestino == Tipo.FLOAT) {
             return new EnteroAFlotante(expresion);
         }
-        if(tipo_origen == Tipo.FLOAT && tipo_destino == Tipo.INTEGER){
+        if (tipoOrigen == Tipo.FLOAT && tipoDestino == Tipo.INTEGER) {
             return new FlotanteAEntero(expresion);
         }
         throw new ExcepcionDeTipos(
-                String.format("No existe un tipo común entre %1$s y %2$s\n", tipo_origen, tipo_destino ));
+                String.format("No existe un tipo común entre %1$s y %2$s\n", tipoOrigen, tipoDestino));
     }
 
+
+    // Transforms
+
     @Override
-    public Asignacion transform(Asignacion a) throws ExcepcionDeTipos{
+    public Asignacion transform(Asignacion a) throws ExcepcionDeTipos {
         Asignacion asignacion = super.transform(a);
-        asignacion.setExpresion(convertir_a_tipo(asignacion.getExpresion(), asignacion.getIdent().getTipo()));
+        asignacion.setExpresion(convertirATipo(asignacion.getExpresion(), asignacion.getIdent().getTipo()));
         return asignacion;
     }
 
-    private OperacionUnaria transformarOperacionUnaria(OperacionUnaria ou) throws ExcepcionDeTipos{
-        if(ou.getTipo() == Tipo.UNKNOWN){
+    private OperacionUnaria transformarOperacionUnaria(OperacionUnaria ou) throws ExcepcionDeTipos {
+        if (ou.getTipo() == Tipo.UNKNOWN) {
             ou.setTipo(ou.getExpresion().getTipo());
-        }else{
-            ou.setExpresion(convertir_a_tipo(ou.getExpresion(), ou.getTipo()));
+        } else {
+            ou.setExpresion(convertirATipo(ou.getExpresion(), ou.getTipo()));
         }
         return ou;
     }
 
-    private OperacionBinaria transformarOperacionBinaria(OperacionBinaria ob) throws ExcepcionDeTipos{
-        Tipo tipo_en_comun = tipo_comun(ob.getIzquierda().getTipo(), ob.getDerecha().getTipo());
-        ob.setIzquierda(convertir_a_tipo(ob.getIzquierda(),tipo_en_comun));
-        ob.setDerecha(convertir_a_tipo(ob.getDerecha(), tipo_en_comun));
-        ob.setTipo(tipo_en_comun);
+    @Override
+    public OperacionBinaria transform(OperacionBinaria ob) throws ExcepcionDeTipos {
+        Expresion expIzquierda = (Expresion) ob.getIzquierda().accept(this);
+        Expresion expDerecha = (Expresion) ob.getDerecha().accept(this);
+
+        Tipo tipoEnComun = getTipoEnComun(expIzquierda.getTipo(), expDerecha.getTipo());
+        expIzquierda = convertirATipo(expIzquierda, tipoEnComun);
+        expDerecha = convertirATipo(expDerecha, tipoEnComun);
+
+        ob.setIzquierda(expIzquierda);
+        ob.setDerecha(expDerecha);
+        ob.setTipo(tipoEnComun);
         return ob;
     }
 
     @Override
-    public Division transform(Division d) throws ExcepcionDeTipos {
-        Division nueva_op = super.transform(d);
-        nueva_op = (Division) transformarOperacionBinaria(nueva_op);
-        return nueva_op;
-    }
-
-    @Override
-    public Multiplicacion transform(Multiplicacion m) throws ExcepcionDeTipos {
-        Multiplicacion nueva_op = super.transform(m);
-        nueva_op = (Multiplicacion) transformarOperacionBinaria(nueva_op);
-        return nueva_op;
-    }
-
-    @Override
-    public Resta transform(Resta r) throws ExcepcionDeTipos {
-        Resta nueva_op = super.transform(r);
-        nueva_op = (Resta) transformarOperacionBinaria(nueva_op);
-        return nueva_op;
-    }
-
-    @Override
-    public Suma transform(Suma s) throws ExcepcionDeTipos {
-        Suma nueva_op = super.transform(s);
-        nueva_op = (Suma) transformarOperacionBinaria(nueva_op);
-        return nueva_op;
-    }
-
-    @Override
     public FlotanteAEntero transform(FlotanteAEntero fae) throws ExcepcionDeTipos {
-        FlotanteAEntero nueva_op = super.transform(fae);
-        nueva_op = (FlotanteAEntero) transformarOperacionUnaria(nueva_op);
-        return nueva_op;
+        FlotanteAEntero nuevaOp = super.transform(fae);
+        transformarOperacionUnaria(nuevaOp);
+        return nuevaOp;
     }
 
     @Override
     public EnteroAFlotante transform(EnteroAFlotante eaf) throws ExcepcionDeTipos {
-        EnteroAFlotante nueva_op = super.transform(eaf);
-        nueva_op = (EnteroAFlotante) transformarOperacionUnaria(nueva_op);
-        return nueva_op;
+        EnteroAFlotante nuevaOp = super.transform(eaf);
+        transformarOperacionUnaria(nuevaOp);
+        return nuevaOp;
     }
 
     @Override
-    public Identificador transform(Identificador ident) throws ExcepcionDeTipos{
-        Object elemento = alcance_actual.resolver(ident.getNombre());
+    public Identificador transform(Identificador ident) throws ExcepcionDeTipos {
+        Nodo elemento = alcanceActual.resolver(ident.getNombre());
         Tipo tipo = Tipo.UNKNOWN;
-        if(elemento instanceof Variable){
+        /* TODO
+        if (elemento instanceof Variable) {
             tipo = ((Variable) elemento).getTipo();
         }
-        if (tipo != Tipo.UNKNOWN){
+
+         */
+        if (tipo != Tipo.UNKNOWN) {
             ident.setTipo(tipo);
             return ident;
         }
         throw new ExcepcionDeTipos(String.format("No se declaró el nombre %1$s\n", ident.getNombre()));
     }
-
 }

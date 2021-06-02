@@ -11,7 +11,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class DecFuncion extends Declaracion {
-
     List<DecVar> args;
     Bloque bloque;
 
@@ -35,6 +34,10 @@ public class DecFuncion extends Declaracion {
         return args;
     }
 
+    public void setArgs(List<DecVar> args) {
+        this.args = args;
+    }
+
     public Bloque getBloque() {
         return bloque;
     }
@@ -42,16 +45,15 @@ public class DecFuncion extends Declaracion {
     public void setBloque(Bloque bloque) {
         this.bloque = bloque;
     }
-    
+
     @Override
     public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
         return v.visit(this);
     }
 
     @Override
-    public <R> R accept_transfomer(Transformer t) throws ExcepcionDeTipos {
-        // TODO: implementar
-        return null;
+    public DecFuncion accept(Transformer t) throws ExcepcionDeTipos {
+        return t.transform(this);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package ar.edu.unnoba.compilador.ast.sentencias.declaracion;
 
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
@@ -7,8 +8,7 @@ import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
 public class DecVar extends Declaracion {
-
-    public DecVar(String nombre, Identificador ident){
+    public DecVar(String nombre, Identificador ident) {
         super(nombre, ident);
     }
 
@@ -18,12 +18,6 @@ public class DecVar extends Declaracion {
 
     public void setTipo(Tipo tipo) {
         this.getIdent().setTipo(tipo);
-    }
-
-
-    @Override
-    public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
-        return v.visit(this);
     }
 
     @Override
@@ -37,7 +31,12 @@ public class DecVar extends Declaracion {
     }
 
     @Override
-    public DecVar accept_transfomer(Transformer t) {
+    public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
+        return v.visit(this);
+    }
+
+    @Override
+    public DecVar accept(Transformer t) throws ExcepcionDeTipos {
         return t.transform(this);
     }
 }

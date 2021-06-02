@@ -10,7 +10,6 @@ import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
 public class CasoCuando extends Sentencia {
-
     OperadorCmp op;
     Expresion expr;
     Bloque bloque;
@@ -57,7 +56,7 @@ public class CasoCuando extends Sentencia {
     }
 
     @Override
-    public <R> R accept_transfomer(Transformer t) throws ExcepcionDeTipos {
-        return null;
+    public CasoCuando accept(Transformer t) throws ExcepcionDeTipos {
+        return t.transform(this);
     }
 }

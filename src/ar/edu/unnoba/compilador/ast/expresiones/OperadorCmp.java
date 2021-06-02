@@ -24,7 +24,4 @@ public enum OperadorCmp {
                 return "<=";
         }
     }
-
 }
-
-

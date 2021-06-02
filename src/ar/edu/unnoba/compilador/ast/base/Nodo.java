@@ -7,7 +7,8 @@ import ar.edu.unnoba.compilador.visitor.*;
 public abstract class Nodo {
     private String nombre;
 
-    public Nodo() {}
+    public Nodo() {
+    }
 
     public Nodo(String nombre) {
         this.nombre = nombre;
@@ -30,5 +31,5 @@ public abstract class Nodo {
 
     public abstract <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance;
 
-    public abstract <R> R accept_transfomer(Transformer t) throws ExcepcionDeTipos;
+    public abstract Nodo accept(Transformer t) throws ExcepcionDeTipos;
 }

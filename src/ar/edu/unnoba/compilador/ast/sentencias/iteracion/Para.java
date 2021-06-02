@@ -8,22 +8,25 @@ import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
-public class Para extends Sentencia {
-    // Tiene un nodo "identificador", un nodo numérico "valorInicial", un nodo numérico
-    // "valorFinal", estos tres de tipo ENTERO. Luego tiene un nodo "bloque" de sentencias.
-    // TODO: asegurarse que Identificador ya esté definido y sea de tipo Entero.
-    // Si valorInicial no está definido, su valor por defecto es 1.
+/* Tiene un nodo "Identificador", nodos de tipo ENTERO "valorInicial" y
+ * "valorFinal", y un nodo "Bloque" de sentencias.
+ * El valor por defecto de "valorInicial" es 1.
+ */
+// TODO: asegurarse que Identificador ya esté definido y sea de tipo Entero.
+// TODO convertir a while con un Transformer
 
-    Identificador ident;
-    int valorInicial, valorFinal;
-    Bloque bloqueSentencias;
-    int salto;
+public class Para extends Sentencia {
+    private final Identificador ident;
+    private final int valorInicial, valorFinal;
+    private Bloque bloqueSentencias;
+    private final int salto;
 
     public Para(String nombre, Identificador ident, int valorInicial, int valorFinal, int salto, Bloque bloqueSentencias) {
         super("Bloque\nFOR");
         this.ident = ident;
         this.valorInicial = valorInicial;
         this.valorFinal = valorFinal;
+        // FIXME esto debería hacerlo el transformer
         if (valorInicial <= valorFinal) {
             this.salto = Math.abs(salto);
         } else {
@@ -50,6 +53,10 @@ public class Para extends Sentencia {
         return bloqueSentencias;
     }
 
+    public void setBloqueSentencias(Bloque bloque) {
+        this.bloqueSentencias = bloque;
+    }
+
     public int getSalto() {
         return salto;
     }
@@ -66,7 +73,7 @@ public class Para extends Sentencia {
     }
 
     @Override
-    public <R> R accept_transfomer(Transformer t) throws ExcepcionDeTipos {
-        return null;
+    public Para accept(Transformer t) throws ExcepcionDeTipos {
+        return t.transform(this);
     }
 }

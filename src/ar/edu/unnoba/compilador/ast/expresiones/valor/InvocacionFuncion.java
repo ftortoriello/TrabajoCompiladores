@@ -3,17 +3,17 @@ package ar.edu.unnoba.compilador.ast.expresiones.valor;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
-import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
 import java.util.List;
 
-public class InvocacionFuncion<T> extends Valor {
+public class InvocacionFuncion<A> extends Valor {
     // Pongo tipo genérico porque los argumentos pueden ser expresiones o strings
-    List<T> argumentos;
+    // TODO: acomodar llamadas, si acepta genéricos tendría que pasarse el tipo
+    final List<A> argumentos;
 
-    public InvocacionFuncion(String nombre, List<T> argumentos, Tipo tipo) {
+    public InvocacionFuncion(String nombre, List<A> argumentos, Tipo tipo) {
         super(tipo, nombre);
         this.argumentos = argumentos;
     }
@@ -29,7 +29,7 @@ public class InvocacionFuncion<T> extends Valor {
     }
 
     @Override
-    public <R> R accept_transfomer(Transformer t) throws ExcepcionDeTipos {
-        return null;
+    public InvocacionFuncion accept(Transformer t) throws ExcepcionDeTipos {
+        return t.transform(this);
     }
 }

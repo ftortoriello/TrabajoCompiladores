@@ -3,11 +3,6 @@ package ar.edu.unnoba.compilador.sintaxis;
 import java_cup.runtime.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.FileReader;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import ar.edu.unnoba.compilador.token.Token;
 
 import ar.edu.unnoba.compilador.ast.base.Nodo;
 import ar.edu.unnoba.compilador.ast.base.Programa;
@@ -30,7 +25,6 @@ import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
 
-import ar.edu.unnoba.compilador.ast.sentencias.control.Control;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Salir;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Continuar;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
@@ -50,7 +44,6 @@ import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Menor;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.MenorIgual;
 
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Adicion;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Suma;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Resta;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Multiplicacion;
@@ -68,8 +61,6 @@ class Parser;
 parser code
 {:
     public void syntax_error(Symbol s) {
-        //System.out.println("Error en la línea "+ (s.left+1) + " Columna "+ s.right + ". Símbolo '"
-        //+ s.value + "'. Símbolo n° " + s.sym + " no reconocido.");
     }
 
     public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception {
@@ -214,13 +205,13 @@ programa ::=
 
 cuerpo_programa ::=
         PR_MAIN_IS:pr_main_is lst_sentencias:sentencias PR_END_PUNTO:pr_end {:
-            boolean esBloquePrincipal = true;
+            final boolean esBloquePrincipal = true;
             Bloque cuerpoPrograma = new Bloque("Bloque principal", sentencias, esBloquePrincipal);
             imprimirEtiqueta(cuerpoPrograma);
             RESULT = cuerpoPrograma;
         :} |
         PR_MAIN_IS:pr_main_is PR_END_PUNTO:pr_end {:
-            boolean esBloquePrincipal = true;
+            final boolean esBloquePrincipal = true;
             Bloque cuerpoPrograma = new Bloque("Bloque principal (vacío)", esBloquePrincipal);
             imprimirEtiqueta(cuerpoPrograma);
             RESULT = cuerpoPrograma;
@@ -238,13 +229,13 @@ encabezado ::=
             RESULT = decs;
         :} |
         dec_var:dec_var PUNTO_Y_COMA:pyc {:
-            List<Declaracion> decs = new ArrayList<Declaracion>();
+            List<Declaracion> decs = new ArrayList<>();
             decs.add(dec_var);
             imprimirEtiqueta(dec_var);
             RESULT = decs;
         :} |
         dec_fun:dec_fun {:
-            List<Declaracion> decs = new ArrayList<Declaracion>();
+            List<Declaracion> decs = new ArrayList<>();
             decs.add(dec_fun);
             imprimirEtiqueta(dec_fun);
             RESULT = decs;
@@ -331,14 +322,14 @@ lst_args_dec_default ::=
 
 bloque ::=
         sentencia:sent {:
-            List<Nodo> sentencias = new ArrayList<Nodo>();
+            List<Nodo> sentencias = new ArrayList<>();
             sentencias.add(sent);
-            boolean esBloquePrincipal = false;
+            final boolean esBloquePrincipal = false;
             Bloque bloque = new Bloque("Bloque simple\n(una sentencia)", sentencias, esBloquePrincipal);
             RESULT = bloque;
         :} |
         PR_BEGIN:begin lst_sentencias:sentencias PR_END:pr_end {:
-            boolean esBloquePrincipal = false;
+            final boolean esBloquePrincipal = false;
             Bloque bloque = new Bloque("Bloque compuesto\n(múltiples sentencias)", sentencias, esBloquePrincipal);
             RESULT = bloque;
         :};
@@ -349,7 +340,7 @@ lst_sentencias ::=
             RESULT = sentencias;
         :} |
         sentencia:sent PUNTO_Y_COMA:pyc {:
-            List<Nodo> sentencias = new ArrayList<Nodo>();
+            List<Nodo> sentencias = new ArrayList<>();
             sentencias.add(sent);
             RESULT = sentencias;
         :};

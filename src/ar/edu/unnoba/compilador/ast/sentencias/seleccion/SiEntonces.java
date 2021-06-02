@@ -8,7 +8,6 @@ import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
 public class SiEntonces extends Seleccion {
-
     Bloque bloqueSiEntonces;
 
     public SiEntonces(String nombre, Expresion condicion, Bloque bloqueSiEntonces) {
@@ -37,7 +36,7 @@ public class SiEntonces extends Seleccion {
     }
 
     @Override
-    public <R> R accept_transfomer(Transformer t) throws ExcepcionDeTipos {
-        return null;
+    public SiEntonces accept(Transformer t) throws ExcepcionDeTipos {
+        return t.transform(this);
     }
 }

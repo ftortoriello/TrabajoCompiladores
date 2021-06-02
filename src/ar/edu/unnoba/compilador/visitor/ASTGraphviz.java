@@ -6,7 +6,6 @@ import java.util.List;
 
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
-import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.Conjuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.Disyuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
@@ -16,7 +15,6 @@ import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Valor;
-import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Control;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
@@ -25,8 +23,7 @@ import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.*;
 
-public class ASTGraphviz extends Visitor<String>{
-
+public class ASTGraphviz extends Visitor<String> {
     private final Deque<Integer> parents;
     private int current_id = 0;
 
@@ -34,15 +31,15 @@ public class ASTGraphviz extends Visitor<String>{
         this.parents = new ArrayDeque<>();
     }
 
-    private String armarStrNodo(Integer tamañoFuente, Integer color, String etiqueta, Integer idPadre) {
+    private String armarStrNodo(Integer tamanhoFuente, Integer color, String etiqueta, Integer idPadre) {
         // Función auxiliar para armar los nodos en dot
-        return String.format("%1$s [label=\"%2$s\", fontsize=" + tamañoFuente + ", fillcolor=" + color +"]\n" +
+        return String.format("%1$s [label=\"%2$s\", fontsize=" + tamanhoFuente + ", fillcolor=" + color + "]\n" +
                 "%3$s -- %1$s\n", current_id, etiqueta, idPadre);
     }
 
-    // VISITAS
+    // *** VISITAS ***
     // TODO: ver si se puede crear un método genérico visit, la mayoría son iguales
-    // --------------------
+
     // Base
     @Override
     public String visit(Programa p) throws ExcepcionDeAlcance {
@@ -66,6 +63,7 @@ public class ASTGraphviz extends Visitor<String>{
         resultado.append("}");
         return resultado.toString();
     }
+
     @Override
     public String visit(Encabezado e) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
@@ -76,6 +74,7 @@ public class ASTGraphviz extends Visitor<String>{
         parents.pop();
         return resultado.toString();
     }
+
     @Override
     public String visit(Bloque b) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
@@ -88,29 +87,32 @@ public class ASTGraphviz extends Visitor<String>{
     }
 
     @Override
-    public String visit(Literal c) throws ExcepcionDeAlcance {
+    public String visit(Literal c) {
         StringBuilder resultado = new StringBuilder();
         current_id = this.getID();
         resultado.append(this.procesarNodo(c));
         return resultado.toString();
     }
+
     @Override
-    public String visit(Identificador i) throws ExcepcionDeAlcance {
+    public String visit(Identificador i) {
         StringBuilder resultado = new StringBuilder();
         current_id = this.getID();
         resultado.append(this.procesarNodo(i));
         return resultado.toString();
     }
+
     @Override
-    public String visit(InvocacionFuncion invo) throws ExcepcionDeAlcance {
+    public String visit(InvocacionFuncion invo) {
         StringBuilder resultado = new StringBuilder();
         current_id = this.getID();
         resultado.append(this.procesarNodo(invo));
         return resultado.toString();
     }
-    // ----------
+
 
     // Operaciones
+
     @Override
     public String visit(OperacionBinaria ob) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
@@ -121,6 +123,7 @@ public class ASTGraphviz extends Visitor<String>{
         parents.pop();
         return resultado.toString();
     }
+
     @Override
     public String visit(OperacionUnaria ou) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
@@ -131,7 +134,7 @@ public class ASTGraphviz extends Visitor<String>{
         parents.pop();
         return resultado.toString();
     }
-    // ----------
+
 
     // Sentencias
     @Override
@@ -144,6 +147,7 @@ public class ASTGraphviz extends Visitor<String>{
         parents.pop();
         return resultado.toString();
     }
+
     @Override
     public String visit(DecFuncion df) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
@@ -154,6 +158,7 @@ public class ASTGraphviz extends Visitor<String>{
         parents.pop();
         return resultado.toString();
     }
+
     @Override
     public String visit(DecVar dv) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
@@ -164,6 +169,7 @@ public class ASTGraphviz extends Visitor<String>{
         parents.pop();
         return resultado.toString();
     }
+
     @Override
     public String visit(DecVarInicializada dvi) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
@@ -174,6 +180,7 @@ public class ASTGraphviz extends Visitor<String>{
         parents.pop();
         return resultado.toString();
     }
+
     @Override
     public String visit(SiEntonces se) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
@@ -184,6 +191,7 @@ public class ASTGraphviz extends Visitor<String>{
         parents.pop();
         return resultado.toString();
     }
+
     @Override
     public String visit(SiEntoncesSino ses) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
@@ -194,6 +202,7 @@ public class ASTGraphviz extends Visitor<String>{
         parents.pop();
         return resultado.toString();
     }
+
     @Override
     public String visit(Cuando c) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
@@ -204,6 +213,7 @@ public class ASTGraphviz extends Visitor<String>{
         parents.pop();
         return resultado.toString();
     }
+
     @Override
     public String visit(CasoCuando cc) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
@@ -214,6 +224,7 @@ public class ASTGraphviz extends Visitor<String>{
         parents.pop();
         return resultado.toString();
     }
+
     @Override
     public String visit(Mientras m) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
@@ -224,6 +235,7 @@ public class ASTGraphviz extends Visitor<String>{
         parents.pop();
         return resultado.toString();
     }
+
     @Override
     public String visit(Para p) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
@@ -234,6 +246,7 @@ public class ASTGraphviz extends Visitor<String>{
         parents.pop();
         return resultado.toString();
     }
+
     @Override
     public String visit(Retorno r) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
@@ -244,11 +257,10 @@ public class ASTGraphviz extends Visitor<String>{
         parents.pop();
         return resultado.toString();
     }
-    // ----------
-    // --------------------
 
-    // PROCESOS
-    // --------------------
+
+    // *** PROCESOS ***
+
     // Base
     @Override
     protected String procesarNodo(Nodo n) {
@@ -256,11 +268,10 @@ public class ASTGraphviz extends Visitor<String>{
 
         Integer idPadre = parents.peekFirst();
 
-        if(idPadre == null){
+        if (idPadre == null) {
             return String.format("%1$s [label=\"%2$s\", fontsize=48, fillcolor=10, penwidth=5]\n",
                     current_id, n.getEtiqueta());
-        }
-        else if (n instanceof Encabezado) {
+        } else if (n instanceof Encabezado) {
             return armarStrNodo(42, 11, n.getEtiqueta(), idPadre);
         } else if (n instanceof Bloque) {
             if (((Bloque) n).esProgramaPrincipal()) {
@@ -286,62 +297,68 @@ public class ASTGraphviz extends Visitor<String>{
             return armarStrNodo(18, 12, n.getEtiqueta(), idPadre);
         }
     }
+
     @Override
     protected String procesarPrograma(Programa p, String enc, String blq) {
         return enc + blq;
     }
+
     @Override
     protected String procesarBloque(Bloque b, List<String> sentencias) {
         StringBuilder resultado = new StringBuilder();
-        sentencias.forEach((sentencia) -> {
-            resultado.append(sentencia);
-        });
+        sentencias.forEach(resultado::append);
         return resultado.toString();
     }
+
     @Override
     protected String procesarEncabezado(Encabezado e, List<String> sentencias) {
         StringBuilder resultado = new StringBuilder();
-        sentencias.forEach((sentencia) -> {
-            resultado.append(sentencia);
-        });
+        sentencias.forEach(resultado::append);
         return resultado.toString();
     }
-    // ----------
+
 
     // Operaciones
+
     @Override
     protected String procesarOperacionBinaria(OperacionBinaria ob, String ei, String ed) {
-        return ei+ed;
+        return ei + ed;
     }
-    // ----------
+
 
     // Sentencias
+
     @Override
     protected String procesarAsignacion(Asignacion a, String identificador, String expresion) {
-        return identificador+expresion;
+        return identificador + expresion;
     }
+
     @Override
     protected String procesarDecFuncion(List<String> args, String bloque) {
         StringBuilder strArgs = new StringBuilder();
-        args.forEach(a -> strArgs.append(a));
+        args.forEach(strArgs::append);
 
         return strArgs + bloque;
     }
+
     @Override
     protected String procesarSiEntonces(String cond, String blq) {
         return cond + blq;
     }
+
     @Override
     protected String procesarSiEntoncesSino(String cond, String blqSi, String blqSino) {
         return cond + blqSi + blqSino;
     }
+
     @Override
     protected String procesarCuando(Cuando cc, String expr, List<String> casosCuando, String blqElse) {
         StringBuilder strCasos = new StringBuilder();
-        casosCuando.forEach(c -> strCasos.append(c));
+        casosCuando.forEach(strCasos::append);
 
         return expr + strCasos + blqElse;
     }
+
     @Override
     protected String procesarCasoCuando(CasoCuando cc, String expr, String blq) {
         return expr + blq;
@@ -351,14 +368,14 @@ public class ASTGraphviz extends Visitor<String>{
     protected String procesarMientras(Mientras m, String expr, String blq) {
         return expr + blq;
     }
+
     @Override
     protected String procesarVarInicializada(String ident, String expr) {
         return ident + expr;
     }
+
     @Override
     protected String procesarRetorno(Retorno r, String expr) {
         return expr;
     }
-    // ----------
-    // --------------------
 }

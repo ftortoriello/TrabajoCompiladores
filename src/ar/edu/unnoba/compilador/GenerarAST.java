@@ -16,7 +16,7 @@ public class GenerarAST {
         String ruta = System.getProperty("user.dir") + "/src/ar/edu/unnoba/compilador/entrada.txt";
         FileReader entrada = new FileReader(ruta);
         Lexer lexico = new Lexer(entrada);
-        Parser parser = new Parser(lexico);
+        @SuppressWarnings("deprecation") Parser parser = new Parser(lexico);
         try {
             Programa programa = (Programa) parser.parse().value;
 
@@ -27,23 +27,20 @@ public class GenerarAST {
             pw.close();
             String cmd = "dot -Tpng arbol.dot -o arbol.png";
             Runtime.getRuntime().exec(cmd);
-            // ----------
 
             // Ejecución de visitor generador de alcances
             GeneradorAlcances ga = new GeneradorAlcances();
             ga.procesar(programa);
             System.out.println("Alcances procesados");
-            // ----------
 
             // Ejecución de visitor validador de tipos
             ValidadorTipos vt = new ValidadorTipos();
             vt.procesar(programa);
             System.out.println("Tipos validados");
-            // ----------
         } catch (ClassCastException e) {
             // Error sintáctico
-        } catch(Exception e) {
-            System.out.println(e);
+        } catch (Exception e) {
+            System.out.println(e.getLocalizedMessage());
         }
     }
 }

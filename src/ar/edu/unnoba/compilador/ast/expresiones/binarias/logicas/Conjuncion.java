@@ -11,14 +11,4 @@ public class Conjuncion extends OperacionBinaria {
     public Conjuncion(Expresion izquierda, Expresion derecha) {
         super(izquierda, derecha, "AND");
     }
-
-    @Override
-    public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
-        return v.visit(this);
-    }
-
-    @Override
-    public <R> R accept_transfomer(Transformer t) throws ExcepcionDeTipos {
-        return null;
-    }
 }

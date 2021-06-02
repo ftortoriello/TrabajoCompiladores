@@ -10,7 +10,7 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 public class Asignacion extends Declaracion {
     private Expresion expresion;
 
-    public Asignacion(Identificador ident, Expresion e){
+    public Asignacion(Identificador ident, Expresion e) {
         super("=", ident);
         this.expresion = e;
     }
@@ -19,7 +19,7 @@ public class Asignacion extends Declaracion {
         this.expresion = expresion;
     }
 
-    public Expresion getExpresion(){
+    public Expresion getExpresion() {
         return expresion;
     }
 
@@ -34,7 +34,7 @@ public class Asignacion extends Declaracion {
     }
 
     @Override
-    public Asignacion accept_transfomer(Transformer t) throws ExcepcionDeTipos {
+    public Asignacion accept(Transformer t) throws ExcepcionDeTipos {
         return t.transform(this);
     }
 }

@@ -11,7 +11,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class Cuando extends Seleccion {
-
     List<CasoCuando> bloqueCuando;
     Bloque bloqueElse;
 
@@ -52,7 +51,7 @@ public class Cuando extends Seleccion {
     }
 
     @Override
-    public <R> R accept_transfomer(Transformer t) throws ExcepcionDeTipos {
-        return null;
+    public Cuando accept(Transformer t) throws ExcepcionDeTipos {
+        return t.transform(this);
     }
 }

@@ -8,7 +8,6 @@ import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
 public class SiEntoncesSino extends SiEntonces {
-
     Bloque bloqueSino;
 
     public SiEntoncesSino(Expresion condicion, Bloque bloqueSiEntonces, Bloque bloqueSino) {
@@ -31,7 +30,7 @@ public class SiEntoncesSino extends SiEntonces {
     }
 
     @Override
-    public <R> R accept_transfomer(Transformer t) throws ExcepcionDeTipos {
-        return null;
+    public SiEntoncesSino accept(Transformer t) throws ExcepcionDeTipos {
+        return t.transform(this);
     }
 }
