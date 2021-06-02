@@ -1,8 +1,6 @@
 package ar.edu.unnoba.compilador.ast.expresiones;
 
 import ar.edu.unnoba.compilador.ast.base.Nodo;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
-import ar.edu.unnoba.compilador.visitor.Transformer;
 
 public abstract class Expresion extends Nodo {
     private Tipo tipo;

@@ -179,7 +179,7 @@ ComentarioUnaLinea = #.*{FinDeLinea}?
                             }
                         }
 
-    [^]                 { /* ignorar todo lo demás */ }
+    [^]                 { /* ignorar lo demás */ }
 }
 
 <CADENA> {
@@ -192,7 +192,7 @@ ComentarioUnaLinea = #.*{FinDeLinea}?
     \\n                 { stringBuffer.append('\n'); }
     \\r                 { stringBuffer.append('\r'); }
     \\\\                { stringBuffer.append('\\'); }  // \\ --> \
-    /* permitir todo lo demás, excepto \ que no estén seguidas por lo definido arriba */
+    /* permitir lo demás, excepto \ que no estén seguidas por lo definido arriba */
     [^\\]               { stringBuffer.append( yytext() ); }
 }
 

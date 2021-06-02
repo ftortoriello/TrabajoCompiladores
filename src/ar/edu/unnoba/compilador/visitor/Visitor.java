@@ -8,7 +8,6 @@ import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
-import ar.edu.unnoba.compilador.ast.sentencias.*;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.*;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.*;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Control;

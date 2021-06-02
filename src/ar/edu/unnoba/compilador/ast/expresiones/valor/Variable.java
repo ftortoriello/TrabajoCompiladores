@@ -1,10 +1,6 @@
 package ar.edu.unnoba.compilador.ast.expresiones.valor;
 
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
-import ar.edu.unnoba.compilador.visitor.Transformer;
-import ar.edu.unnoba.compilador.visitor.Visitor;
-
-/* TODO creo que no hace falta esta clase */
+/* TODO: creo que no hace falta esta clase */
 /*
 public class Variable extends Valor {
     // TODO: reemplaza al nodo Identificador en una 2da pasada

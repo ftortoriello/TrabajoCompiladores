@@ -7,10 +7,6 @@ import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Division;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Multiplicacion;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Resta;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Suma;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.EnteroAFlotante;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.FlotanteAEntero;
@@ -19,11 +15,6 @@ import ar.edu.unnoba.compilador.ast.sentencias.declaracion.Asignacion;
 
 public class ValidadorTipos extends Transformer {
     private Alcance alcanceActual;
-
-    public void procesar(Programa programa) throws ExcepcionDeTipos {
-        this.alcanceActual = programa.getCuerpo().getAlcance();
-        programa.accept(this);
-    }
 
     private static Tipo getTipoEnComun(Tipo tipo1, Tipo tipo2) throws ExcepcionDeTipos {
         if (tipo1 == tipo2) {
@@ -58,25 +49,25 @@ public class ValidadorTipos extends Transformer {
     // Transforms
 
     @Override
+    public Programa transform(Programa p) throws ExcepcionDeTipos {
+        super.transform(p);
+        this.alcanceActual = p.getCuerpo().getAlcance();
+        return p;
+    }
+
+    @Override
     public Asignacion transform(Asignacion a) throws ExcepcionDeTipos {
         Asignacion asignacion = super.transform(a);
         asignacion.setExpresion(convertirATipo(asignacion.getExpresion(), asignacion.getIdent().getTipo()));
         return asignacion;
     }
 
-    private OperacionUnaria transformarOperacionUnaria(OperacionUnaria ou) throws ExcepcionDeTipos {
-        if (ou.getTipo() == Tipo.UNKNOWN) {
-            ou.setTipo(ou.getExpresion().getTipo());
-        } else {
-            ou.setExpresion(convertirATipo(ou.getExpresion(), ou.getTipo()));
-        }
-        return ou;
-    }
-
     @Override
     public OperacionBinaria transform(OperacionBinaria ob) throws ExcepcionDeTipos {
-        Expresion expIzquierda = (Expresion) ob.getIzquierda().accept(this);
-        Expresion expDerecha = (Expresion) ob.getDerecha().accept(this);
+        super.transform(ob);
+
+        Expresion expIzquierda = ob.getIzquierda();
+        Expresion expDerecha = ob.getDerecha();
 
         Tipo tipoEnComun = getTipoEnComun(expIzquierda.getTipo(), expDerecha.getTipo());
         expIzquierda = convertirATipo(expIzquierda, tipoEnComun);
@@ -89,17 +80,14 @@ public class ValidadorTipos extends Transformer {
     }
 
     @Override
-    public FlotanteAEntero transform(FlotanteAEntero fae) throws ExcepcionDeTipos {
-        FlotanteAEntero nuevaOp = super.transform(fae);
-        transformarOperacionUnaria(nuevaOp);
-        return nuevaOp;
-    }
-
-    @Override
-    public EnteroAFlotante transform(EnteroAFlotante eaf) throws ExcepcionDeTipos {
-        EnteroAFlotante nuevaOp = super.transform(eaf);
-        transformarOperacionUnaria(nuevaOp);
-        return nuevaOp;
+    public OperacionUnaria transform(OperacionUnaria ou) throws ExcepcionDeTipos {
+        super.transform(ou);
+        if (ou.getTipo() == Tipo.UNKNOWN) {
+            ou.setTipo(ou.getExpresion().getTipo());
+        } else {
+            ou.setExpresion(convertirATipo(ou.getExpresion(), ou.getTipo()));
+        }
+        return ou;
     }
 
     @Override
@@ -110,8 +98,7 @@ public class ValidadorTipos extends Transformer {
         if (elemento instanceof Variable) {
             tipo = ((Variable) elemento).getTipo();
         }
-
-         */
+        */
         if (tipo != Tipo.UNKNOWN) {
             ident.setTipo(tipo);
             return ident;

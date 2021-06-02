@@ -242,7 +242,8 @@ encabezado ::=
         :} |
         {:
             // Encabezado vacío
-            RESULT = new ArrayList<Declaracion>();
+            List<Declaracion> decs = new ArrayList<>();
+            RESULT = decs;
         :};
 
 dec_var ::=
@@ -290,7 +291,7 @@ lst_args_dec ::=
             RESULT = args;
         :} |
         arg_dec:arg {:
-            List<DecVar> args = new ArrayList<DecVar>();
+            List<DecVar> args = new ArrayList<>();
             args.add(arg);
             imprimirEtiqueta(arg);
             RESULT = args;
@@ -301,7 +302,7 @@ lst_args_dec ::=
             RESULT = args;
         :} |
         arg_dec_default:arg {:
-            List<DecVar> args = new ArrayList<DecVar>();
+            List<DecVar> args = new ArrayList<>();
             args.add(arg);
             imprimirEtiqueta(arg);
             RESULT = args;
@@ -314,7 +315,7 @@ lst_args_dec_default ::=
             RESULT = args;
         :} |
         arg_dec_default:arg {:
-            List<DecVar> args = new ArrayList<DecVar>();
+            List<DecVar> args = new ArrayList<>();
             args.add(arg);
             imprimirEtiqueta(arg);
             RESULT = args;
@@ -349,7 +350,6 @@ sentencia ::=
         asignacion:asig {:
             RESULT = asig;
         :} |
-        // TODO: La invocación es de tipo Expresión, y el resto de lo que está acá son Sentencia, ¿acomodar?
         invocacion_funcion:invo_fun {:
             RESULT = invo_fun;
         :} |
@@ -406,7 +406,7 @@ cuando ::=
 
 bloque_cuando ::=
         PR_IS:pr_is OP_COMPARACION:op disyuncion:disy PR_THEN:pr_then bloque:bloque {:
-            List<CasoCuando> bloqueCuando = new ArrayList<CasoCuando>();
+            List<CasoCuando> bloqueCuando = new ArrayList<>();
             CasoCuando caso = new CasoCuando(getTipoOpCmp(op), disy, bloque);
             imprimirEtiqueta(caso);
             bloqueCuando.add(caso);
@@ -622,7 +622,7 @@ lista_exprs ::=
             RESULT = args;
         :} |
         disyuncion:arg {:
-            List<Expresion> args = new ArrayList<Expresion>();
+            List<Expresion> args = new ArrayList<>();
             args.add(arg);
             RESULT = args;
         :} |

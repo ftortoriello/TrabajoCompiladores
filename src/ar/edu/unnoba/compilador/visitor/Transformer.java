@@ -14,15 +14,9 @@ import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Division;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Multiplicacion;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Resta;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Suma;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.EnteroAFlotante;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.FlotanteAEntero;
-import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Control;
-import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
@@ -96,6 +90,7 @@ public abstract class Transformer {
     public OperacionBinaria transform(OperacionBinaria ob) throws ExcepcionDeTipos {
         ob.setIzquierda((Expresion) ob.getIzquierda().accept(this));
         ob.setDerecha((Expresion) ob.getDerecha().accept(this));
+        // FIXME No se usa el valor de retorno?
         return ob;
     }
 
@@ -108,19 +103,18 @@ public abstract class Transformer {
     // Transforms de sentencias
 
     public Asignacion transform(Asignacion a) throws ExcepcionDeTipos {
-        // FIXME: cast
-        a.setIdent((Identificador) a.getIdent().accept(this));
+        a.setIdent(a.getIdent().accept(this));
         a.setExpresion((Expresion) a.getExpresion().accept(this));
         return a;
     }
 
     public DecVar transform(DecVar dv) throws ExcepcionDeTipos {
-        dv.setIdent((Identificador) dv.getIdent().accept(this));
+        dv.setIdent(dv.getIdent().accept(this));
         return dv;
     }
 
     public DecVarInicializada transform(DecVarInicializada dvi) throws ExcepcionDeTipos {
-        dvi.setIdent((Identificador) dvi.getIdent().accept(this));
+        dvi.setIdent(dvi.getIdent().accept(this));
         dvi.setExpresion((Expresion) dvi.getExpresion().accept(this));
         return dvi;
     }
