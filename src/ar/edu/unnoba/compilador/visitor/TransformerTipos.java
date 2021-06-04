@@ -7,7 +7,7 @@ import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.*;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.EnteroAFlotante;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.FlotanteAEntero;
@@ -62,14 +62,19 @@ public class TransformerTipos extends Transformer {
                 String.format("No existe un tipo común entre %s y %s", tipoOrigen, tipoDestino));
     }
 
-    // Retorna si se encontró el símbolo en el alcance actual y se pudo cambiar el tipo
-    private boolean cambiarTipo(Valor v) {
+    // Retorna el símbolo, si está en el alcance actual y se pudo cambiar el tipo
+    private Simbolo cambiarTipo(Valor v) {
         Simbolo s = alcanceActual.resolver(v.getNombre());
-        if (s == null) return false;
+        if (s == null) {
+            return null;
+        }
         Tipo tipo = s.getTipo();
-        if (tipo == Tipo.UNKNOWN) return false;
+        if (tipo == Tipo.UNKNOWN) {
+            // No se pudo cambiar el tipo
+            return null;
+        }
         v.setTipo(tipo);
-        return true;
+        return s;
     }
 
     // Retorna el tipo en común
@@ -116,16 +121,19 @@ public class TransformerTipos extends Transformer {
 
     @Override
     public Identificador transform(Identificador i) throws ExcepcionDeTipos {
-        if (!cambiarTipo(i)) {
+        Simbolo s = cambiarTipo(i);
+        if (s == null) {
             throw new ExcepcionDeTipos(String.format("No se pudo asignar un tipo a la variable %s", i.getNombre()));
         }
+        // FIXME: Hesto es orrorozo y no anda
+        //i = (Identificador) (Valor) s;
         return super.transform(i);
     }
 
     @Override
     public InvocacionFuncion transform(InvocacionFuncion i) throws ExcepcionDeTipos {
         // No buscar en el alcance las funciones predefinidas
-        if (!i.getEsPredefinida() && !cambiarTipo(i)) {
+        if (!i.getEsPredefinida() && (cambiarTipo(i) == null)) {
             throw new ExcepcionDeTipos(String.format("No se pudo asignar un tipo a la función %s", i.getNombre()));
         }
         return super.transform(i);
@@ -150,7 +158,12 @@ public class TransformerTipos extends Transformer {
     @Override
     public Relacion transform(Relacion r) throws ExcepcionDeTipos {
         r = super.transform(r);
-        transformOperacionBinaria(r);
+        Tipo tipoEnComun = transformOperacionBinaria(r);
+        // Sólo las relaciones de igualdad y desigualdad aceptan operandos booleanos
+        if ((tipoEnComun == Tipo.BOOLEAN) && !(
+                r instanceof Igualdad || r instanceof Desigualdad)) {
+            throw new ExcepcionDeTipos(String.format("No se puede realizar una comparación \"%s\" entre tipos BOOLEAN", r.getNombre()));
+        }
         r.setTipo(Tipo.BOOLEAN);
         return r;
     }

@@ -37,10 +37,12 @@ public class GenerarAST {
         @SuppressWarnings("deprecation") Parser parser = new Parser(lexico);
         try {
             Programa programa = (Programa) parser.parse().value;
+            ASTGraphviz graficador;
 
             // Ejecutar Visitor graficador del árbol sin transformar,
             // y convertirlo a imagen
-            graficarArbol(new ASTGraphviz().visit(programa),"arbol-orig");
+            graficador = new ASTGraphviz("Árbol de sintaxis abstracta (Conti - Tortoriello)");
+            graficarArbol(graficador.visit(programa),"arbol-orig");
 
             System.out.println("Iniciando generador de alcances globales...");
             GeneradorDeAlcanceGlobal gag = new GeneradorDeAlcanceGlobal();
@@ -55,10 +57,11 @@ public class GenerarAST {
             tt.transform(programa);
 
             // Mostrar el árbol transformado
-            graficarArbol(new ASTGraphviz().visit(programa),"arbol-transformado");
+            graficador = new ASTGraphviz("AST con conversión de tipos (Conti - Tortoriello)");
+            graficarArbol(graficador.visit(programa),"arbol-transformado");
         } catch (ClassCastException e) {
             // Error sintáctico
-            //e.printStackTrace(System.out);
+            e.printStackTrace(System.out);
         } catch (Exception e) {
             //e.printStackTrace(System.out);
             System.out.println(String.format("%s: %s", e.getClass().getSimpleName(), e.getLocalizedMessage()));

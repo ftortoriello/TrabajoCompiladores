@@ -27,9 +27,16 @@ import ar.edu.unnoba.compilador.ast.sentencias.seleccion.*;
 public class ASTGraphviz extends Visitor<String> {
     private final Deque<Integer> padres;
     private int idNodoActual = 0;
+    private String etiqueta;
 
     public ASTGraphviz() {
         this.padres = new ArrayDeque<>();
+        this.etiqueta = "";
+    }
+
+    public ASTGraphviz(String etiqueta) {
+        this.padres = new ArrayDeque<>();
+        this.etiqueta = etiqueta;
     }
 
     private String armarStrNodo(Integer tamanhoFuente, Integer color, String etiqueta, Integer idPadre) {
@@ -46,7 +53,7 @@ public class ASTGraphviz extends Visitor<String> {
         StringBuilder resultado = new StringBuilder();
 
         resultado.append("graph Programa {" +
-                "label=\"Árbol de sintaxis abstracta (Conti - Tortoriello)\";\n" +
+                String.format("label=\"%s\";\n", etiqueta) +
                 "bgcolor=aliceblue;\n" +
                 "fontsize=60;\n");
         resultado.append("node [\n" +

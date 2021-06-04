@@ -21,7 +21,6 @@ import java.util.List;
 
 /* Visitor para generar los alcances de los bloques, construir la tabla de
    símbolos locales y verificar los alcances.
-   TODO: Y asignar tipos a las referencias acá? o en el transformer como está ahora?
  */
 public class GeneradorDeAlcancesLocales extends Visitor<Void> {
     private Alcance alcanceGlobal;

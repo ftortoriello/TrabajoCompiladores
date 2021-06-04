@@ -18,6 +18,7 @@ function superficie_círculo(x is float, radio is float = 1) return float
 begin
     variable mostrar is boolean;
 
+    mostrar = (false != true);
     x = read_integer();
     x = factorial(-2);
     # x = writeln("Esto tendría que romper");
