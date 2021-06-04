@@ -69,7 +69,8 @@ parser code
     }
 
     private void imprimirEtiqueta(Nodo nodo) {
-        System.out.println("Se creó el nodo " + nodo.getClass().getSimpleName());
+        // Torto, comento esto para que no haga tanto ruido, si hay que debuguear algo lo activamos
+        // System.out.println("Se creó el nodo " + nodo.getClass().getSimpleName());
     }
 
     public Relacion getClaseRel(OperadorCmp op, Expresion expr1, Expresion expr2) {
@@ -595,17 +596,17 @@ invocacion_funcion ::=
             RESULT = new InvocacionFuncion(nombre_fun, args, Tipo.UNKNOWN);
         :} |
         PR_READ_INTEGER:nombre_fun PAR_ABRE:pa PAR_CIERRA:pc {:
-            InvocacionFuncion invo = new InvocacionFuncion(nombre_fun, new ArrayList<Expresion>(), Tipo.INTEGER);
+            InvocacionFuncion invo = new InvocacionFuncion(nombre_fun, Tipo.INTEGER);
             imprimirEtiqueta(invo);
             RESULT = invo;
         :} |
         PR_READ_FLOAT:nombre_fun PAR_ABRE:pa PAR_CIERRA:pc {:
-            InvocacionFuncion invo = new InvocacionFuncion(nombre_fun, new ArrayList<Expresion>(), Tipo.FLOAT);
+            InvocacionFuncion invo = new InvocacionFuncion(nombre_fun, Tipo.FLOAT);
             imprimirEtiqueta(invo);
             RESULT = invo;
         :} |
         PR_READ_BOOLEAN:nombre_fun PAR_ABRE:pa PAR_CIERRA:pc {:
-            InvocacionFuncion invo = new InvocacionFuncion(nombre_fun, new ArrayList<Expresion>(), Tipo.BOOLEAN);
+            InvocacionFuncion invo = new InvocacionFuncion(nombre_fun, Tipo.BOOLEAN);
             imprimirEtiqueta(invo);
             RESULT = invo;
         :} |

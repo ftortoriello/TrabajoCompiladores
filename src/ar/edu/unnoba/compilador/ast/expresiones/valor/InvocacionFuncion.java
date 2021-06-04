@@ -6,6 +6,7 @@ import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class InvocacionFuncion<A> extends Valor {
@@ -16,6 +17,11 @@ public class InvocacionFuncion<A> extends Valor {
     public InvocacionFuncion(String nombre, List<A> argumentos, Tipo tipo) {
         super(tipo, nombre);
         this.argumentos = argumentos;
+    }
+
+    public InvocacionFuncion(String nombre, Tipo tipo) {
+        super(tipo, nombre);
+        this.argumentos = new ArrayList<>();
     }
 
     @Override

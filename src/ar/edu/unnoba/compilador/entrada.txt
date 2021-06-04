@@ -6,8 +6,6 @@ function factorial(n is integer) return integer
     else
         return 1;
 
-# Ojo con esta declaración de abajo, por ahora funciona, pero a 0 (la Expresión)
-# lo estamos tomando como INTEGER, y superficie (el Identificador) es FLOAT.
 variable superficie₁ is float = 0;
 
 { Una función }
