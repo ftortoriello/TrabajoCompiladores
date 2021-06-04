@@ -3,7 +3,10 @@ package ar.edu.unnoba.compilador.visitor;
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Simbolo;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Valor;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFuncion;
@@ -45,6 +48,10 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
                             simboloExistente.getDeclaracion().getTipo()));
         }
         alcanceActual.put(nombre, s);
+    }
+
+    private boolean estaEnElAlcance(Valor v) {
+        return (alcanceActual.resolver(v.getNombre()) != null);
     }
 
 
@@ -93,6 +100,22 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
     public Void visit(DecVarInicializada dvi) throws ExcepcionDeAlcance {
         agregarSimbolo(new Simbolo(dvi));
         return super.visit(dvi);
+    }
+
+    @Override
+    public Void visit(Identificador i) throws ExcepcionDeAlcance {
+        if (!estaEnElAlcance(i)) {
+            throw new ExcepcionDeAlcance(String.format("No se declaró la variable %s", i.getNombre()));
+        }
+        return super.visit(i);
+    }
+
+    @Override
+    public Void visit(InvocacionFuncion i) throws ExcepcionDeAlcance {
+        if (!i.getEsPredefinida() && !estaEnElAlcance(i)) {
+            throw new ExcepcionDeAlcance(String.format("No se definió la función %s", i.getNombre()));
+        }
+        return super.visit(i);
     }
 
 

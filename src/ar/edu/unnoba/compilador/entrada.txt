@@ -16,17 +16,17 @@ variable superficie₁ is float = 0;
 { Una función }
 function superficie_círculo(x is float, radio is float = 1) return float
 begin
+    variable mostrar is boolean;
+
     x = read_integer();
     x = factorial(-2);
     # x = writeln("Esto tendría que romper");
-    # TODO: Esto tendría que fallar, mostrar está declarado más abajo
     if mostrar == true then
         if x > 1 then
             writeln("Then")
         else
             writeln("Else");
 
-    variable mostrar is boolean;
     x = (-55.5 / 5) * (3 + 4);
     writeln("Dentro de función superficie_círculo()");
     # Definición de una variable local.
@@ -51,9 +51,6 @@ variable superficie₂ is float;
 # Procedimiento principal
 main is
     variable radio is float;
-    if i > 5 and i < 10 or not i / 2 == 0 then
-        writeln("???");
-
     writeln("Inicio del programa");
     writeln(superficie₁);
     writeln(superficie₂);

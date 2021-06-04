@@ -1,6 +1,5 @@
 package ar.edu.unnoba.compilador.visitor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import ar.edu.unnoba.compilador.ast.base.*;
