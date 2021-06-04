@@ -13,13 +13,14 @@ variable superficie₁ is float = 0;
 { Una función }
 function superficie_círculo(x is float, radio is float = 1) return float
 begin
-
+    # TODO: Esto tendría que fallar, mostrar está declarado más abajo
     if mostrar == true then
         if x > 1 then
             writeln("Then")
         else
             writeln("Else");
 
+    variable mostrar is boolean;
     x = (-55.5 / 5) * (3 + 4);
     writeln("Dentro de función superficie_círculo()");
     # Definición de una variable local.
@@ -43,18 +44,8 @@ variable superficie₂ is float;
 
 # Procedimiento principal
 main is
-    i = 15 + 3 * aux2 / var1 - 8;
-
     if i > 5 and i < 10 or not i / 2 == 0 then
         writeln("???");
-
-    while local_al_then > 5 do
-        begin
-            variable local_al_then is integer;
-            local_al_then = local_al_then - 1;
-            variable local_al_while is float = local_al_then * 1.5;
-            writeln(local_al_while);
-        end;
 
     writeln("Inicio del programa");
     writeln(superficie₁);

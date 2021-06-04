@@ -9,6 +9,7 @@ import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.EnteroAFlotante;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.FlotanteAEntero;
@@ -24,6 +25,7 @@ import java.util.Locale;
  * compatibilidad de tipos, haciendo conversiones implícitas si es necesario.
  * TODO: y reemplaza Id por Simbolo
  * TODO: Verificar tipos en DecVarInicializada
+ * TODO: Transformar DecVar a DecVarInicializada con los valores por defecto
  */
 public class TransformerTipos extends Transformer {
     private Alcance alcanceActual;
@@ -61,7 +63,7 @@ public class TransformerTipos extends Transformer {
                 String.format("No existe un tipo común entre %s y %s", tipoOrigen, tipoDestino));
     }
 
-    // Retorna si se encontró el símbolo en el alcance actual y se cambió el tipo
+    // Retorna si se encontró el símbolo en el alcance actual y se pudo cambiar el tipo
     private boolean cambiarTipo(Valor v) {
         Simbolo s = alcanceActual.resolver(v.getNombre());
         if (s == null) return false;
@@ -69,6 +71,21 @@ public class TransformerTipos extends Transformer {
         if (tipo == Tipo.UNKNOWN) return false;
         v.setTipo(tipo);
         return true;
+    }
+
+    // Retorna el tipo en común
+    private Tipo transformOperacionBinaria(OperacionBinaria ob) throws ExcepcionDeTipos {
+        Expresion expIzquierda = ob.getIzquierda();
+        Expresion expDerecha = ob.getDerecha();
+
+        Tipo tipoEnComun = getTipoEnComun(expIzquierda.getTipo(), expDerecha.getTipo());
+        expIzquierda = convertirATipo(expIzquierda, tipoEnComun);
+        expDerecha = convertirATipo(expDerecha, tipoEnComun);
+
+        ob.setIzquierda(expIzquierda);
+        ob.setDerecha(expDerecha);
+
+        return tipoEnComun;
     }
 
 
@@ -137,19 +154,19 @@ public class TransformerTipos extends Transformer {
 
     @Override
     public OperacionBinaria transform(OperacionBinaria ob) throws ExcepcionDeTipos {
-        super.transform(ob);
-
-        Expresion expIzquierda = ob.getIzquierda();
-        Expresion expDerecha = ob.getDerecha();
-
-        Tipo tipoEnComun = getTipoEnComun(expIzquierda.getTipo(), expDerecha.getTipo());
-        expIzquierda = convertirATipo(expIzquierda, tipoEnComun);
-        expDerecha = convertirATipo(expDerecha, tipoEnComun);
-
-        ob.setIzquierda(expIzquierda);
-        ob.setDerecha(expDerecha);
+        ob = super.transform(ob);
+        Tipo tipoEnComun = transformOperacionBinaria(ob);
         ob.setTipo(tipoEnComun);
         return ob;
+    }
+
+    // Las relaciones son como las operaciones binarias, pero su tipo siempre es boolean
+    @Override
+    public Relacion transform(Relacion r) throws ExcepcionDeTipos {
+        r = super.transform(r);
+        transformOperacionBinaria(r);
+        r.setTipo(Tipo.BOOLEAN);
+        return r;
     }
 
     @Override

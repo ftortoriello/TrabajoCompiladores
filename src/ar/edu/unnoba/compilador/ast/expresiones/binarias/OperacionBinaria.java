@@ -1,5 +1,6 @@
 package ar.edu.unnoba.compilador.ast.expresiones.binarias;
 
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
@@ -56,7 +57,7 @@ public abstract class OperacionBinaria extends Expresion {
     }
 
     @Override
-    public OperacionBinaria accept(Transformer t) {
-        return this;
+    public OperacionBinaria accept(Transformer t) throws ExcepcionDeTipos {
+        return t.transform(this);
     }
 }

@@ -7,6 +7,7 @@ import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
+/* Declaración de variable o parámetro sin inicializar. */
 public class DecVar extends Declaracion {
     public DecVar(String nombre, Identificador ident) {
         super(nombre, ident);

@@ -10,6 +10,7 @@ import ar.edu.unnoba.compilador.ast.base.Programa;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
@@ -92,15 +93,19 @@ public abstract class Transformer {
     public OperacionBinaria transform(OperacionBinaria ob) throws ExcepcionDeTipos {
         ob.setIzquierda((Expresion) ob.getIzquierda().accept(this));
         ob.setDerecha((Expresion) ob.getDerecha().accept(this));
-        // FIXME: No se usa el valor de retorno?
         return ob;
+    }
+
+    public Relacion transform(Relacion r) throws ExcepcionDeTipos {
+        r.setIzquierda((Expresion) r.getIzquierda().accept(this));
+        r.setDerecha((Expresion) r.getDerecha().accept(this));
+        return r;
     }
 
     public OperacionUnaria transform(OperacionUnaria ou) throws ExcepcionDeTipos {
         ou.setExpresion((Expresion) ou.getExpresion().accept(this));
         return ou;
     }
-
 
     // Transforms de sentencias
 
