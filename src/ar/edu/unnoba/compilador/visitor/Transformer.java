@@ -30,6 +30,19 @@ import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntonces;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
 
 public abstract class Transformer {
+
+    // Guardamos la última función visitada para validar el tipo de retorno,
+    // y convertir el tipo de la expresión return en caso de ser necesario
+    private DecFuncion ultFunVisitada;
+
+    public DecFuncion getUltFunVisitada() {
+        return ultFunVisitada;
+    }
+
+    public void setUltFunVisitada(DecFuncion ultFunVisitada) {
+        this.ultFunVisitada = ultFunVisitada;
+    }
+
     // Transforms base
 
     public Programa transform(Programa p) throws ExcepcionDeTipos {
@@ -128,12 +141,15 @@ public abstract class Transformer {
     }
 
     public DecFuncion transform(DecFuncion df) throws ExcepcionDeTipos {
+        setUltFunVisitada(df);
+
         List<DecVar> args = new ArrayList<>();
         for (DecVar arg : df.getArgs()) {
             args.add(arg.accept(this));
         }
         df.setArgs(args);
         df.setBloque(df.getBloque().accept(this));
+        setUltFunVisitada(null);
         return df;
     }
 

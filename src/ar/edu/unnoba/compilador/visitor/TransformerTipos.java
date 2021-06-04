@@ -16,6 +16,7 @@ import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Simbolo;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Valor;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
+import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFuncion;
 
 import java.util.Locale;
@@ -86,7 +87,6 @@ public class TransformerTipos extends Transformer {
 
         return tipoEnComun;
     }
-
 
     // Transforms
 
@@ -167,5 +167,16 @@ public class TransformerTipos extends Transformer {
             ou.setExpresion(convertirATipo(ou.getExpresion(), ou.getTipo()));
         }
         return ou;
+    }
+
+    @Override
+    public Retorno transform(Retorno r) throws ExcepcionDeTipos {
+        // Transforma la expresión interna del return
+        super.transform(r);
+        // Y la comparo con el de la función a la que pertenece
+        if (r.getExpr().getTipo() != getUltFunVisitada().getTipo()) {
+            r.setExpr(convertirATipo(r.getExpr(), getUltFunVisitada().getTipo()));
+        }
+        return r;
     }
 }
