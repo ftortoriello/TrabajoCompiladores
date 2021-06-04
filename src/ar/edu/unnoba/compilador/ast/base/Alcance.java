@@ -52,4 +52,9 @@ public class Alcance extends HashMap<String, Simbolo> {
         // No se encontró en ningún alcance
         return null;
     }
+
+    @Override
+    public String toString() {
+        return nombre;
+    }
 }

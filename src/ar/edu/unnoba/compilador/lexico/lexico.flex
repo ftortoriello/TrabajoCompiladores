@@ -15,7 +15,7 @@ import ar.edu.unnoba.compilador.token.Token;
 /* nombre de la clase generada */
 %class Lexer
 /* nombre de la clase para representar tokens (objetos retornados por yylex) */
-%type Token
+//%type Token
 /* finalizar la lectura cuando se encuentra EOF */
 %eofclose
 /* soportar entradas con caracteres Unicode */

@@ -68,14 +68,14 @@ parser code
         + s.value + "'. Símbolo n° " + s.sym + " no reconocido." );
     }
 
+    // Depurar creación de nodos
     private void imprimirEtiqueta(Nodo nodo) {
-        // Torto, comento esto para que no haga tanto ruido, si hay que debuguear algo lo activamos
-        // System.out.println("Se creó el nodo " + nodo.getClass().getSimpleName());
+        //System.out.println("Se creó el nodo " + nodo.getClass().getSimpleName());
     }
 
+    // Crea una clase según sea el operador utilizado
+    // Si se utiliza el operador de IGUALDAD, devuelvo una clase Igualdad, etc.
     public Relacion getClaseRel(OperadorCmp op, Expresion expr1, Expresion expr2) {
-        // Crea una clase según sea el operador utilizado
-        // Si se utiliza el operador de IGUALDAD, devuelvo una clase Igualdad, etc.
         Relacion comp;
 
         switch (op) {
@@ -102,8 +102,8 @@ parser code
         return comp;
     }
 
+    // Recibe el lexema TIPO (en forma de cadena) y devuelve el enum Tipo correspondiente
     public Tipo getTipoDato(String tipoStr) {
-        // Recibe el lexema TIPO (en forma de cadena) y devuelve el enum Tipo correspondiente
         Tipo tipo;
 
         switch (tipoStr.toUpperCase()) {
@@ -124,8 +124,8 @@ parser code
         return tipo;
     }
 
+    // Recibe el lexema OP_COMPARACION (en forma de cadena) y devuelve el enum OperadorCmp correspondiente
     public OperadorCmp getTipoOpCmp(String opStr) {
-        // Recibe el lexema OP_COMPARACION (en forma de cadena) y devuelve el enum OperadorCmp correspondiente
         OperadorCmp op;
 
         switch (opStr) {
@@ -174,7 +174,6 @@ nonterminal List<CasoCuando> bloque_cuando;
 
 // Las producciones "sentencia" podrían ser de tipo Sentencia, pero para poder incluir
 // a invocacion_funcion, que es de tipo Expresión, tengo que declararlas como Nodo...
-// TODO: ver si puede reestructurarse para que quede más prolijo.
 nonterminal List<Nodo> lst_sentencias;
 nonterminal Nodo sentencia;
 

@@ -1,30 +1,36 @@
 package ar.edu.unnoba.compilador.visitor;
 
-import java.util.List;
-
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Simbolo;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFuncion;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarInicializada;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.Declaracion;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 
-/* Visitor para generar los alcances de todos los bloques, y construye la tabla
- * de símbolos.
+import java.util.List;
+
+/* Visitor para generar los alcances de los bloques, construir la tabla de
+   símbolos locales y verificar los alcances.
+   TODO: Y asignar tipos a las referencias acá? o en el transformer como está ahora?
  */
-public class GeneradorAlcances extends Visitor<Void> {
+public class GeneradorDeAlcancesLocales extends Visitor<Void> {
+    private Alcance alcanceGlobal;
     private Alcance alcanceActual;
 
     // Agregar la declaración al ámbito en el que se encuentra
     private void agregarSimbolo(Simbolo s) throws ExcepcionDeAlcance {
+        if (alcanceGlobal == alcanceActual) {
+            // Este Visitor sólo agrega símbolos locales, los globales ya los agregó el visitor
+            // de alcance global
+            return;
+        }
         Declaracion declaracion = s.getDeclaracion();
         String nombre = declaracion.getIdent().getNombre();
 
@@ -45,8 +51,8 @@ public class GeneradorAlcances extends Visitor<Void> {
     @Override
     public Void visit(Programa p) throws ExcepcionDeAlcance {
         // Comenzar con alcance global para el encabezado.
-        alcanceActual = new Alcance("global");
-        p.setAlcance(alcanceActual);
+        // Ya tiene el alcance establecido por el Visitor de alcance global.
+        alcanceGlobal = alcanceActual = p.getAlcance();
         super.visit(p);
         alcanceActual = null;
         return null;
@@ -56,12 +62,35 @@ public class GeneradorAlcances extends Visitor<Void> {
     public Void visit(Bloque b) throws ExcepcionDeAlcance {
         // Establecer el alcance de cada bloque.
         // Crearlo como hijo del alcance actual
-        alcanceActual = new Alcance(String.format("%d-%s", getID(), b.getNombre()), alcanceActual);
-        b.setAlcance(alcanceActual);
+
+        // Hacemos esto por las funciones.
+        // Ponemos el alcance del cuerpo en DecFuncion, para que queden los parámetros en el mismo
+        // alcance que el cuerpo.
+        Alcance alcanceBloque = b.getAlcance();
+        if (alcanceBloque == null) {
+            alcanceActual = new Alcance(String.format("%d-%s", getID(), b.getNombre()), alcanceActual);
+            b.setAlcance(alcanceActual);
+        } else {
+            alcanceActual = alcanceBloque;
+        }
+
         super.visit(b);
+
         // Ya se recorrió el subárbol, subir el nivel de alcance actual
         // (sino no se podrían definir símbolos con el mismo nombre en dos funciones distintas
         // por ejemplo)
+        if (alcanceBloque == null) {
+            alcanceActual = alcanceActual.getPadre();
+        }
+        return null;
+    }
+
+    @Override
+    public Void visit(DecFuncion df) throws ExcepcionDeAlcance {
+        // Generar un alcance nuevo para los parámetros
+        alcanceActual = new Alcance(String.format("%d-%s", getID(), df.getNombre()), alcanceActual);
+        df.getBloque().setAlcance(alcanceActual);
+        super.visit(df);
         alcanceActual = alcanceActual.getPadre();
         return null;
     }
@@ -76,12 +105,6 @@ public class GeneradorAlcances extends Visitor<Void> {
     public Void visit(DecVarInicializada dvi) throws ExcepcionDeAlcance {
         agregarSimbolo(new Simbolo(dvi));
         return super.visit(dvi);
-    }
-
-    @Override
-    public Void visit(DecFuncion df) throws ExcepcionDeAlcance {
-        agregarSimbolo(new Simbolo(df));
-        return super.visit(df);
     }
 
 

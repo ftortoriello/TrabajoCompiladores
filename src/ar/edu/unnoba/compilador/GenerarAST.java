@@ -4,7 +4,8 @@ import ar.edu.unnoba.compilador.ast.base.Programa;
 import ar.edu.unnoba.compilador.lexico.Lexer;
 import ar.edu.unnoba.compilador.sintaxis.Parser;
 import ar.edu.unnoba.compilador.visitor.ASTGraphviz;
-import ar.edu.unnoba.compilador.visitor.GeneradorAlcances;
+import ar.edu.unnoba.compilador.visitor.GeneradorDeAlcanceGlobal;
+import ar.edu.unnoba.compilador.visitor.GeneradorDeAlcancesLocales;
 import ar.edu.unnoba.compilador.visitor.TransformerTipos;
 
 import java.io.*;
@@ -41,20 +42,23 @@ public class GenerarAST {
             // y convertirlo a imagen
             graficarArbol(new ASTGraphviz().visit(programa),"arbol-orig");
 
-            // Ejecutar Visitor generador de alcances
-            GeneradorAlcances ga = new GeneradorAlcances();
-            ga.visit(programa);
-            System.out.println("Alcances procesados");
+            System.out.println("Iniciando generador de alcances globales...");
+            GeneradorDeAlcanceGlobal gag = new GeneradorDeAlcanceGlobal();
+            gag.visit(programa);
 
-            // Ejecutar Transformer validador de tipos
+            System.out.println("Iniciando generador de alcances locales...");
+            GeneradorDeAlcancesLocales gal = new GeneradorDeAlcancesLocales();
+            gal.visit(programa);
+
+            System.out.println("Iniciando validación y conversión de tipos...");
             TransformerTipos tt = new TransformerTipos();
             tt.transform(programa);
-            System.out.println("Tipos validados");
 
             // Mostrar el árbol transformado
             graficarArbol(new ASTGraphviz().visit(programa),"arbol-transformado");
         } catch (ClassCastException e) {
             // Error sintáctico
+            //e.printStackTrace(System.out);
         } catch (Exception e) {
             //e.printStackTrace(System.out);
             System.out.println(String.format("%s: %s", e.getClass().getSimpleName(), e.getLocalizedMessage()));
