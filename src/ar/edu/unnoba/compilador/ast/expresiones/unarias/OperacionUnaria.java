@@ -39,6 +39,11 @@ public abstract class OperacionUnaria extends Expresion {
     }
 
     @Override
+    public String toString() {
+        return String.format("%s %s", getNombre(), getExpresion());
+    }
+
+    @Override
     public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
         return v.visit(this);
     }

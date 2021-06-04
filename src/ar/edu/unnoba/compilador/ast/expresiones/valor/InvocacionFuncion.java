@@ -41,7 +41,9 @@ public class InvocacionFuncion<A> extends Valor {
 
     @Override
     public String getEtiqueta() {
-        return String.format("%s(%s)", getNombre(), this.argumentos.toString().replace("[", "").replace("]", ""));
+        return String.format("%s(%s)\n<%s>", getNombre(),
+                argumentos.toString().replace("[", "").replace("]", ""),
+                getTipo());
     }
 
     @Override

@@ -1,3 +1,8 @@
+(*
+function romper(z is integer) return boolean
+    return z;
+*)
+
 (* Ejemplo de un programa completo dado en la consigna *)
 (* Se definen (* algunas *) variables globales *)
 function factorial(n is integer) return integer
@@ -12,7 +17,7 @@ variable superficie₁ is float = 0;
 function superficie_círculo(x is float, radio is float = 1) return float
 begin
     x = read_integer();
-    x = factorial(5);
+    x = factorial(-2);
     # x = writeln("Esto tendría que romper");
     # TODO: Esto tendría que fallar, mostrar está declarado más abajo
     if mostrar == true then

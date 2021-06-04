@@ -52,6 +52,11 @@ public abstract class OperacionBinaria extends Expresion {
     }
 
     @Override
+    public String toString() {
+        return String.format("%s %s %s", getIzquierda(), getNombre(), getDerecha());
+    }
+
+    @Override
     public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
         return v.visit(this);
     }
