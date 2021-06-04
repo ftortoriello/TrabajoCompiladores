@@ -5,6 +5,7 @@ import java.util.List;
 
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
+import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
@@ -70,6 +71,10 @@ public abstract class Visitor<T> {
     }
 
     public T visit(InvocacionFuncion invo) throws ExcepcionDeAlcance {
+        List<T> argumentos = new ArrayList<>();
+        for (Expresion argumento : invo.getArgumentos()) {
+            argumentos.add(argumento.accept(this));
+        }
         return procesarNodo(invo);
     }
 

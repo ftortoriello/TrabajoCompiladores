@@ -20,7 +20,7 @@ import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 import java.util.List;
 
 /* Visitor para generar los alcances de los bloques, construir la tabla de
-   símbolos locales y verificar los alcances.
+ * símbolos locales y verificar los alcances.
  */
 public class GeneradorDeAlcancesLocales extends Visitor<Void> {
     private Alcance alcanceGlobal;
@@ -42,7 +42,7 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
         Simbolo simboloExistente = alcanceActual.resolver(nombre);
         if (simboloExistente != null) {
             throw new ExcepcionDeAlcance(
-                    String.format("La variable %s de tipo %s ya fue declarada previamente con tipo %s.",
+                    String.format("La variable local «%s» de tipo %s ya fue declarada previamente con tipo %s.",
                             nombre, declaracion.getTipo(),
                             simboloExistente.getDeclaracion().getTipo()));
         }
@@ -104,7 +104,7 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
     @Override
     public Void visit(Identificador i) throws ExcepcionDeAlcance {
         if (!estaEnElAlcance(i)) {
-            throw new ExcepcionDeAlcance(String.format("No se declaró la variable %s", i.getNombre()));
+            throw new ExcepcionDeAlcance(String.format("No se declaró la variable «%s»", i.getNombre()));
         }
         return super.visit(i);
     }
@@ -112,7 +112,7 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
     @Override
     public Void visit(InvocacionFuncion i) throws ExcepcionDeAlcance {
         if (!i.getEsPredefinida() && !estaEnElAlcance(i)) {
-            throw new ExcepcionDeAlcance(String.format("No se definió la función %s", i.getNombre()));
+            throw new ExcepcionDeAlcance(String.format("No se definió la función «%s»", i.getNombre()));
         }
         return super.visit(i);
     }

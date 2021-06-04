@@ -52,11 +52,11 @@ public class TransformerTipos extends Transformer {
             return expresion;
         }
         if (tipoOrigen == Tipo.INTEGER && tipoDestino == Tipo.FLOAT) {
-            System.out.println(String.format("Advertencia: convirtiendo %s de entero a flotante", expresion));
+            System.out.println(String.format("Advertencia: convirtiendo «%s» de entero a flotante", expresion));
             return new EnteroAFlotante(expresion);
         }
         if (tipoOrigen == Tipo.FLOAT && tipoDestino == Tipo.INTEGER) {
-            System.out.println(String.format("Advertencia: convirtiendo %s de flotante a entero", expresion));
+            System.out.println(String.format("Advertencia: convirtiendo «%s» de flotante a entero", expresion));
             return new FlotanteAEntero(expresion);
         }
         throw new ExcepcionDeTipos(
@@ -121,20 +121,18 @@ public class TransformerTipos extends Transformer {
 
     @Override
     public Identificador transform(Identificador i) throws ExcepcionDeTipos {
-        Simbolo s = cambiarTipo(i);
-        if (s == null) {
-            throw new ExcepcionDeTipos(String.format("No se pudo asignar un tipo a la variable %s", i.getNombre()));
+        if (cambiarTipo(i)== null) {
+            throw new ExcepcionDeTipos(String.format("No se pudo asignar un tipo a la variable «%s»", i.getNombre()));
         }
-        // FIXME: Hesto es orrorozo y no anda
-        //i = (Identificador) (Valor) s;
         return super.transform(i);
     }
 
     @Override
     public InvocacionFuncion transform(InvocacionFuncion i) throws ExcepcionDeTipos {
+        // TODO: validar tipos y cantidad de parámetros
         // No buscar en el alcance las funciones predefinidas
         if (!i.getEsPredefinida() && (cambiarTipo(i) == null)) {
-            throw new ExcepcionDeTipos(String.format("No se pudo asignar un tipo a la función %s", i.getNombre()));
+            throw new ExcepcionDeTipos(String.format("No se pudo asignar un tipo a la función «%s»", i.getNombre()));
         }
         return super.transform(i);
     }
@@ -183,7 +181,7 @@ public class TransformerTipos extends Transformer {
     public Retorno transform(Retorno r) throws ExcepcionDeTipos {
         // Transforma la expresión interna del return
         super.transform(r);
-        // Y la comparo con el de la función a la que pertenece
+        // Y la compara con el de la función a la que pertenece
         if (r.getExpr().getTipo() != getUltFunVisitada().getTipo()) {
             r.setExpr(convertirATipo(r.getExpr(), getUltFunVisitada().getTipo()));
         }

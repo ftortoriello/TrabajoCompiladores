@@ -30,7 +30,7 @@ public class GeneradorDeAlcanceGlobal extends Visitor<Void> {
         Simbolo simboloExistente = alcanceGlobal.putIfAbsent(nombre, s);
         if (simboloExistente != null) {
             throw new ExcepcionDeAlcance(
-                    String.format("La variable global %s de tipo %s ya fue declarada previamente con tipo %s.",
+                    String.format("La variable global «%s» de tipo %s ya fue declarada previamente con tipo %s.",
                             nombre, declaracion.getTipo(),
                             simboloExistente.getDeclaracion().getTipo()));
         }

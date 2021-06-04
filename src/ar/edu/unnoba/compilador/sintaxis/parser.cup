@@ -52,6 +52,7 @@ import ar.edu.unnoba.compilador.ast.expresiones.unarias.aritmeticas.NegacionArit
 
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.OperadorCmp;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Cadena;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
@@ -579,8 +580,8 @@ invocacion_funcion ::=
             RESULT = new InvocacionFuncion(nombre_fun, args, Tipo.UNKNOWN);
         :} |
         PR_WRITELN:nombre_fun PAR_ABRE:pa CADENA:c PAR_CIERRA:pc {:
-            List<String> args = new ArrayList<>();
-            args.add("\\\"" + c + "\\\"");
+            List<Expresion> args = new ArrayList<>();
+            args.add(new Cadena("\\\"" + c + "\\\""));
             RESULT = new InvocacionFuncion(nombre_fun, args, Tipo.UNKNOWN);
         :} |
         PR_WRITE:nombre_fun PAR_ABRE:pa disyuncion:disy PAR_CIERRA:pc {:
@@ -589,8 +590,8 @@ invocacion_funcion ::=
             RESULT = new InvocacionFuncion(nombre_fun, args, Tipo.UNKNOWN);
         :} |
         PR_WRITE:nombre_fun PAR_ABRE:pa CADENA:c PAR_CIERRA:pc {:
-            List<String> args = new ArrayList<>();
-            args.add("\\\"" + c + "\\\"");
+            List<Expresion> args = new ArrayList<>();
+            args.add(new Cadena("\\\"" + c + "\\\""));
             RESULT = new InvocacionFuncion(nombre_fun, args, Tipo.UNKNOWN);
         :} |
         PR_READ_INTEGER:nombre_fun PAR_ABRE:pa PAR_CIERRA:pc {:

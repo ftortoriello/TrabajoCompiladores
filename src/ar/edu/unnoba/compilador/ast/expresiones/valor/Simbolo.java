@@ -9,8 +9,11 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 /* Clase para generar los alcances y validar los tipos.
  * TODO: Luego mediante un Transformer este nodo reemplaza a Identificador
  */
-public class Simbolo extends Valor {
+public class Simbolo extends Identificador {
     private Declaracion declaracion;
+
+    public Simbolo() {
+    }
 
     public Simbolo(Declaracion declaracion) {
         this.declaracion = declaracion;

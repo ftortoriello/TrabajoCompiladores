@@ -1,5 +1,6 @@
 package ar.edu.unnoba.compilador.ast.expresiones.valor;
 
+import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
@@ -9,19 +10,19 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InvocacionFuncion<A> extends Valor {
+public class InvocacionFuncion extends Valor {
     // Pongo tipo genérico porque los argumentos pueden ser expresiones o strings
     // TODO: acomodar llamadas, si acepta genéricos tendría que pasarse el tipo
-    private final List<A> argumentos;
+    private List<Expresion> argumentos;
     private Boolean esPredefinida = true;
 
-    public InvocacionFuncion(String nombre, List<A> argumentos, Tipo tipo, Boolean esPredefinida) {
+    public InvocacionFuncion(String nombre, List<Expresion> argumentos, Tipo tipo, Boolean esPredefinida) {
         super(tipo, nombre);
         this.argumentos = argumentos;
         this.esPredefinida = esPredefinida;
     }
 
-    public InvocacionFuncion(String nombre, List<A> argumentos, Tipo tipo) {
+    public InvocacionFuncion(String nombre, List<Expresion> argumentos, Tipo tipo) {
         super(tipo, nombre);
         this.argumentos = argumentos;
     }
@@ -31,8 +32,12 @@ public class InvocacionFuncion<A> extends Valor {
         this.argumentos = new ArrayList<>();
     }
 
-    public List<A> getArgumentos() {
+    public List<Expresion> getArgumentos() {
         return argumentos;
+    }
+
+    public void setArgumentos(List<Expresion> argumentos) {
+        this.argumentos = argumentos;
     }
 
     public Boolean getEsPredefinida() {
@@ -55,6 +60,4 @@ public class InvocacionFuncion<A> extends Valor {
     public InvocacionFuncion accept(Transformer t) throws ExcepcionDeTipos {
         return t.transform(this);
     }
-
-
 }

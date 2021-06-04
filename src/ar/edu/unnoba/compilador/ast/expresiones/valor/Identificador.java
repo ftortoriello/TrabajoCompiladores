@@ -10,6 +10,9 @@ import ar.edu.unnoba.compilador.visitor.Transformer;
  * variables, funciones...
  * TODO: Después se reemplazan por Simbolo cuando se armen las tablas de simbolos. */
 public class Identificador extends Valor {
+    public Identificador() {
+    }
+
     public Identificador(String nombre) {
         super(Tipo.UNKNOWN, nombre);
     }

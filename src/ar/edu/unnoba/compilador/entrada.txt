@@ -1,34 +1,13 @@
-(*
-function romper(z is integer) return boolean
-    return z;
-*)
+{
+(* Ejemplo de un programa completo dado en la consigna de la etapa 1 *)
 
-(* Ejemplo de un programa completo dado en la consigna *)
 (* Se definen (* algunas *) variables globales *)
-function factorial(n is float) return integer
-    if n > 1 then
-        return n * factorial(n - 1)
-    else
-        return 1;
-
+variable radio is float;
 variable superficie₁ is float = 0;
 
 { Una función }
-function superficie_círculo(x is float, radio is float = 1) return float
+function superficie_círculo(x is float) return float
 begin
-    variable mostrar is boolean;
-
-    mostrar = (false != true);
-    x = read_integer();
-    x = factorial(-2);
-    # x = writeln("Esto tendría que romper");
-    if mostrar == true then
-        if x > 1 then
-            writeln("Then")
-        else
-            writeln("Else");
-
-    x = (-55.5 / 5) * (3 + 4);
     writeln("Dentro de función superficie_círculo()");
     # Definición de una variable local.
     if radio < 0 then
@@ -43,25 +22,22 @@ end;
 function cuadrado(valor is float) return float
     return valor * valor;
 
-function get10(w is integer) return integer
-    return 10;
-
 { Otra variable global (esta vez, sin inicialización explícita) }
 variable superficie₂ is float;
 
 # Procedimiento principal
 main is
-    variable radio is float;
     writeln("Inicio del programa");
     writeln(superficie₁);
     writeln(superficie₂);
-    superficie₁ = superficie_círculo(radio);
+    superficie₁ = superficie_círculo(radio); # TODO: los parámetros no se validan
     writeln(superficie₁);
+
     radio = read_float();
     superficie₂ = superficie_círculo(radio);
     writeln(superficie₂);
-    variable justo is boolean = false;
 
+    variable justo is boolean = false;
     when superficie_círculo()
         is < 100 then writeln("Es pequeño")
         is == 100 then begin
@@ -79,16 +55,16 @@ main is
 
     writeln("Se acabó\n\nFin!");
 end.
+}
 
-{
-{ Ejemplo de ambitos }
+(* Ejemplo de ámbitos dado en la consigna de la etapa 2 *)
 
 function ejemplo() return boolean
 begin
     variable local_a_ejemplo is boolean = true;
     if global > 10 then
     begin
-        variable local_al_then is float = global;
+        variable local_al_then is float = global; # TODO falta la conversión de global acá?
         while local_al_then > 5 do
         begin
             local_al_then = local_al_then - 1;
@@ -96,10 +72,10 @@ begin
             writeln(local_al_while);
         end;
         writeln(local_al_then);
-        local_al_main = false;  # tendria que dar error
+        #local_al_main = false;  # error, está fuera del alcance
     end else
         global = global + 5;
-    writeln(local_al_main);     # tendria que dar error
+    #writeln(local_al_main);     # error, está fuera del alcance
     return local_a_ejemplo;
 end;
 
@@ -107,9 +83,9 @@ variable global is integer = 42;
 
 main is
     variable local_al_main is boolean = true;
+
     if not local_al_main then
         variable local_al_then is integer = 1
     else
         ejemplo();
 end.
-}

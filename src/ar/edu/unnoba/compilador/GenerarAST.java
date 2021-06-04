@@ -42,7 +42,7 @@ public class GenerarAST {
             // Ejecutar Visitor graficador del árbol sin transformar,
             // y convertirlo a imagen
             graficador = new ASTGraphviz("Árbol de sintaxis abstracta (Conti - Tortoriello)");
-            graficarArbol(graficador.visit(programa),"arbol-orig");
+            graficarArbol(graficador.visit(programa),"ast-original");
 
             System.out.println("Iniciando generador de alcances globales...");
             GeneradorDeAlcanceGlobal gag = new GeneradorDeAlcanceGlobal();
@@ -58,10 +58,10 @@ public class GenerarAST {
 
             // Mostrar el árbol transformado
             graficador = new ASTGraphviz("AST con conversión de tipos (Conti - Tortoriello)");
-            graficarArbol(graficador.visit(programa),"arbol-transformado");
+            graficarArbol(graficador.visit(programa),"ast-transformado");
         } catch (ClassCastException e) {
             // Error sintáctico
-            e.printStackTrace(System.out);
+            //e.printStackTrace(System.out);
         } catch (Exception e) {
             //e.printStackTrace(System.out);
             System.out.println(String.format("%s: %s", e.getClass().getSimpleName(), e.getLocalizedMessage()));
