@@ -20,6 +20,7 @@ import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.FlotanteAEn
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Simbolo;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Control;
+import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
@@ -175,5 +176,10 @@ public abstract class Transformer {
 
     public Control transform(Control c) throws ExcepcionDeTipos {
         return c;
+    }
+
+    public Retorno transform(Retorno r) throws ExcepcionDeTipos {
+        r.setExpr((Expresion) r.getExpr().accept(this));
+        return r;
     }
 }

@@ -5,7 +5,7 @@ function romper(z is integer) return boolean
 
 (* Ejemplo de un programa completo dado en la consigna *)
 (* Se definen (* algunas *) variables globales *)
-function factorial(n is integer) return integer
+function factorial(n is float) return integer
     if n > 1 then
         return n * factorial(n - 1)
     else
