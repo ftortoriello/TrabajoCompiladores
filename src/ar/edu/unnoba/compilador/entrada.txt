@@ -6,13 +6,14 @@ function factorial(n is integer) return integer
     else
         return 1;
 
-# Ojo con esta declaración de abajo, por ahora funciona, pero a 0 (la Expresión)
-# lo estamos tomando como INTEGER, y superficie (el Identificador) es FLOAT.
 variable superficie₁ is float = 0;
 
 { Una función }
 function superficie_círculo(x is float, radio is float = 1) return float
 begin
+    x = read_integer();
+    x = factorial(5);
+    # x = writeln("Esto tendría que romper");
     # TODO: Esto tendría que fallar, mostrar está declarado más abajo
     if mostrar == true then
         if x > 1 then

@@ -39,7 +39,6 @@ public class ASTGraphviz extends Visitor<String> {
     }
 
     // *** VISITAS ***
-    // TODO: ver si se puede crear un método genérico visit, la mayoría son iguales
 
     // Base
     @Override

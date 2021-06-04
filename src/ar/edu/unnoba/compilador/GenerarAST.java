@@ -19,6 +19,7 @@ public class GenerarAST {
         Runtime.getRuntime().exec(
                 String.format("dot -T%2$s %1$s.dot -o %1$s.%2$s",
                         nombreArchivo, formatoImg));
+        System.out.println("Se graficó el AST «" + nombreArchivo + "».");
     }
 
     public static void main(String[] args) {
@@ -40,7 +41,7 @@ public class GenerarAST {
             // y convertirlo a imagen
             graficarArbol(new ASTGraphviz().visit(programa),"arbol-orig");
 
-            // Ejecuctar Visitor generador de alcances
+            // Ejecutar Visitor generador de alcances
             GeneradorAlcances ga = new GeneradorAlcances();
             ga.visit(programa);
             System.out.println("Alcances procesados");
