@@ -117,7 +117,7 @@ public class TransformerTipos extends Transformer {
     @Override
     public Identificador transform(Identificador i) throws ExcepcionDeTipos {
         if (!cambiarTipo(i)) {
-            throw new ExcepcionDeTipos(String.format("No se declaró la variable %s", i.getNombre()));
+            throw new ExcepcionDeTipos(String.format("No se pudo asignar un tipo a la variable %s", i.getNombre()));
         }
         return super.transform(i);
     }
@@ -125,12 +125,9 @@ public class TransformerTipos extends Transformer {
     @Override
     public InvocacionFuncion transform(InvocacionFuncion i) throws ExcepcionDeTipos {
         // No buscar en el alcance las funciones predefinidas
-        if (!i.getEsPredefinida()) {
-            if (!cambiarTipo(i)) {
-                throw new ExcepcionDeTipos(String.format("No se definió la función %s", i.getNombre()));
-            }
+        if (!i.getEsPredefinida() && !cambiarTipo(i)) {
+            throw new ExcepcionDeTipos(String.format("No se pudo asignar un tipo a la función %s", i.getNombre()));
         }
-
         return super.transform(i);
     }
 
