@@ -9,7 +9,7 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 import java.util.List;
 
 public class Encabezado extends Nodo {
-    List<Declaracion> declaraciones;
+    private List<Declaracion> declaraciones;
 
     public Encabezado(List<Declaracion> declaraciones) {
         super(declaraciones.size() == 0 ? "Encabezado (vacío)" : "Encabezado");

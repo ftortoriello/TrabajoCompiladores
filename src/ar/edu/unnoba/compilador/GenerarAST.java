@@ -7,40 +7,56 @@ import ar.edu.unnoba.compilador.visitor.ASTGraphviz;
 import ar.edu.unnoba.compilador.visitor.GeneradorAlcances;
 import ar.edu.unnoba.compilador.visitor.TransformerTipos;
 
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.PrintWriter;
+import java.io.*;
 
 public class GenerarAST {
-    public static void main(String[] args) throws Exception {
-        String ruta = System.getProperty("user.dir") + "/src/ar/edu/unnoba/compilador/entrada.txt";
-        FileReader entrada = new FileReader(ruta);
+    private static void graficarArbol(String dot, String nombreArchivo) throws IOException {
+        final String formatoImg = "png";
+        PrintWriter pw = new PrintWriter(
+                new FileWriter(String.format("%s.dot", nombreArchivo)));
+        pw.println(dot);
+        pw.close();
+        Runtime.getRuntime().exec(
+                String.format("dot -T%2$s %1$s.dot -o %1$s.%2$s",
+                        nombreArchivo, formatoImg));
+    }
+
+    public static void main(String[] args) {
+        final String ruta = System.getProperty("user.dir") + "/src/ar/edu/unnoba/compilador/entrada.txt";
+        FileReader entrada;
+        try {
+            entrada = new FileReader(ruta);
+        } catch (FileNotFoundException e) {
+            System.out.println("No se pudo encontrar el archivo: " + ruta);
+            return;
+        }
+
         Lexer lexico = new Lexer(entrada);
         @SuppressWarnings("deprecation") Parser parser = new Parser(lexico);
         try {
             Programa programa = (Programa) parser.parse().value;
 
-            // Ejecución de visitor graficador
-            PrintWriter pw = new PrintWriter(new FileWriter("arbol.dot"));
-            ASTGraphviz graficador = new ASTGraphviz();
-            pw.println(graficador.visit(programa));
-            pw.close();
-            String cmd = "dot -Tpng arbol.dot -o arbol.png";
-            Runtime.getRuntime().exec(cmd);
+            // Ejecutar Visitor graficador del árbol sin transformar,
+            // y convertirlo a imagen
+            graficarArbol(new ASTGraphviz().visit(programa),"arbol-orig");
 
-            // Ejecución de visitor generador de alcances
+            // Ejecuctar Visitor generador de alcances
             GeneradorAlcances ga = new GeneradorAlcances();
-            ga.procesar(programa);
+            ga.visit(programa);
             System.out.println("Alcances procesados");
 
-            // Ejecución de transformer validador de tipos
-            TransformerTipos vt = new TransformerTipos();
-            vt.procesar(programa);
+            // Ejecutar Transformer validador de tipos
+            TransformerTipos tt = new TransformerTipos();
+            tt.transform(programa);
             System.out.println("Tipos validados");
+
+            // Mostrar el árbol transformado
+            graficarArbol(new ASTGraphviz().visit(programa),"arbol-convertido");
         } catch (ClassCastException e) {
             // Error sintáctico
         } catch (Exception e) {
-            System.out.println(e.getLocalizedMessage());
+            //e.printStackTrace(System.out);
+            System.out.println(String.format("%s: %s", e.getClass().getSimpleName(), e.getLocalizedMessage()));
         }
     }
 }

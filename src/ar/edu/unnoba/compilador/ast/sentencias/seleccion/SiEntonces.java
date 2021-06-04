@@ -8,7 +8,7 @@ import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
 public class SiEntonces extends Seleccion {
-    Bloque bloqueSiEntonces;
+    private Bloque bloqueSiEntonces;
 
     public SiEntonces(String nombre, Expresion condicion, Bloque bloqueSiEntonces) {
         super(nombre, condicion);

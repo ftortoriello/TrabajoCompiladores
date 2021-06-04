@@ -10,9 +10,9 @@ import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
 public class CasoCuando extends Sentencia {
-    OperadorCmp op;
-    Expresion expr;
-    Bloque bloque;
+    private OperadorCmp op;
+    private Expresion expr;
+    private Bloque bloque;
 
     public CasoCuando(OperadorCmp op, Expresion expr, Bloque bloque) {
         super("CasoCuando");

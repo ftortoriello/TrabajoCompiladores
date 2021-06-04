@@ -1,8 +1,10 @@
 package ar.edu.unnoba.compilador.ast.base;
 
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Simbolo;
+
 import java.util.HashMap;
 
-public class Alcance extends HashMap<String, Nodo> {
+public class Alcance extends HashMap<String, Simbolo> {
     // El "nombre" del alcance puede ser "global", el nombre de la función en la que está incluido, etc...
     private String nombre;
     // Necesitamos el padre porque si una variable no está definida en este ámbito le preguntamos a él
@@ -36,17 +38,18 @@ public class Alcance extends HashMap<String, Nodo> {
         this.padre = padre;
     }
 
-    public Nodo resolver(String nombre) {
+    public Simbolo resolver(String nombre) {
         Alcance alcanceActual = this;
-        Nodo elemento = null;
+        Simbolo s = null;
         while (alcanceActual != null) {
-            elemento = alcanceActual.get(nombre);
-            if (elemento != null) {
-                return elemento;
+            s = alcanceActual.get(nombre);
+            if (s != null) {
+                return s;
             }
+            // No se encontró, buscar en el alcance del padre
             alcanceActual = alcanceActual.getPadre();
         }
-        // No se encontró
+        // No se encontró en ningún alcance
         return null;
     }
 }

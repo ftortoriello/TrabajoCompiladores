@@ -34,9 +34,4 @@ public abstract class Expresion extends Nodo {
     public String getEtiqueta() {
         return String.format("%s\n<%s>", getNombre(), getTipo());
     }
-
-    @Override
-    public String toString() {
-        return getNombre();
-    }
 }

@@ -11,7 +11,7 @@ import ar.edu.unnoba.compilador.ast.base.Bloque;
 
 import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
 
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.Asignacion;
+import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.Declaracion;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFuncion;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
@@ -68,7 +68,7 @@ parser code
         + s.value + "'. Símbolo n° " + s.sym + " no reconocido." );
     }
 
-    public void imprimirEtiqueta(Nodo nodo) {
+    private void imprimirEtiqueta(Nodo nodo) {
         System.out.println("Se creó el nodo " + nodo.getClass().getSimpleName());
     }
 

@@ -10,7 +10,8 @@ import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.*;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.*;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Variable;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Simbolo;
+import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Control;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
@@ -72,7 +73,7 @@ public abstract class Visitor<T> {
         return procesarNodo(invo);
     }
 
-    public <T> T visit(Variable v) {
+    public <T> T visit(Simbolo s) {
         throw new UnsupportedOperationException("Operación no soportada.");
     }
 
@@ -82,7 +83,7 @@ public abstract class Visitor<T> {
     public T visit(OperacionBinaria ob) throws ExcepcionDeAlcance {
         T ti = ob.getIzquierda().accept(this);
         T td = ob.getDerecha().accept(this);
-        return this.procesarOperacionBinaria(ob, ti, td);
+        return procesarOperacionBinaria(ob, ti, td);
     }
 
     public T visit(OperacionUnaria ou) throws ExcepcionDeAlcance {
@@ -95,7 +96,7 @@ public abstract class Visitor<T> {
     public T visit(Asignacion a) throws ExcepcionDeAlcance {
         T identificador = a.getIdent().accept(this);
         T expresion = a.getExpresion().accept(this);
-        return this.procesarAsignacion(a, identificador, expresion);
+        return procesarAsignacion(a, identificador, expresion);
     }
 
     public T visit(DecVar dv) throws ExcepcionDeAlcance {
@@ -105,7 +106,7 @@ public abstract class Visitor<T> {
     public T visit(DecVarInicializada dvi) throws ExcepcionDeAlcance {
         T ident = dvi.getIdent().accept(this);
         T expr = dvi.getExpresion().accept(this);
-        return this.procesarVarInicializada(ident, expr);
+        return procesarVarInicializada(ident, expr);
     }
 
     public T visit(DecFuncion df) throws ExcepcionDeAlcance {
@@ -168,9 +169,9 @@ public abstract class Visitor<T> {
 
     protected abstract T procesarPrograma(Programa p, T enc, T blq);
 
-    protected abstract T procesarBloque(Bloque bloque, List<T> sentencias);
-
     protected abstract T procesarEncabezado(Encabezado encabezado, List<T> sentencias);
+
+    protected abstract T procesarBloque(Bloque bloque, List<T> sentencias);
 
     protected abstract T procesarOperacionBinaria(OperacionBinaria ob, T ei, T ed);
 

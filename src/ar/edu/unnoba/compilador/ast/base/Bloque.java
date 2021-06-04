@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Bloque extends Nodo {
-    private Alcance alcance;
     private List<Nodo> sentencias;
+    private Alcance alcance;
     private final boolean esProgramaPrincipal;
 
     public Bloque(String nombre, List<Nodo> sentencias, boolean esProgramaPrincipal) {

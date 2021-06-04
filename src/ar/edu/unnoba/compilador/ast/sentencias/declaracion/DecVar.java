@@ -12,14 +12,6 @@ public class DecVar extends Declaracion {
         super(nombre, ident);
     }
 
-    public Tipo getTipo() {
-        return this.getIdent().getTipo();
-    }
-
-    public void setTipo(Tipo tipo) {
-        this.getIdent().setTipo(tipo);
-    }
-
     @Override
     public String getEtiqueta() {
         return getClass().getSimpleName();

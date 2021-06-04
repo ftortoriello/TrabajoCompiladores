@@ -13,8 +13,8 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 // TODO: error de compatibilidad si la expresión no puede evaluarse como BOOLEAN
 
 public class Mientras extends Sentencia {
-    Expresion condicion;
-    Bloque bloqueSentencias;
+    private Expresion condicion;
+    private Bloque bloqueSentencias;
 
     public Mientras(Expresion condicion, Bloque bloqueSentencias) {
         super("Bloque\nWHILE");

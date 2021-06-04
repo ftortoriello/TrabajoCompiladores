@@ -7,10 +7,9 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 
 /* Clase para catalogar en la primera pasada cosas que no sabemos si son
- * variables, funciones... */
+ * variables, funciones...
+ * TODO: Después se reemplazan por Simbolo cuando se armen las tablas de simbolos. */
 public class Identificador extends Valor {
-    // TODO: Los nodos Identificador tienen que quedar reemplazados del AST cuando armemos las tablas de símbolos
-
     public Identificador(String nombre) {
         super(Tipo.UNKNOWN, nombre);
     }

@@ -7,7 +7,7 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 
 public class Retorno extends Control {
     // TODO: Tendría que tener un atributo tipo Alcance?
-    Expresion expr;
+    private Expresion expr;
 
     public Retorno(Expresion expr) {
         super("RETURN");

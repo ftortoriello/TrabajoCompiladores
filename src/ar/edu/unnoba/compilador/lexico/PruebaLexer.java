@@ -16,7 +16,7 @@ public class PruebaLexer {
                     break;
                 System.out.println("Token: " + token);
             } catch (java.lang.Error e) {
-                System.out.println(e.getLocalizedMessage());
+                System.out.println(e);
             }
         }
         lexico.tablaDeSimbolos.stream().peek((simbolo) ->

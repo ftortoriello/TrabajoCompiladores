@@ -11,7 +11,7 @@ import java.util.List;
 public class InvocacionFuncion<A> extends Valor {
     // Pongo tipo genérico porque los argumentos pueden ser expresiones o strings
     // TODO: acomodar llamadas, si acepta genéricos tendría que pasarse el tipo
-    final List<A> argumentos;
+    private final List<A> argumentos;
 
     public InvocacionFuncion(String nombre, List<A> argumentos, Tipo tipo) {
         super(tipo, nombre);

@@ -4,7 +4,7 @@ import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
 
 public abstract class Seleccion extends Sentencia {
-    Expresion condicion;
+    private Expresion condicion;
 
     public Seleccion(String nombre, Expresion condicion) {
         super(nombre);

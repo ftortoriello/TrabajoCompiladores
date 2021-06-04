@@ -1,7 +1,5 @@
 (* Ejemplo de un programa completo dado en la consigna *)
 (* Se definen (* algunas *) variables globales *)
-variable radio is float = -1.5;
-
 function factorial(n is integer) return integer
     if n > 1 then
         return n * factorial(n - 1)
@@ -22,8 +20,7 @@ begin
         else
             writeln("Else");
 
-    ancho = 10 + 20 * 4 - 2;
-    X = (-55.5 / 5) * (3 + 4);
+    x = (-55.5 / 5) * (3 + 4);
     writeln("Dentro de función superficie_círculo()");
     # Definición de una variable local.
     if radio < 0 then
@@ -53,6 +50,7 @@ main is
 
     while local_al_then > 5 do
         begin
+            variable local_al_then is integer;
             local_al_then = local_al_then - 1;
             variable local_al_while is float = local_al_then * 1.5;
             writeln(local_al_while);

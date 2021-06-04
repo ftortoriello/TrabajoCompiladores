@@ -11,8 +11,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class DecFuncion extends Declaracion {
-    List<DecVar> args;
-    Bloque bloque;
+    private List<DecVar> args;
+    private Bloque bloque;
 
     public DecFuncion(Identificador ident, List<DecVar> args, Bloque bloque) {
         super(ident.getNombre(), ident);
@@ -59,6 +59,6 @@ public class DecFuncion extends Declaracion {
     @Override
     public String getEtiqueta() {
         return String.format("%s %s()\n<%s>", getClass().getSimpleName(),
-                getIdent().getNombre(), getIdent().getTipo());
+                getIdent().getNombre(), getTipo());
     }
 }

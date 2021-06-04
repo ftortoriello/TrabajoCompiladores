@@ -8,7 +8,7 @@ import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
 public class SiEntoncesSino extends SiEntonces {
-    Bloque bloqueSino;
+    private Bloque bloqueSino;
 
     public SiEntoncesSino(Expresion condicion, Bloque bloqueSiEntonces, Bloque bloqueSino) {
         super("Bloque\nIF-THEN-ELSE", condicion, bloqueSiEntonces);

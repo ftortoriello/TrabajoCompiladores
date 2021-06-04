@@ -8,6 +8,7 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 public class Programa extends Nodo {
     private Encabezado encabezado;
     private Bloque cuerpo;
+    private Alcance alcance;
 
     public Programa(String nombre, Encabezado encabezado, Bloque cuerpo) {
         super(nombre);
@@ -29,6 +30,14 @@ public class Programa extends Nodo {
 
     public void setCuerpo(Bloque cuerpo) {
         this.cuerpo = cuerpo;
+    }
+
+    public Alcance getAlcance() {
+        return alcance;
+    }
+
+    public void setAlcance(Alcance alcance) {
+        this.alcance = alcance;
     }
 
     @Override

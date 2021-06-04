@@ -15,6 +15,7 @@ import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Valor;
+import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Control;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
@@ -24,17 +25,17 @@ import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.*;
 
 public class ASTGraphviz extends Visitor<String> {
-    private final Deque<Integer> parents;
-    private int current_id = 0;
+    private final Deque<Integer> padres;
+    private int idNodoActual = 0;
 
     public ASTGraphviz() {
-        this.parents = new ArrayDeque<>();
+        this.padres = new ArrayDeque<>();
     }
 
     private String armarStrNodo(Integer tamanhoFuente, Integer color, String etiqueta, Integer idPadre) {
         // Función auxiliar para armar los nodos en dot
         return String.format("%1$s [label=\"%2$s\", fontsize=" + tamanhoFuente + ", fillcolor=" + color + "]\n" +
-                "%3$s -- %1$s\n", current_id, etiqueta, idPadre);
+                "%3$s -- %1$s\n", idNodoActual, etiqueta, idPadre);
     }
 
     // *** VISITAS ***
@@ -55,11 +56,11 @@ public class ASTGraphviz extends Visitor<String> {
                 "  fillcolor=red;\n" +
                 "  colorscheme=set312\n" +
                 "]\n");
-        current_id = this.getID();
+        idNodoActual = this.getID();
         resultado.append(this.procesarNodo(p));
-        parents.push(current_id);
+        padres.push(idNodoActual);
         resultado.append(super.visit(p));
-        parents.pop();
+        padres.pop();
         resultado.append("}");
         return resultado.toString();
     }
@@ -67,29 +68,29 @@ public class ASTGraphviz extends Visitor<String> {
     @Override
     public String visit(Encabezado e) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        current_id = getID();
+        idNodoActual = getID();
         resultado.append(this.procesarNodo(e));
-        parents.push(current_id);
+        padres.push(idNodoActual);
         resultado.append(super.visit(e));
-        parents.pop();
+        padres.pop();
         return resultado.toString();
     }
 
     @Override
     public String visit(Bloque b) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        current_id = this.getID();
+        idNodoActual = this.getID();
         resultado.append(this.procesarNodo(b));
-        parents.push(current_id);
+        padres.push(idNodoActual);
         resultado.append(super.visit(b));
-        parents.pop();
+        padres.pop();
         return resultado.toString();
     }
 
     @Override
     public String visit(Literal c) {
         StringBuilder resultado = new StringBuilder();
-        current_id = this.getID();
+        idNodoActual = this.getID();
         resultado.append(this.procesarNodo(c));
         return resultado.toString();
     }
@@ -97,7 +98,7 @@ public class ASTGraphviz extends Visitor<String> {
     @Override
     public String visit(Identificador i) {
         StringBuilder resultado = new StringBuilder();
-        current_id = this.getID();
+        idNodoActual = this.getID();
         resultado.append(this.procesarNodo(i));
         return resultado.toString();
     }
@@ -105,7 +106,7 @@ public class ASTGraphviz extends Visitor<String> {
     @Override
     public String visit(InvocacionFuncion invo) {
         StringBuilder resultado = new StringBuilder();
-        current_id = this.getID();
+        idNodoActual = this.getID();
         resultado.append(this.procesarNodo(invo));
         return resultado.toString();
     }
@@ -116,22 +117,22 @@ public class ASTGraphviz extends Visitor<String> {
     @Override
     public String visit(OperacionBinaria ob) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        current_id = this.getID();
+        idNodoActual = this.getID();
         resultado.append(this.procesarNodo(ob));
-        parents.push(current_id);
+        padres.push(idNodoActual);
         resultado.append(super.visit(ob));
-        parents.pop();
+        padres.pop();
         return resultado.toString();
     }
 
     @Override
     public String visit(OperacionUnaria ou) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        current_id = this.getID();
+        idNodoActual = this.getID();
         resultado.append(this.procesarNodo(ou));
-        parents.push(current_id);
+        padres.push(idNodoActual);
         resultado.append(super.visit(ou));
-        parents.pop();
+        padres.pop();
         return resultado.toString();
     }
 
@@ -140,121 +141,121 @@ public class ASTGraphviz extends Visitor<String> {
     @Override
     public String visit(Asignacion a) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        current_id = this.getID();
+        idNodoActual = this.getID();
         resultado.append(this.procesarNodo(a));
-        parents.push(current_id);
+        padres.push(idNodoActual);
         resultado.append(super.visit(a));
-        parents.pop();
+        padres.pop();
         return resultado.toString();
     }
 
     @Override
     public String visit(DecFuncion df) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        current_id = this.getID();
+        idNodoActual = this.getID();
         resultado.append(this.procesarNodo(df));
-        parents.push(current_id);
+        padres.push(idNodoActual);
         resultado.append(super.visit(df));
-        parents.pop();
+        padres.pop();
         return resultado.toString();
     }
 
     @Override
     public String visit(DecVar dv) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        current_id = this.getID();
+        idNodoActual = this.getID();
         resultado.append(this.procesarNodo(dv));
-        parents.push(current_id);
+        padres.push(idNodoActual);
         resultado.append(super.visit(dv));
-        parents.pop();
+        padres.pop();
         return resultado.toString();
     }
 
     @Override
     public String visit(DecVarInicializada dvi) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        current_id = this.getID();
+        idNodoActual = this.getID();
         resultado.append(this.procesarNodo(dvi));
-        parents.push(current_id);
+        padres.push(idNodoActual);
         resultado.append(super.visit(dvi));
-        parents.pop();
+        padres.pop();
         return resultado.toString();
     }
 
     @Override
     public String visit(SiEntonces se) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        current_id = this.getID();
+        idNodoActual = this.getID();
         resultado.append(this.procesarNodo(se));
-        parents.push(current_id);
+        padres.push(idNodoActual);
         resultado.append(super.visit(se));
-        parents.pop();
+        padres.pop();
         return resultado.toString();
     }
 
     @Override
     public String visit(SiEntoncesSino ses) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        current_id = this.getID();
+        idNodoActual = this.getID();
         resultado.append(this.procesarNodo(ses));
-        parents.push(current_id);
+        padres.push(idNodoActual);
         resultado.append(super.visit(ses));
-        parents.pop();
+        padres.pop();
         return resultado.toString();
     }
 
     @Override
     public String visit(Cuando c) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        current_id = this.getID();
+        idNodoActual = this.getID();
         resultado.append(this.procesarNodo(c));
-        parents.push(current_id);
+        padres.push(idNodoActual);
         resultado.append(super.visit(c));
-        parents.pop();
+        padres.pop();
         return resultado.toString();
     }
 
     @Override
     public String visit(CasoCuando cc) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        current_id = this.getID();
+        idNodoActual = this.getID();
         resultado.append(this.procesarNodo(cc));
-        parents.push(current_id);
+        padres.push(idNodoActual);
         resultado.append(super.visit(cc));
-        parents.pop();
+        padres.pop();
         return resultado.toString();
     }
 
     @Override
     public String visit(Mientras m) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        current_id = this.getID();
+        idNodoActual = this.getID();
         resultado.append(this.procesarNodo(m));
-        parents.push(current_id);
+        padres.push(idNodoActual);
         resultado.append(super.visit(m));
-        parents.pop();
+        padres.pop();
         return resultado.toString();
     }
 
     @Override
     public String visit(Para p) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        current_id = this.getID();
+        idNodoActual = this.getID();
         resultado.append(this.procesarNodo(p));
-        parents.push(current_id);
+        padres.push(idNodoActual);
         resultado.append(super.visit(p));
-        parents.pop();
+        padres.pop();
         return resultado.toString();
     }
 
     @Override
     public String visit(Retorno r) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        current_id = this.getID();
+        idNodoActual = this.getID();
         resultado.append(this.procesarNodo(r));
-        parents.push(current_id);
+        padres.push(idNodoActual);
         resultado.append(super.visit(r));
-        parents.pop();
+        padres.pop();
         return resultado.toString();
     }
 
@@ -267,11 +268,11 @@ public class ASTGraphviz extends Visitor<String> {
     protected String procesarNodo(Nodo n) {
         // Define el nodo n en el archivo .dot, y lo conecta a su padre si lo tiene
 
-        Integer idPadre = parents.peekFirst();
+        Integer idPadre = padres.peekFirst();
 
         if (idPadre == null) {
             return String.format("%1$s [label=\"%2$s\", fontsize=48, fillcolor=10, penwidth=5]\n",
-                    current_id, n.getEtiqueta());
+                    idNodoActual, n.getEtiqueta());
         } else if (n instanceof Encabezado) {
             return armarStrNodo(42, 11, n.getEtiqueta(), idPadre);
         } else if (n instanceof Bloque) {
@@ -305,14 +306,14 @@ public class ASTGraphviz extends Visitor<String> {
     }
 
     @Override
-    protected String procesarBloque(Bloque b, List<String> sentencias) {
+    protected String procesarEncabezado(Encabezado e, List<String> sentencias) {
         StringBuilder resultado = new StringBuilder();
         sentencias.forEach(resultado::append);
         return resultado.toString();
     }
 
     @Override
-    protected String procesarEncabezado(Encabezado e, List<String> sentencias) {
+    protected String procesarBloque(Bloque b, List<String> sentencias) {
         StringBuilder resultado = new StringBuilder();
         sentencias.forEach(resultado::append);
         return resultado.toString();

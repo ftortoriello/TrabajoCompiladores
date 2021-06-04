@@ -11,8 +11,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class Cuando extends Seleccion {
-    List<CasoCuando> bloqueCuando;
-    Bloque bloqueElse;
+    private List<CasoCuando> bloqueCuando;
+    private Bloque bloqueElse;
 
     public Cuando(Expresion expr, List<CasoCuando> bloqueCuando) {
         super("Bloque\nWHEN", expr);

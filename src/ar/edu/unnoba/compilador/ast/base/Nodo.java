@@ -32,4 +32,13 @@ public abstract class Nodo {
     public abstract <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance;
 
     public abstract Nodo accept(Transformer t) throws ExcepcionDeTipos;
+
+    @Override
+    public String toString() {
+        if (nombre == null) {
+            return super.toString();
+        } else {
+            return nombre;
+        }
+    }
 }

@@ -16,7 +16,8 @@ import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.EnteroAFlotante;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.FlotanteAEntero;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Variable;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Simbolo;
+import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Control;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
@@ -67,8 +68,8 @@ public abstract class Transformer {
         return i;
     }
 
-    public Variable transform(Variable v) throws ExcepcionDeTipos {
-        return v;
+    public Simbolo transform(Simbolo s) throws ExcepcionDeTipos {
+        return s;
     }
 
     public InvocacionFuncion transform(InvocacionFuncion invo) throws ExcepcionDeTipos {
