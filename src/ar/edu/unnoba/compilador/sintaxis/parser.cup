@@ -611,7 +611,8 @@ invocacion_funcion ::=
             RESULT = invo;
         :} |
         IDENTIFICADOR:nombre_fun PAR_ABRE:pa lista_exprs:args PAR_CIERRA:pc {:
-            InvocacionFuncion invo = new InvocacionFuncion(nombre_fun, args, Tipo.UNKNOWN);
+            Boolean esPredefinida = false;
+            InvocacionFuncion invo = new InvocacionFuncion(nombre_fun, args, Tipo.UNKNOWN, esPredefinida);
             imprimirEtiqueta(invo);
             RESULT = invo;
         :};

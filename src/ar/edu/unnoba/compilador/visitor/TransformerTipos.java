@@ -122,26 +122,11 @@ public class TransformerTipos extends Transformer {
         // O que en el parser ponga un parámetro esPrededifinida, y si es así la ignore acá...
 
         // No buscar en el alcance las funciones predefinidas
-        switch (i.getNombre().toUpperCase()) {
-            case "WRITE":
-            case "WRITELN":
-                break;
+        if (!i.getEsPredefinida())
+            if (!cambiarTipo(i)) {
+                throw new ExcepcionDeTipos(String.format("No se definió la función %s", i.getNombre()));
+            }
 
-            // Establecer tipo de las funciones "read"
-            case "READ_INTEGER":
-                i.setTipo(Tipo.INTEGER);
-                break;
-            case "READ_FLOAT":
-                i.setTipo(Tipo.FLOAT);
-                break;
-            case "READ_BOOLEAN":
-                i.setTipo(Tipo.BOOLEAN);
-                break;
-            default:
-                if (!cambiarTipo(i)) {
-                    throw new ExcepcionDeTipos(String.format("No se definió la función %s", i.getNombre()));
-                }
-        }
         return super.transform(i);
     }
 

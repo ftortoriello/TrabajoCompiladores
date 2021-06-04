@@ -13,6 +13,13 @@ public class InvocacionFuncion<A> extends Valor {
     // Pongo tipo genérico porque los argumentos pueden ser expresiones o strings
     // TODO: acomodar llamadas, si acepta genéricos tendría que pasarse el tipo
     private final List<A> argumentos;
+    private Boolean esPredefinida = true;
+
+    public InvocacionFuncion(String nombre, List<A> argumentos, Tipo tipo, Boolean esPredefinida) {
+        super(tipo, nombre);
+        this.argumentos = argumentos;
+        this.esPredefinida = esPredefinida;
+    }
 
     public InvocacionFuncion(String nombre, List<A> argumentos, Tipo tipo) {
         super(tipo, nombre);
@@ -22,6 +29,14 @@ public class InvocacionFuncion<A> extends Valor {
     public InvocacionFuncion(String nombre, Tipo tipo) {
         super(tipo, nombre);
         this.argumentos = new ArrayList<>();
+    }
+
+    public List<A> getArgumentos() {
+        return argumentos;
+    }
+
+    public Boolean getEsPredefinida() {
+        return esPredefinida;
     }
 
     @Override
@@ -38,4 +53,6 @@ public class InvocacionFuncion<A> extends Valor {
     public InvocacionFuncion accept(Transformer t) throws ExcepcionDeTipos {
         return t.transform(this);
     }
+
+
 }

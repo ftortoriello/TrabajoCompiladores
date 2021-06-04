@@ -11,6 +11,8 @@ variable superficie₁ is float = 0;
 { Una función }
 function superficie_círculo(x is float, radio is float = 1) return float
 begin
+    x = read_integer();
+    x = factorial(5);
     # TODO: Esto tendría que fallar, mostrar está declarado más abajo
     if mostrar == true then
         if x > 1 then
