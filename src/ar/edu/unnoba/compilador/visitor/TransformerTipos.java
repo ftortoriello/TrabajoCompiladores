@@ -2,9 +2,7 @@ package ar.edu.unnoba.compilador.visitor;
 
 import ar.edu.unnoba.compilador.ast.base.Alcance;
 import ar.edu.unnoba.compilador.ast.base.Bloque;
-import ar.edu.unnoba.compilador.ast.base.Nodo;
 import ar.edu.unnoba.compilador.ast.base.Programa;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
@@ -18,6 +16,7 @@ import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Simbolo;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Valor;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFuncion;
 
 import java.util.Locale;
 
@@ -97,6 +96,14 @@ public class TransformerTipos extends Transformer {
         p = super.transform(p);
         alcanceActual = null;
         return p;
+    }
+
+    @Override
+    public DecFuncion transform(DecFuncion df) throws ExcepcionDeTipos {
+        alcanceActual = df.getAlcance();
+        df = super.transform(df);
+        alcanceActual = alcanceActual.getPadre();
+        return df;
     }
 
     @Override

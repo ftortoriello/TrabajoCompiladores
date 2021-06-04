@@ -62,26 +62,14 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
     public Void visit(Bloque b) throws ExcepcionDeAlcance {
         // Establecer el alcance de cada bloque.
         // Crearlo como hijo del alcance actual
-
-        // Hacemos esto por las funciones.
-        // Ponemos el alcance del cuerpo en DecFuncion, para que queden los parámetros en el mismo
-        // alcance que el cuerpo.
-        Alcance alcanceBloque = b.getAlcance();
-        if (alcanceBloque == null) {
-            alcanceActual = new Alcance(String.format("%d-%s", getID(), b.getNombre()), alcanceActual);
-            b.setAlcance(alcanceActual);
-        } else {
-            alcanceActual = alcanceBloque;
-        }
-
+        alcanceActual = new Alcance(String.format("%d-%s", getID(), b.getNombre()), alcanceActual);
+        b.setAlcance(alcanceActual);
         super.visit(b);
 
         // Ya se recorrió el subárbol, subir el nivel de alcance actual
         // (sino no se podrían definir símbolos con el mismo nombre en dos funciones distintas
         // por ejemplo)
-        if (alcanceBloque == null) {
-            alcanceActual = alcanceActual.getPadre();
-        }
+        alcanceActual = alcanceActual.getPadre();
         return null;
     }
 
@@ -89,7 +77,7 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
     public Void visit(DecFuncion df) throws ExcepcionDeAlcance {
         // Generar un alcance nuevo para los parámetros
         alcanceActual = new Alcance(String.format("%d-%s", getID(), df.getNombre()), alcanceActual);
-        df.getBloque().setAlcance(alcanceActual);
+        df.setAlcance(alcanceActual);
         super.visit(df);
         alcanceActual = alcanceActual.getPadre();
         return null;

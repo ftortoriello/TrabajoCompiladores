@@ -1,5 +1,6 @@
 package ar.edu.unnoba.compilador.ast.sentencias.declaracion;
 
+import ar.edu.unnoba.compilador.ast.base.Alcance;
 import ar.edu.unnoba.compilador.ast.base.Bloque;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
@@ -13,6 +14,7 @@ import java.util.List;
 public class DecFuncion extends Declaracion {
     private List<DecVar> args;
     private Bloque bloque;
+    private Alcance alcance;
 
     public DecFuncion(Identificador ident, List<DecVar> args, Bloque bloque) {
         super(ident.getNombre(), ident);
@@ -44,6 +46,14 @@ public class DecFuncion extends Declaracion {
 
     public void setBloque(Bloque bloque) {
         this.bloque = bloque;
+    }
+
+    public Alcance getAlcance() {
+        return alcance;
+    }
+
+    public void setAlcance(Alcance alcance) {
+        this.alcance = alcance;
     }
 
     @Override

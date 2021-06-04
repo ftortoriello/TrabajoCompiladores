@@ -50,6 +50,7 @@ variable superficie₂ is float;
 
 # Procedimiento principal
 main is
+    variable radio is float;
     if i > 5 and i < 10 or not i / 2 == 0 then
         writeln("???");
 
@@ -79,7 +80,6 @@ main is
     end;
 
     writeln("Se acabó\n\nFin!");
-
 end.
 
 {
