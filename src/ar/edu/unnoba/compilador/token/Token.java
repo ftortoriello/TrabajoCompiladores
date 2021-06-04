@@ -30,11 +30,17 @@ public class Token extends java_cup.runtime.Symbol {
         this.columna = columna;
     }
 
+    public String getPosicion() {
+        if (linea > -1 && columna > -1)
+            return String.format("(L:%d, C:%d)", linea + 1, columna + 1);
+        else
+            return null;
+    }
+
     @Override
     public String toString() {
-        String posicion = "";
-        if (this.linea != -1 && this.columna != -1)
-            posicion = " @ (L:" + this.linea + ", C:" + this.columna + ")";
+        String posicion = getPosicion();
+        posicion = (posicion == null ? "" : " @ " + posicion);
         if (valor == null)
             return "[" + this.nombre + "]" + posicion;
         else

@@ -51,7 +51,7 @@ public class GenerarAST {
             System.out.println("Tipos validados");
 
             // Mostrar el árbol transformado
-            graficarArbol(new ASTGraphviz().visit(programa),"arbol-convertido");
+            graficarArbol(new ASTGraphviz().visit(programa),"arbol-transformado");
         } catch (ClassCastException e) {
             // Error sintáctico
         } catch (Exception e) {

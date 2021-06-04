@@ -3,7 +3,6 @@ package ar.edu.unnoba.compilador.lexico;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Stack;
-import java_cup.sym;
 
 import ar.edu.unnoba.compilador.token.Token;
 
@@ -16,9 +15,9 @@ import ar.edu.unnoba.compilador.token.Token;
 /* nombre de la clase generada */
 %class Lexer
 /* nombre de la clase para representar tokens (objetos retornados por yylex) */
-//%type Token
+%type Token
 /* finalizar la lectura cuando se encuentra EOF */
-//%eofclose
+%eofclose
 /* soportar entradas con caracteres Unicode */
 %unicode
 /* permitir conocer el número de línea que se está analizando mediante this.yyline */
@@ -27,7 +26,7 @@ import ar.edu.unnoba.compilador.token.Token;
 %column
 /* ídem con el número de carácter */
 /* %char */
-/* utilizar CUP */
+/* hacer la clase generada compatible con CUP */
 %cup
 
 %{
@@ -195,5 +194,7 @@ ComentarioUnaLinea = #.*{FinDeLinea}?
     /* permitir lo demás, excepto \ que no estén seguidas por lo definido arriba */
     [^\\]               { stringBuffer.append( yytext() ); }
 }
+
+<<EOF>> { return null; }
 
 [^]                     { errorLexico("Entrada no permitida: (" + yytext() + ")"); }
