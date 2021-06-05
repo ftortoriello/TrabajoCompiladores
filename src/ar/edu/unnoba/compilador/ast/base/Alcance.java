@@ -2,9 +2,9 @@ package ar.edu.unnoba.compilador.ast.base;
 
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Simbolo;
 
-import java.util.HashMap;
+import java.util.TreeMap;
 
-public class Alcance extends HashMap<String, Simbolo> {
+public class Alcance extends TreeMap<String, Simbolo> {
     // El "nombre" del alcance puede ser "global", el nombre de la función en la que está incluido, etc...
     private String nombre;
     // Necesitamos el padre porque si una variable no está definida en este ámbito le preguntamos a él

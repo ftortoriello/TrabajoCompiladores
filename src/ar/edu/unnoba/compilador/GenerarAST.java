@@ -43,20 +43,19 @@ public class GenerarAST {
             graficarArbol(graficador.visit(programa),"ast-original");
 
             System.out.println("Iniciando generador de alcances globales...");
-            GeneradorDeAlcanceGlobal gag = new GeneradorDeAlcanceGlobal();
-            gag.visit(programa);
+            new GeneradorDeAlcanceGlobal().visit(programa);
 
             System.out.println("Iniciando generador de alcances locales...");
-            GeneradorDeAlcancesLocales gal = new GeneradorDeAlcancesLocales();
-            gal.visit(programa);
+            new GeneradorDeAlcancesLocales().visit(programa);
+
+            System.out.println("Reemplazando identificadores por símbolos...");
+            new GeneradorDeAlcancesLocales().visit(programa);
 
             System.out.println("Iniciando validador de sentencias de control...");
-            VisitorControl vc = new VisitorControl();
-            vc.visit(programa);
+            new VisitorControl().visit(programa);
 
             System.out.println("Iniciando validación y conversión de tipos...");
-            TransformerTipos tt = new TransformerTipos();
-            tt.transform(programa);
+            new TransformerTipos().transform(programa);
 
             // Mostrar el árbol transformado
             graficador = new ASTGraphviz("AST con conversión de tipos (Conti - Tortoriello)");

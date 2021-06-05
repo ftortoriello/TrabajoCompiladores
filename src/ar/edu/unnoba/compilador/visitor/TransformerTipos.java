@@ -24,7 +24,6 @@ import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
 
 /* Transformer que asigna tipos a los identificadores y valida la
  * compatibilidad de tipos, haciendo conversiones implícitas si es necesario.
- * TODO: Reemplazar Identificador por Simbolo
  */
 public class TransformerTipos extends Transformer {
     private Alcance alcanceActual;
