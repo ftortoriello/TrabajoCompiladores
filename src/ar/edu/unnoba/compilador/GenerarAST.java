@@ -18,7 +18,7 @@ public class GenerarAST {
         Runtime.getRuntime().exec(
                 String.format("dot -T%2$s %1$s.dot -o %1$s.%2$s",
                         nombreArchivo, formatoImg));
-        System.out.println("Se graficó el AST «" + nombreArchivo + "».");
+        System.out.println("\nSe graficó el AST «" + nombreArchivo + "».");
     }
 
     public static void main(String[] args) {
@@ -42,21 +42,21 @@ public class GenerarAST {
             graficador = new ASTGraphviz("Árbol de sintaxis abstracta (Conti - Tortoriello)");
             graficarArbol(graficador.procesar(programa),"ast-original");
 
-            System.out.println("Iniciando generador de alcances globales...");
+            System.out.println("\nIniciando generador de alcances globales...");
             new GeneradorDeAlcanceGlobal().procesar(programa);
 
-            System.out.println("Iniciando generador de alcances locales...");
+            System.out.println("\nIniciando generador de alcances locales...");
             new GeneradorDeAlcancesLocales().procesar(programa);
 
             // TODO System.out.println("Reemplazando identificadores por símbolos...");
 
-            System.out.println("Iniciando validador de sentencias de control...");
+            System.out.println("\nIniciando validador de sentencias de control...");
             new VisitorControl().procesar(programa);
 
-            System.out.println("Reescribiendo estructuras de control...");
+            System.out.println("\nReescribiendo estructuras de control...");
             new ConversorDeEstructuras().procesar(programa);
 
-            System.out.println("Iniciando validación y conversión de tipos...");
+            System.out.println("\nIniciando validación y conversión de tipos...");
             new TransformerTipos().procesar(programa);
 
             // Mostrar el árbol transformado
