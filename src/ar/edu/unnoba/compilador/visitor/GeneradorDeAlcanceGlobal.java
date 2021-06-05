@@ -16,7 +16,6 @@ import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 
-// TODO hacer visitor para break y continue
 /* Visitor para generar el alcance global y construir la tabla de símbolos
  * globales.
  */

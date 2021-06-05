@@ -19,8 +19,6 @@ import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFuncion;
 
-import java.util.Locale;
-
 /* Transformer que asigna tipos a los identificadores y valida la
  * compatibilidad de tipos, haciendo conversiones implícitas si es necesario.
  * TODO: Reemplazar Identificador por Simbolo
@@ -184,8 +182,9 @@ public class TransformerTipos extends Transformer {
         // Y compararla con el de la función a la que pertenece
         DecFuncion ultFunVisitada = getUltFunVisitada();
         if (ultFunVisitada == null) {
-            // FIXME: mover a otro visitor
-            throw new ExcepcionDeTipos("Se encontró «return» fuera de una función");
+            // No tendría que suceder si se ejecutó el Visitor de sentencias de
+            // control
+            return null;
         }
         Expresion e = r.getExpr();
         Tipo tipoDeLaFuncion = ultFunVisitada.getTipo();

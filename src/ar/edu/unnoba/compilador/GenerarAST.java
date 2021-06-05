@@ -3,10 +3,7 @@ package ar.edu.unnoba.compilador;
 import ar.edu.unnoba.compilador.ast.base.Programa;
 import ar.edu.unnoba.compilador.lexico.Lexer;
 import ar.edu.unnoba.compilador.sintaxis.Parser;
-import ar.edu.unnoba.compilador.visitor.ASTGraphviz;
-import ar.edu.unnoba.compilador.visitor.GeneradorDeAlcanceGlobal;
-import ar.edu.unnoba.compilador.visitor.GeneradorDeAlcancesLocales;
-import ar.edu.unnoba.compilador.visitor.TransformerTipos;
+import ar.edu.unnoba.compilador.visitor.*;
 
 import java.io.*;
 
@@ -52,6 +49,10 @@ public class GenerarAST {
             System.out.println("Iniciando generador de alcances locales...");
             GeneradorDeAlcancesLocales gal = new GeneradorDeAlcancesLocales();
             gal.visit(programa);
+
+            System.out.println("Iniciando validador de sentencias de control...");
+            VisitorControl vc = new VisitorControl();
+            vc.visit(programa);
 
             System.out.println("Iniciando validación y conversión de tipos...");
             TransformerTipos tt = new TransformerTipos();

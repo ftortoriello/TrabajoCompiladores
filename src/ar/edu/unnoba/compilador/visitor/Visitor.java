@@ -13,8 +13,9 @@ import ar.edu.unnoba.compilador.ast.expresiones.binarias.*;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.*;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Simbolo;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
-import ar.edu.unnoba.compilador.ast.sentencias.control.Control;
+import ar.edu.unnoba.compilador.ast.sentencias.control.Continuar;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
+import ar.edu.unnoba.compilador.ast.sentencias.control.Salir;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
@@ -26,9 +27,30 @@ import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
 public abstract class Visitor<T> {
     private int id = 0;
 
+    // Flags para comprobar si el Visitor se encuentra en una función o
+    // estructura de control
+    private boolean enFuncion;
+    private boolean enBucle;
+
     protected int getID() {
         id += 1;
         return id;
+    }
+
+    protected boolean isEnFuncion() {
+        return enFuncion;
+    }
+
+    protected void setEnFuncion(boolean enFuncion) {
+        this.enFuncion = enFuncion;
+    }
+
+    protected boolean isEnBucle() {
+        return enBucle;
+    }
+
+    protected void setEnBucle(boolean enBucle) {
+        this.enBucle = enBucle;
     }
 
 
@@ -115,11 +137,15 @@ public abstract class Visitor<T> {
     }
 
     public T visit(DecFuncion df) throws ExcepcionDeAlcance {
+        setEnFuncion(true);
+
         List<T> args = new ArrayList<>();
         for (DecVar arg : df.getArgs()) {
             args.add(arg.accept(this));
         }
         T cuerpo = df.getBloque().accept(this);
+
+        setEnFuncion(false);
         return procesarDecFuncion(args, cuerpo);
     }
 
@@ -150,21 +176,30 @@ public abstract class Visitor<T> {
     }
 
     public T visit(Mientras m) throws ExcepcionDeAlcance {
+        setEnBucle(true);
         T expr = m.getCondicion().accept(this);
         T blq = m.getBloqueSentencias().accept(this);
+        setEnBucle(false);
         return procesarMientras(m, expr, blq);
     }
 
     public T visit(Para p) throws ExcepcionDeAlcance {
-        return p.getBloqueSentencias().accept(this);
-    }
-
-    public T visit(Control c) {
-        return procesarNodo(c);
+        setEnBucle(true);
+        T blq = p.getBloqueSentencias().accept(this);
+        setEnBucle(false);
+        return blq;
     }
 
     public T visit(Retorno r) throws ExcepcionDeAlcance {
         return procesarRetorno(r, r.getExpr().accept(this));
+    }
+
+    public T visit(Salir s) throws ExcepcionDeAlcance {
+        return procesarNodo(s);
+    }
+
+    public T visit(Continuar c) throws ExcepcionDeAlcance {
+        return procesarNodo(c);
     }
 
 

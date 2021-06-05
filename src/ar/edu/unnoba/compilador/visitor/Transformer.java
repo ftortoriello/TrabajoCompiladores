@@ -19,8 +19,9 @@ import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.EnteroAFlot
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.FlotanteAEntero;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Simbolo;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
-import ar.edu.unnoba.compilador.ast.sentencias.control.Control;
+import ar.edu.unnoba.compilador.ast.sentencias.control.Continuar;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
+import ar.edu.unnoba.compilador.ast.sentencias.control.Salir;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
@@ -30,16 +31,15 @@ import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntonces;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
 
 public abstract class Transformer {
-
     // Guardamos la última función visitada para validar el tipo de retorno,
     // y convertir el tipo de la expresión return en caso de ser necesario
     private DecFuncion ultFunVisitada;
 
-    public DecFuncion getUltFunVisitada() {
+    protected DecFuncion getUltFunVisitada() {
         return ultFunVisitada;
     }
 
-    public void setUltFunVisitada(DecFuncion ultFunVisitada) {
+    protected void setUltFunVisitada(DecFuncion ultFunVisitada) {
         this.ultFunVisitada = ultFunVisitada;
     }
 
@@ -195,12 +195,16 @@ public abstract class Transformer {
         return p;
     }
 
-    public Control transform(Control c) throws ExcepcionDeTipos {
-        return c;
-    }
-
     public Retorno transform(Retorno r) throws ExcepcionDeTipos {
         r.setExpr((Expresion) r.getExpr().accept(this));
         return r;
+    }
+
+    public Salir transform(Salir s) throws ExcepcionDeTipos {
+        return s;
+    }
+
+    public Continuar transform(Continuar c) throws ExcepcionDeTipos {
+        return c;
     }
 }

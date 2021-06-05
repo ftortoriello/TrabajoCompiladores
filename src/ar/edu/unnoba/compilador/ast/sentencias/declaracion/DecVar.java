@@ -1,7 +1,6 @@
 package ar.edu.unnoba.compilador.ast.sentencias.declaracion;
 
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
-import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.visitor.Transformer;
