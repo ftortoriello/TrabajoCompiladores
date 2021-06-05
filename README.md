@@ -58,7 +58,7 @@ Requisitos:
 * Opcional: Conversiones implícitas de tipo: :white_check_mark:
 * Verificación de ámbito de las variables y funciones: :white_check_mark:
 
-* Admitir variables globales definidas después de la definición de una función: :white_check_mark:
+* Constant folding: :x:
 
 ### Revisar
 
