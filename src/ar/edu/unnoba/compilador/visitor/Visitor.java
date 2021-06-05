@@ -11,7 +11,6 @@ import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.*;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.*;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Simbolo;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Continuar;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
@@ -88,7 +87,7 @@ public abstract class Visitor<T> {
         return procesarCasoCuando(cc, expr, blq);
     }
 
-    public T visit(Literal c) throws ExcepcionDeAlcance {
+    public T visit(Literal c) {
         return procesarNodo(c);
     }
 
@@ -97,15 +96,10 @@ public abstract class Visitor<T> {
     }
 
     public T visit(InvocacionFuncion invo) throws ExcepcionDeAlcance {
-        List<T> argumentos = new ArrayList<>();
         for (Expresion argumento : invo.getArgumentos()) {
-            argumentos.add(argumento.accept(this));
+            argumento.accept(this);
         }
         return procesarNodo(invo);
-    }
-
-    public <T> T visit(Simbolo s) {
-        throw new UnsupportedOperationException("Operación no soportada.");
     }
 
 

@@ -4,6 +4,7 @@ import ar.edu.unnoba.compilador.ast.base.Alcance;
 import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
 
 public abstract class Control extends Sentencia {
+    // TODO: Revisar, ¿es necesario guardar el alcance acá?
     private Alcance alcance;
 
     public Control(String nombre) {

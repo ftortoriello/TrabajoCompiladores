@@ -48,8 +48,6 @@ public class GenerarAST {
             System.out.println("\nIniciando generador de alcances locales...");
             new GeneradorDeAlcancesLocales().procesar(programa);
 
-            // TODO System.out.println("Reemplazando identificadores por símbolos...");
-
             System.out.println("\nIniciando validador de sentencias de control...");
             new VisitorControl().procesar(programa);
 
@@ -64,10 +62,10 @@ public class GenerarAST {
             graficarArbol(graficador.visit(programa),"ast-transformado");
         } catch (ClassCastException e) {
             // Error sintáctico
-            //e.printStackTrace(System.out);
+            e.printStackTrace(System.out);
         } catch (Exception e) {
             //e.printStackTrace(System.out);
-            System.out.println(String.format("%s: %s", e.getClass().getSimpleName(), e.getLocalizedMessage()));
+            System.out.printf("%s: %s%n", e.getClass().getSimpleName(), e.getLocalizedMessage());
         }
     }
 }

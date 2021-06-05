@@ -24,6 +24,8 @@ import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
 
 /* Transformer que asigna tipos a los identificadores y valida la
  * compatibilidad de tipos, haciendo conversiones implícitas si es necesario.
+ * También reemplaza los identificadores que encuentra por los símbolos que se
+ * encuentran en la tabla de símbolos.
  */
 public class TransformerTipos extends Transformer {
     private Alcance alcanceActual;
@@ -61,7 +63,7 @@ public class TransformerTipos extends Transformer {
                 String.format("No existe un tipo común entre %s y %s", tipoOrigen, tipoDestino));
     }
 
-    // Retorna el símbolo, si está en el alcance actual y se pudo cambiar el tipo
+    // Retorna el símbolo si está en el alcance actual y se pudo cambiar el tipo
     private Simbolo cambiarTipo(Valor v) {
         Simbolo s = alcanceActual.resolver(v.getNombre());
         if (s == null) {
@@ -77,7 +79,7 @@ public class TransformerTipos extends Transformer {
     }
 
     // Retorna el tipo en común
-    private Tipo transformOperacionBinaria(OperacionBinaria ob) throws ExcepcionDeTipos {
+    private static Tipo transformOperacionBinaria(OperacionBinaria ob) throws ExcepcionDeTipos {
         Expresion expIzquierda = ob.getIzquierda();
         Expresion expDerecha = ob.getDerecha();
 
@@ -127,20 +129,26 @@ public class TransformerTipos extends Transformer {
     @Override
     public Identificador transform(Identificador i) throws ExcepcionDeTipos {
         i = super.transform(i);
-        if (cambiarTipo(i) == null) {
+        Simbolo s = cambiarTipo(i);
+        if (s == null) {
             throw new ExcepcionDeTipos(String.format("No se pudo asignar un tipo a la variable «%s»", i.getNombre()));
         }
-        return i;
+        // Reemplazar cada Identificador por el Simbolo correspondiente
+        return s;
     }
 
     @Override
     public InvocacionFuncion transform(InvocacionFuncion i) throws ExcepcionDeTipos {
         i = super.transform(i);
-        // TODO: validar posición, tipo y cantidad de parámetros
         // No buscar en el alcance las funciones predefinidas
-        if (!i.getEsPredefinida() && (cambiarTipo(i) == null)) {
+        if (i.getEsPredefinida()) {
+            return i;
+        }
+        Simbolo s = cambiarTipo(i);
+        if (s == null) {
             throw new ExcepcionDeTipos(String.format("No se pudo asignar un tipo a la función «%s»", i.getNombre()));
         }
+        // TODO: validar posición, tipo y cantidad de parámetros
         return i;
     }
 
@@ -211,7 +219,7 @@ public class TransformerTipos extends Transformer {
     @Override
     public Para transform(Para p) throws ExcepcionDeTipos {
         p = super.transform(p);
-        p.setIdent((Identificador) convertirATipo((Expresion) p.getIdent(), Tipo.INTEGER));
+        p.setIdent((Identificador) convertirATipo(p.getIdent(), Tipo.INTEGER));
         return p;
     }
 }

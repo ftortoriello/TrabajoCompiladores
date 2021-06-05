@@ -27,13 +27,15 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
     private Alcance alcanceActual;
 
     // Agregar la declaración al ámbito en el que se encuentra
-    private void agregarSimbolo(Simbolo s) throws ExcepcionDeAlcance {
+    private void agregarSimbolo(Declaracion d) throws ExcepcionDeAlcance {
         if (alcanceGlobal == alcanceActual) {
             // Este Visitor sólo agrega símbolos locales, los globales ya los agregó el visitor
             // de alcance global
             return;
         }
-        String nombre = s.getNombre();
+
+        Identificador id = d.getIdent();
+        String nombre = id.getNombre();
 
         // En este lenguaje no se pueden sobreescribir símbolos.
         // Dar error si ya existía un símbolo con este nombre en este ámbito o
@@ -42,10 +44,10 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
         if (simboloExistente != null) {
             throw new ExcepcionDeAlcance(
                     String.format("La variable local «%s» de tipo %s ya fue declarada previamente con tipo %s.",
-                            nombre, s.getTipo(),
+                            nombre, id.getTipo(),
                             simboloExistente.getTipo()));
         }
-        alcanceActual.put(nombre, s);
+        alcanceActual.put(nombre, new Simbolo(d));
     }
 
     private boolean estaEnElAlcance(Valor v) {
@@ -90,13 +92,13 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
 
     @Override
     public Void visit(DecVar dv) throws ExcepcionDeAlcance {
-        agregarSimbolo(new Simbolo(dv));
+        agregarSimbolo(dv);
         return super.visit(dv);
     }
 
     @Override
     public Void visit(DecVarInicializada dvi) throws ExcepcionDeAlcance {
-        agregarSimbolo(new Simbolo(dvi));
+        agregarSimbolo(dvi);
         return super.visit(dvi);
     }
 
@@ -128,7 +130,7 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
     }
 
     @Override
-    protected Void procesarEncabezado(Encabezado e, List<Void> sentencias) {
+    protected Void procesarEncabezado(Encabezado e, List<Void> declaraciones) {
         return null;
     }
 

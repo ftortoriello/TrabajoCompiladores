@@ -55,7 +55,7 @@ public class VisitorControl extends Visitor<Void> {
     }
 
     @Override
-    protected Void procesarEncabezado(Encabezado e, List<Void> sentencias) {
+    protected Void procesarEncabezado(Encabezado e, List<Void> declaraciones) {
         return null;
     }
 

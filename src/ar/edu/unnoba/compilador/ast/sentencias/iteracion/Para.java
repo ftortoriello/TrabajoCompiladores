@@ -19,12 +19,12 @@ public class Para extends Sentencia {
     private Bloque bloqueSentencias;
     private final int salto;
 
-    public Para(String nombre, Identificador ident, int valorInicial, int valorFinal, int salto, Bloque bloqueSentencias) {
-        super("Bloque\nFOR");
+    public Para(Identificador ident, int valorInicial, int valorFinal, int salto, Bloque bloqueSentencias) {
+        super("Bloque FOR");
         this.ident = ident;
         this.valorInicial = valorInicial;
         this.valorFinal = valorFinal;
-        // FIXME: Esto debería hacerlo el transformer
+        // FIXME: Esto debería hacerlo el transformer?
         if (valorInicial <= valorFinal) {
             this.salto = Math.abs(salto);
         } else {

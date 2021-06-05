@@ -17,7 +17,6 @@ import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.EnteroAFlotante;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.FlotanteAEntero;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Simbolo;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Continuar;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
@@ -75,21 +74,17 @@ public abstract class Transformer {
     }
 
     public CasoCuando transform(CasoCuando cc) throws ExcepcionDeTipos {
-        cc.setExpr((Expresion) cc.getExpr().accept(this));
+        cc.setExpr(cc.getExpr().accept(this));
         cc.setBloque(cc.getBloque().accept(this));
         return cc;
     }
 
-    public Literal transform(Literal c) throws ExcepcionDeTipos {
+    public Literal transform(Literal c) {
         return c;
     }
 
     public Identificador transform(Identificador i) throws ExcepcionDeTipos {
         return i;
-    }
-
-    public Simbolo transform(Simbolo s) throws ExcepcionDeTipos {
-        return s;
     }
 
     public InvocacionFuncion transform(InvocacionFuncion invo) throws ExcepcionDeTipos {
@@ -105,29 +100,29 @@ public abstract class Transformer {
     // Transforms de operaciones
 
     public FlotanteAEntero transform(FlotanteAEntero fae) throws ExcepcionDeTipos {
-        fae.setExpresion((Expresion) fae.getExpresion().accept(this));
+        fae.setExpresion(fae.getExpresion().accept(this));
         return fae;
     }
 
     public EnteroAFlotante transform(EnteroAFlotante eaf) throws ExcepcionDeTipos {
-        eaf.setExpresion((Expresion) eaf.getExpresion().accept(this));
+        eaf.setExpresion(eaf.getExpresion().accept(this));
         return eaf;
     }
 
     public OperacionBinaria transform(OperacionBinaria ob) throws ExcepcionDeTipos {
-        ob.setIzquierda((Expresion) ob.getIzquierda().accept(this));
-        ob.setDerecha((Expresion) ob.getDerecha().accept(this));
+        ob.setIzquierda(ob.getIzquierda().accept(this));
+        ob.setDerecha(ob.getDerecha().accept(this));
         return ob;
     }
 
     public Relacion transform(Relacion r) throws ExcepcionDeTipos {
-        r.setIzquierda((Expresion) r.getIzquierda().accept(this));
-        r.setDerecha((Expresion) r.getDerecha().accept(this));
+        r.setIzquierda(r.getIzquierda().accept(this));
+        r.setDerecha(r.getDerecha().accept(this));
         return r;
     }
 
     public OperacionUnaria transform(OperacionUnaria ou) throws ExcepcionDeTipos {
-        ou.setExpresion((Expresion) ou.getExpresion().accept(this));
+        ou.setExpresion(ou.getExpresion().accept(this));
         return ou;
     }
 
@@ -135,7 +130,7 @@ public abstract class Transformer {
 
     public Asignacion transform(Asignacion a) throws ExcepcionDeTipos {
         a.setIdent(a.getIdent().accept(this));
-        a.setExpresion((Expresion) a.getExpresion().accept(this));
+        a.setExpresion(a.getExpresion().accept(this));
         return a;
     }
 
@@ -146,7 +141,7 @@ public abstract class Transformer {
 
     public DecVarInicializada transform(DecVarInicializada dvi) throws ExcepcionDeTipos {
         dvi.setIdent(dvi.getIdent().accept(this));
-        dvi.setExpresion((Expresion) dvi.getExpresion().accept(this));
+        dvi.setExpresion(dvi.getExpresion().accept(this));
         return dvi;
     }
 
@@ -164,20 +159,20 @@ public abstract class Transformer {
     }
 
     public SiEntonces transform(SiEntonces se) throws ExcepcionDeTipos {
-        se.setCondicion((Expresion) se.getCondicion().accept(this));
+        se.setCondicion(se.getCondicion().accept(this));
         se.setBloqueSiEntonces(se.getBloqueSiEntonces().accept(this));
         return se;
     }
 
     public SiEntoncesSino transform(SiEntoncesSino ses) throws ExcepcionDeTipos {
-        ses.setCondicion((Expresion) ses.getCondicion().accept(this));
+        ses.setCondicion(ses.getCondicion().accept(this));
         ses.setBloqueSiEntonces(ses.getBloqueSiEntonces().accept(this));
         ses.setBloqueSino(ses.getBloqueSino().accept(this));
         return ses;
     }
 
     public Cuando transform(Cuando c) throws ExcepcionDeTipos {
-        c.setCondicion((Expresion) c.getCondicion().accept(this));
+        c.setCondicion(c.getCondicion().accept(this));
 
         List<CasoCuando> casosCuando = new ArrayList<>();
         for (CasoCuando caso : c.getCasos()) {
@@ -190,7 +185,7 @@ public abstract class Transformer {
     }
 
     public Mientras transform(Mientras m) throws ExcepcionDeTipos {
-        m.setCondicion((Expresion) m.getCondicion().accept(this));
+        m.setCondicion(m.getCondicion().accept(this));
         m.setBloqueSentencias(m.getBloqueSentencias().accept(this));
         return m;
     }
@@ -202,7 +197,7 @@ public abstract class Transformer {
     }
 
     public Retorno transform(Retorno r) throws ExcepcionDeTipos {
-        r.setExpr((Expresion) r.getExpr().accept(this));
+        r.setExpr(r.getExpr().accept(this));
         return r;
     }
 

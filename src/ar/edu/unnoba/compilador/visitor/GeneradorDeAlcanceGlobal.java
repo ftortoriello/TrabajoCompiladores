@@ -4,12 +4,13 @@ import java.util.List;
 
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Simbolo;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFuncion;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarInicializada;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.Declaracion;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
@@ -22,15 +23,16 @@ import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 public class GeneradorDeAlcanceGlobal extends Visitor<Void> {
     private Alcance alcanceGlobal;
 
-    // Agregar la declaración al ámbito global
-    private void agregarSimboloGlobal(Simbolo s) throws ExcepcionDeAlcance {
-        String nombre = s.getNombre();
+    // Agregar la declaración al ámbito global, y reemplazar Identificador por Simbolo
+    private void agregarSimboloGlobal(Declaracion d) throws ExcepcionDeAlcance {
+        Identificador id = d.getIdent();
+        String nombre = id.getNombre();
 
-        Simbolo simboloExistente = alcanceGlobal.putIfAbsent(nombre, s);
+        Simbolo simboloExistente = alcanceGlobal.putIfAbsent(nombre, new Simbolo(d));
         if (simboloExistente != null) {
             throw new ExcepcionDeAlcance(
                     String.format("La variable global «%s» de tipo %s ya fue declarada previamente con tipo %s.",
-                            nombre, s.getTipo(),
+                            nombre, id.getTipo(),
                             simboloExistente.getTipo()));
         }
     }
@@ -45,14 +47,14 @@ public class GeneradorDeAlcanceGlobal extends Visitor<Void> {
 
     // No procesar los bloques en este Visitor
     @Override
-    public Void visit(Bloque b) throws ExcepcionDeAlcance {
+    public Void visit(Bloque b) {
         return null;
     }
 
     @Override
     public Void visit(DecFuncion df) throws ExcepcionDeAlcance {
         // Agregar a la tabla la declaración de la función
-        agregarSimboloGlobal(new Simbolo(df));
+        agregarSimboloGlobal(df);
         // No visitar los parámetros ni el cuerpo
         return null;
     }
@@ -60,13 +62,13 @@ public class GeneradorDeAlcanceGlobal extends Visitor<Void> {
     // Visit de declaraciones de variables globales (en el encabezado).
     @Override
     public Void visit(DecVar dv) throws ExcepcionDeAlcance {
-        agregarSimboloGlobal(new Simbolo(dv));
+        agregarSimboloGlobal(dv);
         return super.visit(dv);
     }
 
     @Override
     public Void visit(DecVarInicializada dvi) throws ExcepcionDeAlcance {
-        agregarSimboloGlobal(new Simbolo(dvi));
+        agregarSimboloGlobal(dvi);
         return super.visit(dvi);
     }
 
@@ -82,7 +84,7 @@ public class GeneradorDeAlcanceGlobal extends Visitor<Void> {
     }
 
     @Override
-    protected Void procesarEncabezado(Encabezado e, List<Void> sentencias) {
+    protected Void procesarEncabezado(Encabezado e, List<Void> declaraciones) {
         return null;
     }
 

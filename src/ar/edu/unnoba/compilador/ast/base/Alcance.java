@@ -40,7 +40,7 @@ public class Alcance extends TreeMap<String, Simbolo> {
 
     public Simbolo resolver(String nombre) {
         Alcance alcanceActual = this;
-        Simbolo s = null;
+        Simbolo s;
         while (alcanceActual != null) {
             s = alcanceActual.get(nombre);
             if (s != null) {

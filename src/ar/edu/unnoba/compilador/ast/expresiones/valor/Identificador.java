@@ -8,7 +8,7 @@ import ar.edu.unnoba.compilador.visitor.Transformer;
 
 /* Clase para catalogar en la primera pasada cosas que no sabemos si son
  * variables, funciones...
- * Después se reemplazan por Simbolo cuando se arman las tablas de simbolos. */
+ * Después se reemplazan por Simbolo. */
 public class Identificador extends Valor {
     public Identificador(String nombre) {
         super(Tipo.UNKNOWN, nombre);

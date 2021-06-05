@@ -25,10 +25,6 @@ public class Bloque extends Nodo {
         this.esProgramaPrincipal = esProgramaPrincipal;
     }
 
-    public Boolean esCompuesto() {
-        return this.sentencias.size() > 1;
-    }
-
     public void setSentencias(List<Nodo> sentencias) {
         this.sentencias = sentencias;
     }

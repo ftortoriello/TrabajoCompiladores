@@ -45,10 +45,6 @@ import ar.edu.unnoba.compilador.token.Token;
 
     final public List<Token> tablaDeSimbolos = new ArrayList<>();
 
-    private Token token(String nombre) {
-        return new Token(nombre, this.yyline, this.yycolumn);
-    }
-
     private Token token(String nombre, Object valor) {
         return new Token(nombre, this.yyline, this.yycolumn, valor);
     }

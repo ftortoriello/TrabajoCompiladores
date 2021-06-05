@@ -423,14 +423,14 @@ para ::=
         PR_FOR:pr_for IDENTIFICADOR:id PR_FROM:pr_from LIT_ENTERO:num_ini PR_TO:pr_to LIT_ENTERO:num_fin PR_DO:pr_do bloque:bloque {:
             int saltoPorDefecto = 1;
             Identificador ident = new Identificador(id);
-            Para para = new Para("Bloque FOR con salto sin definir", ident, Integer.parseInt(num_ini),
+            Para para = new Para(ident, Integer.parseInt(num_ini),
                                 Integer.parseInt(num_fin), saltoPorDefecto, bloque);
             imprimirEtiqueta(para);
             RESULT = para;
         :} |
         PR_FOR:pr_for IDENTIFICADOR:id PR_FROM:pr_from LIT_ENTERO:num_ini PR_TO:pr_to LIT_ENTERO:num_fin PR_BY:pr_by LIT_ENTERO:salto PR_DO:pr_do bloque:bloque {:
             Identificador ident = new Identificador(id);
-            Para para = new Para("Bloque FOR con salto definido", ident, Integer.parseInt(num_ini),
+            Para para = new Para(ident, Integer.parseInt(num_ini),
                                 Integer.parseInt(num_fin), Integer.parseInt(salto), bloque);
             imprimirEtiqueta(para);
             RESULT = para;
@@ -610,7 +610,7 @@ invocacion_funcion ::=
             RESULT = invo;
         :} |
         IDENTIFICADOR:nombre_fun PAR_ABRE:pa lista_exprs:args PAR_CIERRA:pc {:
-            Boolean esPredefinida = false;
+            final boolean esPredefinida = false;
             InvocacionFuncion invo = new InvocacionFuncion(nombre_fun, args, Tipo.UNKNOWN, esPredefinida);
             imprimirEtiqueta(invo);
             RESULT = invo;
