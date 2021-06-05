@@ -25,7 +25,6 @@ import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
 /* Transformer que asigna tipos a los identificadores y valida la
  * compatibilidad de tipos, haciendo conversiones implícitas si es necesario.
  * TODO: Reemplazar Identificador por Simbolo
- * TODO: Transformar DecVar a DecVarInicializada con los valores por defecto
  */
 public class TransformerTipos extends Transformer {
     private Alcance alcanceActual;
@@ -106,7 +105,7 @@ public class TransformerTipos extends Transformer {
     @Override
     public DecVarInicializada transform(DecVarInicializada dvi) throws ExcepcionDeTipos {
         dvi = super.transform(dvi);
-        convertirATipo(dvi.getExpresion(), dvi.getIdent().getTipo());
+        dvi.setExpresion(convertirATipo(dvi.getExpresion(), dvi.getIdent().getTipo()));
         return dvi;
     }
 
