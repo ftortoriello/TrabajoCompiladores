@@ -219,7 +219,12 @@ public class TransformerTipos extends Transformer {
     @Override
     public Para transform(Para p) throws ExcepcionDeTipos {
         p = super.transform(p);
-        p.setIdent((Identificador) convertirATipo(p.getIdent(), Tipo.INTEGER));
+        // No se puede convertir OperacionConversion a Identificador acá.
+        // Para que soporte conversiones implícitas de flotante a entero
+        // tendríamos que reemplazar en Para el Identificador por Expresion.
+        if (p.getIdent().getTipo() != Tipo.INTEGER) {
+            throw new ExcepcionDeTipos("El tipo de la variable a iterar en «for» no es integer");
+        }
         return p;
     }
 }
