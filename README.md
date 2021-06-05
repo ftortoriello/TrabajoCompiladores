@@ -55,8 +55,6 @@ Requisitos:
   * variables
   * funciones
   * parámetros
-  
-  :x: Falta revisar algunos casos
 * Opcional: Conversiones implícitas de tipo: :white_check_mark:
 * Verificación de ámbito de las variables y funciones: :white_check_mark:
 
