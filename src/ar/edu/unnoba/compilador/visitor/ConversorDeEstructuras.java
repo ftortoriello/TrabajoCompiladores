@@ -10,11 +10,13 @@ import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 public class ConversorDeEstructuras extends Transformer {
     @Override
     public Para transform(Para p) throws ExcepcionDeTipos {
-        return super.transform(p);
+        p = super.transform(p);
+        return p;
     }
 
     @Override
     public Cuando transform(Cuando c) throws ExcepcionDeTipos {
-        return super.transform(c);
+        c = super.transform(c);
+        return c;
     }
 }
