@@ -1,4 +1,3 @@
-![ast-transformado](https://user-images.githubusercontent.com/82975077/120876333-94f05500-c586-11eb-9708-cc6be4b67c6f.png)
 # Compilador
 Trabajo para la asignatura "Compiladores" - UNNOBA - 2021
 [https://github.com/ftortoriello/TrabajoCompiladores](https://github.com/ftortoriello/TrabajoCompiladores)
