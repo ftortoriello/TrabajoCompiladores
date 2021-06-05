@@ -40,22 +40,24 @@ public class GenerarAST {
             // Ejecutar Visitor graficador del árbol sin transformar,
             // y convertirlo a imagen
             graficador = new ASTGraphviz("Árbol de sintaxis abstracta (Conti - Tortoriello)");
-            graficarArbol(graficador.visit(programa),"ast-original");
+            graficarArbol(graficador.procesar(programa),"ast-original");
 
             System.out.println("Iniciando generador de alcances globales...");
-            new GeneradorDeAlcanceGlobal().visit(programa);
+            new GeneradorDeAlcanceGlobal().procesar(programa);
 
             System.out.println("Iniciando generador de alcances locales...");
-            new GeneradorDeAlcancesLocales().visit(programa);
+            new GeneradorDeAlcancesLocales().procesar(programa);
 
-            System.out.println("Reemplazando identificadores por símbolos...");
-            new GeneradorDeAlcancesLocales().visit(programa);
+            // TODO System.out.println("Reemplazando identificadores por símbolos...");
 
             System.out.println("Iniciando validador de sentencias de control...");
-            new VisitorControl().visit(programa);
+            new VisitorControl().procesar(programa);
+
+            System.out.println("Reescribiendo estructuras de control...");
+            new ConversorDeEstructuras().procesar(programa);
 
             System.out.println("Iniciando validación y conversión de tipos...");
-            new TransformerTipos().transform(programa);
+            new TransformerTipos().procesar(programa);
 
             // Mostrar el árbol transformado
             graficador = new ASTGraphviz("AST con conversión de tipos (Conti - Tortoriello)");

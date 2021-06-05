@@ -12,7 +12,6 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
  * "valorFinal", y un nodo "Bloque" de sentencias.
  * El valor por defecto de "valorInicial" es 1.
  */
-// TODO: Convertir a while con un Transformer
 
 public class Para extends Sentencia {
     private Identificador ident;

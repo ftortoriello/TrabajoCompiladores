@@ -43,6 +43,11 @@ public abstract class Transformer {
         this.ultFunVisitada = ultFunVisitada;
     }
 
+
+    public Programa procesar(Programa p) throws ExcepcionDeTipos {
+        return p.accept(this);
+    }
+
     // Transforms base
 
     public Programa transform(Programa p) throws ExcepcionDeTipos {

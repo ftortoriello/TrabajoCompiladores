@@ -54,6 +54,10 @@ public abstract class Visitor<T> {
     }
 
 
+    public T procesar(Programa p) throws ExcepcionDeAlcance {
+        return p.accept(this);
+    }
+
     // Visits base
 
     public T visit(Programa p) throws ExcepcionDeAlcance {
