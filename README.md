@@ -43,39 +43,25 @@ Estado: :white_check_mark:, pero hay cuestiones pendientes con los operadores (v
 
 ## 2.ª Etapa: Analizador semántico con generación del AST
 
-Fecha de entrega: 31/05/2021
+Fecha de entrega: 04/06/2021
 
-![AST](https://i.ibb.co/488D4Xt/arbol.png)
+![AST](https://user-images.githubusercontent.com/82975077/120873170-6454ef00-c577-11eb-83e4-b92b63349d84.png)
 
 Requisitos:
-* AST, con su visualización mediante graphviz
-* Verificación de tipos de datos. Mostrar error si los tipos son incompatibles (por ejemplo: booleanos y números)
+* AST, con su visualización mediante graphviz: :white_check_mark:
+* Verificación de tipos de datos. Mostrar error si los tipos son incompatibles (por ejemplo: booleanos y números): :white_check_mark:
   * expresiones
   * variables
   * funciones
   * parámetros
-* Opcional: Conversiones implícitas de tipo
-* Verificación de ámbito de las variables y funciones
+  
+  :x: Falta revisar algunos casos
+* Opcional: Conversiones implícitas de tipo: :white_check_mark:
+* Verificación de ámbito de las variables y funciones: :white_check_mark:
 
-* Admitir variables globales definidas después de la definición de una función. Por ejemplo:
-```
-function mayor(x is integer)
-    x = aux;
-    return x;
-
-int aux = 10;
-
-main is
-    mayor(10);
-end.
-```
+* Admitir variables globales definidas después de la definición de una función: :white_check_mark:
 
 ### Revisar
-
-#### En general
-* Tratar de normalizar los nombres de las variables, por ej. el atributo Identificador a veces es "id", otras "ident" y así.
-* Ojo en entrada.txt con la declaración de superficie₁. Por ahora funciona, pero a 0 (la Expresión) lo estamos tomando como INTEGER, y superficie (el Identificador) es FLOAT. La idea de esto es que se solucione cuando implementemos las conversiones.
-
 
 #### parser.cup
 * La *producción* sentencia no es de *tipo* sentencia porque tiene en su interior a invocacion_funcion, que es de tipo expresion. Entonces la producción sentencia está forzada a ser de tipo nodo...
