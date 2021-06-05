@@ -4,5 +4,10 @@ public enum Tipo {
     BOOLEAN,
     INTEGER,
     FLOAT,
-    UNKNOWN
+    UNKNOWN;
+
+    @Override
+    public String toString() {
+        return name().toLowerCase();
+    }
 }

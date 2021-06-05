@@ -1,3 +1,4 @@
+{
 (* Ejemplo de un programa completo dado en la consigna de la etapa 1 *)
 
 (* Se definen (* algunas *) variables globales *)
@@ -54,6 +55,7 @@ main is
 
     writeln("Se acabó\n\nFin!");
 end.
+}
 
 {
 (* Ejemplo de ámbitos dado en la consigna de la etapa 2 *)
@@ -90,8 +92,11 @@ main is
 end.
 }
 
-{
 { prueba }
 main is
+    while true do
+        write("Hola ");
+    variable b is boolean;
+    for b from 9 to 5 do write("Che! ");
+    
 end.
-}

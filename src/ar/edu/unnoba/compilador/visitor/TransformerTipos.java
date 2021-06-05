@@ -18,6 +18,7 @@ import ar.edu.unnoba.compilador.ast.expresiones.valor.Valor;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFuncion;
+import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 
 /* Transformer que asigna tipos a los identificadores y valida la
  * compatibilidad de tipos, haciendo conversiones implícitas si es necesario.
@@ -50,11 +51,11 @@ public class TransformerTipos extends Transformer {
             return expresion;
         }
         if (tipoOrigen == Tipo.INTEGER && tipoDestino == Tipo.FLOAT) {
-            System.out.println(String.format("Advertencia: convirtiendo «%s» de entero a flotante", expresion));
+            System.out.println(String.format("Advertencia: convirtiendo «%s» de integer a float", expresion));
             return new EnteroAFlotante(expresion);
         }
         if (tipoOrigen == Tipo.FLOAT && tipoDestino == Tipo.INTEGER) {
-            System.out.println(String.format("Advertencia: convirtiendo «%s» de flotante a entero", expresion));
+            System.out.println(String.format("Advertencia: convirtiendo «%s» de flot a integer", expresion));
             return new FlotanteAEntero(expresion);
         }
         throw new ExcepcionDeTipos(
@@ -158,7 +159,7 @@ public class TransformerTipos extends Transformer {
         // Sólo las relaciones de igualdad y desigualdad aceptan operandos booleanos
         if ((tipoEnComun == Tipo.BOOLEAN) && !(
                 r instanceof Igualdad || r instanceof Desigualdad)) {
-            throw new ExcepcionDeTipos(String.format("No se puede realizar una comparación \"%s\" entre tipos BOOLEAN", r.getNombre()));
+            throw new ExcepcionDeTipos(String.format("No se puede realizar una comparación \"%s\" entre tipos boolean", r.getNombre()));
         }
         r.setTipo(Tipo.BOOLEAN);
         return r;
@@ -192,5 +193,14 @@ public class TransformerTipos extends Transformer {
             r.setExpr(convertirATipo(r.getExpr(), tipoDeLaFuncion));
         }
         return r;
+    }
+
+    @Override
+    public Mientras transform(Mientras m) throws ExcepcionDeTipos {
+        Mientras result = super.transform(m);
+        if (m.getCondicion().getTipo() != Tipo.BOOLEAN) {
+            throw new ExcepcionDeTipos("El tipo de la condición de «while» no es boolean");
+        }
+        return result;
     }
 }

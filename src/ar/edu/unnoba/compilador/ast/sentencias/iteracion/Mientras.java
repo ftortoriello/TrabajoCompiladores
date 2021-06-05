@@ -10,7 +10,6 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 
 /* Tiene un nodo "expresion" de tipo booleano (la condición) y un nodo "bloque"
  * de sentencias. */
-// TODO: error de compatibilidad si la expresión no puede evaluarse como BOOLEAN
 
 public class Mientras extends Sentencia {
     private Expresion condicion;
