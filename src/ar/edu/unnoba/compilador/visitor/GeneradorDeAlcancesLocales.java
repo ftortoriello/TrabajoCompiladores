@@ -33,8 +33,7 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
             // de alcance global
             return;
         }
-        Declaracion declaracion = s.getDeclaracion();
-        String nombre = declaracion.getIdent().getNombre();
+        String nombre = s.getNombre();
 
         // En este lenguaje no se pueden sobreescribir símbolos.
         // Dar error si ya existía un símbolo con este nombre en este ámbito o
@@ -43,8 +42,8 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
         if (simboloExistente != null) {
             throw new ExcepcionDeAlcance(
                     String.format("La variable local «%s» de tipo %s ya fue declarada previamente con tipo %s.",
-                            nombre, declaracion.getTipo(),
-                            simboloExistente.getDeclaracion().getTipo()));
+                            nombre, s.getTipo(),
+                            simboloExistente.getTipo()));
         }
         alcanceActual.put(nombre, s);
     }

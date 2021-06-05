@@ -1,7 +1,6 @@
 package ar.edu.unnoba.compilador.ast.expresiones.valor;
 
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
-import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.Declaracion;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
@@ -10,29 +9,8 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
  * Luego mediante un Transformer este nodo reemplaza a Identificador
  */
 public class Simbolo extends Identificador {
-    private Declaracion declaracion;
-
-    public Simbolo() {
-    }
-
-    public Simbolo(Declaracion declaracion) {
-        this.declaracion = declaracion;
-    }
-
-    public Declaracion getDeclaracion() {
-        return declaracion;
-    }
-
-    public void setDeclaracion(Declaracion declaracion) {
-        this.declaracion = declaracion;
-    }
-
-    public Tipo getTipo() {
-        return declaracion.getTipo();
-    }
-
-    public void setTipo(Tipo tipo) {
-        declaracion.setTipo(tipo);
+    public Simbolo(Declaracion d) {
+        super(d.getIdent().getNombre(), d.getIdent().getTipo());
     }
 
     @Override
@@ -43,10 +21,5 @@ public class Simbolo extends Identificador {
     @Override
     public Simbolo accept(Transformer t) throws ExcepcionDeTipos {
         return t.transform(this);
-    }
-
-    @Override
-    public String toString() {
-        return declaracion.toString();
     }
 }

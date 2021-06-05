@@ -24,15 +24,14 @@ public class GeneradorDeAlcanceGlobal extends Visitor<Void> {
 
     // Agregar la declaración al ámbito global
     private void agregarSimboloGlobal(Simbolo s) throws ExcepcionDeAlcance {
-        Declaracion declaracion = s.getDeclaracion();
-        String nombre = declaracion.getIdent().getNombre();
+        String nombre = s.getNombre();
 
         Simbolo simboloExistente = alcanceGlobal.putIfAbsent(nombre, s);
         if (simboloExistente != null) {
             throw new ExcepcionDeAlcance(
                     String.format("La variable global «%s» de tipo %s ya fue declarada previamente con tipo %s.",
-                            nombre, declaracion.getTipo(),
-                            simboloExistente.getDeclaracion().getTipo()));
+                            nombre, s.getTipo(),
+                            simboloExistente.getTipo()));
         }
     }
 

@@ -15,7 +15,6 @@ begin
         variable radio² is float = cuadrado(radio);
         return 3.14 * radio²;
     end;
-    read_integer(3, 4);
 end;
 
 (* Otra función pero con una única sentencia *)
