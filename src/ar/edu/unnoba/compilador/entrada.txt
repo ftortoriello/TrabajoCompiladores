@@ -1,4 +1,3 @@
-{
 (* Ejemplo de un programa completo dado en la consigna de la etapa 1 *)
 
 (* Se definen (* algunas *) variables globales *)
@@ -55,7 +54,6 @@ main is
 
     writeln("Se acabó\n\nFin!");
 end.
-}
 
 {
 (* Ejemplo de ámbitos dado en la consigna de la etapa 2 *)
@@ -65,7 +63,7 @@ begin
     variable local_a_ejemplo is boolean = true;
     if global > 10 then
     begin
-        variable local_al_then is float = global; # TODO falta la conversión de global acá?
+        variable local_al_then is float = global;
         while local_al_then > 5 do
         begin
             local_al_then = local_al_then - 1;
@@ -92,11 +90,8 @@ main is
 end.
 }
 
+{
 { prueba }
 main is
-    while true do
-        write("Hola ");
-    variable b is boolean;
-    for b from 9 to 5 do write("Che! ");
-    
 end.
+}

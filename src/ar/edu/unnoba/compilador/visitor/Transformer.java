@@ -191,6 +191,7 @@ public abstract class Transformer {
     }
 
     public Para transform(Para p) throws ExcepcionDeTipos {
+        p.setIdent(p.getIdent().accept(this));
         p.setBloqueSentencias(p.getBloqueSentencias().accept(this));
         return p;
     }

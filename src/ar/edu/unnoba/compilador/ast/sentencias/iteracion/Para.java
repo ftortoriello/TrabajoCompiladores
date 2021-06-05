@@ -12,11 +12,10 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
  * "valorFinal", y un nodo "Bloque" de sentencias.
  * El valor por defecto de "valorInicial" es 1.
  */
-// TODO: Asegurarse que Identificador sea de tipo Entero.
 // TODO: Convertir a while con un Transformer
 
 public class Para extends Sentencia {
-    private final Identificador ident;
+    private Identificador ident;
     private final int valorInicial, valorFinal;
     private Bloque bloqueSentencias;
     private final int salto;
@@ -39,6 +38,10 @@ public class Para extends Sentencia {
 
     public Identificador getIdent() {
         return ident;
+    }
+
+    public void setIdent(Identificador ident) {
+        this.ident = ident;
     }
 
     public int getValorInicial() {

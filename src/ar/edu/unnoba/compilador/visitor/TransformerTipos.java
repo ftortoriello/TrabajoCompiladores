@@ -18,12 +18,13 @@ import ar.edu.unnoba.compilador.ast.expresiones.valor.Valor;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFuncion;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarInicializada;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
+import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
 
 /* Transformer que asigna tipos a los identificadores y valida la
  * compatibilidad de tipos, haciendo conversiones implícitas si es necesario.
  * TODO: Reemplazar Identificador por Simbolo
- * TODO: Verificar tipos en DecVarInicializada
  * TODO: Transformar DecVar a DecVarInicializada con los valores por defecto
  */
 public class TransformerTipos extends Transformer {
@@ -55,7 +56,7 @@ public class TransformerTipos extends Transformer {
             return new EnteroAFlotante(expresion);
         }
         if (tipoOrigen == Tipo.FLOAT && tipoDestino == Tipo.INTEGER) {
-            System.out.println(String.format("Advertencia: convirtiendo «%s» de flot a integer", expresion));
+            System.out.println(String.format("Advertencia: convirtiendo «%s» de float a integer", expresion));
             return new FlotanteAEntero(expresion);
         }
         throw new ExcepcionDeTipos(
@@ -103,6 +104,13 @@ public class TransformerTipos extends Transformer {
     }
 
     @Override
+    public DecVarInicializada transform(DecVarInicializada dvi) throws ExcepcionDeTipos {
+        dvi = super.transform(dvi);
+        convertirATipo(dvi.getExpresion(), dvi.getIdent().getTipo());
+        return dvi;
+    }
+
+    @Override
     public DecFuncion transform(DecFuncion df) throws ExcepcionDeTipos {
         alcanceActual = df.getAlcance();
         df = super.transform(df);
@@ -120,27 +128,29 @@ public class TransformerTipos extends Transformer {
 
     @Override
     public Identificador transform(Identificador i) throws ExcepcionDeTipos {
-        if (cambiarTipo(i)== null) {
+        i = super.transform(i);
+        if (cambiarTipo(i) == null) {
             throw new ExcepcionDeTipos(String.format("No se pudo asignar un tipo a la variable «%s»", i.getNombre()));
         }
-        return super.transform(i);
+        return i;
     }
 
     @Override
     public InvocacionFuncion transform(InvocacionFuncion i) throws ExcepcionDeTipos {
+        i = super.transform(i);
         // TODO: validar posición, tipo y cantidad de parámetros
         // No buscar en el alcance las funciones predefinidas
         if (!i.getEsPredefinida() && (cambiarTipo(i) == null)) {
             throw new ExcepcionDeTipos(String.format("No se pudo asignar un tipo a la función «%s»", i.getNombre()));
         }
-        return super.transform(i);
+        return i;
     }
 
     @Override
     public Asignacion transform(Asignacion a) throws ExcepcionDeTipos {
-        Asignacion asignacion = super.transform(a);
-        asignacion.setExpresion(convertirATipo(asignacion.getExpresion(), asignacion.getIdent().getTipo()));
-        return asignacion;
+        a = super.transform(a);
+        a.setExpresion(convertirATipo(a.getExpresion(), a.getIdent().getTipo()));
+        return a;
     }
 
     @Override
@@ -167,7 +177,7 @@ public class TransformerTipos extends Transformer {
 
     @Override
     public OperacionUnaria transform(OperacionUnaria ou) throws ExcepcionDeTipos {
-        super.transform(ou);
+        ou = super.transform(ou);
         if (ou.getTipo() == Tipo.UNKNOWN) {
             ou.setTipo(ou.getExpresion().getTipo());
         } else {
@@ -179,7 +189,7 @@ public class TransformerTipos extends Transformer {
     @Override
     public Retorno transform(Retorno r) throws ExcepcionDeTipos {
         // Transformar la expresión interna del return
-        super.transform(r);
+        r = super.transform(r);
         // Y compararla con el de la función a la que pertenece
         DecFuncion ultFunVisitada = getUltFunVisitada();
         if (ultFunVisitada == null) {
@@ -187,20 +197,23 @@ public class TransformerTipos extends Transformer {
             // control
             return null;
         }
-        Expresion e = r.getExpr();
-        Tipo tipoDeLaFuncion = ultFunVisitada.getTipo();
-        if (e.getTipo() != tipoDeLaFuncion) {
-            r.setExpr(convertirATipo(r.getExpr(), tipoDeLaFuncion));
-        }
+        r.setExpr(convertirATipo(r.getExpr(), ultFunVisitada.getTipo()));
         return r;
     }
 
     @Override
     public Mientras transform(Mientras m) throws ExcepcionDeTipos {
-        Mientras result = super.transform(m);
+        m = super.transform(m);
         if (m.getCondicion().getTipo() != Tipo.BOOLEAN) {
             throw new ExcepcionDeTipos("El tipo de la condición de «while» no es boolean");
         }
-        return result;
+        return m;
+    }
+
+    @Override
+    public Para transform(Para p) throws ExcepcionDeTipos {
+        p = super.transform(p);
+        p.setIdent((Identificador) convertirATipo((Expresion) p.getIdent(), Tipo.INTEGER));
+        return p;
     }
 }

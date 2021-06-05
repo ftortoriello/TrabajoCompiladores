@@ -185,6 +185,7 @@ public abstract class Visitor<T> {
 
     public T visit(Para p) throws ExcepcionDeAlcance {
         setEnBucle(true);
+        p.getIdent().accept(this);
         T blq = p.getBloqueSentencias().accept(this);
         setEnBucle(false);
         return blq;
