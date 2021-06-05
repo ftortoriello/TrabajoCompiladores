@@ -1,3 +1,4 @@
+![ast-transformado](https://user-images.githubusercontent.com/82975077/120876333-94f05500-c586-11eb-9708-cc6be4b67c6f.png)
 # Compilador
 Trabajo para la asignatura "Compiladores" - UNNOBA - 2021
 [https://github.com/ftortoriello/TrabajoCompiladores](https://github.com/ftortoriello/TrabajoCompiladores)
@@ -45,7 +46,8 @@ Estado: :white_check_mark:, pero hay cuestiones pendientes con los operadores (v
 
 Fecha de entrega: 04/06/2021
 
-![AST](https://user-images.githubusercontent.com/82975077/120873170-6454ef00-c577-11eb-83e4-b92b63349d84.png)
+![AST](https://user-images.githubusercontent.com/82975077/120876361-ae919c80-c586-11eb-88c6-0c91690013c7.png)
+
 
 Requisitos:
 * AST, con su visualización mediante graphviz: :white_check_mark:
