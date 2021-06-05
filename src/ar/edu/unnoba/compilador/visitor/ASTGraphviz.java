@@ -53,6 +53,7 @@ public class ASTGraphviz extends Visitor<String> {
         StringBuilder resultado = new StringBuilder();
 
         resultado.append("graph Programa {" +
+                "dpi = 72;\n" +
                 String.format("label=\"%s\";\n", etiqueta) +
                 "bgcolor=aliceblue;\n" +
                 "fontsize=60;\n");

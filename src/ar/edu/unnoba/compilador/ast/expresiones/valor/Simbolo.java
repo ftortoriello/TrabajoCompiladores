@@ -7,7 +7,7 @@ import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
 /* Clase para generar los alcances y validar los tipos.
- * TODO: Luego mediante un Transformer este nodo reemplaza a Identificador
+ * Luego mediante un Transformer este nodo reemplaza a Identificador
  */
 public class Simbolo extends Identificador {
     private Declaracion declaracion;

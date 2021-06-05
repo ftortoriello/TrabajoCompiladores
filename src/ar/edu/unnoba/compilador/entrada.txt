@@ -1,4 +1,3 @@
-{
 (* Ejemplo de un programa completo dado en la consigna de la etapa 1 *)
 
 (* Se definen (* algunas *) variables globales *)
@@ -30,7 +29,7 @@ main is
     writeln("Inicio del programa");
     writeln(superficie₁);
     writeln(superficie₂);
-    superficie₁ = superficie_círculo(radio); # TODO: los parámetros no se validan
+    superficie₁ = superficie_círculo(radio);
     writeln(superficie₁);
 
     radio = read_float();
@@ -55,8 +54,8 @@ main is
 
     writeln("Se acabó\n\nFin!");
 end.
-}
 
+{
 (* Ejemplo de ámbitos dado en la consigna de la etapa 2 *)
 
 function ejemplo() return boolean
@@ -89,3 +88,11 @@ main is
     else
         ejemplo();
 end.
+}
+
+{
+{ prueba }
+main is
+
+end.
+}

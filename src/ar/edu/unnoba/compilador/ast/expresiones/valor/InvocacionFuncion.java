@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class InvocacionFuncion extends Valor {
-    // Pongo tipo genérico porque los argumentos pueden ser expresiones o strings
-    // TODO: acomodar llamadas, si acepta genéricos tendría que pasarse el tipo
     private List<Expresion> argumentos;
     private Boolean esPredefinida = true;
 

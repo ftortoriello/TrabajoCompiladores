@@ -13,6 +13,7 @@ import java.io.*;
 public class GenerarAST {
     private static void graficarArbol(String dot, String nombreArchivo) throws IOException {
         final String formatoImg = "png";
+        //final String formatoImg = "svg";
         PrintWriter pw = new PrintWriter(
                 new FileWriter(String.format("%s.dot", nombreArchivo)));
         pw.println(dot);

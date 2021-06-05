@@ -23,7 +23,7 @@ import java.util.Locale;
 
 /* Transformer que asigna tipos a los identificadores y valida la
  * compatibilidad de tipos, haciendo conversiones implícitas si es necesario.
- * TODO: y reemplaza Id por Simbolo
+ * TODO: Reemplazar Identificador por Simbolo
  * TODO: Verificar tipos en DecVarInicializada
  * TODO: Transformar DecVar a DecVarInicializada con los valores por defecto
  */
@@ -129,7 +129,7 @@ public class TransformerTipos extends Transformer {
 
     @Override
     public InvocacionFuncion transform(InvocacionFuncion i) throws ExcepcionDeTipos {
-        // TODO: validar tipos y cantidad de parámetros
+        // TODO: validar posición, tipo y cantidad de parámetros
         // No buscar en el alcance las funciones predefinidas
         if (!i.getEsPredefinida() && (cambiarTipo(i) == null)) {
             throw new ExcepcionDeTipos(String.format("No se pudo asignar un tipo a la función «%s»", i.getNombre()));
@@ -179,11 +179,18 @@ public class TransformerTipos extends Transformer {
 
     @Override
     public Retorno transform(Retorno r) throws ExcepcionDeTipos {
-        // Transforma la expresión interna del return
+        // Transformar la expresión interna del return
         super.transform(r);
-        // Y la compara con el de la función a la que pertenece
-        if (r.getExpr().getTipo() != getUltFunVisitada().getTipo()) {
-            r.setExpr(convertirATipo(r.getExpr(), getUltFunVisitada().getTipo()));
+        // Y compararla con el de la función a la que pertenece
+        DecFuncion ultFunVisitada = getUltFunVisitada();
+        if (ultFunVisitada == null) {
+            // FIXME: mover a otro visitor
+            throw new ExcepcionDeTipos("Se encontró «return» fuera de una función");
+        }
+        Expresion e = r.getExpr();
+        Tipo tipoDeLaFuncion = ultFunVisitada.getTipo();
+        if (e.getTipo() != tipoDeLaFuncion) {
+            r.setExpr(convertirATipo(r.getExpr(), tipoDeLaFuncion));
         }
         return r;
     }

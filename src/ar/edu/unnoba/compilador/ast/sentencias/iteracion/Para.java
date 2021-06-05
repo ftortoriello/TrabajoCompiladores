@@ -12,8 +12,8 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
  * "valorFinal", y un nodo "Bloque" de sentencias.
  * El valor por defecto de "valorInicial" es 1.
  */
-// TODO: asegurarse que Identificador ya esté definido y sea de tipo Entero.
-// TODO: convertir a while con un Transformer
+// TODO: Asegurarse que Identificador sea de tipo Entero.
+// TODO: Convertir a while con un Transformer
 
 public class Para extends Sentencia {
     private final Identificador ident;
@@ -26,7 +26,7 @@ public class Para extends Sentencia {
         this.ident = ident;
         this.valorInicial = valorInicial;
         this.valorFinal = valorFinal;
-        // FIXME: esto debería hacerlo el transformer
+        // FIXME: Esto debería hacerlo el transformer
         if (valorInicial <= valorFinal) {
             this.salto = Math.abs(salto);
         } else {

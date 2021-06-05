@@ -19,6 +19,6 @@ public class Cadena extends Expresion {
 
     @Override
     public Cadena accept(Transformer t) throws ExcepcionDeTipos {
-        return null;
+        return this;
     }
 }
