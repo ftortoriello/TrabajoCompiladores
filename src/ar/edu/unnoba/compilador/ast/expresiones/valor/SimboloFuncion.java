@@ -9,7 +9,6 @@ public class SimboloFuncion extends InvocacionFuncion {
     private DecFuncion declaracion;
 
     public SimboloFuncion(DecFuncion d) {
-        //super(d.getIdent().getNombre(), argumentos, d.getIdent().getTipo(), false);
         super(d.getIdent().getNombre(), d.getIdent().getTipo());
     }
 
