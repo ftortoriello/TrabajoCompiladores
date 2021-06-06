@@ -11,16 +11,15 @@ import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.*;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.EnteroAFlotante;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.FlotanteAEntero;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Simbolo;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Valor;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.*;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFuncion;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarInicializada;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
+
+import java.util.Map;
 
 /* Transformer que asigna tipos a los identificadores y valida la
  * compatibilidad de tipos, haciendo conversiones implícitas si es necesario.
@@ -29,6 +28,7 @@ import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
  */
 public class TransformerTipos extends Transformer {
     private Alcance alcanceActual;
+    private Map<String, SimboloFuncion> tablaFunciones;
 
     // Métodos auxiliares
 
@@ -64,8 +64,22 @@ public class TransformerTipos extends Transformer {
     }
 
     // Retorna el símbolo si está en el alcance actual y se pudo cambiar el tipo
-    private Simbolo cambiarTipo(Valor v) {
-        Simbolo s = alcanceActual.resolver(v.getNombre());
+    private SimboloVariable cambiarTipoVariable(Valor v) {
+        SimboloVariable s = alcanceActual.resolver(v.getNombre());
+        if (s == null) {
+            return null;
+        }
+        Tipo tipo = s.getTipo();
+        if (tipo == Tipo.UNKNOWN) {
+            // No se pudo cambiar el tipo
+            return null;
+        }
+        v.setTipo(tipo);
+        return s;
+    }
+
+    private SimboloFuncion cambiarTipoFuncion(Valor v) {
+        SimboloFuncion s = tablaFunciones.get(v.getNombre());
         if (s == null) {
             return null;
         }
@@ -98,6 +112,7 @@ public class TransformerTipos extends Transformer {
     @Override
     public Programa transform(Programa p) throws ExcepcionDeTipos {
         alcanceActual = p.getAlcance();
+        tablaFunciones = p.getTablaFunciones();
         p = super.transform(p);
         alcanceActual = null;
         return p;
@@ -129,11 +144,11 @@ public class TransformerTipos extends Transformer {
     @Override
     public Identificador transform(Identificador i) throws ExcepcionDeTipos {
         i = super.transform(i);
-        Simbolo s = cambiarTipo(i);
+        SimboloVariable s = cambiarTipoVariable(i);
         if (s == null) {
             throw new ExcepcionDeTipos(String.format("No se pudo asignar un tipo a la variable «%s»", i.getNombre()));
         }
-        // Reemplazar cada Identificador por el Simbolo correspondiente
+        // Reemplazar cada Identificador por el SimboloVariable correspondiente
         return s;
     }
 
@@ -144,12 +159,13 @@ public class TransformerTipos extends Transformer {
         if (i.getEsPredefinida()) {
             return i;
         }
-        Simbolo s = cambiarTipo(i);
+        SimboloFuncion s = cambiarTipoFuncion(i);
         if (s == null) {
             throw new ExcepcionDeTipos(String.format("No se pudo asignar un tipo a la función «%s»", i.getNombre()));
         }
         // TODO: validar posición, tipo y cantidad de parámetros
-        return i;
+        // Reemplazar cada InvocacionFuncion por el SimboloFuncion correspondiente
+        return s;
     }
 
     @Override

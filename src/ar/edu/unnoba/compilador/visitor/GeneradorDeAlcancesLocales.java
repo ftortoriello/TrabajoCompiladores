@@ -3,10 +3,7 @@ package ar.edu.unnoba.compilador.visitor;
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Simbolo;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Valor;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.*;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFuncion;
@@ -18,6 +15,7 @@ import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 
 import java.util.List;
+import java.util.Map;
 
 /* Visitor para generar los alcances de los bloques, construir la tabla de
  * símbolos locales y verificar los alcances.
@@ -25,6 +23,7 @@ import java.util.List;
 public class GeneradorDeAlcancesLocales extends Visitor<Void> {
     private Alcance alcanceGlobal;
     private Alcance alcanceActual;
+    private Map<String, SimboloFuncion> tablaFunciones;
 
     // Agregar la declaración al ámbito en el que se encuentra
     private void agregarSimbolo(Declaracion d) throws ExcepcionDeAlcance {
@@ -40,18 +39,22 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
         // En este lenguaje no se pueden sobreescribir símbolos.
         // Dar error si ya existía un símbolo con este nombre en este ámbito o
         // en los ámbitos superiores.
-        Simbolo simboloExistente = alcanceActual.resolver(nombre);
+        SimboloVariable simboloExistente = alcanceActual.resolver(nombre);
         if (simboloExistente != null) {
             throw new ExcepcionDeAlcance(
                     String.format("La variable local «%s» de tipo %s ya fue declarada previamente con tipo %s.",
                             nombre, id.getTipo(),
                             simboloExistente.getTipo()));
         }
-        alcanceActual.put(nombre, new Simbolo(d));
+        alcanceActual.put(nombre, new SimboloVariable(d));
     }
 
-    private boolean estaEnElAlcance(Valor v) {
-        return (alcanceActual.resolver(v.getNombre()) != null);
+    private boolean estaEnElAlcance(Identificador i) {
+        return (alcanceActual.resolver(i.getNombre()) != null);
+    }
+
+    private boolean estaEnElAlcance(InvocacionFuncion i) {
+        return (tablaFunciones.get(i.getNombre()) != null);
     }
 
 
@@ -60,6 +63,7 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
         // Comenzar con alcance global para el encabezado.
         // Ya tiene el alcance establecido por el Visitor de alcance global.
         alcanceGlobal = alcanceActual = p.getAlcance();
+        tablaFunciones = p.getTablaFunciones();
         super.visit(p);
         alcanceActual = null;
         return null;

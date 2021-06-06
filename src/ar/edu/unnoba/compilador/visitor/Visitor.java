@@ -203,6 +203,7 @@ public abstract class Visitor<T> {
 
 
     // Procesos implementados en los visitors específicos
+    // TODO: Hace falta acá? Es usado por ASTGraphviz nomás
 
     protected abstract T procesarNodo(Nodo n);
 

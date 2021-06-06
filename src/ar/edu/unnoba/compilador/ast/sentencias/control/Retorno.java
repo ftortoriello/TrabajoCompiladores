@@ -1,6 +1,5 @@
 package ar.edu.unnoba.compilador.ast.sentencias.control;
 
-import ar.edu.unnoba.compilador.ast.base.Alcance;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
@@ -12,11 +11,6 @@ public class Retorno extends Control {
 
     public Retorno(Expresion expr) {
         super("RETURN");
-        this.expr = expr;
-    }
-
-    public Retorno(Expresion expr, Alcance alcance) {
-        super("RETURN", alcance);
         this.expr = expr;
     }
 

@@ -2,13 +2,17 @@ package ar.edu.unnoba.compilador.ast.base;
 
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.SimboloFuncion;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
+
+import java.util.Map;
 
 public class Programa extends Nodo {
     private Encabezado encabezado;
     private Bloque cuerpo;
     private Alcance alcance;
+    private Map<String, SimboloFuncion> tablaFunciones;
 
     public Programa(String nombre, Encabezado encabezado, Bloque cuerpo) {
         super(nombre);
@@ -38,6 +42,14 @@ public class Programa extends Nodo {
 
     public void setAlcance(Alcance alcance) {
         this.alcance = alcance;
+    }
+
+    public Map<String, SimboloFuncion> getTablaFunciones() {
+        return tablaFunciones;
+    }
+
+    public void setTablaFunciones(Map<String, SimboloFuncion> tablaFunciones) {
+        this.tablaFunciones = tablaFunciones;
     }
 
     @Override
