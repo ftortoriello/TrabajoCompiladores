@@ -175,9 +175,13 @@ public class TransformerTipos extends Transformer {
         for (int iArg = 0; iArg < cantArgs; iArg++) {
             Expresion arg = i.getArgumentos().get(iArg);
             Tipo tipoOriginal = decFun.getArgs().get(iArg).getTipo();
+
+            // TODO acá tendría que modificar el SimboloFuncion, pero no tiene los argumentos
+            //s.getDeclaracion().getArgs().set(iArg, convertirATipo(arg, tipoOriginal));
             i.getArgumentos().set(iArg, convertirATipo(arg, tipoOriginal));
         }
-        return i;
+        // return s
+        return s;
     }
 
     @Override
