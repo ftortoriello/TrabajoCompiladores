@@ -3,10 +3,7 @@ package ar.edu.unnoba.compilador.visitor;
 import java.util.ArrayList;
 import java.util.List;
 
-import ar.edu.unnoba.compilador.ast.base.Bloque;
-import ar.edu.unnoba.compilador.ast.base.Encabezado;
-import ar.edu.unnoba.compilador.ast.base.Nodo;
-import ar.edu.unnoba.compilador.ast.base.Programa;
+import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
@@ -148,7 +145,7 @@ public abstract class Transformer {
     public DecFuncion transform(DecFuncion df) throws ExcepcionDeTipos {
         setUltFunVisitada(df);
 
-        List<DecVar> args = new ArrayList<>();
+        ArrayList<DecVar> args = new ArrayList<>();
         for (DecVar arg : df.getArgs()) {
             args.add(arg.accept(this));
         }

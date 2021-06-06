@@ -37,7 +37,7 @@ main is
     writeln(superficie₂);
 
     variable justo is boolean = false;
-    when superficie_círculo()
+    when superficie_círculo(radio)
         is < 100 then writeln("Es pequeño")
         is == 100 then begin
             writeln("Qué puntería!");

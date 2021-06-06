@@ -15,10 +15,12 @@ import ar.edu.unnoba.compilador.ast.expresiones.valor.*;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFuncion;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarInicializada;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 /* Transformer que asigna tipos a los identificadores y valida la
@@ -155,17 +157,27 @@ public class TransformerTipos extends Transformer {
     @Override
     public InvocacionFuncion transform(InvocacionFuncion i) throws ExcepcionDeTipos {
         i = super.transform(i);
+
         // No buscar en el alcance las funciones predefinidas
         if (i.getEsPredefinida()) {
             return i;
         }
+
         SimboloFuncion s = cambiarTipoFuncion(i);
         if (s == null) {
             throw new ExcepcionDeTipos(String.format("No se pudo asignar un tipo a la función «%s»", i.getNombre()));
         }
-        // TODO: validar posición, tipo y cantidad de parámetros
-        // Reemplazar cada InvocacionFuncion por el SimboloFuncion correspondiente
-        return s;
+
+        DecFuncion decFun = s.getDeclaracion();
+        int cantArgs = decFun.getArgs().size();
+
+        // Validar el tipo de cada argumento, y convertir cuando sea necesario
+        for (int iArg = 0; iArg < cantArgs; iArg++) {
+            Expresion arg = i.getArgumentos().get(iArg);
+            Tipo tipoOriginal = decFun.getArgs().get(iArg).getTipo();
+            i.getArgumentos().set(iArg, convertirATipo(arg, tipoOriginal));
+        }
+        return i;
     }
 
     @Override

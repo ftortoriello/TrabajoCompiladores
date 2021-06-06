@@ -53,7 +53,6 @@ public class GeneradorDeAlcanceGlobal extends Visitor<Void> {
         }
     }
 
-
     @Override
     public Void visit(Programa p) throws ExcepcionDeAlcance {
         alcanceGlobal = new Alcance("global");

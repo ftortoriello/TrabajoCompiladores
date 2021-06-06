@@ -10,6 +10,7 @@ public class SimboloFuncion extends InvocacionFuncion {
 
     public SimboloFuncion(DecFuncion d) {
         super(d.getIdent().getNombre(), d.getIdent().getTipo());
+        this.declaracion = d;
     }
 
     public DecFuncion getDeclaracion() {

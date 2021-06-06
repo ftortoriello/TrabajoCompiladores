@@ -2,7 +2,7 @@ package ar.edu.unnoba.compilador.sintaxis;
 
 import java_cup.runtime.*;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.ArrayList;
 
 import ar.edu.unnoba.compilador.ast.base.Nodo;
 import ar.edu.unnoba.compilador.ast.base.Programa;
@@ -169,25 +169,25 @@ terminal String PR_MAIN_IS, PR_END_PUNTO,
     LIT_BOOLEANO, LIT_FLOTANTE, LIT_ENTERO, CADENA;
 
 nonterminal Programa programa;
-nonterminal List<Declaracion> encabezado;
+nonterminal ArrayList<Declaracion> encabezado;
 nonterminal Bloque cuerpo_programa, bloque;
-nonterminal List<CasoCuando> bloque_cuando;
+nonterminal ArrayList<CasoCuando> bloque_cuando;
 
 // Las producciones "sentencia" podrían ser de tipo Sentencia, pero para poder incluir
 // a invocacion_funcion, que es de tipo Expresión, tengo que declararlas como Nodo...
-nonterminal List<Nodo> lst_sentencias;
+nonterminal ArrayList<Nodo> lst_sentencias;
 nonterminal Nodo sentencia;
 
 nonterminal Expresion disyuncion, conjuncion, negacion_logica,
     relacion, adicion, termino, negacion_aritmetica,
     factor, literal, invocacion_funcion;
 
-nonterminal List<Expresion> lista_exprs;
+nonterminal ArrayList<Expresion> lista_exprs;
 
 nonterminal Sentencia asignacion, si_entonces, cuando, para, mientras, control;
 nonterminal DecFuncion dec_fun;
 
-nonterminal List<DecVar> lst_args_dec, lst_args_dec_default;
+nonterminal ArrayList<DecVar> lst_args_dec, lst_args_dec_default;
 nonterminal DecVar dec_var, arg_dec, arg_dec_default;
 
 precedence left PR_ELSE, PR_IS;
@@ -229,20 +229,20 @@ encabezado ::=
             RESULT = decs;
         :} |
         dec_var:dec_var PUNTO_Y_COMA:pyc {:
-            List<Declaracion> decs = new ArrayList<>();
+            ArrayList<Declaracion> decs = new ArrayList<>();
             decs.add(dec_var);
             imprimirEtiqueta(dec_var);
             RESULT = decs;
         :} |
         dec_fun:dec_fun {:
-            List<Declaracion> decs = new ArrayList<>();
+            ArrayList<Declaracion> decs = new ArrayList<>();
             decs.add(dec_fun);
             imprimirEtiqueta(dec_fun);
             RESULT = decs;
         :} |
         {:
             // Encabezado vacío
-            List<Declaracion> decs = new ArrayList<>();
+            ArrayList<Declaracion> decs = new ArrayList<>();
             RESULT = decs;
         :};
 
@@ -291,7 +291,7 @@ lst_args_dec ::=
             RESULT = args;
         :} |
         arg_dec:arg {:
-            List<DecVar> args = new ArrayList<>();
+            ArrayList<DecVar> args = new ArrayList<>();
             args.add(arg);
             imprimirEtiqueta(arg);
             RESULT = args;
@@ -302,7 +302,7 @@ lst_args_dec ::=
             RESULT = args;
         :} |
         arg_dec_default:arg {:
-            List<DecVar> args = new ArrayList<>();
+            ArrayList<DecVar> args = new ArrayList<>();
             args.add(arg);
             imprimirEtiqueta(arg);
             RESULT = args;
@@ -315,7 +315,7 @@ lst_args_dec_default ::=
             RESULT = args;
         :} |
         arg_dec_default:arg {:
-            List<DecVar> args = new ArrayList<>();
+            ArrayList<DecVar> args = new ArrayList<>();
             args.add(arg);
             imprimirEtiqueta(arg);
             RESULT = args;
@@ -323,7 +323,7 @@ lst_args_dec_default ::=
 
 bloque ::=
         sentencia:sent {:
-            List<Nodo> sentencias = new ArrayList<>();
+            ArrayList<Nodo> sentencias = new ArrayList<>();
             sentencias.add(sent);
             final boolean esBloquePrincipal = false;
             Bloque bloque = new Bloque("Bloque simple\n(una sentencia)", sentencias, esBloquePrincipal);
@@ -341,7 +341,7 @@ lst_sentencias ::=
             RESULT = sentencias;
         :} |
         sentencia:sent PUNTO_Y_COMA:pyc {:
-            List<Nodo> sentencias = new ArrayList<>();
+            ArrayList<Nodo> sentencias = new ArrayList<>();
             sentencias.add(sent);
             RESULT = sentencias;
         :};
@@ -406,7 +406,7 @@ cuando ::=
 
 bloque_cuando ::=
         PR_IS:pr_is OP_COMPARACION:op disyuncion:disy PR_THEN:pr_then bloque:bloque {:
-            List<CasoCuando> bloqueCuando = new ArrayList<>();
+            ArrayList<CasoCuando> bloqueCuando = new ArrayList<>();
             CasoCuando caso = new CasoCuando(getTipoOpCmp(op), disy, bloque);
             imprimirEtiqueta(caso);
             bloqueCuando.add(caso);
@@ -575,22 +575,22 @@ literal ::=
 
 invocacion_funcion ::=
         PR_WRITELN:nombre_fun PAR_ABRE:pa disyuncion:disy PAR_CIERRA:pc {:
-            List<Expresion> args = new ArrayList<>();
+            ArrayList<Expresion> args = new ArrayList<>();
             args.add(disy);
             RESULT = new InvocacionFuncion(nombre_fun, args, Tipo.UNKNOWN);
         :} |
         PR_WRITELN:nombre_fun PAR_ABRE:pa CADENA:c PAR_CIERRA:pc {:
-            List<Expresion> args = new ArrayList<>();
+            ArrayList<Expresion> args = new ArrayList<>();
             args.add(new Cadena("\\\"" + c + "\\\""));
             RESULT = new InvocacionFuncion(nombre_fun, args, Tipo.UNKNOWN);
         :} |
         PR_WRITE:nombre_fun PAR_ABRE:pa disyuncion:disy PAR_CIERRA:pc {:
-            List<Expresion> args = new ArrayList<>();
+            ArrayList<Expresion> args = new ArrayList<>();
             args.add(disy);
             RESULT = new InvocacionFuncion(nombre_fun, args, Tipo.UNKNOWN);
         :} |
         PR_WRITE:nombre_fun PAR_ABRE:pa CADENA:c PAR_CIERRA:pc {:
-            List<Expresion> args = new ArrayList<>();
+            ArrayList<Expresion> args = new ArrayList<>();
             args.add(new Cadena("\\\"" + c + "\\\""));
             RESULT = new InvocacionFuncion(nombre_fun, args, Tipo.UNKNOWN);
         :} |
@@ -623,13 +623,13 @@ lista_exprs ::=
             RESULT = args;
         :} |
         disyuncion:arg {:
-            List<Expresion> args = new ArrayList<>();
+            ArrayList<Expresion> args = new ArrayList<>();
             args.add(arg);
             RESULT = args;
         :} |
         {:
             // Para que acepte la producción cuando no se pasa ningún argumento,
             // y a la vez genere una lista vacía para pasarle al constructor.
-            List<Expresion> args = new ArrayList<>();
+            ArrayList<Expresion> args = new ArrayList<>();
             RESULT = args;
         :};

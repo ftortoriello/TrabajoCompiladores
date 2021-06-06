@@ -2,6 +2,8 @@ package ar.edu.unnoba.compilador.visitor;
 
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
+import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
+import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.*;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
@@ -14,6 +16,7 @@ import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -116,9 +119,32 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
 
     @Override
     public Void visit(InvocacionFuncion i) throws ExcepcionDeAlcance {
-        if (!i.getEsPredefinida() && !estaEnElAlcance(i)) {
-            throw new ExcepcionDeAlcance(String.format("No se definió la función «%s»", i.getNombre()));
+        // Si es predefinida ya viene validada desde el parser
+        if (i.getEsPredefinida()) return super.visit(i);
+
+        // Validar definición contra la tabla de funciones
+        if (!estaEnElAlcance(i)) throw new ExcepcionDeAlcance(String.format("La función «%s» no está definida", i.getNombre()));
+
+        DecFuncion decFuncion = tablaFunciones.get(i.getNombre()).getDeclaracion();
+
+        // Validar cant. de argumentos
+        int cantArgsFun = decFuncion.getArgs().size();
+        int cantArgsInvo = i.getArgumentos().size();
+        if (cantArgsFun != cantArgsInvo) {
+            throw new ExcepcionDeAlcance(String.format("La función «%s» fue invocada con %s parámetro(s), " +
+                    "cuando requiere %s", decFuncion.getNombre(), cantArgsInvo, cantArgsFun));
         }
+
+        // Cada argumento que se pasó tiene que estar en el alcance, o en su defecto ser un literal
+        for (int iArg = 0; iArg < cantArgsFun; iArg++) {
+            Valor arg = (Valor) i.getArgumentos().get(iArg);
+
+            if (!(arg instanceof Literal) && !estaEnElAlcance((Identificador) arg)) {
+                throw new ExcepcionDeAlcance(String.format("El parámetro «%s» en la posición %s de la " +
+                        "invocación «%s» no está definido.", arg.getNombre(), iArg, i.getNombre()));
+            }
+        }
+
         return super.visit(i);
     }
 

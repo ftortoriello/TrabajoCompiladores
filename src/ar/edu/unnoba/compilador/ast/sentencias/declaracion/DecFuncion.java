@@ -8,15 +8,16 @@ import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class DecFuncion extends Declaracion {
-    private List<DecVar> args;
+    private ArrayList<DecVar> args;
     private Bloque bloque;
     private Alcance alcance;
 
-    public DecFuncion(Identificador ident, List<DecVar> args, Bloque bloque) {
+    public DecFuncion(Identificador ident, ArrayList<DecVar> args, Bloque bloque) {
         super(ident.getNombre(), ident);
         // Invierto el orden de los argumentos porque debido a la forma de las reglas los lee al revés
         Collections.reverse(args);
@@ -28,15 +29,15 @@ public class DecFuncion extends Declaracion {
     public DecFuncion(Identificador ident, Bloque bloque) {
         super(ident.getNombre(), ident);
         bloque.setNombre("Cuerpo\nFUNCIÓN");
-        this.args = Collections.emptyList();
+        this.args = new ArrayList<>();
         this.bloque = bloque;
     }
 
-    public List<DecVar> getArgs() {
+    public ArrayList<DecVar> getArgs() {
         return args;
     }
 
-    public void setArgs(List<DecVar> args) {
+    public void setArgs(ArrayList<DecVar> args) {
         this.args = args;
     }
 
