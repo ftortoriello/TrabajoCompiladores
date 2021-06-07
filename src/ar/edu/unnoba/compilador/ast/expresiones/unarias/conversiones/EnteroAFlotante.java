@@ -7,4 +7,8 @@ public class EnteroAFlotante extends OperacionConversion {
     public EnteroAFlotante(Expresion expresion) {
         super("Entero a flotante", expresion, Tipo.FLOAT);
     }
+
+    public Expresion evaluar() {
+        return getExpresion().evaluar();
+    }
 }

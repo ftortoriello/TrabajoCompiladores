@@ -1,6 +1,7 @@
 package ar.edu.unnoba.compilador.ast.expresiones.valor;
 
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
+import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.visitor.Visitor;
@@ -36,5 +37,10 @@ public class Literal extends Valor {
     @Override
     public Literal accept(Transformer t) throws ExcepcionDeTipos {
         return t.transform(this);
+    }
+
+    @Override
+    public Expresion evaluar() {
+        return this;
     }
 }

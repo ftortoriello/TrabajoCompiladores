@@ -12,4 +12,8 @@ public class Cadena extends Expresion {
     public Cadena accept(Transformer t) {
         return this;
     }
+
+    public Expresion evaluar() {
+        return this;
+    }
 }

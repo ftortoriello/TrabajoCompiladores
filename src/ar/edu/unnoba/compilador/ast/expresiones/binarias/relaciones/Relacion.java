@@ -11,7 +11,7 @@ public abstract class Relacion extends OperacionBinaria {
     }
 
     @Override
-    public OperacionBinaria accept(Transformer t) throws ExcepcionDeTipos {
+    public Expresion accept(Transformer t) throws ExcepcionDeTipos {
         return t.transform(this);
     }
 }

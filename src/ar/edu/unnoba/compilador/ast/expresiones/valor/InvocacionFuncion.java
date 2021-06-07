@@ -58,4 +58,8 @@ public class InvocacionFuncion extends Valor {
     public InvocacionFuncion accept(Transformer t) throws ExcepcionDeTipos {
         return t.transform(this);
     }
+
+    public Expresion evaluar() {
+        return this;
+    }
 }

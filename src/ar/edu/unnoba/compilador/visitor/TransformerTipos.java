@@ -7,6 +7,7 @@ import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Suma;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.*;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.EnteroAFlotante;
@@ -176,12 +177,11 @@ public class TransformerTipos extends Transformer {
             Expresion arg = i.getArgumentos().get(iArg);
             Tipo tipoOriginal = decFun.getArgs().get(iArg).getTipo();
 
-            // TODO acá tendría que modificar el SimboloFuncion, pero no tiene los argumentos
+            // TODO acá tendría que modificar el SimboloFuncion
             //s.getDeclaracion().getArgs().set(iArg, convertirATipo(arg, tipoOriginal));
             i.getArgumentos().set(iArg, convertirATipo(arg, tipoOriginal));
         }
-        // return s
-        return s;
+        return i;
     }
 
     @Override
@@ -192,8 +192,8 @@ public class TransformerTipos extends Transformer {
     }
 
     @Override
-    public OperacionBinaria transform(OperacionBinaria ob) throws ExcepcionDeTipos {
-        ob = super.transform(ob);
+    public Expresion transform(OperacionBinaria ob) throws ExcepcionDeTipos {
+        ob = (OperacionBinaria) super.transform(ob);
         Tipo tipoEnComun = transformOperacionBinaria(ob);
         ob.setTipo(tipoEnComun);
         return ob;
@@ -202,7 +202,7 @@ public class TransformerTipos extends Transformer {
     // Las relaciones son como las operaciones binarias, pero su tipo siempre es boolean
     @Override
     public Relacion transform(Relacion r) throws ExcepcionDeTipos {
-        r = super.transform(r);
+        r = (Relacion) super.transform(r);
         Tipo tipoEnComun = transformOperacionBinaria(r);
         // Sólo las relaciones de igualdad y desigualdad aceptan operandos booleanos
         if ((tipoEnComun == Tipo.BOOLEAN) && !(
@@ -214,8 +214,8 @@ public class TransformerTipos extends Transformer {
     }
 
     @Override
-    public OperacionUnaria transform(OperacionUnaria ou) throws ExcepcionDeTipos {
-        ou = super.transform(ou);
+    public Expresion transform(OperacionUnaria ou) throws ExcepcionDeTipos {
+        ou = (OperacionUnaria) super.transform(ou);
         if (ou.getTipo() == Tipo.UNKNOWN) {
             ou.setTipo(ou.getExpresion().getTipo());
         } else {

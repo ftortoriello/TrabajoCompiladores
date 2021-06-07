@@ -49,7 +49,7 @@ public abstract class OperacionUnaria extends Expresion {
     }
 
     @Override
-    public OperacionUnaria accept(Transformer t) throws ExcepcionDeTipos {
+    public Expresion accept(Transformer t) throws ExcepcionDeTipos {
         return t.transform(this);
     }
 }

@@ -4,6 +4,27 @@
 variable radio is float;
 variable superficie₁ is float = 0;
 
+(* Pruebas constant folding (borrar después) *)
+
+variable x1 is integer = 2 + x1 + 2.1 + 0.9; # ver esta, no reduce pero debería poderse
+variable x2 is float = 5 - -2;
+variable x3 is integer = 3 * 3 * x1;
+variable x4 is float = 10.0 / 4;
+variable x5 is float = 12 / 1.5;
+variable x6 is boolean = 6.2 != 7;
+variable x7 is boolean = true or false or false;
+variable x8 is boolean = true and true or false or false;
+variable x9 is boolean = 2 != 2.0; # esto debería ser true o false? es true ahora
+variable x10 is boolean = 2 == 2;
+variable x11 is boolean = 2 > 2;
+variable x12 is boolean = 2 >= 2;
+variable x13 is boolean = 2 < 2;
+variable x14 is boolean = 2 <= 2;
+variable x15 is integer = - 0.0;
+variable x16 is float = - (- 1);
+variable x17 is boolean = not true;
+variable x18 is boolean = not (false or false);
+
 { Una función }
 function superficie_círculo(x is float) return float
 begin

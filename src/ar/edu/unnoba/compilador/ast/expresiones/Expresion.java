@@ -48,4 +48,6 @@ public abstract class Expresion extends Nodo {
     public Expresion accept(Transformer t) throws ExcepcionDeTipos {
         return null;
     }
+
+    public abstract Expresion evaluar();
 }

@@ -68,7 +68,6 @@ Requisitos:
 * Tuve que definir dos precedencias nuevas: para IDENTIFICADOR y para OP_ARIT_RESTA, pero antes no hacían falta. Ver de eliminar la ambigüedad generada al modificar el parser.
 
 
-
 ## 3.ª Etapa: Generador de código ejecutable a partir del AST
 
 Fecha de entrega: A definirse

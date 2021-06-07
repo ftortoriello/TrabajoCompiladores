@@ -40,7 +40,7 @@ public class GenerarAST {
             // Ejecutar Visitor graficador del árbol sin transformar,
             // y convertirlo a imagen
             graficador = new ASTGraphviz("Árbol de sintaxis abstracta (Conti - Tortoriello)");
-            graficarArbol(graficador.procesar(programa),"ast-original");
+            graficarArbol(graficador.procesar(programa),"1_ast-original");
 
             System.out.println("\nIniciando generador de alcances globales...");
             new GeneradorDeAlcanceGlobal().procesar(programa);
@@ -51,15 +51,19 @@ public class GenerarAST {
             System.out.println("\nIniciando validador de sentencias de control...");
             new VisitorControl().procesar(programa);
 
-            System.out.println("\nReescribiendo estructuras de control...");
-            new ConversorDeEstructuras().procesar(programa);
-
             System.out.println("\nIniciando validación y conversión de tipos...");
             new TransformerTipos().procesar(programa);
 
             // Mostrar el árbol transformado
             graficador = new ASTGraphviz("AST con conversión de tipos (Conti - Tortoriello)");
-            graficarArbol(graficador.visit(programa),"ast-transformado");
+            graficarArbol(graficador.visit(programa),"2_ast-transformado");
+
+            System.out.println("\nIniciando proceso de optimización...");
+            new Optimizador().procesar(programa);
+
+            // Mostrar el árbol optimizado
+            graficador = new ASTGraphviz("AST optimizado (Conti - Tortoriello)");
+            graficarArbol(graficador.visit(programa),"3_ast-optimizado");
         } catch (ClassCastException e) {
             // Error sintáctico
             e.printStackTrace(System.out);
