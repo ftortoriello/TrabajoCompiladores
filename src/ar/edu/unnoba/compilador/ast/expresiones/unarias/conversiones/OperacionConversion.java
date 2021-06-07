@@ -12,4 +12,8 @@ public abstract class OperacionConversion extends OperacionUnaria {
     public OperacionConversion(String nombre, Expresion expresion, Tipo tipo) {
         super(nombre, expresion, tipo);
     }
+
+    public Expresion evaluar() {
+        return getExpresion().evaluar();
+    }
 }

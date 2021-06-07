@@ -6,7 +6,8 @@ variable superficie₁ is float = 0;
 
 (* Pruebas constant folding (borrar después) *)
 
-variable x1 is integer = 2 + x1 + 2.1 + 0.9; # ver esta, no reduce pero debería poderse
+variable x0 is float = 0.5 + 0.5;
+variable x1 is integer = 2 + x1 + 2.1 + 0.9; # ver esta, no reduce pero debería poderse dejar en x1 + 5
 variable x2 is float = 5 - -2;
 variable x3 is integer = 3 * 3 * x1;
 variable x4 is float = 10.0 / 4;

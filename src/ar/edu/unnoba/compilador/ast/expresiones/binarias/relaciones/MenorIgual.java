@@ -8,17 +8,4 @@ public class MenorIgual extends Relacion {
     public MenorIgual(Expresion izquierda, Expresion derecha) {
         super(izquierda, derecha, "<=");
     }
-
-    @Override
-    public Expresion evaluar() {
-        if (!(getIzquierda().evaluar() instanceof Literal) || !(getDerecha().evaluar() instanceof Literal)) {
-            return this;
-        }
-
-        float litIzq = Float.parseFloat(((Literal) getIzquierda().evaluar()).getValor());
-        float litDer = Float.parseFloat(((Literal) getDerecha().evaluar()).getValor());
-        boolean resultado = litIzq <= litDer;
-
-        return new Literal(String.valueOf(resultado), Tipo.BOOLEAN, "Literal BOOLEAN");
-    }
 }

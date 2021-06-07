@@ -7,8 +7,4 @@ public class FlotanteAEntero extends OperacionConversion {
     public FlotanteAEntero(Expresion expresion) {
         super("Flotante a entero", expresion, Tipo.INTEGER);
     }
-
-    public Expresion evaluar() {
-        return getExpresion().evaluar();
-    }
 }
