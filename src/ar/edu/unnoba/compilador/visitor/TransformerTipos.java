@@ -14,6 +14,7 @@ import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.EnteroAFlot
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.FlotanteAEntero;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.*;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
+import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFuncion;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
@@ -249,8 +250,8 @@ public class TransformerTipos extends Transformer {
     }
 
     @Override
-    public Para transform(Para p) throws ExcepcionDeTipos {
-        p = super.transform(p);
+    public Sentencia transform(Para p) throws ExcepcionDeTipos {
+        p = (Para) super.transform(p);
         // No se puede convertir OperacionConversion a Identificador acá.
         // Para que soporte conversiones implícitas de flotante a entero
         // tendríamos que reemplazar en Para el Identificador por Expresion.

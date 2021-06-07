@@ -1,6 +1,7 @@
 package ar.edu.unnoba.compilador.ast.sentencias.iteracion;
 
 import ar.edu.unnoba.compilador.ast.base.Bloque;
+import ar.edu.unnoba.compilador.ast.base.Nodo;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
@@ -24,13 +25,14 @@ public class Para extends Sentencia {
         this.ident = ident;
         this.valorInicial = valorInicial;
         this.valorFinal = valorFinal;
-        // FIXME: Esto debería hacerlo el transformer?
+
         if (valorInicial <= valorFinal) {
             this.salto = Math.abs(salto);
         } else {
             // Si valorFinal < valorInicial, dejar salto negativo.
             this.salto = -Math.abs(salto);
         }
+
         bloqueSentencias.setNombre("Cuerpo\nFOR");
         this.bloqueSentencias = bloqueSentencias;
     }
@@ -75,7 +77,7 @@ public class Para extends Sentencia {
     }
 
     @Override
-    public Para accept(Transformer t) throws ExcepcionDeTipos {
+    public Nodo accept(Transformer t) throws ExcepcionDeTipos {
         return t.transform(this);
     }
 }

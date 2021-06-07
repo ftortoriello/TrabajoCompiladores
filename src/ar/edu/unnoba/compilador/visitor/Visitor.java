@@ -204,6 +204,8 @@ public abstract class Visitor<T> {
 
     // Procesos implementados en los visitors específicos
     // TODO: Hace falta acá? Es usado por ASTGraphviz nomás
+    // Creo que se puede eliminar pero habría que cambiar todas las llamadas de tipo resultado.append(super.visit(p))
+    // Y otro problema es que todos lo visit de acá tienen tipo de retorno T, si sacamos los procesar qué retornan?
 
     protected abstract T procesarNodo(Nodo n);
 

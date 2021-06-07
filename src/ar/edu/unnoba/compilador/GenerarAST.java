@@ -45,6 +45,9 @@ public class GenerarAST {
             System.out.println("\nIniciando generador de alcances globales...");
             new GeneradorDeAlcanceGlobal().procesar(programa);
 
+            System.out.println("\nReescribiendo estructuras de control...");
+            new ConversorDeEstructuras().procesar(programa);
+
             System.out.println("\nIniciando generador de alcances locales...");
             new GeneradorDeAlcancesLocales().procesar(programa);
 

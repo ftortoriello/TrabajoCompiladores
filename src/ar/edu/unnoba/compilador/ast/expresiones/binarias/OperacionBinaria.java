@@ -66,6 +66,4 @@ public abstract class OperacionBinaria extends Expresion {
     public Expresion accept(Transformer t) throws ExcepcionDeTipos {
         return t.transform(this);
     }
-
-
 }

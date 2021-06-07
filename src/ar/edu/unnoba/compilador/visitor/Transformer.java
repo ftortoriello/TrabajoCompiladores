@@ -16,6 +16,7 @@ import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.EnteroAFlotante;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.FlotanteAEntero;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
+import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Continuar;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Salir;
@@ -71,7 +72,7 @@ public abstract class Transformer {
         return b;
     }
 
-    public CasoCuando transform(CasoCuando cc) throws ExcepcionDeTipos {
+    public Sentencia transform(CasoCuando cc) throws ExcepcionDeTipos {
         cc.setExpr(cc.getExpr().accept(this));
         cc.setBloque(cc.getBloque().accept(this));
         return cc;
@@ -169,12 +170,12 @@ public abstract class Transformer {
         return ses;
     }
 
-    public Cuando transform(Cuando c) throws ExcepcionDeTipos {
+    public Sentencia transform(Cuando c) throws ExcepcionDeTipos {
         c.setCondicion(c.getCondicion().accept(this));
 
         List<CasoCuando> casosCuando = new ArrayList<>();
         for (CasoCuando caso : c.getCasos()) {
-            casosCuando.add(caso.accept(this));
+            casosCuando.add((CasoCuando) caso.accept(this));
         }
         c.setCasos(casosCuando);
 
@@ -188,7 +189,7 @@ public abstract class Transformer {
         return m;
     }
 
-    public Para transform(Para p) throws ExcepcionDeTipos {
+    public Nodo transform(Para p) throws ExcepcionDeTipos {
         p.setIdent(p.getIdent().accept(this));
         p.setBloqueSentencias(p.getBloqueSentencias().accept(this));
         return p;

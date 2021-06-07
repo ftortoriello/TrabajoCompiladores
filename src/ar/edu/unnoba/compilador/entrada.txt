@@ -71,7 +71,16 @@ main is
 
     variable i is integer;
     for i from 5 to 1 do begin
-        write("Se acaba en "); writeln(i);
+        write("Se acaba en ");
+        writeln(i);
+    end;
+
+    # El for de arriba debería ser equivalente a:
+    i = 5;
+    while i <= 1 do begin
+        write("Se acaba en ");
+        writeln(i);
+        i = i + -1;
     end;
 
     writeln("Se acabó\n\nFin!");

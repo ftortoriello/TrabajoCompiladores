@@ -56,7 +56,7 @@ public class CasoCuando extends Sentencia {
     }
 
     @Override
-    public CasoCuando accept(Transformer t) throws ExcepcionDeTipos {
+    public Sentencia accept(Transformer t) throws ExcepcionDeTipos {
         return t.transform(this);
     }
 }
