@@ -5,7 +5,7 @@ variable radio is float;
 variable superficie₁ is float = 0;
 
 (* Pruebas constant folding (borrar después) *)
-
+{
 variable x0 is float = 0.5 + 0.5;
 variable x1 is integer = 2 + x1 + 2.1 + 0.9; # ver esta, no reduce pero debería poderse dejar en x1 + 5
 variable x2 is float = 5 - -2;
@@ -25,6 +25,7 @@ variable x15 is integer = - 0.0;
 variable x16 is float = - (- 1);
 variable x17 is boolean = not true;
 variable x18 is boolean = not (false or false);
+}
 
 { Una función }
 function superficie_círculo(x is float) return float
@@ -48,6 +49,7 @@ variable superficie₂ is float;
 
 # Procedimiento principal
 main is
+{
     writeln("Inicio del programa");
     writeln(superficie₁);
     writeln(superficie₂);
@@ -57,6 +59,7 @@ main is
     radio = read_float();
     superficie₂ = superficie_círculo(radio);
     writeln(superficie₂);
+}
 
     variable justo is boolean = false;
     when superficie_círculo(radio)
@@ -67,8 +70,18 @@ main is
         end
         else writeln("Es grande");
 
-    write("Acertó: "); writeln(justo);
+    # El when de arriba debería ser equivalente a:
+    variable temp is float = superficie_círculo(radio);
+    if temp < 100 then writeln("Es pequeño")
+    else if temp == 100 then begin
+        writeln("Qué puntería!");
+        justo = true;
+    end
+    else writeln("Es grande");
 
+
+    write("Acertó: "); writeln(justo);
+{
     variable i is integer;
     for i from 5 to 1 do begin
         write("Se acaba en ");
@@ -82,7 +95,7 @@ main is
         writeln(i);
         i = i + -1;
     end;
-
+}
     writeln("Se acabó\n\nFin!");
 end.
 

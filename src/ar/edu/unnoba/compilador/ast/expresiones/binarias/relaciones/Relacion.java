@@ -2,6 +2,7 @@ package ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones;
 
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
+import ar.edu.unnoba.compilador.ast.expresiones.OperadorCmp;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
@@ -41,5 +42,37 @@ public abstract class Relacion extends OperacionBinaria {
             default:
                 throw new IllegalStateException("Operador inesperado al aplicar Constant Folding: " + getNombre());
         }
+    }
+
+    // Crea una clase según sea el operador utilizado
+    // Si se utiliza el operador de IGUALDAD, devuelvo una clase Igualdad, etc.
+    public static Relacion getClaseRel(OperadorCmp op, Expresion expr1, Expresion expr2) {
+        Relacion comp;
+
+        switch (op) {
+            case IGUALDAD:
+                comp = new Igualdad(expr1, expr2);
+                break;
+            case DESIGUALDAD:
+                comp = new Desigualdad(expr1, expr2);
+                break;
+            case MAYOR:
+                comp = new Mayor(expr1, expr2);
+                break;
+            case MAYOR_IGUAL:
+                comp = new MayorIgual(expr1, expr2);
+                break;
+            case MENOR:
+                comp = new Menor(expr1, expr2);
+                break;
+            case MENOR_IGUAL:
+                comp = new MenorIgual(expr1, expr2);
+                break;
+            default:
+                throw new IllegalStateException("Operador inesperado: " + op);
+
+        }
+
+        return comp;
     }
 }

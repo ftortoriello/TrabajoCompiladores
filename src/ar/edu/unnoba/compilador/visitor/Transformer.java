@@ -170,7 +170,7 @@ public abstract class Transformer {
         return ses;
     }
 
-    public Sentencia transform(Cuando c) throws ExcepcionDeTipos {
+    public Nodo transform(Cuando c) throws ExcepcionDeTipos {
         c.setCondicion(c.getCondicion().accept(this));
 
         List<CasoCuando> casosCuando = new ArrayList<>();

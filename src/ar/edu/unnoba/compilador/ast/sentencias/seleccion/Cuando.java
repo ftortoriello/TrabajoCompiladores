@@ -1,6 +1,7 @@
 package ar.edu.unnoba.compilador.ast.sentencias.seleccion;
 
 import ar.edu.unnoba.compilador.ast.base.Bloque;
+import ar.edu.unnoba.compilador.ast.base.Nodo;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
@@ -52,7 +53,7 @@ public class Cuando extends Seleccion {
     }
 
     @Override
-    public Sentencia accept(Transformer t) throws ExcepcionDeTipos {
+    public Nodo accept(Transformer t) throws ExcepcionDeTipos {
         return t.transform(this);
     }
 }

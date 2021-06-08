@@ -7,14 +7,27 @@ import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Suma;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.MenorIgual;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
-import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarInicializada;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
+import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
+import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
+
+import java.util.ArrayList;
 
 public class ConversorDeEstructuras extends Transformer {
+
+    private int contVarTemp = 0;
+
+    private int getContVarTemp() {
+        contVarTemp = contVarTemp + 1;
+        return contVarTemp;
+    }
 
     @Override
     public Bloque transform(Para p) throws ExcepcionDeTipos {
@@ -34,7 +47,7 @@ public class ConversorDeEstructuras extends Transformer {
         Expresion condMientras = new MenorIgual(p.getIdent(), valHasta);
 
         // Añadir incremento del contador al final del bloque for
-        Literal salto = new Literal(String.valueOf(p.getSalto()), Tipo.INTEGER, "Uno");
+        Literal salto = new Literal(String.valueOf(p.getSalto()), Tipo.INTEGER, "Salto");
         Expresion inc = new Suma(p.getIdent(), salto);
         Asignacion asigInc = new Asignacion(p.getIdent(), inc);
         p.getBloqueSentencias().getSentencias().add(asigInc);
@@ -48,9 +61,49 @@ public class ConversorDeEstructuras extends Transformer {
     }
 
     @Override
-    public Cuando transform(Cuando c) throws ExcepcionDeTipos {
+    public Bloque transform(Cuando c) throws ExcepcionDeTipos {
         c = (Cuando) super.transform(c);
-        return c;
+
+        // El bloque que va a contener la estructura equivalente al when
+        Bloque bloqueNuevo = new Bloque("Conversión\nCASE a IF", false);
+
+        // La expresión del case pasa a estar en una nueva variable temporal
+        // TODO: ¿esto tendría que ser un Símbolo y estar en el alcance?
+        Identificador identTemp = new Identificador("temp" + getContVarTemp(), c.getCondicion().getTipo());
+        DecVarInicializada decVarTemp  = new DecVarInicializada("Variable temporal WHEN -> IF", identTemp, c.getCondicion());
+        bloqueNuevo.getSentencias().add(decVarTemp);
+
+        // Convertir los case a expresiones equivalentes en if
+        SiEntoncesSino seGlobal = null;
+        SiEntoncesSino seActual = null;
+
+        for (CasoCuando cc : c.getCasos()) {
+            // Crear la condición del if en base a la del when y el case
+            Relacion cond = Relacion.getClaseRel(cc.getOp(), c.getCondicion(), cc.getExpr());
+            if (seActual == null) {
+                // Primera vez que entro al for, creo el if principal
+                seActual = new SiEntoncesSino(cond, cc.getBloque());
+                seGlobal = seActual;
+            } else {
+                // Los subsiguientes ifs se encadenan al else del if anterior
+                SiEntoncesSino seInterno = new SiEntoncesSino(cond, cc.getBloque());
+                ArrayList<Nodo> ls = new ArrayList<>();
+                ls.add(seInterno);
+                Bloque bloqueElse = new Bloque("ELSE", ls, false);
+                seActual.setBloqueSino(bloqueElse);
+                seActual = seInterno;
+            }
+        }
+
+        // Agregar el else del switch (si lo tiene)
+        if(seActual != null && c.getBloqueElse() != null) {
+            seActual.setBloqueSino(c.getBloqueElse());
+        }
+
+        // Agrego al bloque el if externo
+        bloqueNuevo.getSentencias().add(seGlobal);
+
+        return bloqueNuevo;
     }
 
 }

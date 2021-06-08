@@ -73,86 +73,6 @@ parser code
     private void imprimirEtiqueta(Nodo nodo) {
         //System.out.println("Se creó el nodo " + nodo.getClass().getSimpleName());
     }
-
-    // Crea una clase según sea el operador utilizado
-    // Si se utiliza el operador de IGUALDAD, devuelvo una clase Igualdad, etc.
-    public Relacion getClaseRel(OperadorCmp op, Expresion expr1, Expresion expr2) {
-        Relacion comp;
-
-        switch (op) {
-            case IGUALDAD:
-                comp = new Igualdad(expr1, expr2);
-                break;
-            case DESIGUALDAD:
-                comp = new Desigualdad(expr1, expr2);
-                break;
-            case MAYOR:
-                comp = new Mayor(expr1, expr2);
-                break;
-            case MAYOR_IGUAL:
-                comp = new MayorIgual(expr1, expr2);
-                break;
-            case MENOR:
-                comp = new Menor(expr1, expr2);
-                break;
-            default:
-                comp = new MenorIgual(expr1, expr2);
-                break;
-        }
-
-        return comp;
-    }
-
-    // Recibe el lexema TIPO (en forma de cadena) y devuelve el enum Tipo correspondiente
-    public Tipo getTipoDato(String tipoStr) {
-        Tipo tipo;
-
-        switch (tipoStr.toUpperCase()) {
-            case "BOOLEAN":
-                tipo = Tipo.BOOLEAN;
-                break;
-            case "INTEGER":
-                tipo = Tipo.INTEGER;
-                break;
-            case "FLOAT":
-                tipo = Tipo.FLOAT;
-                break;
-            default:
-                tipo = Tipo.UNKNOWN;
-                break;
-        }
-
-        return tipo;
-    }
-
-    // Recibe el lexema OP_COMPARACION (en forma de cadena) y devuelve el enum OperadorCmp correspondiente
-    public OperadorCmp getTipoOpCmp(String opStr) {
-        OperadorCmp op;
-
-        switch (opStr) {
-            case "==":
-                op = OperadorCmp.IGUALDAD;
-                break;
-            case "!=":
-                op = OperadorCmp.DESIGUALDAD;
-                break;
-            case ">":
-                op = OperadorCmp.MAYOR;
-                break;
-            case ">=":
-                op = OperadorCmp.MAYOR_IGUAL;
-                break;
-            case "<":
-                op = OperadorCmp.MENOR;
-                break;
-            default:
-                op = OperadorCmp.MENOR_IGUAL;
-                break;
-        }
-
-        return op;
-
-    }
 :};
 
 terminal String PR_MAIN_IS, PR_END_PUNTO,
@@ -256,7 +176,7 @@ dec_var ::=
 
 arg_dec ::=
         IDENTIFICADOR:id PR_IS:pr_is TIPO_DE_DATO:td {:
-            Identificador ident = new Identificador(id, getTipoDato(td));
+            Identificador ident = new Identificador(id, Tipo.getTipoDato(td));
             DecVar decVar = new DecVar("Variable sin inicializar", ident);
             imprimirEtiqueta(decVar);
             RESULT = decVar;
@@ -264,7 +184,7 @@ arg_dec ::=
 
 arg_dec_default ::=
         IDENTIFICADOR:id PR_IS:pr_is TIPO_DE_DATO:td IGUAL:igual disyuncion:disy {:
-            Identificador ident = new Identificador(id, getTipoDato(td));
+            Identificador ident = new Identificador(id, Tipo.getTipoDato(td));
             DecVarInicializada decVar = new DecVarInicializada("Variable inicializada", ident, disy);
             imprimirEtiqueta(decVar);
             RESULT = decVar;
@@ -272,13 +192,13 @@ arg_dec_default ::=
 
 dec_fun ::=
         PR_FUNCTION:pr_funcion IDENTIFICADOR:id PAR_ABRE:pa PAR_CIERRA:pc PR_RETURN:ret TIPO_DE_DATO:td bloque:bloque PUNTO_Y_COMA:pyc {:
-            Identificador ident = new Identificador(id, getTipoDato(td));
+            Identificador ident = new Identificador(id, Tipo.getTipoDato(td));
             DecFuncion decFun = new DecFuncion(ident, bloque);
             imprimirEtiqueta(decFun);
             RESULT = decFun;
         :} |
         PR_FUNCTION:pr_funcion IDENTIFICADOR:id PAR_ABRE:pa lst_args_dec:args PAR_CIERRA:pc PR_RETURN:ret TIPO_DE_DATO:td bloque:bloque PUNTO_Y_COMA:pyc {:
-            Identificador ident = new Identificador(id, getTipoDato(td));
+            Identificador ident = new Identificador(id, Tipo.getTipoDato(td));
             DecFuncion decFun = new DecFuncion(ident, args, bloque);
             imprimirEtiqueta(decFun);
             RESULT = decFun;
@@ -407,13 +327,13 @@ cuando ::=
 bloque_cuando ::=
         PR_IS:pr_is OP_COMPARACION:op disyuncion:disy PR_THEN:pr_then bloque:bloque {:
             ArrayList<CasoCuando> bloqueCuando = new ArrayList<>();
-            CasoCuando caso = new CasoCuando(getTipoOpCmp(op), disy, bloque);
+            CasoCuando caso = new CasoCuando(OperadorCmp.getTipoOpCmp(op), disy, bloque);
             imprimirEtiqueta(caso);
             bloqueCuando.add(caso);
             RESULT = bloqueCuando;
         :} |
         PR_IS:pr_is OP_COMPARACION:op disyuncion:disy PR_THEN:pr_then bloque:bloque bloque_cuando:bloqueCuando {:
-            CasoCuando caso = new CasoCuando(getTipoOpCmp(op), disy, bloque);
+            CasoCuando caso = new CasoCuando(OperadorCmp.getTipoOpCmp(op), disy, bloque);
             imprimirEtiqueta(caso);
             bloqueCuando.add(caso);
             RESULT = bloqueCuando;
@@ -492,7 +412,7 @@ negacion_logica ::=
 
 relacion ::=
         adicion:adicion1 OP_COMPARACION:op adicion:adicion2 {:
-            OperacionBinaria rel = getClaseRel(getTipoOpCmp(op), adicion1, adicion2);
+            OperacionBinaria rel = Relacion.getClaseRel(OperadorCmp.getTipoOpCmp(op), adicion1, adicion2);
             imprimirEtiqueta(rel);
             RESULT = rel;
         :} |

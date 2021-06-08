@@ -16,6 +16,13 @@ public class SiEntoncesSino extends SiEntonces {
         this.bloqueSino = bloqueSino;
     }
 
+    // TODO: Necesito este constructor con el bloque else vacío para la conversión de switch a if,
+    // pero capaz pueda hacerse de otra manera (¿sino para qué tenemos la clase SiEntonces?)
+    public SiEntoncesSino(Expresion condicion, Bloque bloqueSiEntonces) {
+        super("Bloque\nIF-THEN-ELSE", condicion, bloqueSiEntonces);
+        this.bloqueSino = null;
+    }
+
     public Bloque getBloqueSino() {
         return bloqueSino;
     }
