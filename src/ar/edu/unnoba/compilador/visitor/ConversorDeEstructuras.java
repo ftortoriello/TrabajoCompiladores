@@ -45,6 +45,8 @@ public class ConversorDeEstructuras extends Transformer {
 
         // Crear condición del while según los valores del for
         Expresion condMientras = new MenorIgual(p.getIdent(), valHasta);
+        // Las relaciones son siempre boolean, y puedo setearlo directamente porque ya está validado
+        condMientras.setTipo(Tipo.BOOLEAN);
 
         // Añadir incremento del contador al final del bloque for
         Literal salto = new Literal(String.valueOf(p.getSalto()), Tipo.INTEGER, "Salto");
@@ -80,6 +82,7 @@ public class ConversorDeEstructuras extends Transformer {
         for (CasoCuando cc : c.getCasos()) {
             // Crear la condición del if en base a la del when y el case
             Relacion cond = Relacion.getClaseRel(cc.getOp(), c.getCondicion(), cc.getExpr());
+            cond.setTipo(Tipo.BOOLEAN);
             if (seActual == null) {
                 // Primera vez que entro al for, creo el if principal
                 seActual = new SiEntoncesSino(cond, cc.getBloque());

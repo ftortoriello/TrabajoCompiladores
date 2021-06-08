@@ -54,7 +54,7 @@ public class GenerarAST {
             System.out.println("\nIniciando validación y conversión de tipos...");
             new TransformerTipos().procesar(programa);
 
-            System.out.println("\nReescribiendo estructuras de control...");
+            System.out.println("\nReescribiendo estructuras when y for...");
             new ConversorDeEstructuras().procesar(programa);
 
             // Mostrar el árbol transformado
