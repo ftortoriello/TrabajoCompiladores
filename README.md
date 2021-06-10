@@ -50,7 +50,7 @@ Fecha de entrega: 04/06/2021
 
 Requisitos:
 * AST, con su visualización mediante graphviz: :white_check_mark:
-* Verificación de tipos de datos. Mostrar error si los tipos son incompatibles (por ejemplo: suma entre booleano y entero): :white_check_mark:
+* Verificación de tipos de datos. Mostrar error si los tipos son incompatibles (por ejemplo: booleanos y números): :white_check_mark:
   * expresiones
   * variables
   * funciones
