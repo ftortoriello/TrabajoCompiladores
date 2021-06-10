@@ -50,15 +50,19 @@ Fecha de entrega: 04/06/2021
 
 Requisitos:
 * AST, con su visualización mediante graphviz: :white_check_mark:
-* Verificación de tipos de datos. Mostrar error si los tipos son incompatibles (por ejemplo: booleanos y números): :white_check_mark:
+* Verificación de tipos de datos. Mostrar error si los tipos son incompatibles (por ejemplo: suma entre booleano y entero): :white_check_mark:
   * expresiones
   * variables
   * funciones
   * parámetros
-* Opcional: Conversiones implícitas de tipo: :white_check_mark:
 * Verificación de ámbito de las variables y funciones: :white_check_mark:
 
-* Constant folding: :x:
+Opcional: 
+* Conversiones implícitas de tipo: :white_check_mark:
+* Transformación de estruras when y for:  :white_check_mark:, pero falta ver cómo solucionamos el tema de las nuevas variables (¿volver a pasar el visitor generador de alcances?)
+* Constant folding: :x:. casos básicos funcionando (por ej. 1 + 2), los más complejos no (por ej. 1 + x + 2 tendría que quedar x + 3 o 3 + x)
+* Reemplazo de constantes por su valor: :x:
+* Eliminación de variables sin uso: :x:
 
 ### Revisar
 
