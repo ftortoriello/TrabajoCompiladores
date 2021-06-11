@@ -1,5 +1,6 @@
 package ar.edu.unnoba.compilador.visitor;
 
+import ar.edu.unnoba.compilador.ast.base.Alcance;
 import ar.edu.unnoba.compilador.ast.base.Bloque;
 import ar.edu.unnoba.compilador.ast.base.Nodo;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
@@ -10,7 +11,9 @@ import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.MenorIgual;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.SimboloVariable;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarInicializada;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
@@ -33,8 +36,12 @@ public class ConversorDeEstructuras extends Transformer {
     public Bloque transform(Para p) throws ExcepcionDeTipos {
         p = (Para) super.transform(p);
 
-        // bloqueNuevo va a contener el while
+        // bloqueNuevo va a contener el while equivalente al for
         Bloque bloqueNuevo = new Bloque("Conversión\nFOR a WHILE", false);
+
+        // Genero y defino el alcance padre para que no se rompa la cadena
+        bloqueNuevo.setAlcance(new Alcance("Alcance conversión FOR -> WHEN"));
+        bloqueNuevo.getAlcance().setPadre(p.getBloqueSentencias().getAlcance().getPadre());
 
         Literal valDesde = new Literal(String.valueOf(p.getValorInicial()), Tipo.INTEGER, "Valor desde");
         Literal valHasta = new Literal(String.valueOf(p.getValorFinal()), Tipo.INTEGER, "Valor hasta");
@@ -68,12 +75,24 @@ public class ConversorDeEstructuras extends Transformer {
 
         // El bloque que va a contener la estructura equivalente al when
         Bloque bloqueNuevo = new Bloque("Conversión\nCASE a IF", false);
+        bloqueNuevo.setAlcance(new Alcance("Alcance conversión WHEN -> IF"));
 
         // La expresión del case pasa a estar en una nueva variable temporal
-        // TODO: ¿esto tendría que ser un Símbolo y estar en el alcance?
-        Identificador identTemp = new Identificador("temp" + getContVarTemp(), c.getCondicion().getTipo());
-        DecVarInicializada decVarTemp  = new DecVarInicializada("Variable temporal WHEN -> IF", identTemp, c.getCondicion());
+        String nombreVarTemp = "$tmp_" + getContVarTemp();
+        Identificador identTemp = new Identificador(nombreVarTemp, c.getCondicion().getTipo());
+        DecVarInicializada decVarTemp  = new DecVarInicializada(nombreVarTemp + " (WHEN -> IF)",
+                identTemp, c.getCondicion());
+        SimboloVariable simboloTemp = new SimboloVariable(decVarTemp);
+
+        // Agrego la declaración en la lista de sentencias
         bloqueNuevo.getSentencias().add(decVarTemp);
+
+        // Agrego el nuevo símbolo en el alcance
+        bloqueNuevo.getAlcance().put(identTemp.getNombre(), simboloTemp);
+
+        // Tengo que hacer esta chanchada para rescatar el alcance en el que está el when y no perder el padre
+        Alcance alcancePadre = c.getCasos().get(0).getBloque().getAlcance().getPadre();
+        bloqueNuevo.getAlcance().setPadre(alcancePadre);
 
         // Convertir los case a expresiones equivalentes en if
         SiEntoncesSino seGlobal = null;

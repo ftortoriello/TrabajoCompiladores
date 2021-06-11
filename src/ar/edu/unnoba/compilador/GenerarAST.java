@@ -66,12 +66,6 @@ public class GenerarAST {
             System.out.println("\nReescribiendo estructuras when y for...");
             new ConversorDeEstructuras().procesar(programa);
 
-            // Pongo esto temporalmente para que no queden las variables de las transformaciones colgadas
-            System.out.println("\nIniciando generador de alcances locales...");
-            new GeneradorDeAlcancesLocales().procesar(programa);
-            System.out.println("\nIniciando validación y conversión de tipos...");
-            new TransformerTipos().procesar(programa);
-
             // Mostrar el árbol transformado
             graficador = new ASTGraphviz("AST con conversión de tipos (Conti - Tortoriello)");
             graficarArbol(graficador.visit(programa),"2_ast-transformado");

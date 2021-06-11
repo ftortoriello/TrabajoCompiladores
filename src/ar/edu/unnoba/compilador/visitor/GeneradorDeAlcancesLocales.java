@@ -29,7 +29,7 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
     private Map<String, SimboloFuncion> tablaFunciones;
 
     // Agregar la declaración al ámbito en el que se encuentra
-    private void agregarSimbolo(Declaracion d) throws ExcepcionDeAlcance {
+    private void agregarSimbolo(DecVar d) throws ExcepcionDeAlcance {
         if (alcanceGlobal == alcanceActual) {
             // Este Visitor sólo agrega símbolos locales, los globales ya los agregó el visitor
             // de alcance global
