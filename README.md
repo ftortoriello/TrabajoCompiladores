@@ -55,10 +55,14 @@ Requisitos:
   * variables
   * funciones
   * parámetros
-* Opcional: Conversiones implícitas de tipo: :white_check_mark:
 * Verificación de ámbito de las variables y funciones: :white_check_mark:
 
-* Constant folding: :x:
+Opcional: 
+* Conversiones implícitas de tipo: :white_check_mark:
+* Transformación de estruras when y for:  :white_check_mark:, pero falta ver cómo solucionamos el tema de las nuevas variables (¿volver a pasar el visitor generador de alcances?)
+* Constant folding: :x:. casos básicos funcionando (por ej. 1 + 2), los más complejos no (por ej. 1 + x + 2 tendría que quedar x + 3 o 3 + x)
+* Reemplazo de constantes por su valor: :x:
+* Eliminación de las declaraciones de variables sin uso: :x:
 
 ### Revisar
 
