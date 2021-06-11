@@ -5,6 +5,7 @@ import java.util.List;
 
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeCompilacion;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
@@ -214,6 +215,8 @@ public abstract class Visitor<T> {
     protected abstract T procesarEncabezado(Encabezado encabezado, List<T> sentencias);
 
     protected abstract T procesarBloque(Bloque bloque, List<T> sentencias);
+
+    protected abstract T procesarBloque(Bloque bloque, List<T> declaraciones, List<T> sentencias);
 
     protected abstract T procesarOperacionBinaria(OperacionBinaria ob, T ei, T ed);
 

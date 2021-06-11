@@ -70,7 +70,21 @@ Requisitos:
 
 ## 3.ª Etapa: Generador de código ejecutable a partir del AST
 
-Fecha de entrega: A definirse
+Fecha de entrega: 25/06/2021
 
 Requisitos:
-A definirse
+* Estructura gral. del programa: :x:
+* Declaración de funciones: :x:
+* Funciones predefinidas: :x:
+* Declaración de variables: :x:
+* Asignaciones: :x:
+* Operaciones lógicas: :x:
+* Operaciones relacionales: :x:
+* Operaciones aritméticas: :x:
+* Estructuras de selección: :x:
+* Estructuras de iteración: :x:
+* Invocación de funciones: :x:
+
+Cosas secundarias:
+* Tomar la configuración de la máquina anfitrión de un archivo que no esté en el git para no pisarnos.
+* Ver excepciones en GeneradorDeCodigo.java. Está usando ExcepcionDeAlcance porque el visitor abstracto tiene esas definidad en la firma de los métodos. Probé cambiarlas por Exception para que quede más abstracto y poder definir excepciones específicas en cada visitor, pero igual hay lío porque esos visitors llaman a su padre. Y todos los nodos tienen también definido un tipo específico de excepción en los métodos accept y visit.

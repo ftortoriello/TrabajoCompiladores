@@ -12,6 +12,8 @@ public abstract class OperacionBinaria extends Expresion {
     private Expresion izquierda;
     private Expresion derecha;
 
+    public abstract String getInstruccionIR();
+
     public OperacionBinaria(Expresion izquierda, Expresion derecha) {
         super(Tipo.UNKNOWN);
         this.izquierda = izquierda;

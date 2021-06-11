@@ -9,6 +9,9 @@ import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
 import ar.edu.unnoba.compilador.visitor.Transformer;
 
 public abstract class Relacion extends OperacionBinaria {
+
+
+
     public Relacion(Expresion izquierda, Expresion derecha, String nombre) {
         super(izquierda, derecha, nombre);
     }
@@ -74,5 +77,11 @@ public abstract class Relacion extends OperacionBinaria {
         }
 
         return comp;
+    }
+
+    @Override
+    public String getInstruccionIR() {
+        // TODO las comparaciones hay que hacerlas a mano
+        return null;
     }
 }

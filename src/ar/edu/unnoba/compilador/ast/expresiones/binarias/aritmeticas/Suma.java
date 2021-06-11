@@ -9,4 +9,9 @@ public class Suma extends OperacionBinariaAritmetica {
     public Suma(Expresion izquierda, Expresion derecha) {
         super(izquierda, derecha, "+");
     }
+
+    @Override
+    public String getInstruccionIR() {
+        return ((this.getTipo() == Tipo.INTEGER) ? "add" : "fadd");
+    }
 }

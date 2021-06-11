@@ -9,4 +9,9 @@ public class Multiplicacion extends OperacionBinariaAritmetica {
     public Multiplicacion(Expresion izquierda, Expresion derecha) {
         super(izquierda, derecha, "*");
     }
+
+    @Override
+    public String getInstruccionIR() {
+        return ((this.getTipo() == Tipo.INTEGER) ? "mul" : "fmul");
+    }
 }

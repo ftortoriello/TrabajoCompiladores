@@ -9,4 +9,9 @@ public class Disyuncion extends OperacionBinariaLogica {
     public Disyuncion(Expresion izquierda, Expresion derecha) {
         super(izquierda, derecha, "OR");
     }
+
+    @Override
+    public String getInstruccionIR() {
+        return "or";
+    }
 }

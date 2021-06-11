@@ -9,4 +9,9 @@ public class Division extends OperacionBinariaAritmetica {
     public Division(Expresion izquierda, Expresion derecha) {
         super(izquierda, derecha, "/");
     }
+
+    @Override
+    public String getInstruccionIR() {
+        return ((this.getTipo() == Tipo.INTEGER) ? "sdiv" : "fdiv");
+    }
 }

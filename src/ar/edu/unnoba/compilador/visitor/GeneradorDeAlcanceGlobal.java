@@ -113,6 +113,11 @@ public class GeneradorDeAlcanceGlobal extends Visitor<Void> {
     }
 
     @Override
+    protected Void procesarBloque(Bloque bloque, List<Void> declaraciones, List<Void> sentencias) {
+        return null;
+    }
+
+    @Override
     protected Void procesarOperacionBinaria(OperacionBinaria ob, Void ei, Void ed) {
         return null;
     }

@@ -8,6 +8,7 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 
 public abstract class Expresion extends Nodo {
     private Tipo tipo;
+    private String refIR;
 
     public Expresion(Tipo tipo) {
         this.tipo = tipo;
@@ -32,6 +33,14 @@ public abstract class Expresion extends Nodo {
 
     public void setTipo(Tipo tipo) {
         this.tipo = tipo;
+    }
+
+    public String getRefIR() {
+        return refIR;
+    }
+
+    public void setRefIR(String refIR) {
+        this.refIR = refIR;
     }
 
     @Override

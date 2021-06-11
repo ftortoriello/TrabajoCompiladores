@@ -5,12 +5,11 @@ import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
 
-public class OperacionBinariaLogica extends OperacionBinaria {
+public abstract class OperacionBinariaLogica extends OperacionBinaria {
 
     public OperacionBinariaLogica(Expresion izquierda, Expresion derecha, String nombre) {
         super(izquierda, derecha, nombre);
     }
-
 
     @Override
     public Expresion evaluar() {

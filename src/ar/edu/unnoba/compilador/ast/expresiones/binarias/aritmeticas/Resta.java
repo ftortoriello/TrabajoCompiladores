@@ -9,4 +9,9 @@ public class Resta extends OperacionBinariaAritmetica {
     public Resta(Expresion izquierda, Expresion derecha) {
         super(izquierda, derecha, "-");
     }
+
+    @Override
+    public String getInstruccionIR() {
+        return ((this.getTipo() == Tipo.INTEGER) ? "sub" : "fsub");
+    }
 }
