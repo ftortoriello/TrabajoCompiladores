@@ -13,7 +13,6 @@ import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.SimboloVariable;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarInicializada;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
@@ -112,6 +111,7 @@ public class ConversorDeEstructuras extends Transformer {
                 ArrayList<Nodo> ls = new ArrayList<>();
                 ls.add(seInterno);
                 Bloque bloqueElse = new Bloque("ELSE", ls, false);
+                bloqueElse.setAlcance(cc.getBloque().getAlcance());
                 seActual.setBloqueSino(bloqueElse);
                 seActual = seInterno;
             }

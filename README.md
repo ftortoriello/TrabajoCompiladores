@@ -47,7 +47,6 @@ Fecha de entrega: 04/06/2021
 
 ![AST](https://user-images.githubusercontent.com/82975077/120876361-ae919c80-c586-11eb-88c6-0c91690013c7.png)
 
-
 Requisitos:
 * AST, con su visualización mediante graphviz: :white_check_mark:
 * Verificación de tipos de datos. Mostrar error si los tipos son incompatibles (por ejemplo: booleanos y números): :white_check_mark:
@@ -59,8 +58,8 @@ Requisitos:
 
 Opcional: 
 * Conversiones implícitas de tipo: :white_check_mark:
-* Transformación de estruras when y for:  :white_check_mark:, pero falta ver cómo solucionamos el tema de las nuevas variables (¿volver a pasar el visitor generador de alcances?)
-* Constant folding: :x:. casos básicos funcionando (por ej. 1 + 2), los más complejos no (por ej. 1 + x + 2 tendría que quedar x + 3 o 3 + x)
+* Transformación de estruras when y for:  :white_check_mark: 
+* Constant folding: :white_check_mark:. Pero solo casos básicos (por ej. 1 + x + 2 no se simplifica).
 * Reemplazo de constantes por su valor: :x:
 * Eliminación de las declaraciones de variables sin uso: :x:
 

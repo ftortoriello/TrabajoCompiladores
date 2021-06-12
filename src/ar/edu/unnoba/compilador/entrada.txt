@@ -29,12 +29,14 @@ main is
 
     variable justo is boolean = false;
     when superficie_círculo(radio)
-        is < 100 then writeln("Es pequeño")
+        is < 75 then writeln("Re mal...")
+        is < 100 then writeln("Estuvo cerca...")
         is == 100 then begin
             writeln("Qué puntería!");
             justo = true;
         end
-        else writeln("Es grande");
+        is > 125 then writeln("¿Adónde la tiré?")
+        else writeln("Este juego no me gusta");
 
     write("Acertó: "); writeln(justo);
 

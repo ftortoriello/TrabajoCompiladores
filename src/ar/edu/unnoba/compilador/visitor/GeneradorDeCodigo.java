@@ -151,13 +151,15 @@ public class GeneradorDeCodigo extends Visitor<String> {
         } else {
             // TODO declaración variable local
             nombreIR = getNombreVarLocal(dv);
-            resultado.append(String.format("NO IMPLEMENTADO\n", nombreIR, tipoIR, valorIR)); // %temp = load i32, i32* @x3
+            resultado.append(String.format("alloca \n", nombreIR, tipoIR, valorIR)); // %temp = load i32, i32* @x3
             resultado.append(String.format("NO IMPLEMENTADO\n", nombreIR, tipoIR, valorIR)); // store i32 temp, i32* @x3
         }
 
         // TODO: lo modifiqué para que modifique el símbolo en vez de la declaración, revisar
         SimboloVariable sv = alcanceActual.resolver(dv.getIdent().getNombre());
         sv.setNombreIR(nombreIR);
+
+        // reemplazar en el alcance actual
 
         return resultado.toString();
     }
