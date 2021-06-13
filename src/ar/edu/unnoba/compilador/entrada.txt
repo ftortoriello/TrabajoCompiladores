@@ -3,7 +3,7 @@
 (* Se definen (* algunas *) variables globales *)
 
 variable radio is float;
-variable superficie₁ is float = 25;
+variable superficie₁ is float = radio * 1.5;
 
 
 { Una función }
@@ -31,20 +31,31 @@ main is
 
     variable justo is boolean = false;
     when superficie_círculo(radio, 1.0)
-        is < 75 then writeln("Re mal...")
+        is < 75 then begin
+            variable primerCond is float;
+            writeln("Re mal...");
+        end
         is < 100 then writeln("Estuvo cerca...")
         is == 100 then begin
             writeln("Qué puntería!");
             justo = true;
-        end is > 100 then writeln("¿Adónde la tiré?")
-        else writeln("Este juego no me gusta");
+        end
+        is > 100 then begin
+            variable cuartaCond is float;
+            writeln("¿Adónde la tiré?");
+        end
+        else begin
+            variable quintaCond is float;
+            writeln("Este juego no me gusta");
+        end;
 
     write("Acertó: "); writeln(justo);
 
     variable i is integer;
     for i from 5 to 1 do begin
+        variable j is integer = 2;
         write("Se acaba en ");
-        writeln(i);
+        writeln(i + j);
     end;
 
     writeln("Se acabó\n\nFin!");

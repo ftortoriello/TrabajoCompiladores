@@ -8,6 +8,7 @@ import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.SimboloFuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.SimboloVariable;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
@@ -123,7 +124,12 @@ public class GeneradorDeAlcanceGlobal extends Visitor<Void> {
     }
 
     @Override
-    protected Void procesarVarInicializada(Void ident, Void expr) {
+    protected Void procesarDecVar(DecVar dv, Void ident) {
+        return null;
+    }
+
+    @Override
+    protected Void procesarDecVarInicializada(DecVarInicializada dvi, Void ident, Void expr) {
         return null;
     }
 
@@ -133,7 +139,12 @@ public class GeneradorDeAlcanceGlobal extends Visitor<Void> {
     }
 
     @Override
-    protected Void procesarDecFuncion(List<Void> args, Void cuerpo) {
+    protected Void procesarInvocacionFuncion(InvocacionFuncion invoFun) {
+        return null;
+    }
+
+    @Override
+    protected Void procesarDecFuncion(DecFuncion df, List<Void> args, Void cuerpo) {
         return null;
     }
 

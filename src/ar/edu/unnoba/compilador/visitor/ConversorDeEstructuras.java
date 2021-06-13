@@ -62,6 +62,7 @@ public class ConversorDeEstructuras extends Transformer {
 
         // Crear while con la condición y el bloque for adaptado
         Mientras m = new Mientras(condMientras, p.getBloqueSentencias());
+        m.getBloqueSentencias().getAlcance().setPadre(bloqueNuevo.getAlcance());
 
         bloqueNuevo.getSentencias().add(m);
 
@@ -103,6 +104,7 @@ public class ConversorDeEstructuras extends Transformer {
             cond.setTipo(Tipo.BOOLEAN);
             if (seActual == null) {
                 // Primera vez que entro al for, creo el if principal
+                cc.getBloque().getAlcance().setPadre(bloqueNuevo.getAlcance());
                 seActual = new SiEntoncesSino(cond, cc.getBloque());
                 seGlobal = seActual;
             } else {
@@ -112,6 +114,7 @@ public class ConversorDeEstructuras extends Transformer {
                 ls.add(seInterno);
                 Bloque bloqueElse = new Bloque("ELSE", ls, false);
                 bloqueElse.setAlcance(cc.getBloque().getAlcance());
+                bloqueElse.getAlcance().setPadre(bloqueNuevo.getAlcance());
                 seActual.setBloqueSino(bloqueElse);
                 seActual = seInterno;
             }
@@ -120,6 +123,7 @@ public class ConversorDeEstructuras extends Transformer {
         // Agregar el else del switch (si lo tiene)
         if(seActual != null && c.getBloqueElse() != null) {
             seActual.setBloqueSino(c.getBloqueElse());
+            seActual.getBloqueSino().getAlcance().setPadre(bloqueNuevo.getAlcance());
         }
 
         // Agrego al bloque el if externo

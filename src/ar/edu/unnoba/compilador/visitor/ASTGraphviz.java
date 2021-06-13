@@ -345,7 +345,12 @@ public class ASTGraphviz extends Visitor<String> {
     }
 
     @Override
-    protected String procesarDecFuncion(List<String> args, String bloque) {
+    protected String procesarInvocacionFuncion(InvocacionFuncion invoFun) {
+        return procesarNodo(invoFun);
+    }
+
+    @Override
+    protected String procesarDecFuncion(DecFuncion df, List<String> args, String bloque) {
         StringBuilder strArgs = new StringBuilder();
         args.forEach(strArgs::append);
 
@@ -381,7 +386,12 @@ public class ASTGraphviz extends Visitor<String> {
     }
 
     @Override
-    protected String procesarVarInicializada(String ident, String expr) {
+    protected String procesarDecVar(DecVar dv, String ident) {
+        return ident;
+    }
+
+    @Override
+    protected String procesarDecVarInicializada(DecVarInicializada dvi, String ident, String expr) {
         return ident + expr;
     }
 

@@ -100,7 +100,7 @@ public abstract class Visitor<T> {
         for (Expresion argumento : invo.getArgumentos()) {
             argumento.accept(this);
         }
-        return procesarNodo(invo);
+        return procesarInvocacionFuncion(invo);
     }
 
 
@@ -126,13 +126,14 @@ public abstract class Visitor<T> {
     }
 
     public T visit(DecVar dv) throws ExcepcionDeAlcance {
-        return dv.getIdent().accept(this);
+        T ident = dv.getIdent().accept(this);
+        return procesarDecVar(dv, ident);
     }
 
     public T visit(DecVarInicializada dvi) throws ExcepcionDeAlcance {
         T ident = dvi.getIdent().accept(this);
         T expr = dvi.getExpresion().accept(this);
-        return procesarVarInicializada(ident, expr);
+        return procesarDecVarInicializada(dvi, ident, expr);
     }
 
     public T visit(DecFuncion df) throws ExcepcionDeAlcance {
@@ -145,7 +146,7 @@ public abstract class Visitor<T> {
         T cuerpo = df.getBloque().accept(this);
 
         setEnFuncion(false);
-        return procesarDecFuncion(args, cuerpo);
+        return procesarDecFuncion(df, args, cuerpo);
     }
 
     public T visit(SiEntonces se) throws ExcepcionDeAlcance {
@@ -220,11 +221,15 @@ public abstract class Visitor<T> {
 
     protected abstract T procesarOperacionBinaria(OperacionBinaria ob, T ei, T ed);
 
-    protected abstract T procesarVarInicializada(T ident, T expr);
+    protected abstract T procesarDecVar(DecVar dv, T ident);
 
-    protected abstract T procesarAsignacion(Asignacion a, T identificador, T expresion);
+    protected abstract T procesarDecVarInicializada(DecVarInicializada dvi, T ident, T expr);
 
-    protected abstract T procesarDecFuncion(List<T> args, T cuerpo);
+    protected abstract T procesarAsignacion(Asignacion a, T identificador, T expresion) throws ExcepcionDeAlcance;
+
+    protected abstract T procesarInvocacionFuncion(InvocacionFuncion invoFun);
+
+    protected abstract T procesarDecFuncion(DecFuncion df, List<T> args, T cuerpo);
 
     protected abstract T procesarSiEntonces(T cond, T blq);
 

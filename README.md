@@ -76,17 +76,17 @@ Opcional:
 Fecha de entrega: 25/06/2021
 
 Requisitos:
-* Estructura gral. del programa: :x:
-* Declaración de funciones: :x:
-* Funciones predefinidas: :x:
-* Declaración de variables: :x:
-* Asignaciones: :x:
-* Operaciones lógicas: :x:
-* Operaciones relacionales: :x:
-* Operaciones aritméticas: :x:
-* Estructuras de selección: :x:
-* Estructuras de iteración: :x:
-* Invocación de funciones: :x:
+* Estructura gral. del programa: :white_check_mark:
+* Declaración de funciones: :white_check_mark:
+* Bloques de código:
+  * Declaración de variables: :x:
+  * Asignaciones: :x:
+  * Operaciones lógicas: :x:
+  * Operaciones relacionales: :x:
+  * Operaciones aritméticas: :x:
+  * Estructuras de selección: :x:
+  * Estructuras de iteración: :x:
+  * Invocación de funciones: :x:
 
 Cosas secundarias:
 * Tomar la configuración de la máquina anfitrión de un archivo que no esté en el git para no pisarnos.
