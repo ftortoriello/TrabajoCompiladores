@@ -7,9 +7,10 @@ import java.text.Normalizer;
  */
 public class Normalizador {
 
-    private long idVarGlobal = 0;
-    private long idVarLocal = 0;
-    private long idFuncion = 0;
+    private static long idVarGlobal = 0;
+    private static long idVarLocal = 0;
+    private static long idVarTemp = 0;
+    private static long idFuncion = 0;
 
     public Normalizador() {
     }
@@ -22,6 +23,11 @@ public class Normalizador {
     public long getIdVarLocal() {
         idVarLocal += 1;
         return idVarLocal;
+    }
+
+    public static long getIdVarTemp() {
+        idVarTemp += 1;
+        return idVarTemp;
     }
 
     public long getIdFuncion() {
@@ -37,18 +43,23 @@ public class Normalizador {
     // TODO: asignarles un nro. a las funciones/variables sólo si es necesario (o sea si chocan con otra)
 
     // Devuelve el nombre de la función preparado para usar en IR
-    public String getNombreFuncion(String nombreFun) {
-        return String.format("%s_%s", normalizar(nombreFun), getIdFuncion());
+    public String getNuevoNomFun(String nombreFun) {
+        return String.format("%s.%s", normalizar(nombreFun), getIdFuncion());
     }
 
     // Genera un nombre normalizado y único para una nueva variable global de IR
-    public String getNombreVarGlobal(String nombreVar) {
-        return String.format("@g_%s_%s", normalizar(nombreVar), getIdVarGlobal());
+    public String getNuevoNomVarGlobal(String nombreVar) {
+        return String.format("@g.%s.%s", normalizar(nombreVar), getIdVarGlobal());
     }
 
     // Genera un nombre normalizado y único para una nueva variable local de IR
-    public String getNombreVarLocal(String nombreVar) {
-        return String.format("%%%s_%s", normalizar(nombreVar), getIdVarLocal());
+    public String getNuevoNomVarLocal(String nombreVar) {
+        return String.format("%%%s.%s", normalizar(nombreVar), getIdVarLocal());
+    }
+
+    // Genera un nombre para una variable auxiliar
+    public String getNuevoNomVarAux() {
+        return String.format("%%temp.%s", getIdVarTemp());
     }
 
 }

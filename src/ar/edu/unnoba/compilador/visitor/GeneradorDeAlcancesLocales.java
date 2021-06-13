@@ -48,7 +48,7 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
                             alcanceActual.get(nombre).getTipo()));
         }
 
-        String nombreIR = norm.getNombreVarLocal(nombre);
+        String nombreIR = norm.getNuevoNomVarLocal(nombre);
         SimboloVariable simbolo = new SimboloVariable(d, nombreIR);
         alcanceActual.put(nombre, simbolo);
     }

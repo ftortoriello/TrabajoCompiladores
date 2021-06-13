@@ -27,13 +27,6 @@ public class ConversorDeEstructuras extends Transformer {
 
     private static final Normalizador norm = new Normalizador();
 
-    private int contVarTemp = 0;
-
-    private int getContVarTemp() {
-        contVarTemp = contVarTemp + 1;
-        return contVarTemp;
-    }
-
     @Override
     public Bloque transform(Para p) throws ExcepcionDeTipos {
         p = (Para) super.transform(p);
@@ -60,6 +53,7 @@ public class ConversorDeEstructuras extends Transformer {
         // Añadir incremento del contador al final del bloque for
         Literal salto = new Literal(String.valueOf(p.getSalto()), Tipo.INTEGER, "Salto");
         Expresion inc = new Suma(p.getIdent(), salto);
+        inc.setTipo(Tipo.INTEGER);
         Asignacion asigInc = new Asignacion(p.getIdent(), inc);
         p.getBloqueSentencias().getSentencias().add(asigInc);
 
@@ -81,11 +75,11 @@ public class ConversorDeEstructuras extends Transformer {
         bloqueNuevo.setAlcance(new Alcance("Alcance conversión WHEN -> IF"));
 
         // La expresión del case pasa a estar en una nueva variable temporal
-        String nombreVarTemp = "$tmp_" + getContVarTemp();
-        Identificador identTemp = new Identificador(nombreVarTemp, c.getCondicion().getTipo());
-        DecVarInicializada decVarTemp  = new DecVarInicializada(nombreVarTemp + " (WHEN -> IF)",
-                identTemp, c.getCondicion());
-        SimboloVariable simboloTemp = new SimboloVariable(decVarTemp, norm.getNombreVarLocal(nombreVarTemp));
+        String nombreVarAux = norm.getNuevoNomVarAux();
+        Identificador identTemp = new Identificador(nombreVarAux, c.getCondicion().getTipo());
+        DecVarInicializada decVarTemp  = new DecVarInicializada(nombreVarAux, identTemp, c.getCondicion());
+        SimboloVariable simboloTemp = new SimboloVariable(decVarTemp, nombreVarAux);
+        decVarTemp.setIdent(simboloTemp);
 
         // Agrego la declaración en la lista de sentencias
         bloqueNuevo.getSentencias().add(decVarTemp);

@@ -1,5 +1,6 @@
 package ar.edu.unnoba.compilador.visitor;
 
+import ar.edu.unnoba.compilador.Normalizador;
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
@@ -33,6 +34,8 @@ public class GeneradorDeCodigo extends Visitor<String> {
 
     private Map<String, SimboloFuncion> tablaFunciones;
 
+    private static final Normalizador norm = new Normalizador();
+
     // *** AUXILIARES ***
 
     // Mapa para relacionar nuestros tipos con los del IR (y además definir valores por defecto)
@@ -41,11 +44,6 @@ public class GeneradorDeCodigo extends Visitor<String> {
         put(Tipo.INTEGER, new Pair<>("i32", "0"));
         put(Tipo.FLOAT, new Pair<>("float", "0.0"));
     }};
-
-    // Genera un nombre para una variable auxiliar
-    public String getNombreVarAux() {
-        return String.format("%%$t_%s", getID());
-    }
 
     // Genera un nombre único para una nueva etiqueta
     public String getEtiqueta(String nombre) {
@@ -63,7 +61,7 @@ public class GeneradorDeCodigo extends Visitor<String> {
 
         codigoIR.append(String.format("%s = alloca %s\n", nombreIR, tipoIR));
         codigoIR.append(String.format("store %2$s %3$s, %2$s* %1$s\n", nombreIR, tipoIR, valorIR));
-        codigoIR.append(String.format("%3$s = load %2$s, %2$s* %1$s\n", nombreIR, tipoIR, getNombreVarAux()));
+        codigoIR.append(String.format("%3$s = load %2$s, %2$s* %1$s\n", nombreIR, tipoIR, norm.getNuevoNomVarAux()));
 
         return codigoIR.toString();
     }
