@@ -1,5 +1,6 @@
 package ar.edu.unnoba.compilador.visitor;
 
+import ar.edu.unnoba.compilador.Normalizador;
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
@@ -24,6 +25,8 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
     private Alcance alcanceActual;
     private Map<String, SimboloFuncion> tablaFunciones;
 
+    private static final Normalizador norm = new Normalizador();
+
     // Agregar la declaración al ámbito en el que se encuentra
     private void agregarSimbolo(DecVar d) throws ExcepcionDeAlcance {
         if (alcanceGlobal == alcanceActual) {
@@ -38,14 +41,16 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
         // En este lenguaje no se pueden sobreescribir símbolos.
         // Dar error si ya existía un símbolo con este nombre en este ámbito o
         // en los ámbitos superiores.
-        SimboloVariable simboloExistente = alcanceActual.resolver(nombre);
-        if (simboloExistente != null) {
+        if (alcanceActual.containsKey(nombre)) {
             throw new ExcepcionDeAlcance(
                     String.format("La variable local «%s» de tipo %s ya fue declarada previamente con tipo %s.",
                             nombre, id.getTipo(),
-                            simboloExistente.getTipo()));
+                            alcanceActual.get(nombre).getTipo()));
         }
-        alcanceActual.put(nombre, new SimboloVariable(d));
+
+        String nombreIR = norm.getNombreVarLocal(nombre);
+        SimboloVariable simbolo = new SimboloVariable(d, nombreIR);
+        alcanceActual.put(nombre, simbolo);
     }
 
     private boolean estaEnElAlcance(Identificador i) {
@@ -162,11 +167,6 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
 
     @Override
     protected Void procesarBloque(Bloque b, List<Void> sentencias) {
-        return null;
-    }
-
-    @Override
-    protected Void procesarBloque(Bloque bloque, List<Void> declaraciones, List<Void> sentencias) {
         return null;
     }
 

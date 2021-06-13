@@ -400,8 +400,4 @@ public class ASTGraphviz extends Visitor<String> {
         return expr;
     }
 
-    @Override
-    protected String procesarBloque(Bloque bloque, List<String> declaraciones, List<String> sentencias) {
-        return null;
-    }
 }

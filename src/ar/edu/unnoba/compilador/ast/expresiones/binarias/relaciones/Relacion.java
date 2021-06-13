@@ -10,8 +10,6 @@ import ar.edu.unnoba.compilador.visitor.Transformer;
 
 public abstract class Relacion extends OperacionBinaria {
 
-
-
     public Relacion(Expresion izquierda, Expresion derecha, String nombre) {
         super(izquierda, derecha, nombre);
     }

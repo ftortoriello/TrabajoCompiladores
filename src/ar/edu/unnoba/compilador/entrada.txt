@@ -11,11 +11,13 @@ function superficie_círculo(x is float, y is float) return float
 begin
     writeln("Dentro de función superficie_círculo()");
     # Definición de una variable local.
-    if radio < 0 then
-        return 0
+    if radio < 0 then begin
+        variable z is integer;
+        return radio + x;
+    end
     else begin
-        variable radio² is float = cuadrado(radio);
-        return 3.14 * radio²;
+        variable radio² is float = cuadrado(y);
+        return cuadrado(radio) * radio²;
     end;
 end;
 

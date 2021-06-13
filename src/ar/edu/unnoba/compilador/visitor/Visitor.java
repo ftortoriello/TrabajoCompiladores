@@ -217,8 +217,6 @@ public abstract class Visitor<T> {
 
     protected abstract T procesarBloque(Bloque bloque, List<T> sentencias);
 
-    protected abstract T procesarBloque(Bloque bloque, List<T> declaraciones, List<T> sentencias);
-
     protected abstract T procesarOperacionBinaria(OperacionBinaria ob, T ei, T ed);
 
     protected abstract T procesarDecVar(DecVar dv, T ident);

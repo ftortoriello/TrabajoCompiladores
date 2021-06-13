@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ar.edu.unnoba.compilador.Normalizador;
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
@@ -27,31 +28,38 @@ public class GeneradorDeAlcanceGlobal extends Visitor<Void> {
     private Alcance alcanceGlobal;
     private Map<String, SimboloFuncion> tablaFunciones;
 
+    private static final Normalizador norm = new Normalizador();
+
     // Agregar el símbolo de la variable al ámbito global
     private void agregarSimboloVarGlobal(DecVar d) throws ExcepcionDeAlcance {
         Identificador id = d.getIdent();
         String nombre = id.getNombre();
 
-        SimboloVariable simboloExistente = alcanceGlobal.putIfAbsent(nombre, new SimboloVariable(d));
-        if (simboloExistente != null) {
+        if (alcanceGlobal.containsKey(nombre)) {
             throw new ExcepcionDeAlcance(
                     String.format("La variable global «%s» de tipo %s ya fue declarada previamente con tipo %s.",
                             nombre, id.getTipo(),
-                            simboloExistente.getTipo()));
+                            alcanceGlobal.get(nombre).getTipo()));
         }
+
+        String nombreIR = norm.getNombreVarGlobal(nombre);
+        SimboloVariable simbolo = new SimboloVariable(d, nombreIR);
+        alcanceGlobal.put(nombre, simbolo);
     }
 
     private void agregarSimboloFuncion(DecFuncion d) throws ExcepcionDeAlcance {
         Identificador id = d.getIdent();
         String nombre = id.getNombre();
 
-        SimboloFuncion simboloExistente = tablaFunciones.putIfAbsent(nombre, new SimboloFuncion(d));
-        if (simboloExistente != null) {
+        if (tablaFunciones.containsKey(nombre)) {
             throw new ExcepcionDeAlcance(
                     String.format("La función «%s» de tipo %s ya fue declarada previamente con tipo %s.",
-                            nombre, id.getTipo(),
-                            simboloExistente.getTipo()));
+                            nombre, id.getTipo(), tablaFunciones.get(nombre).getTipo()));
         }
+
+        String nombreIR = norm.getNombreFuncion(nombre);
+        SimboloFuncion simbolo = new SimboloFuncion(d, nombreIR);
+        tablaFunciones.put(nombre, simbolo);
     }
 
     @Override
@@ -110,11 +118,6 @@ public class GeneradorDeAlcanceGlobal extends Visitor<Void> {
 
     @Override
     protected Void procesarBloque(Bloque b, List<Void> sentencias) {
-        return null;
-    }
-
-    @Override
-    protected Void procesarBloque(Bloque bloque, List<Void> declaraciones, List<Void> sentencias) {
         return null;
     }
 

@@ -18,7 +18,6 @@ import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 import jflex.base.Pair;
 
-import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +29,6 @@ public class GeneradorDeCodigo extends Visitor<String> {
     // TODO: ver excepciones, las que van acá serían ExcepcionDeCompilacion (aunque hacen exactamente lo mismo)
 
     private String nombreArchivo;
-    private Alcance alcanceGlobal;
     private Alcance alcanceActual;
 
     private Map<String, SimboloFuncion> tablaFunciones;
@@ -43,24 +41,6 @@ public class GeneradorDeCodigo extends Visitor<String> {
         put(Tipo.INTEGER, new Pair<>("i32", "0"));
         put(Tipo.FLOAT, new Pair<>("float", "0.0"));
     }};
-
-    // Devuelve una cadena normalizada
-    public String normalizar(String cadena) {
-        return Normalizer.normalize(cadena, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
-    }
-
-    // Genera un nombre normalizado y único (seguro?) para una nueva variable global
-    // TODO: asignarles un nro. a las funciones/variables sólo si es necesario (o sea si chocan con otra)
-    public String getNombreVarGlobal(DecVar dv) {
-        String nombreNormalizado = normalizar(dv.getIdent().getNombre());
-        return String.format("@g_%s_%s", nombreNormalizado, getID());
-    }
-
-    // Genera un nombre normalizado y único para una nueva variable local
-    public String getNombreVarLocal(DecVar dv) {
-        String nombreNormalizado = normalizar(dv.getIdent().getNombre());
-        return String.format("%%%s_%s", nombreNormalizado, getID());
-    }
 
     // Genera un nombre para una variable auxiliar
     public String getNombreVarAux() {
@@ -83,41 +63,40 @@ public class GeneradorDeCodigo extends Visitor<String> {
 
         codigoIR.append(String.format("%s = alloca %s\n", nombreIR, tipoIR));
         codigoIR.append(String.format("store %2$s %3$s, %2$s* %1$s\n", nombreIR, tipoIR, valorIR));
-        codigoIR.append(String.format("%3$s = load %2$s, %2$s* %1$s\n", codigoIR, tipoIR, getNombreVarAux()));
+        codigoIR.append(String.format("%3$s = load %2$s, %2$s* %1$s\n", nombreIR, tipoIR, getNombreVarAux()));
 
         return codigoIR.toString();
     }
 
     private String generarCodigoDecVar(DecVar dv) {
-        String codigoIR;
-        String nombreIR;
-        String tipoIR = LLVM_IR_TYPE_INFO.get(dv.getTipo()).fst;
+        SimboloVariable sv = alcanceActual.resolver(dv.getIdent().getNombre());
+
+        if (sv == null) {
+            throw new RuntimeException("No se encontró en la tabla a la variable «" + dv.getIdent().getNombre() +
+                    "» cuando ya debería estar definida (¿está mal definido el alcance?)");
+        }
+
+        String nombreIR = sv.getNombreIR();
+        String tipoIR = LLVM_IR_TYPE_INFO.get(sv.getTipo()).fst;
         String valorIR;
+
+        String codigoIR;
 
         if (dv instanceof DecVarInicializada) {
             // Tomo el valor con la que fue inicializada
             valorIR = String.valueOf(((DecVarInicializada) dv).getExpresion().evaluar());
         } else {
             // No fue inicializada, tomo el valor por defecto
-            valorIR =  LLVM_IR_TYPE_INFO.get(dv.getTipo()).snd;
+            valorIR = LLVM_IR_TYPE_INFO.get(dv.getTipo()).snd;
         }
 
         if (alcanceActual.getPadre() == null) {
             // Es variable global
-            nombreIR = getNombreVarGlobal(dv);
             codigoIR = generarCodigoVarGlobal(nombreIR, tipoIR, valorIR);
         } else {
             // Es variable local
-            nombreIR = getNombreVarLocal(dv);
             codigoIR = generarCodigoVarLocal(nombreIR, tipoIR, valorIR);
         }
-
-        // Actualizo el nombreIR en el identificador y en la tabla de símbolos
-        // TODO: ver de usar una cosa o la otra
-        dv.getIdent().setNombreIR(nombreIR);
-        String nombreVar = dv.getIdent().getNombre();
-        SimboloVariable sv = alcanceActual.get(nombreVar);
-        //sv.setNombreIR(nombreIR);
 
         return codigoIR;
     }
@@ -132,15 +111,16 @@ public class GeneradorDeCodigo extends Visitor<String> {
 
     public String procesar(Programa p, String n) throws ExcepcionDeAlcance {
         nombreArchivo = n;
-        alcanceGlobal = alcanceActual = p.getAlcance();
+        alcanceActual = p.getAlcance();
         tablaFunciones = p.getTablaFunciones();
 
-        StringBuilder resultado = new StringBuilder();
-        resultado.append(visit(p));
+        String resultado = visit(p);
 
         alcanceActual = null;
-        return resultado.toString();
+        return resultado;
     }
+
+    // *** VISITORS ***
 
     @Override
     public String visit(Programa p) throws ExcepcionDeAlcance {
@@ -167,9 +147,22 @@ public class GeneradorDeCodigo extends Visitor<String> {
     }
 
     @Override
-    public String visit(DecVar dv) throws ExcepcionDeAlcance {
-        return generarCodigoDecVar(dv);
+    public String visit(DecFuncion df) throws ExcepcionDeAlcance {
+        // Cambio el alcance al de la función para que encuentre los parámetros
+        alcanceActual = df.getAlcance();
+        String resultado = super.visit(df);
+        alcanceActual = df.getAlcance().getPadre();
+        return resultado;
     }
+
+    @Override
+    public String visit(Bloque blq) throws ExcepcionDeAlcance {
+        alcanceActual = blq.getAlcance();
+        String resultado = super.visit(blq);
+        alcanceActual = blq.getAlcance().getPadre();
+        return resultado;
+    }
+
 
     // En el ejemplo tiene un nodo específico para los Write (nosotros no), pero vamos a tener que hacer algo parecido
     // si una invocación es de las write
@@ -205,34 +198,13 @@ public class GeneradorDeCodigo extends Visitor<String> {
         } else {
             val = l.getValor();
         }
+        // TODO boolean
 
         l.setRefIR(val);
         return "";
     }
 
-    // En nuestro caso no tenemos más identificadores en esta etapa (adaptar para símbolos?)
-    /*
-    @Override
-    public String visit(Identificador i) throws ExcepcionDeCompilacion{
-        StringBuilder resultado = new StringBuilder();
-        Object res = this.alcance_actual.resolver(i.getNombre());
-        String temp_id = this.newTempId();
-        if (res instanceof DeclaracionVariable){
-            DeclaracionVariable dv = ((DeclaracionVariable) res);
-            String tipo_llvm = this.LLVM_IR_TYPE_INFO.get(dv.getTipo()).getKey();
-            String llvm_ref = dv.getIr_name();
-            resultado.append(String.format("%1$s = load %2$s, %2$s* %3$s ; %1$s = %4$s\n",
-                    temp_id, tipo_llvm, llvm_ref, i.getNombre()));
-            i.setIr_ref(temp_id);
-            return resultado.toString();
-        }
-        throw new ExcepcionDeCompilacion("No se encontró el identificador "+i.getNombre());
-    }
-    */
-
     // *** PROCESOS ***
-
-    // Base
 
     @Override
     protected String procesarPrograma(Programa p, String enc, String cpo) {
@@ -247,15 +219,7 @@ public class GeneradorDeCodigo extends Visitor<String> {
         return resultado.toString();
     }
 
-    @Override
     protected String procesarBloque(Bloque bloque, List<String> sentencias) {
-        return procesarBloque(bloque, new ArrayList<>(), sentencias);
-    }
-
-    @Override
-    protected String procesarBloque(Bloque bloque, List<String> declaraciones, List<String> sentencias) {
-
-        alcanceActual = bloque.getAlcance();
 
         StringBuilder resultado = new StringBuilder();
 
@@ -272,45 +236,52 @@ public class GeneradorDeCodigo extends Visitor<String> {
             });
         }
 
-        alcanceActual = alcanceActual.getPadre();
         return resultado.toString();
     }
 
     @Override
     protected String procesarDecFuncion(DecFuncion df, List<String> args, String cuerpo) {
-        StringBuilder resultado = new StringBuilder();
 
-        // Parámetros que necesito para definir la función: tipo, nombre y argumentos
-        String tipoRetorno = LLVM_IR_TYPE_INFO.get(df.getTipo()).fst;
+        SimboloFuncion simboloFun = tablaFunciones.get(df.getNombre());
+        if (simboloFun == null) {
+            throw new RuntimeException("No se encontró en la tabla a la función «" + df.getNombre() +
+                "» cuando ya debería estar definida (¿está mal definido el alcance?)");
+        }
 
-        String nombreFuncion = String.format("%s_%s", normalizar(df.getNombre()), getID());
+        // Parámetros que necesito para definir la función: tipo, nombre y parámetros
+        String tipoRetorno = LLVM_IR_TYPE_INFO.get(simboloFun.getTipo()).fst;
 
         StringBuilder params = new StringBuilder();
         for (int i = 0; i < df.getArgs().size(); i++) {
-            DecVar arg = df.getArgs().get(i);
-            String tipoRetornoArg = LLVM_IR_TYPE_INFO.get(arg.getTipo()).fst;
-            String nombreIR = getNombreVarLocal(arg);
-            arg.getIdent().setNombreIR(nombreIR);
+            String nombreVar = df.getArgs().get(i).getIdent().getNombre();
+            SimboloVariable sArg = alcanceActual.resolver(nombreVar);
+
+            String tipoRetornoArg = LLVM_IR_TYPE_INFO.get(sArg.getTipo()).fst;
+            String nombreIR = sArg.getNombreIR();
+
             String sep = i != df.getArgs().size() - 1 ? ", " : "";
             params.append(String.format("%s %s%s", tipoRetornoArg, nombreIR, sep));
         }
 
         // Declaro la función
-        resultado.append(String.format("\ndeclare %s @%s(%s) {\n", tipoRetorno, nombreFuncion, params));
-        resultado.append(cuerpo);
-        resultado.append("}\n\n");
+        StringBuilder declaracionFunIR = new StringBuilder();
+        declaracionFunIR.append(String.format("\ndeclare %s @%s(%s) {\n", tipoRetorno, simboloFun.getNombreIR(), params));
+        declaracionFunIR.append(cuerpo);
+        declaracionFunIR.append("}\n\n");
 
-        return resultado.toString();
+        return declaracionFunIR.toString();
     }
 
     @Override
     protected String procesarAsignacion(Asignacion a, String identificador, String expresion) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
         resultado.append(a.getExpresion().accept(this));
-        SimboloVariable sv = this.alcanceActual.resolver(a.getIdent().getNombre());
-        String tipoLLVM = this.LLVM_IR_TYPE_INFO.get(sv.getTipo()).fst;
+
+        SimboloVariable sv = alcanceActual.resolver(a.getIdent().getNombre());
+        String tipoLLVM = LLVM_IR_TYPE_INFO.get(sv.getTipo()).fst;
         resultado.append(String.format("store %1$s %2$s, %1$s* %3$s ; %3$s = %2$s\n",
-                tipoLLVM, a.getExpresion().getRefIR(), sv.getNombreIR(), sv.getNombre()));
+                tipoLLVM, a.getExpresion().getRefIR(), sv.getNombreIR()));
+
         return resultado.toString();
     }
 
@@ -377,10 +348,10 @@ public class GeneradorDeCodigo extends Visitor<String> {
         return "; While no implementado\n";
     }
 
-    // Operaciones
-
     @Override
     public String procesarOperacionBinaria(OperacionBinaria ob, String ei, String ed) {
+        return "OP_BIN (SIN IMPLEMENTAR)";
+        /*
         StringBuilder resultado = new StringBuilder();
         // resultado.append(super.visit(ob));
         ob.setRefIR(this.getNombreVarAux());
@@ -388,9 +359,8 @@ public class GeneradorDeCodigo extends Visitor<String> {
         resultado.append(String.format("%1$s = %2$s %3$s %4$s, %5$s\n", ob.getRefIR(),
                 ob.getInstruccionIR(), tipoLLVM, ob.getIzquierda().getRefIR(), ob.getDerecha().getRefIR()));
         return resultado.toString();
+        */
     }
-
-    // Control
 
     @Override
     protected String procesarRetorno(Retorno r, String expr) {

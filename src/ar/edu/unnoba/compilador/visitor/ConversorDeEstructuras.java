@@ -1,5 +1,6 @@
 package ar.edu.unnoba.compilador.visitor;
 
+import ar.edu.unnoba.compilador.Normalizador;
 import ar.edu.unnoba.compilador.ast.base.Alcance;
 import ar.edu.unnoba.compilador.ast.base.Bloque;
 import ar.edu.unnoba.compilador.ast.base.Nodo;
@@ -23,6 +24,8 @@ import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
 import java.util.ArrayList;
 
 public class ConversorDeEstructuras extends Transformer {
+
+    private static final Normalizador norm = new Normalizador();
 
     private int contVarTemp = 0;
 
@@ -82,7 +85,7 @@ public class ConversorDeEstructuras extends Transformer {
         Identificador identTemp = new Identificador(nombreVarTemp, c.getCondicion().getTipo());
         DecVarInicializada decVarTemp  = new DecVarInicializada(nombreVarTemp + " (WHEN -> IF)",
                 identTemp, c.getCondicion());
-        SimboloVariable simboloTemp = new SimboloVariable(decVarTemp);
+        SimboloVariable simboloTemp = new SimboloVariable(decVarTemp, norm.getNombreVarLocal(nombreVarTemp));
 
         // Agrego la declaración en la lista de sentencias
         bloqueNuevo.getSentencias().add(decVarTemp);
