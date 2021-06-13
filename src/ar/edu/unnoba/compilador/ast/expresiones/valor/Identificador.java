@@ -11,8 +11,19 @@ import ar.edu.unnoba.compilador.visitor.Transformer;
  * variables, funciones...
  * Después se reemplazan por Simbolo. */
 public class Identificador extends Valor {
+
+    private String nombreIR = null;
+
     public Identificador(String nombre) {
         super(Tipo.UNKNOWN, nombre);
+    }
+
+    public String getNombreIR() {
+        return nombreIR;
+    }
+
+    public void setNombreIR(String nombreIR) {
+        this.nombreIR = nombreIR;
     }
 
     public Identificador(String nombre, Tipo tipo) {

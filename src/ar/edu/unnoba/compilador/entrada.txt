@@ -1,11 +1,13 @@
 (* Ejemplo de un programa completo dado en la consigna de la etapa 1 *)
 
 (* Se definen (* algunas *) variables globales *)
+
 variable radio is float;
-variable superficie₁ is float = 0;
+variable superficie₁ is float = 25;
+
 
 { Una función }
-function superficie_círculo(x is float) return float
+function superficie_círculo(x is float, y is float) return float
 begin
     writeln("Dentro de función superficie_círculo()");
     # Definición de una variable local.
@@ -28,14 +30,13 @@ variable superficie₂ is float;
 main is
 
     variable justo is boolean = false;
-    when superficie_círculo(radio)
+    when superficie_círculo(radio, 1.0)
         is < 75 then writeln("Re mal...")
         is < 100 then writeln("Estuvo cerca...")
         is == 100 then begin
             writeln("Qué puntería!");
             justo = true;
-        end
-        is > 125 then writeln("¿Adónde la tiré?")
+        end is > 100 then writeln("¿Adónde la tiré?")
         else writeln("Este juego no me gusta");
 
     write("Acertó: "); writeln(justo);
@@ -45,16 +46,6 @@ main is
         write("Se acaba en ");
         writeln(i);
     end;
-
-{
-    # El for de arriba debería ser equivalente a:
-    i = 5;
-    while i <= 1 do begin
-        write("Se acaba en ");
-        writeln(i);
-        i = i + -1;
-    end;
-}
 
     writeln("Se acabó\n\nFin!");
 end.

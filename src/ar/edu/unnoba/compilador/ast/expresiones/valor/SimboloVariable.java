@@ -8,18 +8,9 @@ import ar.edu.unnoba.compilador.ast.sentencias.declaracion.Declaracion;
  */
 
 public class SimboloVariable extends Identificador {
-
-    private String nombreIR;
-
-    public String getNombreIR() {
-        return nombreIR;
-    }
-
-    public void setNombreIR(String nombreIR) {
-        this.nombreIR = nombreIR;
-    }
-
     public SimboloVariable(DecVar d) {
         super(d.getIdent().getNombre(), d.getIdent().getTipo());
     }
+
+
 }
