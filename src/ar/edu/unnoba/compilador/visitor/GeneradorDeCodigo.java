@@ -19,7 +19,7 @@ import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 import jflex.base.Pair;
 
-import java.util.ArrayList;
+import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,16 +118,56 @@ public class GeneradorDeCodigo extends Visitor<String> {
 
     // *** VISITORS ***
 
+    /* Función para no tener fija la arquitectura y SO destino
+     * Es un hack, pero mejor que poner ifs...
+     * El triple se puede sacar de  "llvm-config --host-target"
+     * o "clang -print-target-triple", pero el datalayout no se.
+     * Compilar un programa básico en C a IR y fijarse.
+     */
+    private static String getHostTarget() throws IOException, InterruptedException {
+        String datalayout = null;
+        String triple = null;
+
+        PrintWriter pw = new PrintWriter(new FileWriter("void.c"));
+        pw.println("int main() {}");
+        pw.close();
+        Process clang = Runtime.getRuntime().exec("clang -emit-llvm -S -o - void.c");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(clang.getInputStream()));
+        String line;
+        while ((line = reader.readLine()) != null && (datalayout == null || triple == null)) {
+            if (line.startsWith("target datalayout")) {
+                datalayout = line;
+            } else if (line.startsWith("target triple")) {
+                triple = line;
+            }
+        }
+        clang.waitFor();
+        // borrar archivo C temporal
+        File file = new File("void.c");
+        file.delete();
+        return datalayout + "\n" + triple;
+    }
+
     @Override
     public String visit(Programa p) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
         resultado.append(String.format(";Programa: %s\n", p.getNombre()));
         resultado.append(String.format("source_filename = \"%s\"\n", nombreArchivo));
 
-        // TODO: podríamos tomar el target de un archivo que no esté en el git asi no nos pisamos a cada rato
-        // Target Bruno:
-        resultado.append("target datalayout = \"e-m:w-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128\"\n");
-        resultado.append("target triple = \"x86_64-pc-windows-msvc19.28.29335\"\n");
+        try {
+            resultado.append(getHostTarget());
+        } catch (IOException | InterruptedException e) {
+            // algo falló... dejarlo hardcodeado
+            if (System.getProperty("os.name").startsWith("Windows")) {
+                // Target Bruno
+                resultado.append("target datalayout = \"e-m:w-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128\"\n");
+                resultado.append("target triple = \"x86_64-pc-windows-msvc19.28.29335\"\n");
+            } else {
+                // Target Franco
+                resultado.append("target datalayout = \"e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128\"\n");
+                resultado.append("target triple = \"x86_64-pc-linux-gnu\"\n");
+            }
+        }
 
         resultado.append("\n");
         resultado.append("declare i32 @puts(i8*)\n");

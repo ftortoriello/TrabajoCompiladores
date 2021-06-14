@@ -2,7 +2,6 @@ package ar.edu.unnoba.compilador;
 
 import ar.edu.unnoba.compilador.ast.base.Programa;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeCompilacion;
 import ar.edu.unnoba.compilador.lexico.Lexer;
 import ar.edu.unnoba.compilador.sintaxis.Parser;
 import ar.edu.unnoba.compilador.visitor.*;
@@ -25,9 +24,34 @@ public class GenerarAST {
 
     private static void generarCodigoIR(Programa p, String nombreArchivo) throws IOException, ExcepcionDeAlcance {
         GeneradorDeCodigo gc = new GeneradorDeCodigo();
-        PrintWriter pw = new PrintWriter(new FileWriter(nombreArchivo + ".ll"));
-        pw.println(gc.procesar(p, nombreArchivo + ".ll"));
+        PrintWriter pw = new PrintWriter(new FileWriter(nombreArchivo));
+        pw.println(gc.procesar(p, nombreArchivo ));
         pw.close();
+    }
+
+    private static void compilarExe(String nombre) throws IOException, InterruptedException {
+        final String nombreExe;
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            nombreExe = nombre + ".exe";
+        } else {
+            // Unix
+            nombreExe = nombre;
+        }
+
+        String cmd = String.format("clang %1$s.ll -o %1$s.exe", nombreExe);
+        Process clang = Runtime.getRuntime().exec(cmd);
+        clang.waitFor();
+        if (clang.exitValue() == 0) {
+            System.out.format("Ejecutable generado exitosamente en «\" + %1 + \"».\n", nombreExe);
+        } else {
+            System.out.format("Código de salida %d al generar el ejecutable.\n", clang.exitValue());
+            System.out.println("Errores:");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(clang.getErrorStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+        }
     }
 
     public static void main(String[] args) {
@@ -80,17 +104,14 @@ public class GenerarAST {
             final String nombreArchivo = "4-entrada";
 
             System.out.println("\nIniciando traducción a código IR...");
-            generarCodigoIR(programa, nombreArchivo);
+            generarCodigoIR(programa, nombreArchivo + ".ll");
             System.out.println("\nTraducción a código IR finalizada");
 
             System.out.println("\nConvirtiendo el código IR en un programa ejecutable...");
-            String cmd = String.format("clang %1$s.ll -o %1$s.exe", nombreArchivo);
-            Runtime.getRuntime().exec(cmd);
-            // TODO informar si hubo un error al generar el .exe
-            System.out.println("\nEjecutable generado");
+            compilarExe(nombreArchivo);
 
         } catch (ClassCastException e) {
-            // Error sintáctico
+            // Error sintáctico probablemente
             e.printStackTrace(System.out);
         } catch (Exception e) {
             //e.printStackTrace(System.out);

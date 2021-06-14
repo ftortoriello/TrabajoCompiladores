@@ -30,6 +30,10 @@ build/
 
 dist/
 
+# Eclipse
+.classpath
+.project
+
 # Intellij
 .idea/
 out/
@@ -47,3 +51,5 @@ out/
 *.svg
 *.ll
 *.exe
+4-entrada
+
