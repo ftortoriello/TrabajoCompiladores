@@ -25,8 +25,6 @@ import java.util.ArrayList;
 
 public class ConversorDeEstructuras extends Transformer {
 
-    private static final Normalizador norm = new Normalizador();
-
     @Override
     public Bloque transform(Para p) throws ExcepcionDeTipos {
         p = (Para) super.transform(p);
@@ -75,7 +73,7 @@ public class ConversorDeEstructuras extends Transformer {
         bloqueNuevo.setAlcance(new Alcance("Alcance conversión WHEN -> IF"));
 
         // La expresión del case pasa a estar en una nueva variable temporal
-        String nombreVarAux = norm.getNuevoNomVarAux();
+        String nombreVarAux = Normalizador.getNuevoNomVarAux();
         Identificador identTemp = new Identificador(nombreVarAux, c.getCondicion().getTipo());
         DecVarInicializada decVarTemp  = new DecVarInicializada(nombreVarAux, identTemp, c.getCondicion());
         SimboloVariable simboloTemp = new SimboloVariable(decVarTemp, nombreVarAux);

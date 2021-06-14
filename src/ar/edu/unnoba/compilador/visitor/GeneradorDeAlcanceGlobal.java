@@ -28,8 +28,6 @@ public class GeneradorDeAlcanceGlobal extends Visitor<Void> {
     private Alcance alcanceGlobal;
     private Map<String, SimboloFuncion> tablaFunciones;
 
-    private static final Normalizador norm = new Normalizador();
-
     // Agregar el símbolo de la variable al ámbito global
     private void agregarSimboloVarGlobal(DecVar d) throws ExcepcionDeAlcance {
         Identificador id = d.getIdent();
@@ -42,7 +40,7 @@ public class GeneradorDeAlcanceGlobal extends Visitor<Void> {
                             alcanceGlobal.get(nombre).getTipo()));
         }
 
-        String nombreIR = norm.getNuevoNomVarGlobal(nombre);
+        String nombreIR = Normalizador.getNuevoNomVarGlobal(nombre);
         SimboloVariable simbolo = new SimboloVariable(d, nombreIR);
         alcanceGlobal.put(nombre, simbolo);
     }
@@ -57,7 +55,7 @@ public class GeneradorDeAlcanceGlobal extends Visitor<Void> {
                             nombre, id.getTipo(), tablaFunciones.get(nombre).getTipo()));
         }
 
-        String nombreIR = norm.getNuevoNomFun(nombre);
+        String nombreIR = Normalizador.getNuevoNomFun(nombre);
         SimboloFuncion simbolo = new SimboloFuncion(d, nombreIR);
         tablaFunciones.put(nombre, simbolo);
     }

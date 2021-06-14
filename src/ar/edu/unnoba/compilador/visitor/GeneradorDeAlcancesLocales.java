@@ -25,8 +25,6 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
     private Alcance alcanceActual;
     private Map<String, SimboloFuncion> tablaFunciones;
 
-    private static final Normalizador norm = new Normalizador();
-
     // Agregar la declaración al ámbito en el que se encuentra
     private void agregarSimbolo(DecVar d) throws ExcepcionDeAlcance {
         if (alcanceGlobal == alcanceActual) {
@@ -48,7 +46,7 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
                             alcanceActual.get(nombre).getTipo()));
         }
 
-        String nombreIR = norm.getNuevoNomVarLocal(nombre);
+        String nombreIR = Normalizador.getNuevoNomVarLocal(nombre);
         SimboloVariable simbolo = new SimboloVariable(d, nombreIR);
         alcanceActual.put(nombre, simbolo);
     }

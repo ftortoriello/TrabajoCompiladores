@@ -34,8 +34,6 @@ public class GeneradorDeCodigo extends Visitor<String> {
 
     private Map<String, SimboloFuncion> tablaFunciones;
 
-    private static final Normalizador norm = new Normalizador();
-
     // *** AUXILIARES ***
 
     // Mapa para relacionar nuestros tipos con los del IR (y además definir valores por defecto)
@@ -61,7 +59,7 @@ public class GeneradorDeCodigo extends Visitor<String> {
 
         codigoIR.append(String.format("%s = alloca %s\n", nombreIR, tipoIR));
         codigoIR.append(String.format("store %2$s %3$s, %2$s* %1$s\n", nombreIR, tipoIR, valorIR));
-        codigoIR.append(String.format("%3$s = load %2$s, %2$s* %1$s\n", nombreIR, tipoIR, norm.getNuevoNomVarAux()));
+        codigoIR.append(String.format("%3$s = load %2$s, %2$s* %1$s\n", nombreIR, tipoIR, Normalizador.getNuevoNomVarAux()));
 
         return codigoIR.toString();
     }

@@ -15,12 +15,12 @@ public class Normalizador {
     public Normalizador() {
     }
 
-    public long getIdVarGlobal() {
+    public static long getIdVarGlobal() {
         idVarGlobal += 1;
         return idVarGlobal;
     }
 
-    public long getIdVarLocal() {
+    public static long getIdVarLocal() {
         idVarLocal += 1;
         return idVarLocal;
     }
@@ -30,35 +30,35 @@ public class Normalizador {
         return idVarTemp;
     }
 
-    public long getIdFuncion() {
+    public static long getIdFuncion() {
         idFuncion += 1;
         return idFuncion;
     }
 
     // Devuelve una cadena normalizada
-    public String normalizar(String cadena) {
+    public static String normalizar(String cadena) {
         return Normalizer.normalize(cadena, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
     }
 
     // TODO: asignarles un nro. a las funciones/variables sólo si es necesario (o sea si chocan con otra)
 
     // Devuelve el nombre de la función preparado para usar en IR
-    public String getNuevoNomFun(String nombreFun) {
+    public static String getNuevoNomFun(String nombreFun) {
         return String.format("%s.%s", normalizar(nombreFun), getIdFuncion());
     }
 
     // Genera un nombre normalizado y único para una nueva variable global de IR
-    public String getNuevoNomVarGlobal(String nombreVar) {
+    public static String getNuevoNomVarGlobal(String nombreVar) {
         return String.format("@g.%s.%s", normalizar(nombreVar), getIdVarGlobal());
     }
 
     // Genera un nombre normalizado y único para una nueva variable local de IR
-    public String getNuevoNomVarLocal(String nombreVar) {
+    public static String getNuevoNomVarLocal(String nombreVar) {
         return String.format("%%%s.%s", normalizar(nombreVar), getIdVarLocal());
     }
 
     // Genera un nombre para una variable auxiliar
-    public String getNuevoNomVarAux() {
+    public static String getNuevoNomVarAux() {
         return String.format("%%temp.%s", getIdVarTemp());
     }
 

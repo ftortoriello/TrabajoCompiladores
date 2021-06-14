@@ -86,6 +86,7 @@ public class GenerarAST {
             System.out.println("\nConvirtiendo el código IR en un programa ejecutable...");
             String cmd = String.format("clang %1$s.ll -o %1$s.exe", nombreArchivo);
             Runtime.getRuntime().exec(cmd);
+            // TODO informar si hubo un error al generar el .exe
             System.out.println("\nEjecutable generado");
 
         } catch (ClassCastException e) {
