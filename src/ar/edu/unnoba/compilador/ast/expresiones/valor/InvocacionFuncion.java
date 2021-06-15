@@ -44,9 +44,29 @@ public class InvocacionFuncion extends Valor {
 
     @Override
     public String getEtiqueta() {
-        return String.format("%s(%s)\n<%s>", getNombre(),
-                argumentos.toString().replace("[", "").replace("]", ""),
-                getTipo());
+        String args = argumentos.toString()
+                .replace("[", "")
+                .replace("]", "");
+
+        // Esto es un lío, pero no se como puede mejorar... Estaría bueno sacarlo de alguna manera como viene de la entrada
+        // Acomodar las cadenas para que no queden errores de sintaxis en el DOT.
+        // En el gráfico quedan de forma idéntica al código de entrada.
+
+        // Si comienza con \" tiene sólo un argumento, que es una cadena literal.
+        if (args.startsWith("\\\"")) {
+            args = "\\\"" + args
+                    // Sacar comillas externas escapadas
+                    .substring(2, args.length() - 2)
+                    // Mostrar escape en los caracteres de escape
+                    .replace("\\", "\\\\\\\\")
+                    .replace("\t", "\\\\t")
+                    .replace("\n", "\\\\n")
+                    .replace("\r", "\\\\r")
+                    .replace("\"", "\\\\\\\"")
+                    + "\\\"";
+        }
+
+        return String.format("%s(%s)\n<%s>", getNombre(), args, getTipo());
     }
 
     @Override

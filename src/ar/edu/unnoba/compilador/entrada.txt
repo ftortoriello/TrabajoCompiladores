@@ -1,3 +1,4 @@
+{
 (* Ejemplo de un programa completo dado en la consigna de la etapa 1 *)
 
 (* Se definen algunas variables globales *)
@@ -62,6 +63,7 @@ main is
 
     writeln("Se acabó\n\nFin!");
 end.
+}
 
 {
 (* Ejemplo de ámbitos dado en la consigna de la etapa 2 *)
@@ -98,12 +100,10 @@ main is
 end.
 }
 
-{
 { prueba }
 main is
     # TODO: Admitir esto
     variable x is integer;
-    x = --3;
-
+    #x = --3;
+    writeln("Hola \\\t\n\r\"Mundo\"");
 end.
-}

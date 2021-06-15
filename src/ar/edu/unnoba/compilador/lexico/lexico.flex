@@ -182,10 +182,10 @@ ComentarioUnaLinea = #.*{FinDeLinea}?
                             yybegin(YYINITIAL);
                             return token("CADENA", cadena_yyline, cadena_yycolumn, stringBuffer.toString());
                         }
-    \\\"                { stringBuffer.append('"'); }   // comillas dobles escapadas (\")
-    \\t                 { stringBuffer.append('\t'); }
-    \\n                 { stringBuffer.append('\n'); }
-    \\r                 { stringBuffer.append('\r'); }
+    \\\"                { stringBuffer.append('"'); }   // comilla doble escapada: \"
+    \\t                 { stringBuffer.append('\t'); }  // tabulación
+    \\n                 { stringBuffer.append('\n'); }  // salto de línea
+    \\r                 { stringBuffer.append('\r'); }  // retorno de carro
     \\\\                { stringBuffer.append('\\'); }  // \\ --> \
     /* permitir lo demás, excepto \ que no estén seguidas por lo definido arriba */
     [^\\]               { stringBuffer.append( yytext() ); }

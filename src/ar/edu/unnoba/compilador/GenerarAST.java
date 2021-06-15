@@ -10,17 +10,29 @@ import java_cup.runtime.Symbol;
 import java.io.*;
 
 public class GenerarAST {
-    private static void graficarArbol(String dot, String nombreArchivo) throws IOException {
+    private static void graficarArbol(String dot, String nombreArchivo) throws IOException, InterruptedException {
         final String formatoImg = "png";
         //final String formatoImg = "svg";
+
         PrintWriter pw = new PrintWriter(
                 new FileWriter(String.format("%s.dot", nombreArchivo)));
         pw.println(dot);
         pw.close();
-        Runtime.getRuntime().exec(
-                String.format("dot -T%2$s %1$s.dot -o %1$s.%2$s",
-                        nombreArchivo, formatoImg));
-        System.out.println("\nSe graficó el AST «" + nombreArchivo + "».");
+
+        String cmd[] = new String[5];
+        cmd[0] = "dot";
+        cmd[1] = "-T" + formatoImg;
+        // entrada
+        cmd[2] = nombreArchivo + ".dot";
+        // salida
+        cmd[3] = "-o";
+        cmd[4] = nombreArchivo + "." + formatoImg;
+        int exitCode = Util.ejecutar(cmd);
+        if (exitCode == 0) {
+            System.out.println("Se graficó el AST «" + nombreArchivo + "».");
+        } else {
+            System.out.println("Ha ocurrido un error al graficar el AST «" + nombreArchivo + "».");
+        }
     }
 
     private static void generarCodigoIR(Programa p, String nombreArchivo) throws IOException, ExcepcionDeAlcance {
@@ -39,19 +51,18 @@ public class GenerarAST {
             nombreExe = nombre;
         }
 
-        String cmd = String.format("clang %s.ll -o %s", nombre, nombreExe);
-        Process clang = Runtime.getRuntime().exec(cmd);
-        clang.waitFor();
-        if (clang.exitValue() == 0) {
+        String[] cmd = new String[4];
+        cmd[0] = "clang";
+        // entrada
+        cmd[1] = nombre + ".ll";
+        // salida
+        cmd[2] = "-o";
+        cmd[3] = nombreExe;
+        int exitCode = Util.ejecutar(cmd);
+        if (exitCode == 0) {
             System.out.format("Ejecutable generado exitosamente en «%s».\n", nombreExe);
         } else {
-            System.out.format("Código de salida %d al generar el ejecutable.\n", clang.exitValue());
-            System.out.println("Errores:");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(clang.getErrorStream()));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                System.out.println(line);
-            }
+            System.out.format("Código de salida %d al generar el ejecutable.\n", exitCode);
         }
     }
 
