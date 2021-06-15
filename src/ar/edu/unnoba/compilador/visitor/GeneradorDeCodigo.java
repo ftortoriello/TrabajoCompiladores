@@ -103,6 +103,7 @@ public class GeneradorDeCodigo extends Visitor<String> {
     }
 
     private String generarCodigoDecVar(DecVar dv) {
+        // TODO: No habría que resolver de vuelta. Según Juan Pablo la idea de los símbolos era que ya esté
         SimboloVariable sv = alcanceActual.resolver(dv.getIdent().getNombre());
 
         if (sv == null) {
