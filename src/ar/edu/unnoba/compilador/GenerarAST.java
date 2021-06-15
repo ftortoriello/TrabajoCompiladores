@@ -5,6 +5,7 @@ import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.lexico.Lexer;
 import ar.edu.unnoba.compilador.sintaxis.Parser;
 import ar.edu.unnoba.compilador.visitor.*;
+import java_cup.runtime.Symbol;
 
 import java.io.*;
 
@@ -38,11 +39,11 @@ public class GenerarAST {
             nombreExe = nombre;
         }
 
-        String cmd = String.format("clang %1$s.ll -o %1$s.exe", nombreExe);
+        String cmd = String.format("clang %1$s.ll -o %1$s", nombreExe);
         Process clang = Runtime.getRuntime().exec(cmd);
         clang.waitFor();
         if (clang.exitValue() == 0) {
-            System.out.format("Ejecutable generado exitosamente en «\" + %1 + \"».\n", nombreExe);
+            System.out.format("Ejecutable generado exitosamente en «%s».\n", nombreExe);
         } else {
             System.out.format("Código de salida %d al generar el ejecutable.\n", clang.exitValue());
             System.out.println("Errores:");
@@ -64,10 +65,21 @@ public class GenerarAST {
             return;
         }
 
+        // TODO: Podríamos dejar todos los archivos generados en otra carpeta, por ej. out, y entrada.txt en la raíz...
         Lexer lexico = new Lexer(entrada);
         @SuppressWarnings("deprecation") Parser parser = new Parser(lexico);
         try {
-            Programa programa = (Programa) parser.parse().value;
+            Symbol simboloPrograma = parser.parse();
+            if (simboloPrograma == null) {
+                System.out.println("\nEntrada vacía.");
+                return;
+            }
+            if (!(simboloPrograma.value instanceof Programa)) {
+                // Error sintáctico, ya se tendría que haber mostrado el error
+                return;
+            }
+
+            Programa programa = (Programa) simboloPrograma.value;
             ASTGraphviz graficador;
 
             // Ejecutar Visitor graficador del árbol sin transformar,

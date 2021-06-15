@@ -43,6 +43,36 @@ public class GeneradorDeCodigo extends Visitor<String> {
         put(Tipo.FLOAT, new Pair<>("float", "0.0"));
     }};
 
+    /* Función para no tener fija la arquitectura y SO destino
+     * Es un hack, pero mejor que poner ifs...
+     * El triple se puede sacar de  "llvm-config --host-target"
+     * o "clang -print-target-triple", pero el datalayout no se.
+     * Compilar un programa básico en C a IR y fijarse.
+     */
+    private static String getHostTarget() throws IOException, InterruptedException {
+        String datalayout = null;
+        String triple = null;
+
+        PrintWriter pw = new PrintWriter(new FileWriter("void.c"));
+        pw.println("int main() {}");
+        pw.close();
+        Process clang = Runtime.getRuntime().exec("clang -emit-llvm -S -o - void.c");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(clang.getInputStream()));
+        String line;
+        while ((line = reader.readLine()) != null && (datalayout == null || triple == null)) {
+            if (line.startsWith("target datalayout")) {
+                datalayout = line;
+            } else if (line.startsWith("target triple")) {
+                triple = line;
+            }
+        }
+        clang.waitFor();
+        // borrar archivo C temporal
+        File file = new File("void.c");
+        file.delete();
+        return datalayout + "\n" + triple;
+    }
+
     // Genera un nombre único para una nueva etiqueta
     public String getEtiqueta(String nombre) {
         return String.format("e_%s_%s", nombre, getID());
@@ -117,36 +147,6 @@ public class GeneradorDeCodigo extends Visitor<String> {
     }
 
     // *** VISITORS ***
-
-    /* Función para no tener fija la arquitectura y SO destino
-     * Es un hack, pero mejor que poner ifs...
-     * El triple se puede sacar de  "llvm-config --host-target"
-     * o "clang -print-target-triple", pero el datalayout no se.
-     * Compilar un programa básico en C a IR y fijarse.
-     */
-    private static String getHostTarget() throws IOException, InterruptedException {
-        String datalayout = null;
-        String triple = null;
-
-        PrintWriter pw = new PrintWriter(new FileWriter("void.c"));
-        pw.println("int main() {}");
-        pw.close();
-        Process clang = Runtime.getRuntime().exec("clang -emit-llvm -S -o - void.c");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(clang.getInputStream()));
-        String line;
-        while ((line = reader.readLine()) != null && (datalayout == null || triple == null)) {
-            if (line.startsWith("target datalayout")) {
-                datalayout = line;
-            } else if (line.startsWith("target triple")) {
-                triple = line;
-            }
-        }
-        clang.waitFor();
-        // borrar archivo C temporal
-        File file = new File("void.c");
-        file.delete();
-        return datalayout + "\n" + triple;
-    }
 
     @Override
     public String visit(Programa p) throws ExcepcionDeAlcance {
@@ -256,7 +256,6 @@ public class GeneradorDeCodigo extends Visitor<String> {
     }
 
     protected String procesarBloque(Bloque bloque, List<String> sentencias) {
-
         StringBuilder resultado = new StringBuilder();
 
         if (bloque.esProgramaPrincipal()) {
@@ -386,6 +385,7 @@ public class GeneradorDeCodigo extends Visitor<String> {
 
     @Override
     public String procesarOperacionBinaria(OperacionBinaria ob, String ei, String ed) {
+        // TODO: ver si dejamos visits o procesar separados
         return "OP_BIN (SIN IMPLEMENTAR)";
         /*
         StringBuilder resultado = new StringBuilder();

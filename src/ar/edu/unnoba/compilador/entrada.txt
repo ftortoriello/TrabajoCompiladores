@@ -96,6 +96,7 @@ main is
     else
         ejemplo();
 end.
+}
 
 {
 { prueba }
