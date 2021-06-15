@@ -44,15 +44,20 @@ public class InvocacionFuncion extends Valor {
 
     @Override
     public String getEtiqueta() {
+        String nombre = getNombre();
         String args = argumentos.toString()
                 .replace("[", "")
                 .replace("]", "");
 
-        // Esto es un lío, pero no se como puede mejorar... Estaría bueno sacarlo de alguna manera como viene de la entrada
-        // Acomodar las cadenas para que no queden errores de sintaxis en el DOT.
-        // En el gráfico quedan de forma idéntica al código de entrada.
+        if (!(esPredefinida && nombre.startsWith("write"))) {
+            return String.format("%s(%s)\n<%s>", nombre, args, getTipo());
+        }
 
-        // Si comienza con \" tiene sólo un argumento, que es una cadena literal.
+        /* Es una invocación a write o writeln.
+         * Fijarse si su argumento es una cadena literal (podría ser una expresión).
+         * En ese caso, acomodar las cadenas para que el gráfico las muestre idénticas al código de
+         * entrada y no quede el DOT con errores de sintaxis.
+         */
         if (args.startsWith("\\\"")) {
             args = "\\\"" + args
                     // Sacar comillas externas escapadas
@@ -66,7 +71,8 @@ public class InvocacionFuncion extends Valor {
                     + "\\\"";
         }
 
-        return String.format("%s(%s)\n<%s>", getNombre(), args, getTipo());
+        // write y writeln no son funciones que devuelven un valor; no poner el tipo
+        return String.format("%s(%s)", nombre, args);
     }
 
     @Override
