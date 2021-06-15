@@ -31,10 +31,6 @@ variable superficie₂ is float;
 # Procedimiento principal
 main is
 
-    // TODO: Admitir esto
-    variable x is integer;
-    x = --3;
-
     variable justo is boolean = false;
     when superficie_círculo(radio, 1.0)
         is < 75 then begin
@@ -105,5 +101,9 @@ end.
 {
 { prueba }
 main is
+    # TODO: Admitir esto
+    variable x is integer;
+    x = --3;
+
 end.
 }

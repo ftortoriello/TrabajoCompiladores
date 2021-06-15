@@ -111,14 +111,18 @@ nonterminal ArrayList<DecVar> lst_args_dec, lst_args_dec_default;
 nonterminal DecVar dec_var, arg_dec, arg_dec_default;
 
 precedence left PR_ELSE, PR_IS;
-precedence right IDENTIFICADOR, OP_ARIT_RESTA, PR_VARIABLE, PR_FUNCTION;
 
 start with programa;
 
 programa ::=
-        // TODO: Agregar regla sin encabezado y sacar precedencias innecesarias
         encabezado:decs cuerpo_programa:cpo_prog {:
             Encabezado enc = new Encabezado(decs);
+            Programa prog = new Programa("Programa", enc, cpo_prog);
+            imprimirEtiqueta(prog);
+            RESULT = prog;
+        :} |
+        cuerpo_programa:cpo_prog {:
+            Encabezado enc = new Encabezado(new ArrayList<Declaracion>());
             Programa prog = new Programa("Programa", enc, cpo_prog);
             imprimirEtiqueta(prog);
             RESULT = prog;
@@ -159,11 +163,6 @@ encabezado ::=
             ArrayList<Declaracion> decs = new ArrayList<>();
             decs.add(dec_fun);
             imprimirEtiqueta(dec_fun);
-            RESULT = decs;
-        :} |
-        {:
-            // Encabezado vacío
-            ArrayList<Declaracion> decs = new ArrayList<>();
             RESULT = decs;
         :};
 
