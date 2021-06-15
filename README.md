@@ -91,3 +91,4 @@ Requisitos:
 Cosas secundarias:
 * Tomar la configuración de la máquina anfitrión de un archivo que no esté en el git para no pisarnos.
 * Ver excepciones en GeneradorDeCodigo.java. Está usando ExcepcionDeAlcance porque el visitor abstracto tiene esas definidad en la firma de los métodos. Probé cambiarlas por Exception para que quede más abstracto y poder definir excepciones específicas en cada visitor, pero igual hay lío porque esos visitors llaman a su padre. Y todos los nodos tienen también definido un tipo específico de excepción en los métodos accept y visit.
+* Código inaccesible después de los `ret`

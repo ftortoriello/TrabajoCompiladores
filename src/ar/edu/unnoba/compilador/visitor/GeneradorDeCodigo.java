@@ -74,8 +74,12 @@ public class GeneradorDeCodigo extends Visitor<String> {
     }
 
     // Genera un nombre único para una nueva etiqueta
-    public String getEtiqueta(String nombre) {
+    public String getNuevaEtiqueta(String nombre) {
         return String.format("e_%s_%s", nombre, getID());
+    }
+
+    public String formatearEtiqueta(String nombre) {
+        return String.format("\n%s:\n", nombre);
     }
 
     // Genera la declaración en IR para una var. global
@@ -196,9 +200,9 @@ public class GeneradorDeCodigo extends Visitor<String> {
         alcanceActual = blq.getAlcance();
         String resultado = super.visit(blq);
         alcanceActual = blq.getAlcance().getPadre();
+
         return resultado;
     }
-
 
     // En el ejemplo tiene un nodo específico para los Write (nosotros no), pero vamos a tener que hacer algo parecido
     // si una invocación es de las write
@@ -330,19 +334,19 @@ public class GeneradorDeCodigo extends Visitor<String> {
     protected String procesarSiEntonces(String cond, String blqSi) {
         StringBuilder resultado = new StringBuilder();
 
-        String etiBlqThen = getEtiqueta("blq_then");
-        String etiFin = getEtiqueta("fin_if");
+        String etiBlqThen = getNuevaEtiqueta("blq_then");
+        String etiFin = getNuevaEtiqueta("fin_if");
 
         // Salto condicional
         resultado.append(generarCodigoSaltoCond(cond, etiBlqThen, etiFin));
 
         // Caso true
-        resultado.append(etiBlqThen);
+        resultado.append(formatearEtiqueta(etiBlqThen));
         resultado.append(blqSi);
         resultado.append(generarCodigoSaltoInc(etiFin));
 
         // Fin if
-        resultado.append(etiFin);
+        resultado.append(formatearEtiqueta(etiFin));
 
         return resultado.toString();
     }
@@ -351,36 +355,50 @@ public class GeneradorDeCodigo extends Visitor<String> {
     protected String procesarSiEntoncesSino(String cond, String blqSi, String blqSino) {
         StringBuilder resultado = new StringBuilder();
 
-        String etiBlqThen = getEtiqueta("blq_then");
-        String etiBlqElse = getEtiqueta("blq_else");
-        String etiFin = getEtiqueta("fin_if");
+        String etiBlqThen = getNuevaEtiqueta("blq_then");
+        String etiBlqElse = getNuevaEtiqueta("blq_else");
+        String etiFin = getNuevaEtiqueta("fin_if");
 
         // Salto condicional
-        resultado.append("\n; Comienzo del if, evaluar cond.\n");
         resultado.append(generarCodigoSaltoCond(cond, etiBlqThen, etiBlqElse));
 
         // Caso true
-        resultado.append(etiBlqThen + ":\n");
-        resultado.append("; Bloque then\n");
+        resultado.append(formatearEtiqueta(etiBlqThen));
         resultado.append(blqSi);
         resultado.append(generarCodigoSaltoInc(etiFin));
 
         // Caso false
-        resultado.append(etiBlqElse + ":\n");
-        resultado.append("; Bloque else\n");
+        resultado.append(formatearEtiqueta(etiBlqElse));
         resultado.append(blqSino);
         resultado.append(generarCodigoSaltoInc(etiFin));
 
         // Fin if
-        resultado.append(etiFin + ":\n");
-        resultado.append("\n; Fin del if\n\n");
+        resultado.append(formatearEtiqueta(etiFin));
 
         return resultado.toString();
     }
 
     @Override
-    protected String procesarMientras(Mientras m, String expr, String blq) {
-        return "; While no implementado\n";
+    protected String procesarMientras(Mientras m, String cond, String blq) {
+        StringBuilder resultado = new StringBuilder();
+
+        String etiInicioWhile = getNuevaEtiqueta("inicio_while");
+        String etiBucleWhile = getNuevaEtiqueta("bucle_while");
+        String etiFinWhile = getNuevaEtiqueta("fin_while");
+
+        resultado.append(formatearEtiqueta(etiInicioWhile));
+
+        // Se evalúa la condición, si es verdadera se salta al bucle y si es falsa al fin
+        resultado.append(generarCodigoSaltoCond(cond, etiBucleWhile, etiFinWhile));
+        resultado.append(formatearEtiqueta(etiBucleWhile));
+        resultado.append(blq);
+
+        // Ejecutado el cuerpo, se evalúa de nuevo la condición inicial
+        resultado.append(generarCodigoSaltoInc(etiInicioWhile));
+
+        resultado.append(formatearEtiqueta(etiFinWhile));
+
+        return resultado.toString();
     }
 
     @Override
@@ -400,7 +418,9 @@ public class GeneradorDeCodigo extends Visitor<String> {
 
     @Override
     protected String procesarRetorno(Retorno r, String expr) {
-        return "; Sentencias de control no implementadas\n";
+        String tipoRetorno = r.getExpr().getTipo().toString();
+        String resultado = String.format("ret %s %s\n", tipoRetorno, expr);
+        return resultado;
     }
 
     @Override
