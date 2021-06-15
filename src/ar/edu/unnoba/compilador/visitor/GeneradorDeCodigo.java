@@ -70,15 +70,19 @@ public class GeneradorDeCodigo extends Visitor<String> {
         // borrar archivo C temporal
         File file = new File("void.c");
         file.delete();
+        if (datalayout == null || triple == null) {
+            // falló algo... tirar excepción para usar datos predeterminados
+            throw new IOException("No se pudieron obtener los datos del host");
+        }
         return datalayout + "\n" + triple;
     }
 
     // Genera un nombre único para una nueva etiqueta
-    public String getNuevaEtiqueta(String nombre) {
+    private String getNuevaEtiqueta(String nombre) {
         return String.format("e_%s_%s", nombre, getID());
     }
 
-    public String formatearEtiqueta(String nombre) {
+    private String formatearEtiqueta(String nombre) {
         return String.format("\n%s:\n", nombre);
     }
 
@@ -110,7 +114,7 @@ public class GeneradorDeCodigo extends Visitor<String> {
         String tipoIR = LLVM_IR_TYPE_INFO.get(sv.getTipo()).fst;
         String valorIR;
 
-        String codigoIR;
+        StringBuilder codigoIR = new StringBuilder();
 
         if (dv instanceof DecVarInicializada) {
             // Tomo el valor con la que fue inicializada
@@ -120,15 +124,20 @@ public class GeneradorDeCodigo extends Visitor<String> {
             valorIR = LLVM_IR_TYPE_INFO.get(dv.getTipo()).snd;
         }
 
+        // Mostrar comentario con la declaración en el lenguaje original
+        codigoIR.append(String.format("; variable %s is %s = %s\n",
+                sv.getNombre(), sv.getTipo(), valorIR));
+
         if (alcanceActual.getPadre() == null) {
             // Es variable global
-            codigoIR = generarCodigoVarGlobal(nombreIR, tipoIR, valorIR);
+            codigoIR.append(generarCodigoVarGlobal(nombreIR, tipoIR, valorIR));
         } else {
             // Es variable local
-            codigoIR = generarCodigoVarLocal(nombreIR, tipoIR, valorIR);
+            codigoIR.append(generarCodigoVarLocal(nombreIR, tipoIR, valorIR));
         }
 
-        return codigoIR;
+        codigoIR.append("\n");
+        return codigoIR.toString();
     }
 
     private String generarCodigoSaltoInc(String etiquetaDestino) {
@@ -156,6 +165,7 @@ public class GeneradorDeCodigo extends Visitor<String> {
     public String visit(Programa p) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
         resultado.append(String.format(";Programa: %s\n", p.getNombre()));
+        // FIXME: Iría entrada.txt acá?
         resultado.append(String.format("source_filename = \"%s\"\n", nombreArchivo));
 
         try {
@@ -268,7 +278,7 @@ public class GeneradorDeCodigo extends Visitor<String> {
                 resultado.append(sentencia);
             });
             resultado.append("ret i32 0\n");
-            resultado.append("\n}\n\n");
+            resultado.append("}\n\n");
         } else {
             sentencias.forEach((sentencia) -> {
                 resultado.append(sentencia);
@@ -302,9 +312,9 @@ public class GeneradorDeCodigo extends Visitor<String> {
             params.append(String.format("%s %s%s", tipoRetornoArg, nombreIR, sep));
         }
 
-        // Declaro la función
+        // Definir la función
         StringBuilder declaracionFunIR = new StringBuilder();
-        declaracionFunIR.append(String.format("\ndeclare %s @%s(%s) {\n", tipoRetorno, simboloFun.getNombreIR(), params));
+        declaracionFunIR.append(String.format("\ndefine %s @%s(%s) {\n", tipoRetorno, simboloFun.getNombreIR(), params));
         declaracionFunIR.append(cuerpo);
         declaracionFunIR.append("}\n\n");
 
@@ -316,10 +326,11 @@ public class GeneradorDeCodigo extends Visitor<String> {
         StringBuilder resultado = new StringBuilder();
         resultado.append(a.getExpresion().accept(this));
 
+        // FIXME: acá no funcionan las conversiones implícitas
         SimboloVariable sv = alcanceActual.resolver(a.getIdent().getNombre());
         String tipoLLVM = LLVM_IR_TYPE_INFO.get(sv.getTipo()).fst;
-        resultado.append(String.format("store %1$s %2$s, %1$s* %3$s ; %3$s = %2$s\n",
-                tipoLLVM, a.getExpresion().getRefIR(), sv.getNombreIR()));
+        resultado.append(String.format("store %1$s %2$s, %1$s* %3$s\t; %4$s = %2$s\n",
+                tipoLLVM, a.getExpresion().getRefIR(), sv.getNombreIR(), sv.getNombre()));
 
         return resultado.toString();
     }
@@ -418,8 +429,8 @@ public class GeneradorDeCodigo extends Visitor<String> {
 
     @Override
     protected String procesarRetorno(Retorno r, String expr) {
-        String tipoRetorno = r.getExpr().getTipo().toString();
-        String resultado = String.format("ret %s %s\n", tipoRetorno, expr);
+        String tipoRetorno = LLVM_IR_TYPE_INFO.get(r.getExpr().getTipo()).fst;
+        String resultado = String.format("ret %s %s\n", tipoRetorno, r.getExpr());
         return resultado;
     }
 

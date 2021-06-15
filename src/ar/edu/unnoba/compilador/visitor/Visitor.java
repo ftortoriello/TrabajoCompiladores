@@ -223,6 +223,7 @@ public abstract class Visitor<T> {
 
     protected abstract T procesarDecVarInicializada(DecVarInicializada dvi, T ident, T expr);
 
+    // FIXME: podríamos dejar sólo el primer parámetro en esta y algunas otras funciones
     protected abstract T procesarAsignacion(Asignacion a, T identificador, T expresion) throws ExcepcionDeAlcance;
 
     protected abstract T procesarInvocacionFuncion(InvocacionFuncion invoFun);

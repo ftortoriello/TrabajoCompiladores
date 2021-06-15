@@ -1,6 +1,6 @@
 (* Ejemplo de un programa completo dado en la consigna de la etapa 1 *)
 
-(* Se definen (* algunas *) variables globales *)
+(* Se definen algunas variables globales *)
 
 variable radio is float;
 variable superficie₁ is float = radio * 1.5;
