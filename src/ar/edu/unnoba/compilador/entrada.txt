@@ -1,11 +1,9 @@
-{
 (* Ejemplo de un programa completo dado en la consigna de la etapa 1 *)
 
 (* Se definen algunas variables globales *)
 
 variable radio is float;
 variable superficie₁ is float = radio * 1.5;
-
 
 { Una función }
 function superficie_círculo(x is float, y is float) return float
@@ -63,7 +61,7 @@ main is
 
     writeln("Se acabó\n\nFin!");
 end.
-}
+
 
 {
 (* Ejemplo de ámbitos dado en la consigna de la etapa 2 *)
@@ -98,12 +96,13 @@ main is
     else
         ejemplo();
 end.
-}
 
+{
 { prueba }
 main is
-    # TODO: Admitir esto
     variable x is integer;
+    # TODO: Admitir esto
     #x = --3;
     writeln("Hola \\\t\n\r\"Mundo\"");
 end.
+}

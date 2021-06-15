@@ -94,6 +94,11 @@ public class GeneradorDeAlcanceGlobal extends Visitor<Void> {
 
     @Override
     public Void visit(DecVarInicializada dvi) throws ExcepcionDeAlcance {
+        if (dvi.getExpresion() instanceof InvocacionFuncion) {
+            throw new ExcepcionDeAlcance(String.format(
+                    "«%s»: No se puede invocar a una función desde la inicialización de una variable global.",
+                    dvi.getIdent()));
+        }
         agregarSimboloVarGlobal(dvi);
         return super.visit(dvi);
     }
