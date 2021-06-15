@@ -39,7 +39,7 @@ public class GenerarAST {
             nombreExe = nombre;
         }
 
-        String cmd = String.format("clang %1$s.ll -o %1$s", nombreExe);
+        String cmd = String.format("clang %s.ll -o %s", nombre, nombreExe);
         Process clang = Runtime.getRuntime().exec(cmd);
         clang.waitFor();
         if (clang.exitValue() == 0) {
