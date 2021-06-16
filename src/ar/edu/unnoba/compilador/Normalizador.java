@@ -7,27 +7,27 @@ import java.text.Normalizer;
  */
 public class Normalizador {
 
-    private static long idVarGlobal = 0;
-    private static long idVarLocal = 0;
-    private static long idVarTemp = 0;
+    private static long idVarGbl = 0;
+    private static long idVarLcl = 0;
+    private static long idVarAux = 0;
     private static long idFuncion = 0;
 
     public Normalizador() {
     }
 
-    public static long getIdVarGlobal() {
-        idVarGlobal += 1;
-        return idVarGlobal;
+    public static long getIdVarGbl() {
+        idVarGbl += 1;
+        return idVarGbl;
     }
 
-    public static long getIdVarLocal() {
-        idVarLocal += 1;
-        return idVarLocal;
+    public static long getIdVarLcl() {
+        idVarLcl += 1;
+        return idVarLcl;
     }
 
-    public static long getIdVarTemp() {
-        idVarTemp += 1;
-        return idVarTemp;
+    public static long getIdVarAux() {
+        idVarAux += 1;
+        return idVarAux;
     }
 
     public static long getIdFuncion() {
@@ -43,23 +43,23 @@ public class Normalizador {
     // TODO: asignarles un nro. a las funciones/variables sólo si es necesario (o sea si chocan con otra)
 
     // Devuelve el nombre de la función preparado para usar en IR
-    public static String getNuevoNomFun(String nombreFun) {
+    public static String getNvoNomFun(String nombreFun) {
         return String.format("%s.%s", normalizar(nombreFun), getIdFuncion());
     }
 
     // Genera un nombre normalizado y único para una nueva variable global de IR
-    public static String getNuevoNomVarGlobal(String nombreVar) {
-        return String.format("@g.%s.%s", normalizar(nombreVar), getIdVarGlobal());
+    public static String getNvoNomVarGbl(String nombreVar) {
+        return String.format("@g.%s.%s", normalizar(nombreVar), getIdVarGbl());
     }
 
     // Genera un nombre normalizado y único para una nueva variable local de IR
-    public static String getNuevoNomVarLocal(String nombreVar) {
-        return String.format("%%%s.%s", normalizar(nombreVar), getIdVarLocal());
+    public static String getNvoNomVarLcl(String nombreVar) {
+        return String.format("%%%s.%s", normalizar(nombreVar), getIdVarLcl());
     }
 
-    // Genera un nombre para una variable auxiliar
-    public static String getNuevoNomVarAux() {
-        return String.format("%%temp.%s", getIdVarTemp());
+    // Genera un nombre para una variable auxiliar local
+    public static String getNvoNomVarAux() {
+        return String.format("%%aux.%s", getIdVarAux());
     }
 
 }
