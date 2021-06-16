@@ -159,7 +159,7 @@ public class TransformerTipos extends Transformer {
     public InvocacionFuncion transform(InvocacionFuncion i) throws ExcepcionDeTipos {
         i = super.transform(i);
 
-        // No buscar en el alcance las funciones predefinidas
+        // No buscar en el alcance las funciones predefinidas.
         if (i.getEsPredefinida()) {
             return i;
         }
@@ -170,16 +170,16 @@ public class TransformerTipos extends Transformer {
         }
 
         DecFuncion decFun = s.getDeclaracion();
-        int cantArgs = decFun.getArgs().size();
+        int cantArgs = i.getArgs().size();
 
         // Validar el tipo de cada argumento, y convertir cuando sea necesario
         for (int iArg = 0; iArg < cantArgs; iArg++) {
-            Expresion arg = i.getArgumentos().get(iArg);
+            Expresion arg = i.getArgs().get(iArg);
             Tipo tipoOriginal = decFun.getArgs().get(iArg).getTipo();
 
             // TODO acá tendría que modificar el SimboloFuncion
             //s.getDeclaracion().getArgs().set(iArg, convertirATipo(arg, tipoOriginal));
-            i.getArgumentos().set(iArg, convertirATipo(arg, tipoOriginal));
+            i.getArgs().set(iArg, convertirATipo(arg, tipoOriginal));
         }
         return i;
     }

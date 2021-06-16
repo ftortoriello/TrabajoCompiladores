@@ -88,7 +88,7 @@ public abstract class Transformer {
 
     public InvocacionFuncion transform(InvocacionFuncion invo) throws ExcepcionDeTipos {
         List<Expresion> argumentos = new ArrayList<>();
-        for (Expresion argumento : invo.getArgumentos()) {
+        for (Expresion argumento : invo.getArgs()) {
             argumentos.add(argumento.accept(this));
         }
         invo.setArgumentos(argumentos);

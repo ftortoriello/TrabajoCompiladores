@@ -120,31 +120,24 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
 
     @Override
     public Void visit(InvocacionFuncion i) throws ExcepcionDeAlcance {
-        // Si es predefinida ya viene validada desde el parser
+        // Si es predefinida ya está limitado por el parser, no es necesario realizar estas validaciones
         if (i.getEsPredefinida()) return super.visit(i);
 
         // Validar definición contra la tabla de funciones
         if (!estaEnElAlcance(i)) throw new ExcepcionDeAlcance(String.format("La función «%s» no está definida", i.getNombre()));
 
+        // Validar que la cantidad de argumentos pasados sea por lo menos la cantidad obligaria,
+        // y no supere la cantidad total de parámetros, incluyendo los opcionales
         DecFuncion decFuncion = tablaFunciones.get(i.getNombre()).getDeclaracion();
 
-        // Validar cant. de argumentos
-        int cantArgsFun = decFuncion.getArgs().size();
-        int cantArgsInvo = i.getArgumentos().size();
-        if (cantArgsFun != cantArgsInvo) {
-            throw new ExcepcionDeAlcance(String.format("La función «%s» fue invocada con %s parámetro(s), " +
-                    "cuando requiere %s", decFuncion.getNombre(), cantArgsInvo, cantArgsFun));
-        }
-
-        // Cada argumento que se pasó tiene que estar en el alcance, o en su defecto ser un literal
-        for (int iArg = 0; iArg < cantArgsFun; iArg++) {
-            // FIXME: Tira una excepción si se pasa una expresión como parámetro, no se puede castear a Valor
-            Valor arg = (Valor) i.getArgumentos().get(iArg);
-
-            if (!(arg instanceof Literal) && !estaEnElAlcance((Identificador) arg)) {
-                throw new ExcepcionDeAlcance(String.format("El parámetro «%s» en la posición %s de la " +
-                        "invocación «%s» no está definido.", arg.getNombre(), iArg, i.getNombre()));
-            }
+        int cantArgsInvo = i.getArgs().size();
+        int cantMinArgs = decFuncion.getCantArgsObligatorios();
+        int cantMaxArgs = decFuncion.getArgs().size();
+        if (cantArgsInvo < cantMinArgs || cantArgsInvo > cantMaxArgs) {
+            throw new ExcepcionDeAlcance(String.format(
+                    "La función «%s» fue invocada con %d " + (cantArgsInvo == 1 ? "parámetro" : "parámetros") +
+                            ", cuando requiere " + (cantMinArgs == cantMaxArgs ? "%d" : "entre %d y %d") + ".",
+                    decFuncion.getNombre(), cantArgsInvo, cantMinArgs, cantMaxArgs));
         }
 
         return super.visit(i);

@@ -30,7 +30,7 @@ public class InvocacionFuncion extends Valor {
         this.argumentos = new ArrayList<>();
     }
 
-    public List<Expresion> getArgumentos() {
+    public List<Expresion> getArgs() {
         return argumentos;
     }
 

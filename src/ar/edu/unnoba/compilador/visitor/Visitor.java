@@ -95,7 +95,7 @@ public abstract class Visitor<T> {
     }
 
     public T visit(InvocacionFuncion invo) throws ExcepcionDeAlcance {
-        for (Expresion argumento : invo.getArgumentos()) {
+        for (Expresion argumento : invo.getArgs()) {
             argumento.accept(this);
         }
         return procesarInvocacionFuncion(invo);

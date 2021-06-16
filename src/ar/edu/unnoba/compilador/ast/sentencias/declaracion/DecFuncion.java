@@ -57,6 +57,21 @@ public class DecFuncion extends Declaracion {
         this.alcance = alcance;
     }
 
+    /* Retorna la cantidad de argumentos no opcionales de la declaración.
+     * Usado para validar el pasaje de parámetros.
+     */
+    public int getCantArgsObligatorios() {
+        int cant = 0;
+        for (DecVar dv : args) {
+            if (dv instanceof DecVarInicializada) {
+                // Se encontró una variable con parámetro opcional. A partir de acá son todos opcionales.
+                break;
+            }
+            cant++;
+        }
+        return cant;
+    }
+
     @Override
     public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
         return v.visit(this);
