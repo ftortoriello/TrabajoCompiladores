@@ -1,9 +1,8 @@
-variable tot is float;
+variable a is float = 4.0;
 
 main is
-    variable cond is boolean = true;
-    cond = false;
-    tot = 100.0;
+    variable total is float;
+    total = 1.5 - a + 5.0;
 end.
 
 {

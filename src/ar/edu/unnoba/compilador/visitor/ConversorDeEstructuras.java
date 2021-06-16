@@ -84,7 +84,7 @@ public class ConversorDeEstructuras extends Transformer {
         Identificador identTemp = new Identificador(nombreVarAux, c.getCondicion().getTipo());
         DecVarInicializada decVarTemp  = new DecVarInicializada(nombreVarAux, identTemp, c.getCondicion());
         Boolean esGlobal = false;
-        SimboloVariable simbolo = new SimboloVariable(decVarTemp, nombreVarAux, nombreVarAux, esGlobal);
+        SimboloVariable simbolo = new SimboloVariable(decVarTemp, nombreVarAux, esGlobal);
         decVarTemp.setIdent(simbolo);
 
         // Agrego la declaración en la lista de sentencias

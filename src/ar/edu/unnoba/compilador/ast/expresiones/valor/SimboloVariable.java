@@ -24,10 +24,9 @@ public class SimboloVariable extends Identificador {
         return esGlobal;
     }
 
-    public SimboloVariable(DecVar d, String nombreIR, String refIR, Boolean esGlobal) {
+    public SimboloVariable(DecVar d, String nombreIR, Boolean esGlobal) {
         super(d.getIdent().getNombre(), d.getIdent().getTipo());
         this.nombreIR = nombreIR;
-        this.setRefIR(refIR);
         this.esGlobal = esGlobal;
     }
 }
