@@ -86,7 +86,7 @@ public abstract class Visitor<T> {
         return procesarCasoCuando(cc, expr, blq);
     }
 
-    public T visit(Literal c) {
+    public T visit(Literal c) throws ExcepcionDeAlcance {
         return procesarNodo(c);
     }
 

@@ -58,8 +58,8 @@ public class Normalizador {
     }
 
     // Genera un nombre para una variable auxiliar local
-    public static String getNvoNomVarAux() {
-        return String.format("%%aux.%s", getIdVarAux());
+    public static String getNvoNomVarAux(String nombreVar) {
+        return String.format("%%aux.%s.%s", nombreVar, getIdVarAux());
     }
 
 }

@@ -1,8 +1,9 @@
-variable altura is integer = 3;
+variable tot is float;
 
 main is
-    variable resultado is integer;
-    resultado = altura - 8;
+    variable cond is boolean = true;
+    cond = false;
+    tot = 100.0;
 end.
 
 {

@@ -80,7 +80,7 @@ public class ConversorDeEstructuras extends Transformer {
         bloqueNuevo.setAlcance(new Alcance("Alcance conversión WHEN -> IF"));
 
         // La expresión del case pasa a estar en una nueva variable temporal, para la cual tengo que crear su símbolo
-        String nombreVarAux = Normalizador.getNvoNomVarAux();
+        String nombreVarAux = Normalizador.getNvoNomVarAux("when");
         Identificador identTemp = new Identificador(nombreVarAux, c.getCondicion().getTipo());
         DecVarInicializada decVarTemp  = new DecVarInicializada(nombreVarAux, identTemp, c.getCondicion());
         Boolean esGlobal = false;

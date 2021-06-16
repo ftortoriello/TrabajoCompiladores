@@ -1,5 +1,6 @@
 package ar.edu.unnoba.compilador.visitor;
 
+import ar.edu.unnoba.compilador.Normalizador;
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
@@ -224,22 +225,21 @@ public class GeneradorDeCodigo extends Visitor<String> {
     public String visit(Asignacion asig) throws ExcepcionDeAlcance {
         // FIXME: acá no funcionan las conversiones implícitas
 
+        StringBuilder resultado = new StringBuilder();
+
+        // Primero visito a la expresión para delegarle la generación de las vars. auxs. necesarias
+        // TODO ¿cómo sé si ya generé una variable de esta expresión para no hacerlo de nuevo?
+        resultado.append(asig.getExpresion().accept(this));
+
         SimboloVariable svDestino = (SimboloVariable) asig.getIdent();
         String origen = asig.getExpresion().getRefIR();
         String tipoOrigen = LLVM_IR_TYPE_INFO.get(asig.getExpresion().getTipo()).fst;
         String destino = svDestino.getNombreIR();
         String tipoDestino = LLVM_IR_TYPE_INFO.get(svDestino.getTipo()).fst;
         // tipoOrigen y tipoDestino deberían ser iguales, pero lo dejo así para detectar algún error
-        // y usar los nombres de las variables para que quede un poco más claro lo que se hace
+        // y de paso usar los nombres de las variables para que quede un poco más claro lo que se hace
 
-        StringBuilder resultado = new StringBuilder();
-        resultado.append(String.format("; %s = %s\n", origen, destino));
-
-        // Visito a la expresión para delegar la generación de los stores necesarios a los nodos correspondientes.
-        // TODO ¿cómo sé si ya generé el store de esta expresión para no hacerlo de nuevo?
-        resultado.append(asig.getExpresion().accept(this));
-
-        resultado.append(String.format("store %s %s, %s* %s\n", tipoOrigen, origen, tipoDestino, destino));
+        resultado.append(String.format("store %1$s %2$s, %3$s* %4$s ; %2$s = %4$s\n", tipoOrigen, origen, tipoDestino, destino));
         return resultado.toString();
     }
 
@@ -263,18 +263,46 @@ public class GeneradorDeCodigo extends Visitor<String> {
     }
 
     @Override
-    public String visit(Literal l) {
-        String val;
+    public String visit(Literal lit) throws ExcepcionDeAlcance {
+        // Este visitor genere una variable auxiliar para utilizar los valores literales
+        // Como alternativa a generar la variable, podríamos guardar el valor en refIR
+        // pero de esta manera queda más uniforme con la forma en la que hacemos lo otro.
 
-        if (l.getTipo() == Tipo.FLOAT) {
-            val = Double.toString(Float.valueOf(l.getValor()));
+        // TODO ver acá el tema ese de truncar los valores
+
+        String nombreIR;
+        String refIR;
+
+        Tipo tipoParser = lit.getTipo();
+        String tipoIR = LLVM_IR_TYPE_INFO.get(tipoParser).fst;
+        String valorParser = lit.getValor();
+        String valorIR;
+
+        if (tipoParser == Tipo.INTEGER) {
+            nombreIR = Normalizador.getNvoNomVarAux("i");
+            refIR = Normalizador.getNvoNomVarAux("ref.i");
+            valorIR = valorParser;
+        } else if (tipoParser == Tipo.FLOAT) {
+            nombreIR = Normalizador.getNvoNomVarAux("f");
+            refIR = Normalizador.getNvoNomVarAux("ref.f");
+            valorIR = String.valueOf(valorParser);
+        } else if (tipoParser == Tipo.BOOLEAN) {
+            nombreIR = Normalizador.getNvoNomVarAux("b");
+            refIR = Normalizador.getNvoNomVarAux("ref.b");
+            valorIR = valorParser == "false" ? "0" : "1";
         } else {
-            val = l.getValor();
+            throw new ExcepcionDeAlcance("Valor de tipo inesperado: " + lit.getTipo());
         }
-        // TODO boolean
 
-        l.setRefIR(val);
-        return "";
+        lit.setRefIR(refIR);
+
+        StringBuilder resultado = new StringBuilder();
+        resultado.append("; visit(Literal)\n");
+        resultado.append(String.format("%s = alloca %s\n", nombreIR, tipoIR));
+        resultado.append(String.format("store %2$s %3$s, %2$s* %1$s\n", nombreIR, tipoIR, valorIR));
+        resultado.append(String.format("%1$s = load %2$s, %2$s* %3$s\n", refIR, tipoIR, nombreIR));
+
+        return resultado.toString();
     }
 
     // *** PROCESOS ***

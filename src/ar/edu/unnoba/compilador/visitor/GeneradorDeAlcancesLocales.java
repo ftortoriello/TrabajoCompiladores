@@ -47,7 +47,7 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
         }
 
         String nombreIR = Normalizador.getNvoNomVarLcl(nombre);
-        String refIR = Normalizador.getNvoNomVarAux();
+        String refIR = Normalizador.getNvoNomVarAux(nombre);
         Boolean esGlobal = false;
 
         SimboloVariable simbolo = new SimboloVariable(d, nombreIR, refIR, esGlobal);
