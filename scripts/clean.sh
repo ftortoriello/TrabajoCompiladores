@@ -1,4 +1,5 @@
 #!/bin/sh
+
 find . -type f \( \
 	-name '*.class' -o -name '*~' \
 	-o -name 'Lexer.java' \
@@ -6,4 +7,5 @@ find . -type f \( \
 	\) -delete -print
 rm -rfv bin build dist out
 rm -fv .classpath .project
+
 exit 0

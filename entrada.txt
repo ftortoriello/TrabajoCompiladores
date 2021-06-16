@@ -2,7 +2,7 @@ variable altura is integer = 3;
 
 main is
     variable resultado is integer;
-    resultado = altura;
+    resultado = altura - 8;
 end.
 
 {
@@ -105,7 +105,3 @@ main is
         ejemplo();
 end.
 }
-
-{ prueba }
-main is
-end.

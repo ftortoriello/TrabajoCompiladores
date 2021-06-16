@@ -21,11 +21,10 @@ import java.util.List;
 import java.util.Map;
 
 public class GeneradorDeCodigo extends Visitor<String> {
-
     // TODO: esta clase hay que revisarla toda, la adapté rápido del ejemplo original para que compile
     // TODO: ver excepciones, las que van acá serían ExcepcionDeCompilacion (aunque hacen exactamente lo mismo)
 
-    private String nombreArchivo;
+    private String nombreArchivoFuente;
 
     private Map<String, SimboloFuncion> tablaFunciones;
 
@@ -122,8 +121,8 @@ public class GeneradorDeCodigo extends Visitor<String> {
         return String.format("br %s, label %%%s, label %%%s\n", cond, etiquetaTrue, etiquetaFalse);
     }
 
-    public String procesar(Programa p, String n) throws ExcepcionDeAlcance {
-        nombreArchivo = n;
+    public String procesar(Programa p, String nombreArchivoFuente) throws ExcepcionDeAlcance {
+        this.nombreArchivoFuente = nombreArchivoFuente;
         tablaFunciones = p.getTablaFunciones();
 
         String resultado = visit(p);
@@ -135,9 +134,8 @@ public class GeneradorDeCodigo extends Visitor<String> {
     @Override
     public String visit(Programa p) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        resultado.append(String.format(";Programa: %s\n", p.getNombre()));
-        // FIXME: Iría entrada.txt acá?
-        resultado.append(String.format("source_filename = \"%s\"\n", nombreArchivo));
+        resultado.append(String.format("; Programa: %s\n", p.getNombre()));
+        resultado.append(String.format("source_filename = \"%s\"\n", nombreArchivoFuente));
 
         try {
             resultado.append(getHostTarget());

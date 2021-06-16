@@ -8,8 +8,12 @@ import ar.edu.unnoba.compilador.visitor.*;
 import java_cup.runtime.Symbol;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
-public class GenerarAST {
+/* Clase principal que realiza todos los pasos para convertir código fuente en un ejecutable */
+
+public class Compilar {
     private static void graficarArbol(String dot, String nombreArchivo) throws IOException, InterruptedException {
         final String formatoImg = "png";
         //final String formatoImg = "svg";
@@ -35,10 +39,11 @@ public class GenerarAST {
         }
     }
 
-    private static void generarCodigoIR(Programa p, String nombreArchivo) throws IOException, ExcepcionDeAlcance {
+    private static void generarCodigoIR(Programa p, String archivoEntrada, String archivoSalida)
+            throws IOException, ExcepcionDeAlcance {
         GeneradorDeCodigo gc = new GeneradorDeCodigo();
-        PrintWriter pw = new PrintWriter(new FileWriter(nombreArchivo));
-        pw.println(gc.procesar(p, nombreArchivo ));
+        PrintWriter pw = new PrintWriter(new FileWriter(archivoSalida));
+        pw.println(gc.procesar(p, archivoEntrada));
         pw.close();
     }
 
@@ -67,19 +72,31 @@ public class GenerarAST {
     }
 
     public static void main(String[] args) {
-        final String ruta = System.getProperty("user.dir") + "/src/ar/edu/unnoba/compilador/entrada.txt";
+        final String rutaEntrada;
+        final String carpetaSalida = "salida/";
+
+        if (args.length > 0) {
+            // Tomar ruta de archivo fuente de la línea de comandos
+            rutaEntrada = args[0];
+        } else {
+            // Ruta predeterminada
+            rutaEntrada = "entrada.txt";
+        }
+
         FileReader entrada;
         try {
-            entrada = new FileReader(ruta);
+            entrada = new FileReader(rutaEntrada);
         } catch (FileNotFoundException e) {
-            System.out.println("No se pudo encontrar el archivo: " + ruta);
+            System.out.println("No se pudo encontrar el archivo: " + rutaEntrada);
             return;
         }
 
-        // TODO: Podríamos dejar todos los archivos generados en otra carpeta, por ej. out, y entrada.txt en la raíz...
         Lexer lexico = new Lexer(entrada);
         @SuppressWarnings("deprecation") Parser parser = new Parser(lexico);
         try {
+            // Crear directorio de salida si no existe
+            Files.createDirectories(Paths.get(carpetaSalida));
+
             Symbol simboloPrograma = parser.parse();
             if (simboloPrograma == null) {
                 System.out.println("\nEntrada vacía.");
@@ -96,7 +113,7 @@ public class GenerarAST {
             // Ejecutar Visitor graficador del árbol sin transformar,
             // y convertirlo a imagen
             graficador = new ASTGraphviz("Árbol de sintaxis abstracta (Conti - Tortoriello)");
-            graficarArbol(graficador.procesar(programa),"1_ast-original");
+            graficarArbol(graficador.procesar(programa), carpetaSalida + "1_ast-original");
 
             System.out.println("\nIniciando generador de alcances globales...");
             new GeneradorDeAlcanceGlobal().procesar(programa);
@@ -115,23 +132,23 @@ public class GenerarAST {
 
             // Mostrar el árbol transformado
             graficador = new ASTGraphviz("AST con conversión de tipos (Conti - Tortoriello)");
-            graficarArbol(graficador.visit(programa),"2_ast-transformado");
+            graficarArbol(graficador.visit(programa), carpetaSalida + "2_ast-transformado");
 
             System.out.println("\nIniciando proceso de optimización...");
             new Optimizador().procesar(programa);
 
             // Mostrar el árbol optimizado
             graficador = new ASTGraphviz("AST optimizado (Conti - Tortoriello)");
-            graficarArbol(graficador.visit(programa),"3_ast-optimizado");
+            graficarArbol(graficador.visit(programa), carpetaSalida + "3_ast-optimizado");
 
             final String nombreArchivo = "4_entrada";
 
             System.out.println("\nIniciando traducción a código IR...");
-            generarCodigoIR(programa, nombreArchivo + ".ll");
+            generarCodigoIR(programa, rutaEntrada,  carpetaSalida + nombreArchivo + ".ll");
             System.out.println("\nTraducción a código IR finalizada");
 
             System.out.println("\nConvirtiendo el código IR en un programa ejecutable...");
-            compilarExe(nombreArchivo);
+            compilarExe(carpetaSalida + nombreArchivo);
 
         } catch (ClassCastException e) {
             // Error sintáctico probablemente

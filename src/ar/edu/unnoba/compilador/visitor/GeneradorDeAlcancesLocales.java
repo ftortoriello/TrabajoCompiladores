@@ -139,6 +139,7 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
 
         // Cada argumento que se pasó tiene que estar en el alcance, o en su defecto ser un literal
         for (int iArg = 0; iArg < cantArgsFun; iArg++) {
+            // FIXME: Tira una excepción si se pasa una expresión como parámetro, no se puede castear a Valor
             Valor arg = (Valor) i.getArgumentos().get(iArg);
 
             if (!(arg instanceof Literal) && !estaEnElAlcance((Identificador) arg)) {
