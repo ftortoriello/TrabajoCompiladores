@@ -78,14 +78,19 @@ Fecha de entrega: 25/06/2021
 Requisitos:
 * Estructura gral. del programa: :white_check_mark:
 * Declaración de funciones: :white_check_mark:
+  * Valor de retorno por defecto (si no hay return): :x:
+  * Procedimientos (tipo de retorno void): :x:
 * Bloques de código:
   * Declaración de variables: :x:
   * Asignaciones: :x:
   * Operaciones lógicas: :x:
+    * Cortocircuito: :x:
   * Operaciones relacionales: :x:
   * Operaciones aritméticas: :x:
-  * Estructuras de selección: :x:
-  * Estructuras de iteración: :x:
+  * If: :x:
+  * While: :x:
+    * Continue y break: :x:
+    * While anidado (ver etiquetas y demás): :x:
   * Invocación de funciones: :x:
 
 Cosas secundarias:

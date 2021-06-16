@@ -1,3 +1,13 @@
+variable altura is integer = 3;
+variable ancho is integer;
+
+main is
+    variable radio is integer = 5;
+    variable resultado is integer;
+    resultado = altura + radio;
+end.
+
+{
 (* Ejemplo de un programa completo dado en la consigna de la etapa 1 *)
 
 (* Se definen algunas variables globales *)
@@ -61,6 +71,7 @@ main is
 
     writeln("Se acabó\n\nFin!");
 end.
+}
 
 
 {

@@ -40,8 +40,13 @@ public class GeneradorDeAlcanceGlobal extends Visitor<Void> {
                             alcanceGlobal.get(nombre).getTipo()));
         }
 
-        String nombreIR = Normalizador.getNuevoNomVarGlobal(nombre);
-        SimboloVariable simbolo = new SimboloVariable(d, nombreIR);
+        // Defino de antemano los nombres que necesitamos para el IR
+        String nombreIR = Normalizador.getNvoNomVarGbl(nombre);
+        String auxIR = Normalizador.getNvoNomVarAux();
+        Boolean esGlobal = true;
+
+        SimboloVariable simbolo = new SimboloVariable(d, nombreIR, auxIR, esGlobal);
+
         alcanceGlobal.put(nombre, simbolo);
     }
 
@@ -55,7 +60,7 @@ public class GeneradorDeAlcanceGlobal extends Visitor<Void> {
                             nombre, id.getTipo(), tablaFunciones.get(nombre).getTipo()));
         }
 
-        String nombreIR = Normalizador.getNuevoNomFun(nombre);
+        String nombreIR = Normalizador.getNvoNomFun(nombre);
         SimboloFuncion simbolo = new SimboloFuncion(d, nombreIR);
         tablaFunciones.put(nombre, simbolo);
     }

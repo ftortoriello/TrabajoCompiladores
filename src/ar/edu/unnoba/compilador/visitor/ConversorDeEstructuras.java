@@ -25,6 +25,13 @@ import java.util.ArrayList;
 
 public class ConversorDeEstructuras extends Transformer {
 
+    // Estos dos métodos quedaron más complicados de lo que deberían porque para los nodos
+    // nuevos que tienen que crearse en las transformaciones hacemos muchas cosas* a mano,
+    // para evitar tener que pasar los generadores de alcance una segunda vez..
+
+    // *: generar alcances, generar simboloVariable, agregar los Simbolos en los Alcances,
+    // setear el padre de los alcances, setear los tipos y creo que nada más.
+
     @Override
     public Bloque transform(Para p) throws ExcepcionDeTipos {
         p = (Para) super.transform(p);
@@ -72,18 +79,19 @@ public class ConversorDeEstructuras extends Transformer {
         Bloque bloqueNuevo = new Bloque("Conversión\nCASE a IF", false);
         bloqueNuevo.setAlcance(new Alcance("Alcance conversión WHEN -> IF"));
 
-        // La expresión del case pasa a estar en una nueva variable temporal
-        String nombreVarAux = Normalizador.getNuevoNomVarAux();
+        // La expresión del case pasa a estar en una nueva variable temporal, para la cual tengo que crear su símbolo
+        String nombreVarAux = Normalizador.getNvoNomVarAux();
         Identificador identTemp = new Identificador(nombreVarAux, c.getCondicion().getTipo());
         DecVarInicializada decVarTemp  = new DecVarInicializada(nombreVarAux, identTemp, c.getCondicion());
-        SimboloVariable simboloTemp = new SimboloVariable(decVarTemp, nombreVarAux);
-        decVarTemp.setIdent(simboloTemp);
+        Boolean esGlobal = false;
+        SimboloVariable simbolo = new SimboloVariable(decVarTemp, nombreVarAux, nombreVarAux, esGlobal);
+        decVarTemp.setIdent(simbolo);
 
         // Agrego la declaración en la lista de sentencias
         bloqueNuevo.getSentencias().add(decVarTemp);
 
         // Agrego el nuevo símbolo en el alcance
-        bloqueNuevo.getAlcance().put(identTemp.getNombre(), simboloTemp);
+        bloqueNuevo.getAlcance().put(identTemp.getNombre(), simbolo);
 
         // Tengo que hacer esta chanchada para rescatar el alcance en el que está el when y no perder el padre
         Alcance alcancePadre = c.getCasos().get(0).getBloque().getAlcance().getPadre();

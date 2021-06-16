@@ -124,7 +124,7 @@ public class GenerarAST {
             graficador = new ASTGraphviz("AST optimizado (Conti - Tortoriello)");
             graficarArbol(graficador.visit(programa),"3_ast-optimizado");
 
-            final String nombreArchivo = "4-entrada";
+            final String nombreArchivo = "4_entrada";
 
             System.out.println("\nIniciando traducción a código IR...");
             generarCodigoIR(programa, nombreArchivo + ".ll");
