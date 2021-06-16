@@ -14,10 +14,6 @@ public class SimboloFuncion extends InvocacionFuncion {
         return nombreIR;
     }
 
-    public void setNombreIR(String nombreIR) {
-        this.nombreIR = nombreIR;
-    }
-
     public SimboloFuncion(DecFuncion d, String nombreIR) {
         super(d.getIdent().getNombre(), d.getIdent().getTipo());
         this.nombreIR = nombreIR;

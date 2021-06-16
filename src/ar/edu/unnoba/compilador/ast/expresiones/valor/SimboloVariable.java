@@ -11,10 +11,8 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 
 public class SimboloVariable extends Identificador {
 
-    // El nombre original, pero único y normalizado para usarse en IR
+    // El nombre original, pero único y normalizado para usarse en IR.
     private String nombreIR;
-    // El nombre auxiliar, desde el cual accedemos al valor
-    private String auxIR;
 
     private Boolean esGlobal;
 
@@ -22,18 +20,14 @@ public class SimboloVariable extends Identificador {
         return nombreIR;
     }
 
-    public String getAuxIR() {
-        return auxIR;
-    }
-
     public Boolean getEsGlobal() {
         return esGlobal;
     }
 
-    public SimboloVariable(DecVar d, String nombreIR, String auxIR, Boolean esGlobal) {
+    public SimboloVariable(DecVar d, String nombreIR, String refIR, Boolean esGlobal) {
         super(d.getIdent().getNombre(), d.getIdent().getTipo());
         this.nombreIR = nombreIR;
-        this.auxIR = auxIR;
+        this.setRefIR(refIR);
         this.esGlobal = esGlobal;
     }
 }

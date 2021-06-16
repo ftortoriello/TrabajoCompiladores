@@ -107,5 +107,7 @@ end.
 }
 
 { prueba }
+{
 main is
 end.
+}

@@ -223,31 +223,45 @@ public class GeneradorDeCodigo extends Visitor<String> {
     }
     */
 
-    public String visit(Asignacion asig) {
-
-        SimboloVariable sv = (SimboloVariable) asig.getIdent();
-        String nombreIR = sv.getNombreIR();
-        // TODO asignarle refIR a las expresiones
-        String refIR = asig.getExpresion().getRefIR();
-
-        StringBuilder resultado = new StringBuilder();
-
-        resultado.append(String.format("; %s = %s\n", nombreIR, refIR));
-        return resultado.toString();
-
-        /*
-
+    public String visit(Asignacion asig) throws ExcepcionDeAlcance {
         // FIXME: acá no funcionan las conversiones implícitas
-        SimboloVariable sv = (SimboloVariable) asig.getIdent();
-        String tipoLLVM = LLVM_IR_TYPE_INFO.get(sv.getTipo()).fst;
+
+        SimboloVariable svDestino = (SimboloVariable) asig.getIdent();
+        String origen = asig.getExpresion().getRefIR();
+        String tipoOrigen = LLVM_IR_TYPE_INFO.get(asig.getExpresion().getTipo()).fst;
+        String destino = svDestino.getNombreIR();
+        String tipoDestino = LLVM_IR_TYPE_INFO.get(svDestino.getTipo()).fst;
+        // tipoOrigen y tipoDestino deberían ser iguales, pero lo dejo así para detectar algún error
+        // y usar los nombres de las variables para que quede un poco más claro lo que se hace
+
+        StringBuilder resultado = new StringBuilder();
+        resultado.append(String.format("; %s = %s\n", origen, destino));
+
+        // Visito a la expresión para delegar la generación de los stores necesarios a los nodos correspondientes.
+        // TODO ¿cómo sé si ya generé el store de esta expresión para no hacerlo de nuevo?
+        resultado.append(asig.getExpresion().accept(this));
+
+        resultado.append(String.format("store %s %s, %s* %s\n", tipoOrigen, origen, tipoDestino, destino));
+        return resultado.toString();
+    }
+
+    @Override
+    public String visit(Identificador ident) {
+        // Genera store para poder acceder a una variable
+
+        // En esta etapa este Identificador va a ser siempre un SimboloVariable
+        // Tengo que utilizarlo así porque si creo visit(SimboloVariable) da muchos problemas
+        SimboloVariable sv = (SimboloVariable) ident;
 
         StringBuilder resultado = new StringBuilder();
 
-        resultado.append(String.format("store %1$s %2$s, %1$s* %3$s\t; %4$s = %2$s\n",
-                tipoLLVM, sv.getRefIR(), sv.getNombreIR(), sv.getNombre()));
+        String nombreIR = sv.getNombreIR();
+        String tipoIR = LLVM_IR_TYPE_INFO.get(sv.getTipo()).fst;
+        String refIR = sv.getRefIR();
 
+        resultado.append(String.format("; visit(SimboloVariable)\n")); // borrar desp. es para ver si hace cagadas
+        resultado.append(String.format("%1$s = load %2$s, %2$s* %3$s\n", refIR, tipoIR, nombreIR));
         return resultado.toString();
-        */
     }
 
     @Override
@@ -303,14 +317,11 @@ public class GeneradorDeCodigo extends Visitor<String> {
     protected String procesarDecFuncion(DecFuncion df, List<String> args, String cuerpo) {
 
         SimboloFuncion simboloFun = tablaFunciones.get(df.getNombre());
-        if (simboloFun == null) {
-            throw new RuntimeException("No se encontró en la tabla a la función «" + df.getNombre() +
-                "» cuando ya debería estar definida (¿está mal definido el alcance?)");
-        }
 
         // Elementos que necesito para definir la función: tipo, nombre y parámetros
         String tipoRetorno = LLVM_IR_TYPE_INFO.get(simboloFun.getTipo()).fst;
 
+        // Formatear la lista de parámetros de acuerdo a lo requerido por IR
         StringBuilder params = new StringBuilder();
         for (int i = 0; i < df.getArgs().size(); i++) {
             SimboloVariable sArg = (SimboloVariable) df.getArgs().get(i).getIdent();
@@ -329,11 +340,6 @@ public class GeneradorDeCodigo extends Visitor<String> {
         declaracionFunIR.append("}\n\n");
 
         return declaracionFunIR.toString();
-    }
-
-    @Override
-    protected String procesarAsignacion(Asignacion asig, String decVarAux, String expr) {
-        return null;
     }
 
     @Override
@@ -439,6 +445,11 @@ public class GeneradorDeCodigo extends Visitor<String> {
     protected String procesarNodo(Nodo n) {
         // Esto tendría que devolver el nombreIR?
         return n.getNombre();
+    }
+
+    @Override
+    protected String procesarAsignacion(Asignacion asig, String decVarAux, String expr) {
+        return null;
     }
 
     @Override

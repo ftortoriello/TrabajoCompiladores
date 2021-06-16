@@ -42,10 +42,10 @@ public class GeneradorDeAlcanceGlobal extends Visitor<Void> {
 
         // Defino de antemano los nombres que necesitamos para el IR
         String nombreIR = Normalizador.getNvoNomVarGbl(nombre);
-        String auxIR = Normalizador.getNvoNomVarAux();
+        String refIR = Normalizador.getNvoNomVarAux();
         Boolean esGlobal = true;
 
-        SimboloVariable simbolo = new SimboloVariable(d, nombreIR, auxIR, esGlobal);
+        SimboloVariable simbolo = new SimboloVariable(d, nombreIR, refIR, esGlobal);
 
         alcanceGlobal.put(nombre, simbolo);
     }
