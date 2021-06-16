@@ -62,7 +62,6 @@ main is
     writeln("Se acabó\n\nFin!");
 end.
 
-
 {
 (* Ejemplo de ámbitos dado en la consigna de la etapa 2 *)
 
@@ -96,13 +95,8 @@ main is
     else
         ejemplo();
 end.
+}
 
-{
 { prueba }
 main is
-    variable x is integer;
-    # TODO: Admitir esto
-    #x = --3;
-    writeln("Hola \\\t\n\r\"Mundo\"");
 end.
-}

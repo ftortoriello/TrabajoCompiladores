@@ -401,8 +401,8 @@ conjuncion ::=
        :};
 
 negacion_logica ::=
-        OP_LOG_UNA_NOT:op_not relacion:rel {:
-            NegacionLogica negLog = new NegacionLogica(rel);
+        OP_LOG_UNA_NOT:op_not negacion_logica:neg {:
+            NegacionLogica negLog = new NegacionLogica(neg);
             imprimirEtiqueta(negLog);
             RESULT = negLog;
         :} |
@@ -451,9 +451,8 @@ termino ::=
         :};
 
 negacion_aritmetica ::=
-        // TODO: Debería admitir --
-        OP_ARIT_RESTA:menos factor:factor {:
-            NegacionAritmetica negArit = new NegacionAritmetica(factor);
+        OP_ARIT_RESTA:menos negacion_aritmetica:neg {:
+            NegacionAritmetica negArit = new NegacionAritmetica(neg);
             imprimirEtiqueta(negArit);
             RESULT = negArit;
         :} |
