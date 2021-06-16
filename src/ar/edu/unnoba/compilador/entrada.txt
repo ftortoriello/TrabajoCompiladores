@@ -1,10 +1,8 @@
 variable altura is integer = 3;
-variable ancho is integer;
 
 main is
-    variable radio is integer = 5;
     variable resultado is integer;
-    resultado = altura + radio;
+    resultado = altura;
 end.
 
 {
