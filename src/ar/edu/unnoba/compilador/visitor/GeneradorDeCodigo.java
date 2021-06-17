@@ -100,6 +100,14 @@ public class GeneradorDeCodigo extends Visitor<String> {
         return String.format("br %s, label %%%s, label %%%s\n", cond, etiquetaTrue, etiquetaFalse);
     }
 
+    private String grarCodFuncion(String tipoRetorno, String nombreIR, String params, String cuerpo) {
+        StringBuilder codigo = new StringBuilder();
+        codigo.append(String.format("\ndefine %s @%s(%s) {\n", tipoRetorno, nombreIR, params));
+        codigo.append(cuerpo);
+        codigo.append("}\n\n");
+        return codigo.toString();
+    }
+
     // *** VISITORS ***
 
     @Override
@@ -151,8 +159,9 @@ public class GeneradorDeCodigo extends Visitor<String> {
         String refIR = Normalizador.getNvoNomVarAux("sv");
         sv.setRefIR(refIR);
 
-        resultado.append(String.format("; visit(SimboloVariable %s)\n", sv.getNombre())); // borrar desp. es para ver si hace cagadas
+        resultado.append(String.format("; visit(SimboloVariable %s)\n", sv.getNombre()));
         resultado.append(String.format("%1$s = load %2$s, %2$s* %3$s\n", refIR, tipoIR, nombreIR));
+
         return resultado.toString();
     }
 
@@ -164,7 +173,7 @@ public class GeneradorDeCodigo extends Visitor<String> {
 
         // TODO ver acá el tema ese de truncar los valores
 
-        String refIR = Normalizador.getNvoNomVarAux("ref");
+        String refIR = Normalizador.getNvoNomVarAux("lit");
         Tipo tipoParser = lit.getTipo();
         String tipoIR = TIPO_IR.get(tipoParser).fst;
         String valorParser = lit.getValor();
@@ -184,6 +193,7 @@ public class GeneradorDeCodigo extends Visitor<String> {
 
         StringBuilder resultado = new StringBuilder();
         resultado.append(String.format("\n; visit(Literal %s)\n", valorParser));
+        // Hack para generar vars. auxs. en una linea (le sumo 0 al valor que quiero guardar)
         resultado.append(String.format("%s = add %s %s, 0\n", refIR, tipoIR, valorIR));
         return resultado.toString();
     }
@@ -220,32 +230,34 @@ public class GeneradorDeCodigo extends Visitor<String> {
         return resultado.toString();
     }
 
-    protected String procesarDecFuncion(DecFuncion df, List<String> args, String cuerpo) {
-
+    protected String procesarDecFuncion(DecFuncion df, List<String> decArgs, String cuerpo) {
         SimboloFuncion simboloFun = tablaFunciones.get(df.getNombre());
 
-        // Elementos que necesito para definir la función: tipo, nombre y parámetros
-        String tipoRetorno = TIPO_IR.get(simboloFun.getTipo()).fst;
+        // Elementos que necesito para definir la función: tipo de retorno, nombre, parámetros y el cuerpo
+        String funTipoRet = TIPO_IR.get(simboloFun.getTipo()).fst;
+        String funNombreIR = simboloFun.getNombreIR();
+        // Añado al principio del cuerpo la declaración de los parámetros
+        // cuerpo = String.join("", decArgs) + cuerpo;
 
         // Formatear la lista de parámetros de acuerdo a lo requerido por IR
+        // Tengo que hacerlo acá porque el argumento es un nodo DecVar, y al
+        // visitor de DecVar ya lo usamos para generar la declaración.
         StringBuilder params = new StringBuilder();
         for (int i = 0; i < df.getArgs().size(); i++) {
-            SimboloVariable sArg = (SimboloVariable) df.getArgs().get(i).getIdent();
+            SimboloVariable simboloArg = (SimboloVariable) df.getArgs().get(i).getIdent();
+            String tipoRetornoArg = TIPO_IR.get(simboloArg.getTipo()).fst;
+            String argNombreIR = simboloArg.getNombreIR();
 
-            String tipoRetornoArg = TIPO_IR.get(sArg.getTipo()).fst;
-            String nombreIR = sArg.getNombreIR();
-
+            // Para separar los argumentos mediante comas, excepto el final
             String sep = i != df.getArgs().size() - 1 ? ", " : "";
-            params.append(String.format("%s %s%s", tipoRetornoArg, nombreIR, sep));
+
+            // Añado el argumento a la lista
+            params.append(String.format("%s %s%s", tipoRetornoArg, argNombreIR, sep));
         }
 
-        // Definir la función
-        StringBuilder declaracionFunIR = new StringBuilder();
-        declaracionFunIR.append(String.format("\ndefine %s @%s(%s) {\n", tipoRetorno, simboloFun.getNombreIR(), params));
-        declaracionFunIR.append(cuerpo);
-        declaracionFunIR.append("}\n\n");
-
-        return declaracionFunIR.toString();
+        // Cuando tengo lo que necesito, llamo a esta función para que imprima la función
+        String codigo = grarCodFuncion(funTipoRet, funNombreIR, params.toString(), cuerpo);
+        return codigo;
     }
 
     protected String procesarDecVar(DecVar dv, String sinUso) {
@@ -285,7 +297,7 @@ public class GeneradorDeCodigo extends Visitor<String> {
         String nombreIR = sv.getNombreIR();
         String tipoIR = TIPO_IR.get(sv.getTipo()).fst;
         Boolean esGlobal = sv.getEsGlobal();
-        String valorIR = "";
+        String valorIR;
 
         StringBuilder resultado = new StringBuilder();
 
@@ -294,21 +306,23 @@ public class GeneradorDeCodigo extends Visitor<String> {
             // Tengo que armar una función que me retorne el valor para poder asignarla
             // valorIR = el return de la funcion que hay que crear
             valorIR = "globalIni";
+
+            // Mostrar comentario con la declaración en el lenguaje original
+            resultado.append(String.format("\n; procesarDecVarInicializada: variable %s is %s = %s\n",
+                    sv.getNombre(), sv.getTipo(), valorIR));
+
+            resultado.append(String.format("%s = global %s %s\n", nombreIR, tipoIR, valorIR));
         } else {
             // decsRefs contiene las declaraciones que necesito para acceder al valor de la expresión
             resultado.append(decsRefs);
+
             // El resultado final del valor de la expresión ya viene seteado gracias a los visitors
             valorIR = dvi.getExpresion().getRefIR();
-        }
 
+            // Mostrar comentario con la declaración en el lenguaje original
+            resultado.append(String.format("\n; procesarDecVarInicializada: variable %s is %s = %s\n",
+                    sv.getNombre(), sv.getTipo(), valorIR));
 
-        // Mostrar comentario con la declaración en el lenguaje original
-        resultado.append(String.format("\n; procesarDecVarInicializada: variable %s is %s = %s\n",
-                sv.getNombre(), sv.getTipo(), valorIR));
-
-        if (sv.getEsGlobal()) {
-            resultado.append(String.format("%s = global %s %s\n", nombreIR, tipoIR, valorIR));
-        } else {
             resultado.append(String.format("%s = alloca %s\n", nombreIR, tipoIR));
             resultado.append(String.format("store %2$s %3$s, %2$s* %1$s\n", nombreIR, tipoIR, valorIR));
         }
@@ -356,11 +370,14 @@ public class GeneradorDeCodigo extends Visitor<String> {
         resultado.append(decAuxDer);
 
         if (ob instanceof OperacionBinariaAritmetica) {
+            // Por ej.: %aux.ob.11 = add i32 %aux.sv.9, %aux.ref.10 ; %aux.ob.11 = %aux.sv.9 + %aux.ref.10
             resultado.append(String.format("%1$s = %2$s %3$s %4$s, %5$s ; %1$s = %4$s %6$s %5$s\n",
                     refIR, instIR, tipoIR, refIzqIR, refDerIR, operadorParser));
         } else if (ob instanceof Relacion) {
-            resultado.append(String.format("%1$s = icmp %2$s %3$s %4$s, %5$s ; %4$s %6$s %5$s)",
-                    refIR, instIR, tipoIR, refIzqIR, refDerIR, operadorParser));
+            String tipoCmp = ((Relacion)ob).getTipoCmp();
+            // Por ej.: %aux.ob.15 = icmp sgt i32 %aux.sv.13, %aux.sv.14 ; %aux.sv.13 > %aux.sv.14
+            resultado.append(String.format("%1$s = %2$s %3$s %4$s %5$s, %6$s ; %5$s %7$s %6$s",
+                    refIR, tipoCmp, instIR, tipoIR, refIzqIR, refDerIR, operadorParser));
         } else if (ob instanceof OperacionBinariaLogica) {
             resultado.append("; procesarOperacionBinaria -> OpBinLog sin implementar");
         }
@@ -441,10 +458,13 @@ public class GeneradorDeCodigo extends Visitor<String> {
         return resultado.toString();
     }
 
-    protected String procesarRetorno(Retorno r, String expr) {
+    protected String procesarRetorno(Retorno r, String decsRefs) {
         String tipoRetorno = TIPO_IR.get(r.getExpr().getTipo()).fst;
-        String resultado = String.format("ret %s %s\n", tipoRetorno, r.getExpr());
-        return resultado;
+        String refRetorno = r.getExpr().getRefIR();
+        StringBuilder codigo = new StringBuilder();
+        codigo.append(decsRefs);
+        codigo.append(String.format("ret %s %s\n", tipoRetorno, refRetorno));
+        return codigo.toString();
     }
 
     // *** PROCESOS NO UTILIZADOS ***

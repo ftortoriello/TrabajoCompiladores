@@ -1,6 +1,14 @@
+function suma(a is integer) return integer
+begin
+    variable b is integer = a;
+    return b;
+end;
+
 main is
     variable a is integer = 1;
     variable b is integer = a + 2;
+
+    variable z is boolean = a > b;
 end.
 
 {

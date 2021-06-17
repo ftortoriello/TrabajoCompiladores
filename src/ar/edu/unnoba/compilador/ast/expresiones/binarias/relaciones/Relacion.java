@@ -76,4 +76,8 @@ public abstract class Relacion extends OperacionBinaria {
 
         return comp;
     }
+
+    public String getTipoCmp() {
+        return getIzquierda().getTipo() == Tipo.INTEGER ? "icmp" : "fcmp";
+    }
 }

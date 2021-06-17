@@ -12,6 +12,6 @@ public class Suma extends OperacionBinariaAritmetica {
 
     @Override
     public String getInstruccionIR() {
-        return ((this.getTipo() == Tipo.INTEGER) ? "add" : "fadd");
+        return getTipo() == Tipo.INTEGER ? "add" : "fadd";
     }
 }

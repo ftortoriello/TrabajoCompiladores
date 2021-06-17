@@ -8,8 +8,7 @@ public class Desigualdad extends Relacion {
         super(izquierda, derecha, "!=");
     }
 
-    @Override
     public String getInstruccionIR() {
-        return "ne";
+        return getIzquierda().getTipo() == Tipo.INTEGER ? "ne" : "one";
     }
 }
