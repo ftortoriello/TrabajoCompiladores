@@ -5,6 +5,9 @@ import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
 
 public abstract class Declaracion extends Sentencia {
+    // Clase que engloba a las variables inicializadas y a los
+    // parámetros de funciones con valores por defecto.
+
     private Identificador ident;
 
     public Declaracion(String nombre, Identificador ident) {
@@ -31,5 +34,10 @@ public abstract class Declaracion extends Sentencia {
     @Override
     public String toString() {
         return ident.toString();
+    }
+
+    @Override
+    public String getEtiqueta() {
+        return getClass().getSimpleName();
     }
 }

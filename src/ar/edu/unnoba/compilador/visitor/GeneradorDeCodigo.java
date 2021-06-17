@@ -14,9 +14,7 @@ import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Continuar;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Salir;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFuncion;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarInicializada;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
@@ -152,7 +150,7 @@ public class GeneradorDeCodigo extends Visitor {
 
         super.visit(p);
     }
-
+    
     @Override
     public void visit(Encabezado e) throws ExcepcionDeAlcance {
         super.visit(e);
@@ -199,7 +197,6 @@ public class GeneradorDeCodigo extends Visitor {
                 tipoOrigen, origen, tipoDestino, destino));
     }
 
-
     /* Sentencias de declaración */
 
     @Override
@@ -231,7 +228,7 @@ public class GeneradorDeCodigo extends Visitor {
     }
 
     @Override
-    public void visit(DecVarInicializada dvi) {
+    public void visit(DecVarIni dvi) {
         // Genera la declaración de una variable que sí fue inicializada
 
         SimboloVariable sv = (SimboloVariable) dvi.getIdent();
@@ -249,7 +246,7 @@ public class GeneradorDeCodigo extends Visitor {
             valorIR = "globalIni";
 
             // Mostrar comentario con la declaración en el lenguaje original
-            codigo.append(String.format("\n; DecVarInicializada: variable %s is %s = %s\n",
+            codigo.append(String.format("\n; DecVarIni: variable %s is %s = %s\n",
                     sv.getNombre(), sv.getTipo(), valorIR));
 
             codigo.append(String.format("%s = global %s %s\n", nombreIR, tipoIR, valorIR));
@@ -262,7 +259,7 @@ public class GeneradorDeCodigo extends Visitor {
             valorIR = dvi.getExpresion().getRefIR();
 
             // Mostrar comentario con la declaración en el lenguaje original
-            codigo.append(String.format("\n; DecVarInicializada: variable %s is %s = %s\n",
+            codigo.append(String.format("\n; DecVarIni: variable %s is %s = %s\n",
                     sv.getNombre(), sv.getTipo(), valorIR));
 
             codigo.append(String.format("%s = alloca %s\n", nombreIR, tipoIR));
@@ -273,7 +270,7 @@ public class GeneradorDeCodigo extends Visitor {
     }
 
     @Override
-    public void visit(DecFuncion df) throws ExcepcionDeAlcance {
+    public void visit(DecFun df) throws ExcepcionDeAlcance {
         super.visit(df);
 
         SimboloFuncion simboloFun = tablaFunciones.get(df.getNombre());
@@ -288,13 +285,13 @@ public class GeneradorDeCodigo extends Visitor {
         // Tengo que hacerlo acá porque el argumento es un nodo DecVar, y al
         // visitor de DecVar ya lo usamos para generar la declaración.
         StringBuilder params = new StringBuilder();
-        for (int i = 0; i < df.getArgs().size(); i++) {
-            SimboloVariable simboloArg = (SimboloVariable) df.getArgs().get(i).getIdent();
+        for (int i = 0; i < df.getParams().size(); i++) {
+            SimboloVariable simboloArg = (SimboloVariable) df.getParams().get(i).getIdent();
             String tipoRetornoArg = TIPO_IR.get(simboloArg.getTipo()).fst;
             String argNombreIR = simboloArg.getNombreIR();
 
             // Para separar los argumentos mediante comas, excepto el final
-            String sep = i != df.getArgs().size() - 1 ? ", " : "";
+            String sep = i != df.getParams().size() - 1 ? ", " : "";
 
             // Añado el argumento a la lista
             params.append(String.format("%s %s%s", tipoRetornoArg, argNombreIR, sep));
@@ -304,6 +301,18 @@ public class GeneradorDeCodigo extends Visitor {
         // FIXME: ver de donde sacar "cuerpo"
         //grarCodFuncion(funTipoRet, funNombreIR, params.toString(), cuerpo);
         grarCodFuncion(funTipoRet, funNombreIR, params.toString(), "");
+    }
+
+    @Override
+    public void visit(Param p) throws ExcepcionDeAlcance {
+        // TODO
+        codigo.append("; visit(Param) sin implementar");
+    }
+
+    @Override
+    public void visit(ParamDef pi) throws ExcepcionDeAlcance {
+        // TODO
+        codigo.append("; visit(ParamDef) sin implementar");
     }
 
 

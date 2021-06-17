@@ -14,7 +14,7 @@ import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.SimboloVariable;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarInicializada;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarIni;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
@@ -83,7 +83,7 @@ public class ConversorDeEstructuras extends Transformer {
         // La expresión del case pasa a estar en una nueva variable temporal, para la cual tengo que crear su símbolo
         String nombreVarAux = Normalizador.getNvoNomVarAux("when");
         Identificador identTemp = new Identificador(nombreVarAux, c.getCondicion().getTipo());
-        DecVarInicializada decVarTemp  = new DecVarInicializada(nombreVarAux, identTemp, c.getCondicion());
+        DecVarIni decVarTemp  = new DecVarIni(nombreVarAux, identTemp, c.getCondicion());
         Boolean esGlobal = false;
         SimboloVariable simbolo = new SimboloVariable(decVarTemp, nombreVarAux, esGlobal);
         decVarTemp.setIdent(simbolo);

@@ -10,9 +10,7 @@ import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.SimboloFuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.SimboloVariable;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFuncion;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarInicializada;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
 
 /* Visitor para generar el alcance global y construir la tabla de símbolos
  * globales.
@@ -22,7 +20,7 @@ public class GeneradorDeAlcanceGlobal extends Visitor {
     private Map<String, SimboloFuncion> tablaFunciones;
 
     // Agregar el símbolo de la variable al ámbito global
-    private void agregarSimboloVarGlobal(DecVar d) throws ExcepcionDeAlcance {
+    private void agregarSimboloVarGlobal(Declaracion d) throws ExcepcionDeAlcance {
         Identificador id = d.getIdent();
         String nombre = id.getNombre();
 
@@ -42,7 +40,7 @@ public class GeneradorDeAlcanceGlobal extends Visitor {
         alcanceGlobal.put(nombre, simbolo);
     }
 
-    private void agregarSimboloFuncion(DecFuncion d) throws ExcepcionDeAlcance {
+    private void agregarSimboloFuncion(DecFun d) throws ExcepcionDeAlcance {
         Identificador id = d.getIdent();
         String nombre = id.getNombre();
 
@@ -74,7 +72,7 @@ public class GeneradorDeAlcanceGlobal extends Visitor {
     }
 
     @Override
-    public void visit(DecFuncion df) throws ExcepcionDeAlcance {
+    public void visit(DecFun df) throws ExcepcionDeAlcance {
         // Agregar a la tabla la declaración de la función
         agregarSimboloFuncion(df);
         // No visitar los parámetros ni el cuerpo
@@ -88,7 +86,7 @@ public class GeneradorDeAlcanceGlobal extends Visitor {
     }
 
     @Override
-    public void visit(DecVarInicializada dvi) throws ExcepcionDeAlcance {
+    public void visit(DecVarIni dvi) throws ExcepcionDeAlcance {
         if (dvi.getExpresion() instanceof InvocacionFuncion) {
             throw new ExcepcionDeAlcance(String.format(
                     "«%s»: No se puede invocar a una función desde la inicialización de una variable global.",

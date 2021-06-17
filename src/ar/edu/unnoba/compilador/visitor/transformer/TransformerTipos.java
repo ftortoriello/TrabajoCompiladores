@@ -15,8 +15,8 @@ import ar.edu.unnoba.compilador.ast.expresiones.valor.*;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFuncion;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarInicializada;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFun;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarIni;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
 
@@ -120,14 +120,14 @@ public class TransformerTipos extends Transformer {
     }
 
     @Override
-    public DecVarInicializada transform(DecVarInicializada dvi) throws ExcepcionDeTipos {
+    public DecVarIni transform(DecVarIni dvi) throws ExcepcionDeTipos {
         dvi = super.transform(dvi);
         dvi.setExpresion(convertirATipo(dvi.getExpresion(), dvi.getIdent().getTipo()));
         return dvi;
     }
 
     @Override
-    public DecFuncion transform(DecFuncion df) throws ExcepcionDeTipos {
+    public DecFun transform(DecFun df) throws ExcepcionDeTipos {
         alcanceActual = df.getAlcance();
         df = super.transform(df);
         alcanceActual = alcanceActual.getPadre();
@@ -167,13 +167,13 @@ public class TransformerTipos extends Transformer {
             throw new ExcepcionDeTipos(String.format("No se pudo asignar un tipo a la función «%s»", i.getNombre()));
         }
 
-        DecFuncion decFun = s.getDeclaracion();
+        DecFun decFun = s.getDeclaracion();
         int cantArgs = i.getArgs().size();
 
         // Validar el tipo de cada argumento, y convertir cuando sea necesario
         for (int iArg = 0; iArg < cantArgs; iArg++) {
             Expresion arg = i.getArgs().get(iArg);
-            Tipo tipoOriginal = decFun.getArgs().get(iArg).getTipo();
+            Tipo tipoOriginal = decFun.getParams().get(iArg).getTipo();
 
             // TODO acá tendría que modificar el SimboloFuncion
             //s.getDeclaracion().getArgs().set(iArg, convertirATipo(arg, tipoOriginal));
@@ -227,7 +227,7 @@ public class TransformerTipos extends Transformer {
         // Transformar la expresión interna del return
         r = super.transform(r);
         // Y compararla con el de la función a la que pertenece
-        DecFuncion ultFunVisitada = getUltFunVisitada();
+        DecFun ultFunVisitada = getUltFunVisitada();
         if (ultFunVisitada == null) {
             // No tendría que suceder si se ejecutó el Visitor de sentencias de
             // control

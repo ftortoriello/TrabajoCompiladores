@@ -154,7 +154,7 @@ public class ASTGraphviz extends Visitor {
     }
 
     @Override
-    public void visit(DecVarInicializada dvi) throws ExcepcionDeAlcance {
+    public void visit(DecVarIni dvi) throws ExcepcionDeAlcance {
         armarStrDec(dvi.getEtiqueta());
         padres.push(idNodoActual);
         super.visit(dvi);
@@ -162,7 +162,23 @@ public class ASTGraphviz extends Visitor {
     }
 
     @Override
-    public void visit(DecFuncion df) throws ExcepcionDeAlcance {
+    public void visit(DecFun df) throws ExcepcionDeAlcance {
+        armarStrDec(df.getEtiqueta());
+        padres.push(idNodoActual);
+        super.visit(df);
+        padres.pop();
+    }
+
+    @Override
+    public void visit(Param df) throws ExcepcionDeAlcance {
+        armarStrDec(df.getEtiqueta());
+        padres.push(idNodoActual);
+        super.visit(df);
+        padres.pop();
+    }
+
+    @Override
+    public void visit(ParamDef df) throws ExcepcionDeAlcance {
         armarStrDec(df.getEtiqueta());
         padres.push(idNodoActual);
         super.visit(df);

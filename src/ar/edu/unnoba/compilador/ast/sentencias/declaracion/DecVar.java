@@ -8,13 +8,10 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 
 /* Declaración de variable o parámetro sin inicializar. */
 public class DecVar extends Declaracion {
+    // Clase para las variables que no fueron inicializadas al crearse.
+
     public DecVar(String nombre, Identificador ident) {
         super(nombre, ident);
-    }
-
-    @Override
-    public String getEtiqueta() {
-        return getClass().getSimpleName();
     }
 
     @Override

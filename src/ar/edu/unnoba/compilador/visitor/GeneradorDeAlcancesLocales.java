@@ -4,9 +4,7 @@ import ar.edu.unnoba.compilador.Normalizador;
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.*;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFuncion;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarInicializada;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
 
 import java.util.Map;
 
@@ -19,7 +17,7 @@ public class GeneradorDeAlcancesLocales extends Visitor {
     private Map<String, SimboloFuncion> tablaFunciones;
 
     // Agregar la declaración al ámbito en el que se encuentra
-    private void agregarSimbolo(DecVar d) throws ExcepcionDeAlcance {
+    private void agregarSimbolo(Declaracion d) throws ExcepcionDeAlcance {
         if (alcanceGlobal == alcanceActual) {
             // Este Visitor sólo agrega símbolos locales, los globales ya los agregó el visitor
             // de alcance global
@@ -80,12 +78,23 @@ public class GeneradorDeAlcancesLocales extends Visitor {
     }
 
     @Override
-    public void visit(DecFuncion df) throws ExcepcionDeAlcance {
+    public void visit(DecFun df) throws ExcepcionDeAlcance {
         // Generar un alcance nuevo para los parámetros
         alcanceActual = new Alcance(String.format("%d-%s", getID(), df.getNombre()), alcanceActual);
         df.setAlcance(alcanceActual);
         super.visit(df);
         alcanceActual = alcanceActual.getPadre();
+    }
+
+    public void visit(Param p) throws ExcepcionDeAlcance {
+        agregarSimbolo(p);
+        super.visit(p);
+    }
+
+    @Override
+    public void visit(ParamDef pd) throws ExcepcionDeAlcance {
+        agregarSimbolo(pd);
+        super.visit(pd);
     }
 
     @Override
@@ -95,7 +104,7 @@ public class GeneradorDeAlcancesLocales extends Visitor {
     }
 
     @Override
-    public void visit(DecVarInicializada dvi) throws ExcepcionDeAlcance {
+    public void visit(DecVarIni dvi) throws ExcepcionDeAlcance {
         agregarSimbolo(dvi);
         super.visit(dvi);
     }
@@ -123,16 +132,16 @@ public class GeneradorDeAlcancesLocales extends Visitor {
 
         // Validar que la cantidad de argumentos pasados sea por lo menos la cantidad obligaria,
         // y no supere la cantidad total de parámetros, incluyendo los opcionales
-        DecFuncion decFuncion = tablaFunciones.get(i.getNombre()).getDeclaracion();
+        DecFun decFun = tablaFunciones.get(i.getNombre()).getDeclaracion();
 
         int cantArgsInvo = i.getArgs().size();
-        int cantMinArgs = decFuncion.getCantArgsObligatorios();
-        int cantMaxArgs = decFuncion.getArgs().size();
+        int cantMinArgs = decFun.getCantArgsObligatorios();
+        int cantMaxArgs = decFun.getParams().size();
         if (cantArgsInvo < cantMinArgs || cantArgsInvo > cantMaxArgs) {
             throw new ExcepcionDeAlcance(String.format(
                     "La función «%s» fue invocada con %d " + (cantArgsInvo == 1 ? "parámetro" : "parámetros") +
                             ", cuando requiere " + (cantMinArgs == cantMaxArgs ? "%d" : "entre %d y %d") + ".",
-                    decFuncion.getNombre(), cantArgsInvo, cantMinArgs, cantMaxArgs));
+                    decFun.getNombre(), cantArgsInvo, cantMinArgs, cantMaxArgs));
         }
 
         super.visit(i);

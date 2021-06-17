@@ -90,17 +90,26 @@ public abstract class Visitor {
         dv.getIdent().accept(this);
     }
 
-    public void visit(DecVarInicializada dvi) throws ExcepcionDeAlcance {
+    public void visit(DecVarIni dvi) throws ExcepcionDeAlcance {
         dvi.getIdent().accept(this);
         dvi.getExpresion().accept(this);
     }
 
-    public void visit(DecFuncion df) throws ExcepcionDeAlcance {
+    public void visit(DecFun df) throws ExcepcionDeAlcance {
         setEnFuncion(true);
-        for (DecVar arg : df.getArgs()) {
-            arg.accept(this);
+        for (Param p : df.getParams()) {
+            p.accept(this);
         }
         setEnFuncion(false);
+    }
+
+    public void visit(Param p) throws ExcepcionDeAlcance {
+        p.getIdent().accept(this);
+    }
+
+    public void visit(ParamDef p) throws ExcepcionDeAlcance {
+        p.getIdent().accept(this);
+        p.getExpresion().accept(this);
     }
 
 
