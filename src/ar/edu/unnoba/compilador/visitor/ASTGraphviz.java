@@ -31,6 +31,7 @@ public class ASTGraphviz extends Visitor {
         this.etiqueta = etiqueta;
     }
 
+    /*** Función principal ***/
     public String generarCodigo(Programa p) throws ExcepcionDeAlcance {
         super.procesar(p);
         return codigo.toString();

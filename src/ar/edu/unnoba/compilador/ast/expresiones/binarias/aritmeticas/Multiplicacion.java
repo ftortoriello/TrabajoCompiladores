@@ -10,6 +10,6 @@ public class Multiplicacion extends OperacionBinariaAritmetica {
 
     @Override
     public String getInstruccionIR() {
-        return ((this.getTipo() == Tipo.INTEGER) ? "mul" : "fmul");
+        return getTipo() == Tipo.INTEGER ? "mul" : "fmul";
     }
 }

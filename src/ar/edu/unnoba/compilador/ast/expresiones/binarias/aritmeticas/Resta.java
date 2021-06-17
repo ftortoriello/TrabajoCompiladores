@@ -10,6 +10,6 @@ public class Resta extends OperacionBinariaAritmetica {
 
     @Override
     public String getInstruccionIR() {
-        return ((this.getTipo() == Tipo.INTEGER) ? "sub" : "fsub");
+        return getTipo() == Tipo.INTEGER ? "sub" : "fsub";
     }
 }

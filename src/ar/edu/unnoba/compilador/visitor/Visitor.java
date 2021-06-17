@@ -50,7 +50,7 @@ public abstract class Visitor {
     }
 
 
-    /* Inicio del Visitor */
+    /*** Inicio del Visitor ***/
     public void procesar(Programa p) throws ExcepcionDeAlcance {
         p.accept(this);
     }

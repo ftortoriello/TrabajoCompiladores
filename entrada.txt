@@ -1,8 +1,14 @@
-variable a is float = 4.0;
+function suma(a is integer) return integer
+begin
+    variable b is integer = a;
+    return b;
+end;
 
 main is
-    variable total is float;
-    total = 1.5 - a + 5.0;
+    variable a is integer = 1;
+    variable b is integer = a + 2;
+
+    variable z is boolean = a > b;
 end.
 
 {

@@ -10,6 +10,6 @@ public class Division extends OperacionBinariaAritmetica {
 
     @Override
     public String getInstruccionIR() {
-        return ((this.getTipo() == Tipo.INTEGER) ? "sdiv" : "fdiv");
+        return getTipo() == Tipo.INTEGER ? "sdiv" : "fdiv";
     }
 }
