@@ -8,4 +8,9 @@ public class MenorIgual extends Relacion {
     public MenorIgual(Expresion izquierda, Expresion derecha) {
         super(izquierda, derecha, "<=");
     }
+
+    @Override
+    public String getInstruccionIR() {
+        return "sle";
+    }
 }

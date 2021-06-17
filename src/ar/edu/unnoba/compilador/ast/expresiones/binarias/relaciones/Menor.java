@@ -6,4 +6,9 @@ public class Menor extends Relacion {
     public Menor(Expresion izquierda, Expresion derecha) {
         super(izquierda, derecha, "<");
     }
+
+    @Override
+    public String getInstruccionIR() {
+        return "slt";
+    }
 }

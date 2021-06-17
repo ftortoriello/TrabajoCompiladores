@@ -6,4 +6,9 @@ public class Mayor extends Relacion {
     public Mayor(Expresion izquierda, Expresion derecha) {
         super(izquierda, derecha, ">");
     }
+
+    @Override
+    public String getInstruccionIR() {
+        return "sgt";
+    }
 }

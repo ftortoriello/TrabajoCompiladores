@@ -1,8 +1,6 @@
-variable a is float = 4.0;
-
 main is
-    variable total is float;
-    total = 1.5 - a + 5.0;
+    variable a is integer = 1;
+    variable b is integer = a + 2;
 end.
 
 {

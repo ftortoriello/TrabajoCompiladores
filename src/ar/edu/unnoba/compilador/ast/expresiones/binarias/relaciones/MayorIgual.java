@@ -6,4 +6,9 @@ public class MayorIgual extends Relacion {
     public MayorIgual(Expresion izquierda, Expresion derecha) {
         super(izquierda, derecha, ">=");
     }
+
+    @Override
+    public String getInstruccionIR() {
+        return "sge";
+    }
 }

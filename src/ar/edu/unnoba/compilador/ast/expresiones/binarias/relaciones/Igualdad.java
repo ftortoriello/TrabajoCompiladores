@@ -6,4 +6,9 @@ public class Igualdad extends Relacion {
     public Igualdad(Expresion izquierda, Expresion derecha) {
         super(izquierda, derecha, "==");
     }
+
+    @Override
+    public String getInstruccionIR() {
+        return "eq";
+    }
 }

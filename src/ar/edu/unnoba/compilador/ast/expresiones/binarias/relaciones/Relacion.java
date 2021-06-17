@@ -76,10 +76,4 @@ public abstract class Relacion extends OperacionBinaria {
 
         return comp;
     }
-
-    @Override
-    public String getInstruccionIR() {
-        // TODO las comparaciones hay que hacerlas a mano
-        return null;
-    }
 }
