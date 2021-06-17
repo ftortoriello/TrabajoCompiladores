@@ -10,8 +10,6 @@ import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarInicializada;
 
 import java.util.Map;
 
-// FIXME: Se rompió el write en algúm momento...
-
 /* Visitor para generar los alcances de los bloques, construir la tabla de
  * símbolos locales y verificar los alcances.
  */
@@ -113,10 +111,15 @@ public class GeneradorDeAlcancesLocales extends Visitor {
     @Override
     public void visit(InvocacionFuncion i) throws ExcepcionDeAlcance {
         // Si es predefinida ya está limitado por el parser, no es necesario realizar estas validaciones
-        if (i.getEsPredefinida()) super.visit(i);
+        if (i.getEsPredefinida()) {
+            super.visit(i);
+            return;
+        }
 
         // Validar definición contra la tabla de funciones
-        if (!estaEnElAlcance(i)) throw new ExcepcionDeAlcance(String.format("La función «%s» no está definida", i.getNombre()));
+        if (!estaEnElAlcance(i)) {
+            throw new ExcepcionDeAlcance(String.format("La función «%s» no está definida", i.getNombre()));
+        }
 
         // Validar que la cantidad de argumentos pasados sea por lo menos la cantidad obligaria,
         // y no supere la cantidad total de parámetros, incluyendo los opcionales
