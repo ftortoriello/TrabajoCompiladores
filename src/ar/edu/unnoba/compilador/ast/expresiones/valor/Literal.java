@@ -5,7 +5,7 @@ import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.visitor.Visitor;
-import ar.edu.unnoba.compilador.visitor.Transformer;
+import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 
 public class Literal extends Valor {
     private final String valor;
@@ -30,8 +30,8 @@ public class Literal extends Valor {
     }
 
     @Override
-    public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
-        return v.visit(this);
+    public void accept(Visitor v) throws ExcepcionDeAlcance {
+        v.visit(this);
     }
 
     @Override

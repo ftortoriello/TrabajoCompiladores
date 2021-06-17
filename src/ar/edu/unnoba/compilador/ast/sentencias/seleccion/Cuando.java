@@ -5,8 +5,7 @@ import ar.edu.unnoba.compilador.ast.base.Nodo;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
-import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
-import ar.edu.unnoba.compilador.visitor.Transformer;
+import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
 import java.util.Collections;
@@ -48,8 +47,8 @@ public class Cuando extends Seleccion {
     }
 
     @Override
-    public <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance {
-        return v.visit(this);
+    public void accept(Visitor v) throws ExcepcionDeAlcance {
+        v.visit(this);
     }
 
     @Override

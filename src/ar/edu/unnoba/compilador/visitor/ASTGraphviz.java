@@ -2,18 +2,17 @@ package ar.edu.unnoba.compilador.visitor;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.List;
 
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.Conjuncion;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.Disyuncion;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.OperacionBinariaLogica;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.logicas.NegacionLogica;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.*;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
-import ar.edu.unnoba.compilador.ast.sentencias.control.Control;
+import ar.edu.unnoba.compilador.ast.sentencias.control.Continuar;
+import ar.edu.unnoba.compilador.ast.sentencias.control.Salir;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
@@ -21,383 +20,283 @@ import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.*;
 
-public class ASTGraphviz extends Visitor<String> {
-    private final Deque<Integer> padres;
-    private int idNodoActual = 0;
+public class ASTGraphviz extends Visitor {
     private final String etiqueta;
+    private StringBuilder codigo;
 
-    public ASTGraphviz() {
-        this.padres = new ArrayDeque<>();
-        this.etiqueta = "";
-    }
+    private final Deque<Integer> padres = new ArrayDeque<>();
+    private Integer idNodoActual = 0;
 
     public ASTGraphviz(String etiqueta) {
-        this.padres = new ArrayDeque<>();
         this.etiqueta = etiqueta;
     }
 
-    private String armarStrNodo(Integer tamanhoFuente, Integer color, String etiqueta, Integer idPadre) {
-        // Función auxiliar para armar los nodos en dot
-        return String.format("%1$s [label=\"%2$s\", fontsize=" + tamanhoFuente + ", fillcolor=" + color + "]\n" +
-                "%3$s -- %1$s\n", idNodoActual, etiqueta, idPadre);
+    public String generarCodigo(Programa p) throws ExcepcionDeAlcance {
+        super.procesar(p);
+        return codigo.toString();
     }
 
-
-    // *** VISITAS ***
-
-    // Base
-    @Override
-    public String visit(Programa p) throws ExcepcionDeAlcance {
-        StringBuilder resultado = new StringBuilder();
-
-        resultado
-                .append("graph Programa {")
-                .append("dpi = 72;\n")
-                .append(String.format("label=\"%s\";\n", etiqueta))
-                .append("bgcolor=aliceblue;\n")
-                .append("fontsize=60;\n")
-
-                .append("node [\n")
-                .append("  style=\"filled,bold\";\n")
-                .append("  color=black;\n")
-                .append("  fillcolor=red;\n")
-                .append("  colorscheme=set312\n")
-                .append("]\n");
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(p));
-        padres.push(idNodoActual);
-        resultado.append(super.visit(p));
-        padres.pop();
-        resultado.append("}");
-        return resultado.toString();
-    }
-
-    @Override
-    public String visit(Encabezado e) throws ExcepcionDeAlcance {
-        StringBuilder resultado = new StringBuilder();
+    // Genera un ID nuevo, agrega al código dot un nodo, y lo conecta a su padre si lo tiene.
+    private void armarStrNodo(String etiqueta, Integer tamanhoFuente, Integer color) {
         idNodoActual = getID();
-        resultado.append(this.procesarNodo(e));
-        padres.push(idNodoActual);
-        resultado.append(super.visit(e));
-        padres.pop();
-        return resultado.toString();
-    }
+        Integer idNodoPadre = padres.peekFirst();  // el que está en el tope ahora
 
-    @Override
-    public String visit(Bloque b) throws ExcepcionDeAlcance {
-        StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(b));
-        padres.push(idNodoActual);
-        resultado.append(super.visit(b));
-        padres.pop();
-        return resultado.toString();
-    }
-
-    @Override
-    public String visit(Literal c) {
-        StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(c));
-        return resultado.toString();
-    }
-
-    @Override
-    public String visit(Identificador i) {
-        StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(i));
-        return resultado.toString();
-    }
-
-    @Override
-    public String visit(InvocacionFuncion invo) {
-        StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(invo));
-        return resultado.toString();
-    }
-
-
-    // Operaciones
-
-    @Override
-    public String visit(OperacionBinaria ob) throws ExcepcionDeAlcance {
-        StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(ob));
-        padres.push(idNodoActual);
-        resultado.append(super.visit(ob));
-        padres.pop();
-        return resultado.toString();
-    }
-
-    @Override
-    public String visit(OperacionUnaria ou) throws ExcepcionDeAlcance {
-        StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(ou));
-        padres.push(idNodoActual);
-        resultado.append(super.visit(ou));
-        padres.pop();
-        return resultado.toString();
-    }
-
-
-    // Sentencias
-    @Override
-    public String visit(Asignacion a) throws ExcepcionDeAlcance {
-        StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(a));
-        padres.push(idNodoActual);
-        resultado.append(super.visit(a));
-        padres.pop();
-        return resultado.toString();
-    }
-
-    @Override
-    public String visit(DecFuncion df) throws ExcepcionDeAlcance {
-        StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(df));
-        padres.push(idNodoActual);
-        resultado.append(super.visit(df));
-        padres.pop();
-        return resultado.toString();
-    }
-
-    @Override
-    public String visit(DecVar dv) throws ExcepcionDeAlcance {
-        StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(dv));
-        padres.push(idNodoActual);
-        resultado.append(super.visit(dv));
-        padres.pop();
-        return resultado.toString();
-    }
-
-    @Override
-    public String visit(DecVarInicializada dvi) throws ExcepcionDeAlcance {
-        StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(dvi));
-        padres.push(idNodoActual);
-        resultado.append(super.visit(dvi));
-        padres.pop();
-        return resultado.toString();
-    }
-
-    @Override
-    public String visit(SiEntonces se) throws ExcepcionDeAlcance {
-        StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(se));
-        padres.push(idNodoActual);
-        resultado.append(super.visit(se));
-        padres.pop();
-        return resultado.toString();
-    }
-
-    @Override
-    public String visit(SiEntoncesSino ses) throws ExcepcionDeAlcance {
-        StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(ses));
-        padres.push(idNodoActual);
-        resultado.append(super.visit(ses));
-        padres.pop();
-        return resultado.toString();
-    }
-
-    @Override
-    public String visit(Cuando c) throws ExcepcionDeAlcance {
-        StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(c));
-        padres.push(idNodoActual);
-        resultado.append(super.visit(c));
-        padres.pop();
-        return resultado.toString();
-    }
-
-    @Override
-    public String visit(CasoCuando cc) throws ExcepcionDeAlcance {
-        StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(cc));
-        padres.push(idNodoActual);
-        resultado.append(super.visit(cc));
-        padres.pop();
-        return resultado.toString();
-    }
-
-    @Override
-    public String visit(Mientras m) throws ExcepcionDeAlcance {
-        StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(m));
-        padres.push(idNodoActual);
-        resultado.append(super.visit(m));
-        padres.pop();
-        return resultado.toString();
-    }
-
-    @Override
-    public String visit(Para p) throws ExcepcionDeAlcance {
-        StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(p));
-        padres.push(idNodoActual);
-        resultado.append(super.visit(p));
-        padres.pop();
-        return resultado.toString();
-    }
-
-    @Override
-    public String visit(Retorno r) throws ExcepcionDeAlcance {
-        StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(r));
-        padres.push(idNodoActual);
-        resultado.append(super.visit(r));
-        padres.pop();
-        return resultado.toString();
-    }
-
-
-    // *** PROCESOS ***
-
-    // Base
-
-    @Override
-    protected String procesarNodo(Nodo n) {
-        // Define el nodo n en el archivo .dot, y lo conecta a su padre si lo tiene
-
-        Integer idPadre = padres.peekFirst();
-
-        if (idPadre == null) {
-            return String.format("%1$s [label=\"%2$s\", fontsize=48, fillcolor=10, penwidth=5]\n",
-                    idNodoActual, n.getEtiqueta());
-        } else if (n instanceof Encabezado) {
-            return armarStrNodo(42, 11, n.getEtiqueta(), idPadre);
-        } else if (n instanceof Bloque) {
-            if (((Bloque) n).esProgramaPrincipal()) {
-                return armarStrNodo(42, 11, n.getEtiqueta(), idPadre);
-            } else {
-                return armarStrNodo(28, 3, n.getEtiqueta(), idPadre);
-            }
-        } else if (n instanceof Declaracion) {
-            return armarStrNodo(28, 1, n.getEtiqueta(), idPadre);
-        } else if (n instanceof Disyuncion || n instanceof Conjuncion || n instanceof NegacionLogica) {
-            return armarStrNodo(28, 5, n.getEtiqueta(), idPadre);
-        } else if (n instanceof Relacion || n instanceof CasoCuando) {
-            return armarStrNodo(26, 6, n.getEtiqueta(), idPadre);
-        } else if (n instanceof OperacionBinaria || n instanceof OperacionUnaria) {
-            return armarStrNodo(24, 7, n.getEtiqueta(), idPadre);
-        } else if (n instanceof Seleccion || n instanceof Para || n instanceof Mientras) {
-            return armarStrNodo(28, 8, n.getEtiqueta(), idPadre);
-        } else if (n instanceof SimboloVariable || n instanceof SimboloFuncion) {
-            return armarStrNodo(18, 2, n.getEtiqueta(), idPadre);
-        } else if (n instanceof Valor) {
-            return armarStrNodo(18, 9, n.getEtiqueta(), idPadre);
-        } else if (n instanceof Control) {
-            return armarStrNodo(24, 4, n.getEtiqueta(), idPadre);
+        if (idNodoPadre == null) {
+            // nodo raíz
+            codigo.append(String.format(
+                    "%1$s [label=\"%2$s\", fontsize=%3$d, fillcolor=%4$d, penwidth=5]\n",
+                    idNodoActual, etiqueta, tamanhoFuente, color));
         } else {
-            return armarStrNodo(18, 12, n.getEtiqueta(), idPadre);
+            codigo.append(String.format(
+                    "%1$s [label=\"%3$s\", fontsize=%4$d, fillcolor=%5$d]\n%2$s -- %1$s\n",
+                    idNodoActual, idNodoPadre, etiqueta, tamanhoFuente, color));
+        }
+    }
+
+    // Armarlo con estos valores predeterminados si no se pasan
+    private void armarStrNodo(String etiqueta) {
+        armarStrNodo(etiqueta, 18, 12);
+    }
+    private void armarStrEncabezado(String etiqueta) {
+        armarStrNodo(etiqueta, 42, 11);
+    }
+    private void armarStrOperacion(String etiqueta) {
+        armarStrNodo(etiqueta, 24, 7);
+    }
+    private void armarStrValor(String etiqueta) {
+        armarStrNodo(etiqueta, 18, 9);
+    }
+    private void armarStrEstructura(String etiqueta) {
+        armarStrNodo(etiqueta, 28, 8);
+    }
+    private void armarStrControl(String etiqueta) {
+        armarStrNodo(etiqueta, 24, 4);
+    }
+    private void armarStrSimbolo(String etiqueta) {
+        armarStrNodo(etiqueta, 18, 2);
+    }
+    private void armarStrDec(String etiqueta) {
+        armarStrNodo(etiqueta, 28, 1);
+    }
+    private void armarStrOpLogica(String etiqueta) {
+        armarStrNodo(etiqueta, 28, 5);
+    }
+
+
+    /* Base */
+
+    @Override
+    public void visit(Programa p) throws ExcepcionDeAlcance {
+        codigo = new StringBuilder();
+
+        codigo.append("graph Programa {\n")
+              .append("dpi = 72;\n")
+              .append(String.format("label=\"%s\";\n", etiqueta))
+              .append("bgcolor=aliceblue;\n")
+              .append("fontsize=60;\n")
+              .append("node [\n")
+              .append("  style=\"filled,bold\";\n")
+              .append("  color=black;\n")
+              .append("  fillcolor=red;\n")
+              .append("  colorscheme=set312\n")
+              .append("]\n");
+
+        armarStrNodo(p.getEtiqueta(), 48, 10);
+        padres.push(idNodoActual);
+        super.visit(p);
+        padres.pop();
+
+        codigo.append("}");
+    }
+
+    @Override
+    public void visit(Encabezado e) throws ExcepcionDeAlcance {
+        armarStrEncabezado(e.getEtiqueta());
+        padres.push(idNodoActual);
+        super.visit(e);
+        padres.pop();
+    }
+
+    @Override
+    public void visit(Bloque b) throws ExcepcionDeAlcance {
+        if (b.esProgramaPrincipal()) {
+            armarStrEncabezado(b.getEtiqueta());
+        } else {
+            armarStrNodo(b.getEtiqueta(), 28, 3);
+        }
+
+        padres.push(idNodoActual);
+        super.visit(b);
+        padres.pop();
+    }
+
+
+    /* Sentencia de asignación */
+
+    @Override
+    public void visit(Asignacion a) throws ExcepcionDeAlcance {
+        armarStrNodo(a.getEtiqueta());
+        padres.push(idNodoActual);
+        super.visit(a);
+        padres.pop();
+    }
+
+
+    /* Sentencias de declaración */
+
+    @Override
+    public void visit(DecVar dv) throws ExcepcionDeAlcance {
+        armarStrDec(dv.getEtiqueta());
+        padres.push(idNodoActual);
+        super.visit(dv);
+        padres.pop();
+    }
+
+    @Override
+    public void visit(DecVarInicializada dvi) throws ExcepcionDeAlcance {
+        armarStrDec(dvi.getEtiqueta());
+        padres.push(idNodoActual);
+        super.visit(dvi);
+        padres.pop();
+    }
+
+    @Override
+    public void visit(DecFuncion df) throws ExcepcionDeAlcance {
+        armarStrDec(df.getEtiqueta());
+        padres.push(idNodoActual);
+        super.visit(df);
+        padres.pop();
+    }
+
+
+    /* Sentencias de selección */
+
+    @Override
+    public void visit(SiEntonces se) throws ExcepcionDeAlcance {
+        armarStrEstructura(se.getEtiqueta());
+        padres.push(idNodoActual);
+        super.visit(se);
+        padres.pop();
+    }
+
+    @Override
+    public void visit(SiEntoncesSino ses) throws ExcepcionDeAlcance {
+        armarStrEstructura(ses.getEtiqueta());
+        padres.push(idNodoActual);
+        super.visit(ses);
+        padres.pop();
+    }
+
+    @Override
+    public void visit(Cuando c) throws ExcepcionDeAlcance {
+        armarStrNodo(c.getEtiqueta());
+        padres.push(idNodoActual);
+        super.visit(c);
+        padres.pop();
+    }
+
+    @Override
+    public void visit(CasoCuando cc) throws ExcepcionDeAlcance {
+        armarStrNodo(cc.getEtiqueta(), 26, 6);
+        padres.push(idNodoActual);
+        super.visit(cc);
+        padres.pop();
+    }
+
+
+    /* Sentencias de iteración */
+
+    @Override
+    public void visit(Mientras m) throws ExcepcionDeAlcance {
+        armarStrEstructura(m.getEtiqueta());
+        padres.push(idNodoActual);
+        super.visit(m);
+        padres.pop();
+    }
+
+    @Override
+    public void visit(Para p) throws ExcepcionDeAlcance {
+        armarStrEstructura(p.getEtiqueta());
+        padres.push(idNodoActual);
+        super.visit(p);
+        padres.pop();
+    }
+
+
+    /* Sentencias de control */
+
+    @Override
+    public void visit(Retorno r) throws ExcepcionDeAlcance {
+        armarStrControl(r.getEtiqueta());
+        padres.push(idNodoActual);
+        super.visit(r);
+        padres.pop();
+    }
+
+    @Override
+    public void visit(Continuar c) throws ExcepcionDeAlcance {
+        armarStrControl(c.getEtiqueta());
+    }
+
+    @Override
+    public void visit(Salir s) throws ExcepcionDeAlcance {
+        armarStrControl(s.getEtiqueta());
+    }
+
+
+    /* Operaciones */
+
+    @Override
+    public void visit(OperacionBinaria ob) throws ExcepcionDeAlcance {
+        if (ob instanceof Relacion) {
+            // TODO: Buscar otro color no usado?
+            armarStrNodo(ob.getEtiqueta(), 26, 6);
+        } else if (ob instanceof OperacionBinariaLogica) {
+            armarStrOpLogica(ob.getEtiqueta());
+        } else {
+            armarStrOperacion(ob.getEtiqueta());
+        }
+
+        padres.push(idNodoActual);
+        super.visit(ob);
+        padres.pop();
+    }
+
+    @Override
+    public void visit(OperacionUnaria ou) throws ExcepcionDeAlcance {
+        if (ou instanceof NegacionLogica) {
+            armarStrOpLogica(ou.getEtiqueta());
+        } else {
+            armarStrOperacion(ou.getEtiqueta());
+        }
+        padres.push(idNodoActual);
+        super.visit(ou);
+        padres.pop();
+    }
+
+
+    /* Valores */
+
+    @Override
+    public void visit(Literal l) {
+        armarStrValor(l.getEtiqueta());
+    }
+
+    @Override
+    public void visit(Identificador i) {
+        if (i instanceof SimboloVariable) {
+            armarStrSimbolo(i.getEtiqueta());
+        } else {
+            armarStrValor(i.getEtiqueta());
         }
     }
 
     @Override
-    protected String procesarPrograma(Programa p, String enc, String blq) {
-        return enc + blq;
+    public void visit(InvocacionFuncion i) {
+        if (i instanceof SimboloFuncion) {
+            armarStrSimbolo(i.getEtiqueta());
+        } else {
+            armarStrValor(i.getEtiqueta());
+        }
     }
-
-    @Override
-    protected String procesarEncabezado(Encabezado e, List<String> declaraciones) {
-        StringBuilder resultado = new StringBuilder();
-        declaraciones.forEach(resultado::append);
-        return resultado.toString();
-    }
-
-    @Override
-    protected String procesarBloque(Bloque b, List<String> sentencias) {
-        StringBuilder resultado = new StringBuilder();
-        sentencias.forEach(resultado::append);
-        return resultado.toString();
-    }
-
-
-    // Operaciones
-
-    @Override
-    protected String procesarOperacionBinaria(OperacionBinaria ob, String ei, String ed) {
-        return ei + ed;
-    }
-
-
-    // Sentencias
-
-    @Override
-    protected String procesarAsignacion(Asignacion a, String identificador, String expresion) {
-        return identificador + expresion;
-    }
-
-    @Override
-    protected String procesarInvocacionFuncion(InvocacionFuncion invoFun) {
-        return procesarNodo(invoFun);
-    }
-
-    @Override
-    protected String procesarDecFuncion(DecFuncion df, List<String> args, String bloque) {
-        StringBuilder strArgs = new StringBuilder();
-        args.forEach(strArgs::append);
-
-        return strArgs + bloque;
-    }
-
-    @Override
-    protected String procesarSiEntonces(String cond, String blq) {
-        return cond + blq;
-    }
-
-    @Override
-    protected String procesarSiEntoncesSino(String cond, String blqSi, String blqSino) {
-        return cond + blqSi + blqSino;
-    }
-
-    @Override
-    protected String procesarCuando(Cuando cc, String expr, List<String> casosCuando, String blqElse) {
-        StringBuilder strCasos = new StringBuilder();
-        casosCuando.forEach(strCasos::append);
-
-        return expr + strCasos + blqElse;
-    }
-
-    @Override
-    protected String procesarCasoCuando(CasoCuando cc, String expr, String blq) {
-        return expr + blq;
-    }
-
-    @Override
-    protected String procesarMientras(Mientras m, String expr, String blq) {
-        return expr + blq;
-    }
-
-    @Override
-    protected String procesarDecVar(DecVar dv, String ident) {
-        return ident;
-    }
-
-    @Override
-    protected String procesarDecVarInicializada(DecVarInicializada dvi, String ident, String expr) {
-        return ident + expr;
-    }
-
-    @Override
-    protected String procesarRetorno(Retorno r, String expr) {
-        return expr;
-    }
-
 }

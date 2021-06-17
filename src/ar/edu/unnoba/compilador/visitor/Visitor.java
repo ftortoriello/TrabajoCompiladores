@@ -1,11 +1,7 @@
 package ar.edu.unnoba.compilador.visitor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeCompilacion;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.*;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.*;
@@ -22,14 +18,16 @@ import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntonces;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
 
-public abstract class Visitor<T> {
+public abstract class Visitor {
     private int id = 0;
 
-    // Flags para comprobar si el Visitor se encuentra en una función o
-    // estructura de control
+    /* Flags para comprobar si el Visitor se encuentra en una función o
+     * estructura de control
+     */
     private boolean enFuncion;
     private boolean enBucle;
 
+    /* Funciones auxiliares */
     protected int getID() {
         id += 1;
         return id;
@@ -52,191 +50,140 @@ public abstract class Visitor<T> {
     }
 
 
-    public T procesar(Programa p) throws ExcepcionDeAlcance {
-        return p.accept(this);
+    /* Inicio del Visitor */
+    public void procesar(Programa p) throws ExcepcionDeAlcance {
+        p.accept(this);
     }
 
-    // Visits base
 
-    public T visit(Programa p) throws ExcepcionDeAlcance {
-        T enc = p.getEncabezado().accept(this);
-        T blq = p.getCuerpo().accept(this);
-        return procesarPrograma(p, enc, blq);
+    /* Base */
+
+    public void visit(Programa p) throws ExcepcionDeAlcance {
+        p.getEncabezado().accept(this);
+        p.getCuerpo().accept(this);
     }
 
-    public T visit(Encabezado e) throws ExcepcionDeAlcance {
-        List<T> declaraciones = new ArrayList<>();
+    public void visit(Encabezado e) throws ExcepcionDeAlcance {
         for (Declaracion d : e.getDeclaraciones()) {
-            declaraciones.add(d.accept(this));
+            d.accept(this);
         }
-        return procesarEncabezado(e, declaraciones);
     }
 
-    public T visit(Bloque b) throws ExcepcionDeAlcance {
-        List<T> sentencias = new ArrayList<>();
+    public void visit(Bloque b) throws ExcepcionDeAlcance {
         for (Nodo sentencia : b.getSentencias()) {
-            sentencias.add(sentencia.accept(this));
+            sentencia.accept(this);
         }
-        return procesarBloque(b, sentencias);
-    }
-
-    public T visit(CasoCuando cc) throws ExcepcionDeAlcance {
-        T expr = cc.getExpr().accept(this);
-        T blq = cc.getBloque().accept(this);
-        return procesarCasoCuando(cc, expr, blq);
-    }
-
-    public T visit(Literal c) throws ExcepcionDeAlcance {
-        return procesarNodo(c);
-    }
-
-    public T visit(Identificador i) throws ExcepcionDeAlcance {
-        return procesarNodo(i);
-    }
-
-    public T visit(InvocacionFuncion invo) throws ExcepcionDeAlcance {
-        for (Expresion argumento : invo.getArgs()) {
-            argumento.accept(this);
-        }
-        return procesarInvocacionFuncion(invo);
     }
 
 
-    // Visits de operaciones
+    /* Sentencia de asignación */
 
-    public T visit(OperacionBinaria ob) throws ExcepcionDeAlcance {
-        T ti = ob.getIzquierda().accept(this);
-        T td = ob.getDerecha().accept(this);
-        return procesarOperacionBinaria(ob, ti, td);
-    }
-
-    public T visit(OperacionUnaria ou) throws ExcepcionDeAlcance {
-        return ou.getExpresion().accept(this);
+    public void visit(Asignacion a) throws ExcepcionDeAlcance {
+        a.getIdent().accept(this);
+        a.getExpresion().accept(this);
     }
 
 
-    // Visits de sentencias
+    /* Sentencias de declaración */
 
-    public T visit(Asignacion a) throws ExcepcionDeAlcance {
-        T identificador = a.getIdent().accept(this);
-        T expresion = a.getExpresion().accept(this);
-        return procesarAsignacion(a, identificador, expresion);
+    public void visit(DecVar dv) throws ExcepcionDeAlcance {
+        dv.getIdent().accept(this);
     }
 
-    public T visit(DecVar dv) throws ExcepcionDeAlcance {
-        T ident = dv.getIdent().accept(this);
-        return procesarDecVar(dv, ident);
+    public void visit(DecVarInicializada dvi) throws ExcepcionDeAlcance {
+        dvi.getIdent().accept(this);
+        dvi.getExpresion().accept(this);
     }
 
-    public T visit(DecVarInicializada dvi) throws ExcepcionDeAlcance {
-        T ident = dvi.getIdent().accept(this);
-        T expr = dvi.getExpresion().accept(this);
-        return procesarDecVarInicializada(dvi, ident, expr);
-    }
-
-    public T visit(DecFuncion df) throws ExcepcionDeAlcance {
+    public void visit(DecFuncion df) throws ExcepcionDeAlcance {
         setEnFuncion(true);
-
-        List<T> args = new ArrayList<>();
         for (DecVar arg : df.getArgs()) {
-            args.add(arg.accept(this));
+            arg.accept(this);
         }
-        T cuerpo = df.getBloque().accept(this);
-
         setEnFuncion(false);
-        return procesarDecFuncion(df, args, cuerpo);
     }
 
-    public T visit(SiEntonces se) throws ExcepcionDeAlcance {
-        T cond = se.getCondicion().accept(this);
-        T blqSi = se.getBloqueSiEntonces().accept(this);
-        return procesarSiEntonces(cond, blqSi);
+
+    /* Sentencias de selección */
+
+    public void visit(SiEntonces se) throws ExcepcionDeAlcance {
+        se.getCondicion().accept(this);
+        se.getBloqueSiEntonces().accept(this);
     }
 
-    public T visit(SiEntoncesSino ses) throws ExcepcionDeAlcance {
-        T cond = ses.getCondicion().accept(this);
-        T blqSi = ses.getBloqueSiEntonces().accept(this);
-        T blqSino = ses.getBloqueSino().accept(this);
-        return procesarSiEntoncesSino(cond, blqSi, blqSino);
+    public void visit(SiEntoncesSino ses) throws ExcepcionDeAlcance {
+        ses.getCondicion().accept(this);
+        ses.getBloqueSiEntonces().accept(this);
+        ses.getBloqueSino().accept(this);
     }
 
-    public T visit(Cuando c) throws ExcepcionDeAlcance {
-        T expr = c.getCondicion().accept(this);
-
-        List<T> casosCuando = new ArrayList<>();
+    public void visit(Cuando c) throws ExcepcionDeAlcance {
+        c.getCondicion().accept(this);
         for (CasoCuando caso : c.getCasos()) {
-            casosCuando.add(caso.accept(this));
+            caso.accept(this);
         }
-
-        T blqElse = c.getBloqueElse().accept(this);
-
-        return procesarCuando(c, expr, casosCuando, blqElse);
+        c.getBloqueElse().accept(this);
     }
 
-    public T visit(Mientras m) throws ExcepcionDeAlcance {
+    public void visit(CasoCuando cc) throws ExcepcionDeAlcance {
+        cc.getExpr().accept(this);
+        cc.getBloque().accept(this);
+    }
+
+
+    /* Sentencias de iteración */
+
+    public void visit(Mientras m) throws ExcepcionDeAlcance {
         setEnBucle(true);
-        T expr = m.getCondicion().accept(this);
-        T blq = m.getBloqueSentencias().accept(this);
+        m.getCondicion().accept(this);
+        m.getBloqueSentencias().accept(this);
         setEnBucle(false);
-        return procesarMientras(m, expr, blq);
     }
 
-    public T visit(Para p) throws ExcepcionDeAlcance {
+    public void visit(Para p) throws ExcepcionDeAlcance {
         setEnBucle(true);
         p.getIdent().accept(this);
-        T blq = p.getBloqueSentencias().accept(this);
+        p.getBloqueSentencias().accept(this);
         setEnBucle(false);
-        return blq;
-    }
-
-    public T visit(Retorno r) throws ExcepcionDeAlcance {
-        return procesarRetorno(r, r.getExpr().accept(this));
-    }
-
-    public T visit(Salir s) throws ExcepcionDeAlcance {
-        return procesarNodo(s);
-    }
-
-    public T visit(Continuar c) throws ExcepcionDeAlcance {
-        return procesarNodo(c);
     }
 
 
-    // Procesos implementados en los visitors específicos
-    // TODO: Hace falta acá? Es usado por ASTGraphviz nomás
-    // Creo que se puede eliminar pero habría que cambiar todas las llamadas de tipo resultado.append(super.visit(p))
-    // Y otro problema es que todos lo visit de acá tienen tipo de retorno T, si sacamos los procesar qué retornan?
+    /* Sentencias de control */
 
-    protected abstract T procesarNodo(Nodo n);
+    public void visit(Retorno r) throws ExcepcionDeAlcance {
+        r.getExpr().accept(this);
+    }
 
-    protected abstract T procesarPrograma(Programa p, T enc, T blq);
+    public void visit(Continuar c) throws ExcepcionDeAlcance {
+    }
 
-    protected abstract T procesarEncabezado(Encabezado encabezado, List<T> sentencias);
+    public void visit(Salir s) throws ExcepcionDeAlcance {
+    }
 
-    protected abstract T procesarBloque(Bloque bloque, List<T> sentencias);
 
-    protected abstract T procesarOperacionBinaria(OperacionBinaria ob, T ei, T ed);
+    /* Operaciones */
 
-    protected abstract T procesarDecVar(DecVar dv, T ident);
+    public void visit(OperacionBinaria ob) throws ExcepcionDeAlcance {
+        ob.getIzquierda().accept(this);
+        ob.getDerecha().accept(this);
+    }
 
-    protected abstract T procesarDecVarInicializada(DecVarInicializada dvi, T ident, T expr);
+    public void visit(OperacionUnaria ou) throws ExcepcionDeAlcance {
+        ou.getExpresion().accept(this);
+    }
 
-    // FIXME: podríamos dejar sólo el primer parámetro en esta y algunas otras funciones
-    protected abstract T procesarAsignacion(Asignacion a, T identificador, T expresion) throws ExcepcionDeAlcance;
 
-    protected abstract T procesarInvocacionFuncion(InvocacionFuncion invoFun);
+    /* Valores */
 
-    protected abstract T procesarDecFuncion(DecFuncion df, List<T> args, T cuerpo);
+    public void visit(Literal l) throws ExcepcionDeAlcance {
+    }
 
-    protected abstract T procesarSiEntonces(T cond, T blq);
+    public void visit(Identificador i) throws ExcepcionDeAlcance {
+    }
 
-    protected abstract T procesarSiEntoncesSino(T cond, T blqSi, T blqSino);
-
-    protected abstract T procesarCuando(Cuando cc, T expr, List<T> casosCuando, T blqElse);
-
-    protected abstract T procesarCasoCuando(CasoCuando cc, T expr, T blq);
-
-    protected abstract T procesarMientras(Mientras m, T expr, T blq);
-
-    protected abstract T procesarRetorno(Retorno r, T expr);
+    public void visit(InvocacionFuncion i) throws ExcepcionDeAlcance {
+        for (Expresion argumento : i.getArgs()) {
+            argumento.accept(this);
+        }
+    }
 }

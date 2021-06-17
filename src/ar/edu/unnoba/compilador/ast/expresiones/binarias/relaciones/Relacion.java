@@ -6,7 +6,7 @@ import ar.edu.unnoba.compilador.ast.expresiones.OperadorCmp;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
-import ar.edu.unnoba.compilador.visitor.Transformer;
+import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 
 public abstract class Relacion extends OperacionBinaria {
 
@@ -71,7 +71,6 @@ public abstract class Relacion extends OperacionBinaria {
                 break;
             default:
                 throw new IllegalStateException("Operador inesperado: " + op);
-
         }
 
         return comp;

@@ -5,6 +5,9 @@ import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.lexico.Lexer;
 import ar.edu.unnoba.compilador.sintaxis.Parser;
 import ar.edu.unnoba.compilador.visitor.*;
+import ar.edu.unnoba.compilador.visitor.transformer.ConversorDeEstructuras;
+import ar.edu.unnoba.compilador.visitor.transformer.Optimizador;
+import ar.edu.unnoba.compilador.visitor.transformer.TransformerTipos;
 import java_cup.runtime.Symbol;
 
 import java.io.*;
@@ -14,13 +17,13 @@ import java.nio.file.Paths;
 /* Clase principal que realiza todos los pasos para convertir código fuente en un ejecutable */
 
 public class Compilar {
-    private static void graficarArbol(String dot, String nombreArchivo) throws IOException, InterruptedException {
+    private static void graficarArbol(Programa programa, String nombreArchivo, String etiqueta) throws IOException, InterruptedException, ExcepcionDeAlcance {
         final String formatoImg = "png";
         //final String formatoImg = "svg";
 
         PrintWriter pw = new PrintWriter(
                 new FileWriter(String.format("%s.dot", nombreArchivo)));
-        pw.println(dot);
+        pw.println(new ASTGraphviz(etiqueta).generarCodigo(programa));
         pw.close();
 
         String cmd[] = new String[5];
@@ -41,9 +44,8 @@ public class Compilar {
 
     private static void generarCodigoIR(Programa p, String archivoEntrada, String archivoSalida)
             throws IOException, ExcepcionDeAlcance {
-        GeneradorDeCodigo gc = new GeneradorDeCodigo();
         PrintWriter pw = new PrintWriter(new FileWriter(archivoSalida));
-        pw.println(gc.procesar(p, archivoEntrada));
+        pw.println(new GeneradorDeCodigo().generarCodigo(p, archivoEntrada));
         pw.close();
     }
 
@@ -108,12 +110,11 @@ public class Compilar {
             }
 
             Programa programa = (Programa) simboloPrograma.value;
-            ASTGraphviz graficador;
 
             // Ejecutar Visitor graficador del árbol sin transformar,
             // y convertirlo a imagen
-            graficador = new ASTGraphviz("Árbol de sintaxis abstracta (Conti - Tortoriello)");
-            graficarArbol(graficador.procesar(programa), carpetaSalida + "1_ast-original");
+            graficarArbol(programa, carpetaSalida + "1_ast-original",
+                    "Árbol de sintaxis abstracta (Conti - Tortoriello)");
 
             System.out.println("\nIniciando generador de alcances globales...");
             new GeneradorDeAlcanceGlobal().procesar(programa);
@@ -131,15 +132,15 @@ public class Compilar {
             new ConversorDeEstructuras().procesar(programa);
 
             // Mostrar el árbol transformado
-            graficador = new ASTGraphviz("AST con conversión de tipos (Conti - Tortoriello)");
-            graficarArbol(graficador.visit(programa), carpetaSalida + "2_ast-transformado");
+            graficarArbol(programa, carpetaSalida + "2_ast-transformado",
+                    "AST con conversión de tipos (Conti - Tortoriello)");
 
             System.out.println("\nIniciando proceso de optimización...");
             new Optimizador().procesar(programa);
 
             // Mostrar el árbol optimizado
-            graficador = new ASTGraphviz("AST optimizado (Conti - Tortoriello)");
-            graficarArbol(graficador.visit(programa), carpetaSalida + "3_ast-optimizado");
+            graficarArbol(programa, carpetaSalida + "3_ast-optimizado",
+                    "AST optimizado (Conti - Tortoriello)");
 
             final String nombreArchivo = "4_entrada";
 

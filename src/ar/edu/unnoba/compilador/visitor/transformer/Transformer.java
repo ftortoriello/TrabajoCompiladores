@@ -1,4 +1,4 @@
-package ar.edu.unnoba.compilador.visitor;
+package ar.edu.unnoba.compilador.visitor.transformer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +7,6 @@ import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Suma;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;

@@ -3,6 +3,7 @@ package ar.edu.unnoba.compilador.ast.base;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.visitor.*;
+import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 
 public abstract class Nodo {
     private String nombre;
@@ -29,7 +30,7 @@ public abstract class Nodo {
         return this.getClass().getSimpleName();
     }
 
-    public abstract <T> T accept(Visitor<T> v) throws ExcepcionDeAlcance;
+    public abstract void accept(Visitor v) throws ExcepcionDeAlcance;
 
     public abstract Nodo accept(Transformer t) throws ExcepcionDeTipos;
 
