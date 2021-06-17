@@ -1,3 +1,4 @@
+
 function suma(a is integer) return integer
 begin
     variable b is integer = a;
@@ -76,7 +77,6 @@ main is
     writeln("Se acabó\n\nFin!");
 end.
 }
-
 {
 (* Ejemplo de ámbitos dado en la consigna de la etapa 2 *)
 

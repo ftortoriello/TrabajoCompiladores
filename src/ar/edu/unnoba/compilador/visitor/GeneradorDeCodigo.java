@@ -11,9 +11,7 @@ import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.*;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFuncion;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarInicializada;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
@@ -143,6 +141,18 @@ public class GeneradorDeCodigo extends Visitor<String> {
         resultado.append(super.visit(p));
         return resultado.toString();
     }
+    
+    @Override
+    public String visit(Param p) throws ExcepcionDeAlcance {
+        // TODO
+        return "; visit(Param) sin implementar";
+    }
+    
+    @Override
+    public String visit(ParamDef pi) throws ExcepcionDeAlcance {
+        // TODO
+        return "; visit(ParamDef) sin implementar";
+    }
 
     @Override
     public String visit(Identificador ident) {
@@ -230,7 +240,7 @@ public class GeneradorDeCodigo extends Visitor<String> {
         return resultado.toString();
     }
 
-    protected String procesarDecFuncion(DecFuncion df, List<String> decArgs, String cuerpo) {
+    protected String procesarDecFuncion(DecFun df, List<String> decArgs, String cuerpo) {
         SimboloFuncion simboloFun = tablaFunciones.get(df.getNombre());
 
         // Elementos que necesito para definir la función: tipo de retorno, nombre, parámetros y el cuerpo
@@ -243,13 +253,13 @@ public class GeneradorDeCodigo extends Visitor<String> {
         // Tengo que hacerlo acá porque el argumento es un nodo DecVar, y al
         // visitor de DecVar ya lo usamos para generar la declaración.
         StringBuilder params = new StringBuilder();
-        for (int i = 0; i < df.getArgs().size(); i++) {
-            SimboloVariable simboloArg = (SimboloVariable) df.getArgs().get(i).getIdent();
+        for (int i = 0; i < df.getParams().size(); i++) {
+            SimboloVariable simboloArg = (SimboloVariable) df.getParams().get(i).getIdent();
             String tipoRetornoArg = TIPO_IR.get(simboloArg.getTipo()).fst;
             String argNombreIR = simboloArg.getNombreIR();
 
             // Para separar los argumentos mediante comas, excepto el final
-            String sep = i != df.getArgs().size() - 1 ? ", " : "";
+            String sep = i != df.getParams().size() - 1 ? ", " : "";
 
             // Añado el argumento a la lista
             params.append(String.format("%s %s%s", tipoRetornoArg, argNombreIR, sep));
@@ -258,77 +268,6 @@ public class GeneradorDeCodigo extends Visitor<String> {
         // Cuando tengo lo que necesito, llamo a esta función para que imprima la función
         String codigo = grarCodFuncion(funTipoRet, funNombreIR, params.toString(), cuerpo);
         return codigo;
-    }
-
-    protected String procesarDecVar(DecVar dv, String sinUso) {
-        // Genera la declaración de una variable que no fue inicializada
-
-        SimboloVariable sv = (SimboloVariable) dv.getIdent();
-
-        // Parámetros que necesito para declarar la variable
-        String nombreIR = sv.getNombreIR();
-        String tipoIR = TIPO_IR.get(sv.getTipo()).fst;
-        Boolean esGlobal = sv.getEsGlobal();
-        String valorIR = TIPO_IR.get(dv.getTipo()).snd;
-
-        StringBuilder resultado = new StringBuilder();
-
-        // Mostrar comentario con la declaración en el lenguaje original
-        resultado.append(String.format("\n; procesarDecVar: variable %s is %s = %s\n",
-                sv.getNombre(), sv.getTipo(), valorIR));
-
-        if (esGlobal) {
-            resultado.append(String.format("%s = global %s %s\n", nombreIR, tipoIR, valorIR));
-        } else {
-            resultado.append(String.format("%s = alloca %s\n", nombreIR, tipoIR));
-            resultado.append(String.format("store %2$s %3$s, %2$s* %1$s\n", nombreIR, tipoIR, valorIR));
-        }
-
-        resultado.append("\n");
-        return resultado.toString();
-    }
-
-    protected String procesarDecVarInicializada(DecVarInicializada dvi, String sinUso, String decsRefs) {
-        // Genera la declaración de una variable que sí fue inicializada
-
-        SimboloVariable sv = (SimboloVariable) dvi.getIdent();
-
-        // Parámetros que necesito para declarar la variable
-        String nombreIR = sv.getNombreIR();
-        String tipoIR = TIPO_IR.get(sv.getTipo()).fst;
-        Boolean esGlobal = sv.getEsGlobal();
-        String valorIR;
-
-        StringBuilder resultado = new StringBuilder();
-
-        if (esGlobal) {
-            // TODO
-            // Tengo que armar una función que me retorne el valor para poder asignarla
-            // valorIR = el return de la funcion que hay que crear
-            valorIR = "globalIni";
-
-            // Mostrar comentario con la declaración en el lenguaje original
-            resultado.append(String.format("\n; procesarDecVarInicializada: variable %s is %s = %s\n",
-                    sv.getNombre(), sv.getTipo(), valorIR));
-
-            resultado.append(String.format("%s = global %s %s\n", nombreIR, tipoIR, valorIR));
-        } else {
-            // decsRefs contiene las declaraciones que necesito para acceder al valor de la expresión
-            resultado.append(decsRefs);
-
-            // El resultado final del valor de la expresión ya viene seteado gracias a los visitors
-            valorIR = dvi.getExpresion().getRefIR();
-
-            // Mostrar comentario con la declaración en el lenguaje original
-            resultado.append(String.format("\n; procesarDecVarInicializada: variable %s is %s = %s\n",
-                    sv.getNombre(), sv.getTipo(), valorIR));
-
-            resultado.append(String.format("%s = alloca %s\n", nombreIR, tipoIR));
-            resultado.append(String.format("store %2$s %3$s, %2$s* %1$s\n", nombreIR, tipoIR, valorIR));
-        }
-
-        resultado.append("\n");
-        return resultado.toString();
     }
 
     protected String procesarAsignacion(Asignacion asig, String sinUso, String decRefs) {
@@ -383,6 +322,90 @@ public class GeneradorDeCodigo extends Visitor<String> {
         }
 
         return resultado.toString();
+    }
+
+    @Override
+    protected String procesarDecVar(DecVar dv, String ident) {
+        // Genera la declaración de una variable que no fue inicializada
+
+        SimboloVariable sv = (SimboloVariable) dv.getIdent();
+
+        // Parámetros que necesito para declarar la variable
+        String nombreIR = sv.getNombreIR();
+        String tipoIR = TIPO_IR.get(sv.getTipo()).fst;
+        Boolean esGlobal = sv.getEsGlobal();
+        String valorIR = TIPO_IR.get(dv.getTipo()).snd;
+
+        StringBuilder resultado = new StringBuilder();
+
+        // Mostrar comentario con la declaración en el lenguaje original
+        resultado.append(String.format("\n; procesarDecVar: variable %s is %s = %s\n",
+                sv.getNombre(), sv.getTipo(), valorIR));
+
+        if (esGlobal) {
+            resultado.append(String.format("%s = global %s %s\n", nombreIR, tipoIR, valorIR));
+        } else {
+            resultado.append(String.format("%s = alloca %s\n", nombreIR, tipoIR));
+            resultado.append(String.format("store %2$s %3$s, %2$s* %1$s\n", nombreIR, tipoIR, valorIR));
+        }
+
+        resultado.append("\n");
+        return resultado.toString();
+    }
+
+    @Override
+    protected String procesarDecVarIni(DecVarIni dvi, String sinUso, String decsRefs) {
+        // Genera la declaración de una variable que sí fue inicializada
+
+        SimboloVariable sv = (SimboloVariable) dvi.getIdent();
+
+        // Parámetros que necesito para declarar la variable
+        String nombreIR = sv.getNombreIR();
+        String tipoIR = TIPO_IR.get(sv.getTipo()).fst;
+        Boolean esGlobal = sv.getEsGlobal();
+        String valorIR;
+
+        StringBuilder resultado = new StringBuilder();
+
+        if (esGlobal) {
+            // TODO
+            // Tengo que armar una función que me retorne el valor para poder asignarla
+            // valorIR = el return de la funcion que hay que crear
+            valorIR = "globalIni";
+
+            // Mostrar comentario con la declaración en el lenguaje original
+            resultado.append(String.format("\n; procesarDecVarInicializada: variable %s is %s = %s\n",
+                    sv.getNombre(), sv.getTipo(), valorIR));
+
+            resultado.append(String.format("%s = global %s %s\n", nombreIR, tipoIR, valorIR));
+            return "; Dec. de var. global inicializada sin implementar\n";
+        } else {
+            // decsRefs contiene las declaraciones que necesito para acceder al valor de la expresión
+            resultado.append(decsRefs);
+
+            // El resultado final del valor de la expresión ya viene seteado gracias a los visitors
+            valorIR = dvi.getExpresion().getRefIR();
+
+            // Mostrar comentario con la declaración en el lenguaje original
+            resultado.append(String.format("\n; procesarDecVarInicializada: variable %s is %s = %s\n",
+                    sv.getNombre(), sv.getTipo(), valorIR));
+
+            resultado.append(String.format("%s = alloca %s\n", nombreIR, tipoIR));
+            resultado.append(String.format("store %2$s %3$s, %2$s* %1$s\n", nombreIR, tipoIR, valorIR));
+        }
+
+        resultado.append("\n");
+        return resultado.toString();
+    }
+
+    @Override
+    protected String procesarParam(Param p, String ident) {
+        return null;
+    }
+
+    @Override
+    protected String procesarParamIni(ParamDef pi, String ident, String expr) {
+        return null;
     }
 
     protected String procesarInvocacionFuncion(InvocacionFuncion invoFun) {

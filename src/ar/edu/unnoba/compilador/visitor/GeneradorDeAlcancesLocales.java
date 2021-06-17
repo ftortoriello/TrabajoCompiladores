@@ -7,9 +7,7 @@ import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.*;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFuncion;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarInicializada;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
@@ -26,7 +24,7 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
     private Map<String, SimboloFuncion> tablaFunciones;
 
     // Agregar la declaración al ámbito en el que se encuentra
-    private void agregarSimbolo(DecVar d) throws ExcepcionDeAlcance {
+    private void agregarSimbolo(Declaracion d) throws ExcepcionDeAlcance {
         if (alcanceGlobal == alcanceActual) {
             // Este Visitor sólo agrega símbolos locales, los globales ya los agregó el visitor
             // de alcance global
@@ -89,7 +87,7 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
     }
 
     @Override
-    public Void visit(DecFuncion df) throws ExcepcionDeAlcance {
+    public Void visit(DecFun df) throws ExcepcionDeAlcance {
         // Generar un alcance nuevo para los parámetros
         alcanceActual = new Alcance(String.format("%d-%s", getID(), df.getNombre()), alcanceActual);
         df.setAlcance(alcanceActual);
@@ -105,9 +103,21 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
     }
 
     @Override
-    public Void visit(DecVarInicializada dvi) throws ExcepcionDeAlcance {
+    public Void visit(DecVarIni dvi) throws ExcepcionDeAlcance {
         agregarSimbolo(dvi);
         return super.visit(dvi);
+    }
+
+    @Override
+    public Void visit(Param p) throws ExcepcionDeAlcance {
+        agregarSimbolo(p);
+        return super.visit(p);
+    }
+
+    @Override
+    public Void visit(ParamDef pd) throws ExcepcionDeAlcance {
+        agregarSimbolo(pd);
+        return super.visit(pd);
     }
 
     @Override
@@ -128,16 +138,16 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
 
         // Validar que la cantidad de argumentos pasados sea por lo menos la cantidad obligaria,
         // y no supere la cantidad total de parámetros, incluyendo los opcionales
-        DecFuncion decFuncion = tablaFunciones.get(i.getNombre()).getDeclaracion();
+        DecFun decFun = tablaFunciones.get(i.getNombre()).getDeclaracion();
 
         int cantArgsInvo = i.getArgs().size();
-        int cantMinArgs = decFuncion.getCantArgsObligatorios();
-        int cantMaxArgs = decFuncion.getArgs().size();
+        int cantMinArgs = decFun.getCantArgsObligatorios();
+        int cantMaxArgs = decFun.getParams().size();
         if (cantArgsInvo < cantMinArgs || cantArgsInvo > cantMaxArgs) {
             throw new ExcepcionDeAlcance(String.format(
                     "La función «%s» fue invocada con %d " + (cantArgsInvo == 1 ? "parámetro" : "parámetros") +
                             ", cuando requiere " + (cantMinArgs == cantMaxArgs ? "%d" : "entre %d y %d") + ".",
-                    decFuncion.getNombre(), cantArgsInvo, cantMinArgs, cantMaxArgs));
+                    decFun.getNombre(), cantArgsInvo, cantMinArgs, cantMaxArgs));
         }
 
         return super.visit(i);
@@ -175,7 +185,17 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
     }
 
     @Override
-    protected Void procesarDecVarInicializada(DecVarInicializada dvi, Void ident, Void expr) {
+    protected Void procesarDecVarIni(DecVarIni dvi, Void ident, Void expr) {
+        return null;
+    }
+
+    @Override
+    protected Void procesarParam(Param p, Void ident) {
+        return null;
+    }
+
+    @Override
+    protected Void procesarParamIni(ParamDef pi, Void ident, Void expr) {
         return null;
     }
 
@@ -190,7 +210,7 @@ public class GeneradorDeAlcancesLocales extends Visitor<Void> {
     }
 
     @Override
-    protected Void procesarDecFuncion(DecFuncion df, List<Void> args, Void cuerpo) {
+    protected Void procesarDecFuncion(DecFun df, List<Void> args, Void cuerpo) {
         return null;
     }
 

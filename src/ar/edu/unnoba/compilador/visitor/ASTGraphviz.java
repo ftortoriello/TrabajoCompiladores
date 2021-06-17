@@ -63,8 +63,8 @@ public class ASTGraphviz extends Visitor<String> {
                 .append("  fillcolor=red;\n")
                 .append("  colorscheme=set312\n")
                 .append("]\n");
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(p));
+        idNodoActual = getID();
+        resultado.append(procesarNodo(p));
         padres.push(idNodoActual);
         resultado.append(super.visit(p));
         padres.pop();
@@ -76,7 +76,7 @@ public class ASTGraphviz extends Visitor<String> {
     public String visit(Encabezado e) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
         idNodoActual = getID();
-        resultado.append(this.procesarNodo(e));
+        resultado.append(procesarNodo(e));
         padres.push(idNodoActual);
         resultado.append(super.visit(e));
         padres.pop();
@@ -86,8 +86,8 @@ public class ASTGraphviz extends Visitor<String> {
     @Override
     public String visit(Bloque b) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(b));
+        idNodoActual = getID();
+        resultado.append(procesarNodo(b));
         padres.push(idNodoActual);
         resultado.append(super.visit(b));
         padres.pop();
@@ -97,24 +97,24 @@ public class ASTGraphviz extends Visitor<String> {
     @Override
     public String visit(Literal c) {
         StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(c));
+        idNodoActual = getID();
+        resultado.append(procesarNodo(c));
         return resultado.toString();
     }
 
     @Override
     public String visit(Identificador i) {
         StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(i));
+        idNodoActual = getID();
+        resultado.append(procesarNodo(i));
         return resultado.toString();
     }
 
     @Override
     public String visit(InvocacionFuncion invo) {
         StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(invo));
+        idNodoActual = getID();
+        resultado.append(procesarNodo(invo));
         return resultado.toString();
     }
 
@@ -124,8 +124,8 @@ public class ASTGraphviz extends Visitor<String> {
     @Override
     public String visit(OperacionBinaria ob) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(ob));
+        idNodoActual = getID();
+        resultado.append(procesarNodo(ob));
         padres.push(idNodoActual);
         resultado.append(super.visit(ob));
         padres.pop();
@@ -135,8 +135,8 @@ public class ASTGraphviz extends Visitor<String> {
     @Override
     public String visit(OperacionUnaria ou) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(ou));
+        idNodoActual = getID();
+        resultado.append(procesarNodo(ou));
         padres.push(idNodoActual);
         resultado.append(super.visit(ou));
         padres.pop();
@@ -148,8 +148,8 @@ public class ASTGraphviz extends Visitor<String> {
     @Override
     public String visit(Asignacion a) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(a));
+        idNodoActual = getID();
+        resultado.append(procesarNodo(a));
         padres.push(idNodoActual);
         resultado.append(super.visit(a));
         padres.pop();
@@ -157,10 +157,10 @@ public class ASTGraphviz extends Visitor<String> {
     }
 
     @Override
-    public String visit(DecFuncion df) throws ExcepcionDeAlcance {
+    public String visit(DecFun df) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(df));
+        idNodoActual = getID();
+        resultado.append(procesarNodo(df));
         padres.push(idNodoActual);
         resultado.append(super.visit(df));
         padres.pop();
@@ -170,8 +170,8 @@ public class ASTGraphviz extends Visitor<String> {
     @Override
     public String visit(DecVar dv) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(dv));
+        idNodoActual = getID();
+        resultado.append(procesarNodo(dv));
         padres.push(idNodoActual);
         resultado.append(super.visit(dv));
         padres.pop();
@@ -179,10 +179,10 @@ public class ASTGraphviz extends Visitor<String> {
     }
 
     @Override
-    public String visit(DecVarInicializada dvi) throws ExcepcionDeAlcance {
+    public String visit(DecVarIni dvi) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(dvi));
+        idNodoActual = getID();
+        resultado.append(procesarNodo(dvi));
         padres.push(idNodoActual);
         resultado.append(super.visit(dvi));
         padres.pop();
@@ -190,10 +190,32 @@ public class ASTGraphviz extends Visitor<String> {
     }
 
     @Override
+    public String visit(Param p) throws ExcepcionDeAlcance {
+        StringBuilder resultado = new StringBuilder();
+        idNodoActual = getID();
+        resultado.append(procesarNodo(p));
+        padres.push(idNodoActual);
+        resultado.append(super.visit(p));
+        padres.pop();
+        return resultado.toString();
+    }
+
+    @Override
+    public String visit(ParamDef pd) throws ExcepcionDeAlcance {
+        StringBuilder resultado = new StringBuilder();
+        idNodoActual = getID();
+        resultado.append(procesarNodo(pd));
+        padres.push(idNodoActual);
+        resultado.append(super.visit(pd));
+        padres.pop();
+        return resultado.toString();
+    }
+
+    @Override
     public String visit(SiEntonces se) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(se));
+        idNodoActual = getID();
+        resultado.append(procesarNodo(se));
         padres.push(idNodoActual);
         resultado.append(super.visit(se));
         padres.pop();
@@ -203,8 +225,8 @@ public class ASTGraphviz extends Visitor<String> {
     @Override
     public String visit(SiEntoncesSino ses) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(ses));
+        idNodoActual = getID();
+        resultado.append(procesarNodo(ses));
         padres.push(idNodoActual);
         resultado.append(super.visit(ses));
         padres.pop();
@@ -214,8 +236,8 @@ public class ASTGraphviz extends Visitor<String> {
     @Override
     public String visit(Cuando c) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(c));
+        idNodoActual = getID();
+        resultado.append(procesarNodo(c));
         padres.push(idNodoActual);
         resultado.append(super.visit(c));
         padres.pop();
@@ -225,8 +247,8 @@ public class ASTGraphviz extends Visitor<String> {
     @Override
     public String visit(CasoCuando cc) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(cc));
+        idNodoActual = getID();
+        resultado.append(procesarNodo(cc));
         padres.push(idNodoActual);
         resultado.append(super.visit(cc));
         padres.pop();
@@ -236,8 +258,8 @@ public class ASTGraphviz extends Visitor<String> {
     @Override
     public String visit(Mientras m) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(m));
+        idNodoActual = getID();
+        resultado.append(procesarNodo(m));
         padres.push(idNodoActual);
         resultado.append(super.visit(m));
         padres.pop();
@@ -247,8 +269,8 @@ public class ASTGraphviz extends Visitor<String> {
     @Override
     public String visit(Para p) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(p));
+        idNodoActual = getID();
+        resultado.append(procesarNodo(p));
         padres.push(idNodoActual);
         resultado.append(super.visit(p));
         padres.pop();
@@ -258,8 +280,8 @@ public class ASTGraphviz extends Visitor<String> {
     @Override
     public String visit(Retorno r) throws ExcepcionDeAlcance {
         StringBuilder resultado = new StringBuilder();
-        idNodoActual = this.getID();
-        resultado.append(this.procesarNodo(r));
+        idNodoActual = getID();
+        resultado.append(procesarNodo(r));
         padres.push(idNodoActual);
         resultado.append(super.visit(r));
         padres.pop();
@@ -350,7 +372,7 @@ public class ASTGraphviz extends Visitor<String> {
     }
 
     @Override
-    protected String procesarDecFuncion(DecFuncion df, List<String> args, String bloque) {
+    protected String procesarDecFuncion(DecFun df, List<String> args, String bloque) {
         StringBuilder strArgs = new StringBuilder();
         args.forEach(strArgs::append);
 
@@ -391,7 +413,17 @@ public class ASTGraphviz extends Visitor<String> {
     }
 
     @Override
-    protected String procesarDecVarInicializada(DecVarInicializada dvi, String ident, String expr) {
+    protected String procesarDecVarIni(DecVarIni di, String ident, String expr) {
+        return ident + expr;
+    }
+
+    @Override
+    protected String procesarParam(Param p, String ident) {
+        return ident;
+    }
+
+    @Override
+    protected String procesarParamIni(ParamDef pi, String ident, String expr) {
         return ident + expr;
     }
 

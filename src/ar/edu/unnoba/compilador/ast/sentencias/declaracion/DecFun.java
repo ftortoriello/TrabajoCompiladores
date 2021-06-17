@@ -10,35 +10,36 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
-public class DecFuncion extends Declaracion {
-    private ArrayList<DecVar> args;
+public class DecFun extends Declaracion {
+    // Clase para la declaración de funciones
+
+    private ArrayList<Param> params;
     private Bloque bloque;
     private Alcance alcance;
 
-    public DecFuncion(Identificador ident, ArrayList<DecVar> args, Bloque bloque) {
+    public DecFun(Identificador ident, ArrayList<Param> params, Bloque bloque) {
         super(ident.getNombre(), ident);
-        // Invierto el orden de los argumentos porque debido a la forma de las reglas los lee al revés
-        Collections.reverse(args);
+        // Invierto el orden de los parámetros porque debido a la forma de las reglas los lee al revés
+        Collections.reverse(params);
         bloque.setNombre("Cuerpo\nFUNCIÓN");
-        this.args = args;
+        this.params = params;
         this.bloque = bloque;
     }
 
-    public DecFuncion(Identificador ident, Bloque bloque) {
+    public DecFun(Identificador ident, Bloque bloque) {
         super(ident.getNombre(), ident);
         bloque.setNombre("Cuerpo\nFUNCIÓN");
-        this.args = new ArrayList<>();
+        this.params = new ArrayList<>();
         this.bloque = bloque;
     }
 
-    public ArrayList<DecVar> getArgs() {
-        return args;
+    public ArrayList<Param> getParams() {
+        return params;
     }
 
-    public void setArgs(ArrayList<DecVar> args) {
-        this.args = args;
+    public void setParams(ArrayList<Param> params) {
+        this.params = params;
     }
 
     public Bloque getBloque() {
@@ -62,8 +63,8 @@ public class DecFuncion extends Declaracion {
      */
     public int getCantArgsObligatorios() {
         int cant = 0;
-        for (DecVar dv : args) {
-            if (dv instanceof DecVarInicializada) {
+        for (Param p : params) {
+            if (p instanceof ParamDef) {
                 // Se encontró una variable con parámetro opcional. A partir de acá son todos opcionales.
                 break;
             }
@@ -78,7 +79,7 @@ public class DecFuncion extends Declaracion {
     }
 
     @Override
-    public DecFuncion accept(Transformer t) throws ExcepcionDeTipos {
+    public DecFun accept(Transformer t) throws ExcepcionDeTipos {
         return t.transform(this);
     }
 

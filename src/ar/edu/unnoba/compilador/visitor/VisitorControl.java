@@ -4,14 +4,11 @@ import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.SimboloVariable;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Continuar;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Salir;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFuncion;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarInicializada;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
@@ -80,7 +77,17 @@ public class VisitorControl extends Visitor<Void> {
     }
 
     @Override
-    protected Void procesarDecVarInicializada(DecVarInicializada dvi, Void ident, Void expr) {
+    protected Void procesarDecVarIni(DecVarIni dvi, Void ident, Void expr) {
+        return null;
+    }
+
+    @Override
+    protected Void procesarParam(Param p, Void ident) {
+        return null;
+    }
+
+    @Override
+    protected Void procesarParamIni(ParamDef pi, Void ident, Void expr) {
         return null;
     }
 
@@ -95,7 +102,7 @@ public class VisitorControl extends Visitor<Void> {
     }
 
     @Override
-    protected Void procesarDecFuncion(DecFuncion df, List<Void> args, Void cuerpo) {
+    protected Void procesarDecFuncion(DecFun df, List<Void> args, Void cuerpo) {
         return null;
     }
 

@@ -7,7 +7,6 @@ import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Suma;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
@@ -31,13 +30,13 @@ import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
 public abstract class Transformer {
     // Guardamos la última función visitada para validar el tipo de retorno,
     // y convertir el tipo de la expresión return en caso de ser necesario
-    private DecFuncion ultFunVisitada;
+    private DecFun ultFunVisitada;
 
-    protected DecFuncion getUltFunVisitada() {
+    protected DecFun getUltFunVisitada() {
         return ultFunVisitada;
     }
 
-    protected void setUltFunVisitada(DecFuncion ultFunVisitada) {
+    protected void setUltFunVisitada(DecFun ultFunVisitada) {
         this.ultFunVisitada = ultFunVisitada;
     }
 
@@ -138,20 +137,31 @@ public abstract class Transformer {
         return dv;
     }
 
-    public DecVarInicializada transform(DecVarInicializada dvi) throws ExcepcionDeTipos {
+    public DecVarIni transform(DecVarIni dvi) throws ExcepcionDeTipos {
         dvi.setIdent(dvi.getIdent().accept(this));
         dvi.setExpresion(dvi.getExpresion().accept(this));
         return dvi;
     }
 
-    public DecFuncion transform(DecFuncion df) throws ExcepcionDeTipos {
+    public Param transform(Param p) throws ExcepcionDeTipos {
+        p.setIdent(p.getIdent().accept(this));
+        return p;
+    }
+
+    public ParamDef transform(ParamDef pi) throws ExcepcionDeTipos {
+        pi.setIdent(pi.getIdent().accept(this));
+        pi.setExpresion(pi.getExpresion().accept(this));
+        return pi;
+    }
+
+    public DecFun transform(DecFun df) throws ExcepcionDeTipos {
         setUltFunVisitada(df);
 
-        ArrayList<DecVar> args = new ArrayList<>();
-        for (DecVar arg : df.getArgs()) {
-            args.add(arg.accept(this));
+        ArrayList<Param> params = new ArrayList<>();
+        for (Param p : df.getParams()) {
+            params.add(p.accept(this));
         }
-        df.setArgs(args);
+        df.setParams(params);
         df.setBloque(df.getBloque().accept(this));
         setUltFunVisitada(null);
         return df;

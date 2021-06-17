@@ -5,7 +5,6 @@ import java.util.List;
 
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeCompilacion;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.*;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.*;
@@ -50,7 +49,6 @@ public abstract class Visitor<T> {
     protected void setEnBucle(boolean enBucle) {
         this.enBucle = enBucle;
     }
-
 
     public T procesar(Programa p) throws ExcepcionDeAlcance {
         return p.accept(this);
@@ -123,23 +121,34 @@ public abstract class Visitor<T> {
         return procesarAsignacion(a, identificador, expresion);
     }
 
-    public T visit(DecVar dv) throws ExcepcionDeAlcance {
-        T ident = dv.getIdent().accept(this);
-        return procesarDecVar(dv, ident);
+    public T visit(DecVar v) throws ExcepcionDeAlcance {
+        T ident = v.getIdent().accept(this);
+        return procesarDecVar(v, ident);
     }
 
-    public T visit(DecVarInicializada dvi) throws ExcepcionDeAlcance {
+    public T visit(DecVarIni dvi) throws ExcepcionDeAlcance {
         T ident = dvi.getIdent().accept(this);
         T expr = dvi.getExpresion().accept(this);
-        return procesarDecVarInicializada(dvi, ident, expr);
+        return procesarDecVarIni(dvi, ident, expr);
     }
 
-    public T visit(DecFuncion df) throws ExcepcionDeAlcance {
+    public T visit(Param p) throws ExcepcionDeAlcance {
+        T ident = p.getIdent().accept(this);
+        return procesarParam(p, ident);
+    }
+
+    public T visit(ParamDef pi) throws ExcepcionDeAlcance {
+        T ident = pi.getIdent().accept(this);
+        T expr = pi.getExpresion().accept(this);
+        return procesarParamIni(pi, ident, expr);
+    }
+
+    public T visit(DecFun df) throws ExcepcionDeAlcance {
         setEnFuncion(true);
 
         List<T> args = new ArrayList<>();
-        for (DecVar arg : df.getArgs()) {
-            args.add(arg.accept(this));
+        for (Param p : df.getParams()) {
+            args.add(p.accept(this));
         }
         T cuerpo = df.getBloque().accept(this);
 
@@ -217,16 +226,20 @@ public abstract class Visitor<T> {
 
     protected abstract T procesarOperacionBinaria(OperacionBinaria ob, T ei, T ed);
 
-    protected abstract T procesarDecVar(DecVar dv, T ident);
+    protected abstract T procesarDecVar(DecVar v, T ident);
 
-    protected abstract T procesarDecVarInicializada(DecVarInicializada dvi, T ident, T expr) throws ExcepcionDeAlcance;
+    protected abstract T procesarDecVarIni(DecVarIni dvi, T ident, T expr);
+
+    protected abstract T procesarParam(Param p, T ident);
+
+    protected abstract T procesarParamIni(ParamDef pi, T ident, T expr);
 
     // FIXME: podríamos dejar sólo el primer parámetro en esta y algunas otras funciones
     protected abstract T procesarAsignacion(Asignacion a, T identificador, T expresion) throws ExcepcionDeAlcance;
 
     protected abstract T procesarInvocacionFuncion(InvocacionFuncion invoFun);
 
-    protected abstract T procesarDecFuncion(DecFuncion df, List<T> args, T cuerpo);
+    protected abstract T procesarDecFuncion(DecFun df, List<T> args, T cuerpo);
 
     protected abstract T procesarSiEntonces(T cond, T blq);
 

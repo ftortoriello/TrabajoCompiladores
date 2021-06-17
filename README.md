@@ -60,16 +60,17 @@ Opcional:
 * Conversiones implícitas de tipo: :white_check_mark:
 * Transformación de estruras when y for:  :white_check_mark: 
 * Constant folding: :white_check_mark:. Pero solo casos básicos (por ej. 1 + x + 2 no se simplifica).
-* Reemplazo de constantes por su valor: :x:
-* Eliminación de las declaraciones de variables sin uso: :x:
+  
+Más que opcional:
+* Constant folding más potente. 
+* Reemplazo de constantes por su valor.
+* Eliminación de las declaraciones de variables sin uso.
+* Código inaccesible.
 
 ### Revisar
 
 #### parser.cup
 * La *producción* sentencia no es de *tipo* sentencia porque tiene en su interior a invocacion_funcion, que es de tipo expresion. Entonces la producción sentencia está forzada a ser de tipo nodo...
-* En la parte de declaración de variables ahora mismo tenemos: dec_var, arg_dec, arg_dec_default, lst_args_dec, lst_args_dec_default, ... tal vez pueda simplificarse.
-* Tuve que definir dos precedencias nuevas: para IDENTIFICADOR y para OP_ARIT_RESTA, pero antes no hacían falta. Ver de eliminar la ambigüedad generada al modificar el parser.
-
 
 ## 3.ª Etapa: Generador de código ejecutable a partir del AST
 
@@ -95,5 +96,5 @@ Requisitos:
 
 Cosas secundarias:
 * Ver excepciones en GeneradorDeCodigo.java. Está usando ExcepcionDeAlcance porque el visitor abstracto tiene esas definidad en la firma de los métodos. Probé cambiarlas por Exception para que quede más abstracto y poder definir excepciones específicas en cada visitor, pero igual hay lío porque esos visitors llaman a su padre. Y todos los nodos tienen también definido un tipo específico de excepción en los métodos accept y visit.
-* Código inaccesible después de los `ret`
 * Estaría bueno ver si podemos indentar el código IR producido. Pero tiene que ser una forma genérica sino es una locura, por ej. cuando hacemos el return del visit del bloque. Estuve viendo y hay una función `indent` que lo hace prácticamente solo (hasta tiene en cuenta los saltos de línea), el tema es que la estructura de bloques que tenemos no es muy consistente y a veces indenta y a veces no. Pero por lo menos indentar 1 nivel (porque no sé si habría más) todo lo que está dentro de las funciones.
+* Eliminar clase "Para" y "Cuando". Generar la transformación de esas estructuras en el propio parser (posiblemente creando un constructor nuevo en las clases Cuando e If, cosa de tirarlo ahí y resolverlo en la propia clase).
