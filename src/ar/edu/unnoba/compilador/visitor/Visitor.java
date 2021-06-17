@@ -100,6 +100,7 @@ public abstract class Visitor {
         for (Param p : df.getParams()) {
             p.accept(this);
         }
+        df.getBloque().accept(this);
         setEnFuncion(false);
     }
 
