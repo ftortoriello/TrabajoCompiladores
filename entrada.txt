@@ -1,19 +1,11 @@
-{
-function suma(a is integer) return integer
-begin
-    variable b is integer;
-    b = 1 + a;
-    a = 1;
-    return a;
-end;
-}
+function inc(a is integer) return integer
+    return a + 1;
+
 main is
-    variable a is integer = 1;
-    while a < 10 do
-        if a / 2 == 0 then
-            a = a + 1;
-    # variable b is integer = a + 2;
-    # variable z is boolean = a > b;
+    variable i is integer = inc(-1);
+    while i < 10 do
+        if i / 2 == 0 then
+            i = i + 1;
 end.
 
 {
