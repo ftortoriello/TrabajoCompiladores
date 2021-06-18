@@ -9,7 +9,7 @@ public class Normalizador {
 
     private static long idVarGbl = 0;
     private static long idVarLcl = 0;
-    private static long idVarAux = 0;
+    private static long idVarRef = 0;
     private static long idFuncion = 0;
 
     public Normalizador() {
@@ -25,9 +25,9 @@ public class Normalizador {
         return idVarLcl;
     }
 
-    public static long getIdVarAux() {
-        idVarAux += 1;
-        return idVarAux;
+    public static long getIdVarRef() {
+        idVarRef += 1;
+        return idVarRef;
     }
 
     public static long getIdFuncion() {
@@ -40,26 +40,27 @@ public class Normalizador {
         return Normalizer.normalize(cadena, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
     }
 
-    // TODO: asignarles un nro. a las funciones/variables sólo si es necesario (o sea si chocan con otra)
+    // TODO: asignarles un nro. a las funciones/variables sólo si es necesario
+    // O sea si chocan con otra después de ser normalizados
 
-    // Devuelve el nombre de la función preparado para usar en IR
-    public static String getNvoNomFun(String nombreFun) {
-        return String.format("%s.%s", normalizar(nombreFun), getIdFuncion());
+    // Genera un nombre para una función
+    public static String crearNomFun(String nombreOrigFun) {
+        return String.format("%s.%s", normalizar(nombreOrigFun), getIdFuncion());
     }
 
-    // Genera un nombre normalizado y único para una nueva variable global de IR
-    public static String getNvoNomVarGbl(String nombreVar) {
-        return String.format("@g.%s.%s", normalizar(nombreVar), getIdVarGbl());
+    // Genera un nombre para una nueva variable global tipo puntero de IR (gralmente. usado para el atrib. nombreIR)
+    public static String crearNomPtroGbl(String nombreOrigVar) {
+        return String.format("@ptro.%s.%s", normalizar(nombreOrigVar), getIdVarGbl());
     }
 
-    // Genera un nombre normalizado y único para una nueva variable local de IR
-    public static String getNvoNomVarLcl(String nombreVar) {
-        return String.format("%%%s.%s", normalizar(nombreVar), getIdVarLcl());
+    // Genera un nombre para una nueva variable local tipo puntero de IR (gralmente. usado para el atrib. nombreIR)
+    public static String crearNomPtroLcl(String nombreOrigVar) {
+        return String.format("%%ptro.%s.%s", normalizar(nombreOrigVar), getIdVarLcl());
     }
 
-    // Genera un nombre para una variable auxiliar local
-    public static String getNvoNomVarAux(String nombreVar) {
-        return String.format("%%aux.%s.%s", nombreVar, getIdVarAux());
+    // Genera un nombre para una variable que contenga el valor de un puntero (gralmente. usado para los refIR)
+    public static String crearNomRef(String nombreOrigVar) {
+        return String.format("%%ref.%s.%s", nombreOrigVar, getIdVarRef());
     }
 
 }

@@ -34,14 +34,14 @@ public class GeneradorDeCodigo extends Visitor {
 
     private Map<String, SimboloFuncion> tablaFunciones;
 
-    // *** AUXILIARES ***
-
     // Mapa para relacionar nuestros tipos con los del IR (y además definir valores por defecto)
     private final Map<Tipo, Pair<String, String>> TIPO_IR = new HashMap<>() {{
         put(Tipo.BOOLEAN, new Pair<>("i1", "0"));
         put(Tipo.INTEGER, new Pair<>("i32", "0"));
         put(Tipo.FLOAT, new Pair<>("float", "0.0"));
     }};
+
+    /*** Funciones auxiliares ***/
 
     public static boolean targetEsWindows() {
         return System.getProperty("os.name").startsWith("Windows");
@@ -81,12 +81,12 @@ public class GeneradorDeCodigo extends Visitor {
     }
 
     // Genera un nombre único para una nueva etiqueta
-    private String getNuevaEtiqueta(String nombre) {
-        return String.format("e_%s_%s", nombre, getID());
+    private String getNuevaEtiqueta(String nombreEtiqueta) {
+        return String.format("e_%s_%s", nombreEtiqueta, getID());
     }
 
-    private String formatearEtiqueta(String nombre) {
-        return String.format("\n%s:\n", nombre);
+    private void imprimirEtiqueta(String nombreEtiqueta) {
+        codigo.append(String.format("\n%s:\n", nombreEtiqueta));
     }
 
     private void grarCodSaltoInc(String etiquetaDestino) {
@@ -94,11 +94,11 @@ public class GeneradorDeCodigo extends Visitor {
     }
 
     private void grarCodSaltoCond(String cond, String etiquetaTrue, String etiquetaFalse) {
-        codigo.append("\t" + String.format("br %s, label %%%s, label %%%s\n", cond, etiquetaTrue, etiquetaFalse));
+        codigo.append(String.format("\tbr i1 %s, label %%%s, label %%%s\n", cond, etiquetaTrue, etiquetaFalse));
     }
 
     private String grarStrParams(ArrayList<Param> arrParams) {
-        // Genere una lista de parámetros de acuerdo a lo requerido por IR
+        // Genera una lista de parámetros de acuerdo a lo requerido por IR
         StringBuilder strParams = new StringBuilder();
 
         int cantParams = arrParams.size();
@@ -131,11 +131,6 @@ public class GeneradorDeCodigo extends Visitor {
     /**** Visitors ***/
 
     /* Base */
-    private String grarCodRefIR() {
-        return "";
-    }
-
-    // *** VISITORS ***
 
     @Override
     public void visit(Programa p) throws ExcepcionDeAlcance {
@@ -188,6 +183,7 @@ public class GeneradorDeCodigo extends Visitor {
         }
     }
 
+
     /* Sentencia de asignación */
 
     @Override
@@ -211,27 +207,6 @@ public class GeneradorDeCodigo extends Visitor {
                 tipoOrigen, origen, tipoDestino, destino));
     }
 
-    /*
-    protected String procesarAsignacion(Asignacion asig, String sinUso, String decRefs) {
-        // Quedaría horrible poner un atributo "esAsignacion" en las expresiones...
-        // Anexo la generación de las vars. auxs. necesarias
-        //codigo.append(decRefs);
-
-        // Elementos que necesito para definir la asignación
-        SimboloVariable svDestino = (SimboloVariable) asig.getIdent();
-        String origen = asig.getExpresion().getRefIR();
-        String tipoOrigen = TIPO_IR.get(asig.getExpresion().getTipo()).fst;
-        String destino = svDestino.getNombreIR();
-        String tipoDestino = TIPO_IR.get(svDestino.getTipo()).fst;
-        // tipoOrigen y tipoDestino deberían ser iguales, pero lo dejo así para detectar algún error
-        // y de paso usar los nombres de las variables para que quede un poco más claro lo que se hace
-
-        // TODO: Comentario
-        codigo.append(String.format("\n\t; Asignacion\n"));
-        codigo.append(String.format("\tstore %1$s %2$s, %3$s* %4$s ; %4$s = %2$s\n",
-                tipoOrigen, origen, tipoDestino, destino));
-    }
-    */
 
     /* Sentencias de declaración */
 
@@ -279,7 +254,7 @@ public class GeneradorDeCodigo extends Visitor {
             valorIR = "globalIni";
 
             // Mostrar comentario con la declaración en el lenguaje original
-            codigo.append(String.format("\n\t; DecVarIni: variable %s is %s = %s\n",
+            codigo.append(String.format("\t; DecVarIni: variable %s is %s = %s\n",
                     sv.getNombre(), sv.getTipo(), valorIR));
 
             codigo.append(String.format("\t%s = global %s %s\n", nombreIR, tipoIR, valorIR));
@@ -291,14 +266,12 @@ public class GeneradorDeCodigo extends Visitor {
             valorIR = dvi.getExpresion().getRefIR();
 
             // Mostrar comentario con la declaración en el lenguaje original
-            codigo.append(String.format("\n\t; DecVarIni: variable %s is %s = %s\n",
+            codigo.append(String.format("\t; DecVarIni: variable %s is %s = %s\n",
                     sv.getNombre(), sv.getTipo(), valorIR));
 
             codigo.append(String.format("\t%s = alloca %s\n", nombreIR, tipoIR));
             codigo.append(String.format("\tstore %2$s %3$s, %2$s* %1$s\n", nombreIR, tipoIR, valorIR));
         }
-
-        codigo.append("\n");
     }
 
     @Override
@@ -336,8 +309,8 @@ public class GeneradorDeCodigo extends Visitor {
 
         // Guardo el nombre formal acá para poder extraer el valor, después lo piso
         String nombreFormal = sv.getNombreIR();
-        String refIR = Normalizador.getNvoNomVarLcl("ref");
-        String nombreIR = Normalizador.getNvoNomVarLcl("param");
+        String refIR = Normalizador.crearNomPtroLcl("ref");
+        String nombreIR = Normalizador.crearNomPtroLcl("param");
         String tipoIR = TIPO_IR.get(p.getTipo()).fst;
 
         sv.setRefIR(refIR);
@@ -362,18 +335,20 @@ public class GeneradorDeCodigo extends Visitor {
         String etiBlqThen = getNuevaEtiqueta("blq_then");
         String etiFin = getNuevaEtiqueta("fin_if");
 
+        codigo.append("; visit(SiEntonces\n");
+
         // Salto condicional
-        // TODO: Ver
-        //codigo.append(grarCodSaltoCond(cond, etiBlqThen, etiFin));
+        se.getCondicion().accept(this);
+        String refCond = se.getCondicion().getRefIR();
+        grarCodSaltoCond(refCond, etiBlqThen, etiFin);
 
         // Caso true
-        codigo.append(formatearEtiqueta(etiBlqThen));
-        // TODO: Ver como resolverlo
-        //codigo.append(blqSi);
+        imprimirEtiqueta(etiBlqThen);
+        se.getBloqueSiEntonces().accept(this);
         grarCodSaltoInc(etiFin);
 
         // Fin if
-        codigo.append(formatearEtiqueta(etiFin));
+        imprimirEtiqueta(etiFin);
     }
 
     @Override
@@ -382,25 +357,27 @@ public class GeneradorDeCodigo extends Visitor {
         String etiBlqElse = getNuevaEtiqueta("blq_else");
         String etiFin = getNuevaEtiqueta("fin_if");
 
+        codigo.append("; visit(SiEntoncesSino)\n");
+
         // Salto condicional
-        // TODO: Ver
-        //codigo.append(grarCodSaltoCond(cond, etiBlqThen, etiBlqElse));
+        ses.getCondicion().accept(this);
+        String refCond = ses.getCondicion().getRefIR();
+        grarCodSaltoCond(refCond, etiBlqThen, etiBlqElse);
 
         // Caso true
-        codigo.append(formatearEtiqueta(etiBlqThen));
-        // TODO
-        //codigo.append(blqSi);
+        imprimirEtiqueta(etiBlqThen);
+        ses.getBloqueSiEntonces().accept(this);
         grarCodSaltoInc(etiFin);
 
         // Caso false
-        codigo.append(formatearEtiqueta(etiBlqElse));
-        // TODO
-        //codigo.append(blqSino);
+        imprimirEtiqueta(etiBlqElse);
+        ses.getBloqueSino().accept(this);
         grarCodSaltoInc(etiFin);
 
         // Fin if
-        codigo.append(formatearEtiqueta(etiFin));
+        imprimirEtiqueta(etiFin);
     }
+
 
     /* Sentencias de iteración */
 
@@ -410,19 +387,25 @@ public class GeneradorDeCodigo extends Visitor {
         String etiBucleWhile = getNuevaEtiqueta("bucle_while");
         String etiFinWhile = getNuevaEtiqueta("fin_while");
 
-        codigo.append(formatearEtiqueta(etiInicioWhile));
+        codigo.append("; visit(Mientras)\n");
+        grarCodSaltoInc(etiInicioWhile);
+        imprimirEtiqueta(etiInicioWhile);
+
+        // Generar ref. al resultado de la condición
+        m.getCondicion().accept(this);
+        String refCond = m.getCondicion().getRefIR();
 
         // Se evalúa la condición, si es verdadera se salta al bucle y si es falsa al fin
-        // TODO: Ver
-        //grarCodSaltoCond(cond, etiBucleWhile, etiFinWhile);
-        codigo.append(formatearEtiqueta(etiBucleWhile));
-        // TODO: Ver
-        //codigo.append(blq);
+        grarCodSaltoCond(refCond, etiBucleWhile, etiFinWhile);
+        imprimirEtiqueta(etiBucleWhile);
+
+        // Generar cuerpo del while
+        m.getBloqueSentencias().accept(this);
 
         // Ejecutado el cuerpo, se evalúa de nuevo la condición inicial
         grarCodSaltoInc(etiInicioWhile);
 
-        codigo.append(formatearEtiqueta(etiFinWhile));
+        imprimirEtiqueta(etiFinWhile);
     }
 
 
@@ -455,12 +438,11 @@ public class GeneradorDeCodigo extends Visitor {
     @Override
     public void visit(OperacionBinaria ob) throws ExcepcionDeAlcance {
         // Defino un nombre auxiliar con el cual puedo referenciar el valor de la expr.
-        String refIR = Normalizador.getNvoNomVarAux("ob");
+        String refIR = Normalizador.crearNomRef("ob");
         ob.setRefIR(refIR);
 
-        // Visito a las exprs. para generar la declaración de referencias
-        ob.getIzquierda().accept(this);
-        ob.getDerecha().accept(this);
+        // El padre visita a las exprs. izq. y der. para generar la declaración de referencias
+        super.visit(ob);
 
         String refIzqIR = ob.getIzquierda().getRefIR();
         String refDerIR = ob.getDerecha().getRefIR();
@@ -475,10 +457,10 @@ public class GeneradorDeCodigo extends Visitor {
         } else if (ob instanceof Relacion) {
             String tipoCmp = ((Relacion)ob).getTipoCmp();
             // Por ej.: %aux.ob.15 = icmp sgt i32 %aux.sv.13, %aux.sv.14 ; %aux.sv.13 > %aux.sv.14
-            codigo.append(String.format("\t%1$s = %2$s %3$s %4$s %5$s, %6$s\t; %5$s %7$s %6$s",
+            codigo.append(String.format("\t%1$s = %2$s %3$s %4$s %5$s, %6$s ; %5$s %7$s %6$s\n",
                     refIR, tipoCmp, instIR, tipoIR, refIzqIR, refDerIR, operadorParser));
         } else if (ob instanceof OperacionBinariaLogica) {
-            codigo.append("\t; OperacionBinaria -> OpBinLog sin implementar");
+            codigo.append("\t; OperacionBinaria -> OpBinLog sin implementar\n");
         }
     }
 
@@ -498,7 +480,9 @@ public class GeneradorDeCodigo extends Visitor {
 
         // TODO ver acá el tema ese de truncar los valores
 
-        String refIR = Normalizador.getNvoNomVarAux("lit");
+        String refIR = Normalizador.crearNomRef("lit");
+        lit.setRefIR(refIR);
+
         Tipo tipoParser = lit.getTipo();
         String tipoIR = TIPO_IR.get(tipoParser).fst;
         String valorParser = lit.getValor();
@@ -514,10 +498,8 @@ public class GeneradorDeCodigo extends Visitor {
             throw new ExcepcionDeAlcance("Valor de tipo inesperado: " + lit.getTipo());
         }
 
-        lit.setRefIR(refIR);
-
-        codigo.append(String.format("\n\t; visit(Literal %s)\n", valorParser));
-        // Hack para generar vars. auxs. en una línea (le sumo 0 al valor que quiero guardar)
+        codigo.append(String.format("\t; visit(Literal %s)\n", valorParser));
+        // Hack para generar referencias a valores en una línea (le sumo 0 al valor que quiero guardar)
         codigo.append(String.format("\t%s = add %s %s, 0\n", refIR, tipoIR, valorIR));
     }
 
@@ -531,7 +513,7 @@ public class GeneradorDeCodigo extends Visitor {
 
         String nombreIR = sv.getNombreIR();
         String tipoIR = TIPO_IR.get(sv.getTipo()).fst;
-        String refIR = Normalizador.getNvoNomVarAux("sv");
+        String refIR = Normalizador.crearNomRef("sv");
         sv.setRefIR(refIR);
 
         codigo.append(String.format("\t; visit(Identificador %s)\n", sv.getNombre()));
