@@ -1,6 +1,9 @@
 function inc(a is integer) return integer
     return a + 1;
 
+function def(a is integer) return integer
+    writeln("Esta función retorna 0 de forma implícita");
+
 main is
     variable i is integer = inc(-1);
     while i < 10 do

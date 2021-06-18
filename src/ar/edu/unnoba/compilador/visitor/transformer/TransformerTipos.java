@@ -233,6 +233,7 @@ public class TransformerTipos extends Transformer {
             // control
             return null;
         }
+        ultFunVisitada.setTieneRetorno(true);
         r.setExpr(convertirATipo(r.getExpr(), ultFunVisitada.getTipo()));
         return r;
     }

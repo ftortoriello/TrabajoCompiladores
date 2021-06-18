@@ -326,7 +326,15 @@ public class GeneradorDeCodigo extends Visitor {
 
         // Anexar cuerpo de la función y cerrar
         df.getBloque().accept(this);
-        codigo.append("}\n\n");
+
+        if (!(df.getTieneRetorno())) {
+            // Si no tiene retorno definido, devuelvo el valor por defecto asociado
+            // al tipo de la función para evitar comportamientos indefinidos.
+            String valorPorDef = TIPO_IR.get(df.getTipo()).snd;
+            codigo.append(String.format("\tret %s %s\n", funTipoRetIR, valorPorDef));
+        }
+
+        codigo.append("}\n");
     }
 
     @Override
@@ -570,6 +578,18 @@ public class GeneradorDeCodigo extends Visitor {
 
     @Override
     public void visit(InvocacionFuncion i) throws ExcepcionDeAlcance {
+        // TODO los nombres de los argumentos tienen que ser locales
+        // o sea que si se pasa una variable global tiene generarse
+        // una referencia y pasarse esto como parámetro
+
+        if (i.getEsPredefinida()) {
+            // TODO write o read
+            // si las agregamos a la tabla de funciones, le asignamos un nombreIR y generamos la
+            // declaración dinámicamente como si fueran una fun. más podemos eliminar este if creo
+            codigo.append(String.format("\t; %s()\n", i.getNombre()));
+            return;
+        }
+
         SimboloFuncion sf = tablaFunciones.get(i.getNombre());
 
         String refIR = Normalizador.crearNomRef("fun");
@@ -578,14 +598,6 @@ public class GeneradorDeCodigo extends Visitor {
         String tipoIR = TIPO_IR.get(sf.getTipo()).fst;
         String nombreIR = sf.getNombreIR();
         String args = grarStrArgs(i.getArgs());
-
-        if (i.getEsPredefinida()) {
-            // TODO write o read
-            // si las agregamos a la tabla de funciones, le asignamos un nombreIR y generamos la
-            // declaración dinámicamente como si fueran una fun. más podemos eliminar este if creo
-        } else {
-            //codigo.append(String.format("",));
-            codigo.append(String.format("\t%s = call %s %s(%s)\n", refIR, tipoIR, nombreIR, args));
-        }
+        codigo.append(String.format("\t%s = call %s %s(%s)\n", refIR, tipoIR, nombreIR, args));
     }
 }

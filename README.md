@@ -79,20 +79,27 @@ Fecha de entrega: 25/06/2021
 Requisitos:
 * Estructura gral. del programa: :white_check_mark:
 * Declaración de funciones: :white_check_mark:
-  * Valor de retorno por defecto (si no hay return): :x:
-  * Procedimientos (tipo de retorno void): :x:
+  * Parámetros opcionales: white_check_mark
+  * Valor de retorno por defecto (si no hay return): :white_check_mark:
+  * Procedimientos (tipo de retorno void): esto no sé bien qué hacer, los menciona Germán en un video pero no tenemos tipo void así que.
+* Funciones predefinidas o externas:
+  * Read: :x:
+  * Write: :x:
 * Bloques de código:
-  * Declaración de variables: :x:
-  * Asignaciones: :x:
+  * Declaración de variables, locales y globales e inicializadas y no: :x:
+    * Valores por defecto para las no inicializadas: white_check_mark
+  * Asignaciones: :white_check_mark:
   * Operaciones lógicas: :x:
-    * Cortocircuito: :x:
-  * Operaciones relacionales: :x:
-  * Operaciones aritméticas: :x:
-  * If: :x:
-  * While: :x:
-    * Continue y break: :x:
+  * Operaciones relacionales: :white_check_mark:
+  * Cortocircuito para expresiones lógicas y relacionales: :x:
+  * Operaciones aritméticas: :white_check_mark:
+  * Invocación de funciones definidas en el lenguaje: :white_check_mark:
+  * Literales: :white_check_mark:
+    * Truncamiento o conversiones: :x:
+  * If: :white_check_mark:
+  * While: :white_check_mark:
+    * Sentencias de control (continue y break): :x:
     * While anidado (ver etiquetas y demás): :x:
-  * Invocación de funciones: :x:
 
 Cosas secundarias:
 * Ver excepciones en GeneradorDeCodigo.java. Está usando ExcepcionDeAlcance porque el visitor abstracto tiene esas definidad en la firma de los métodos. Probé cambiarlas por Exception para que quede más abstracto y poder definir excepciones específicas en cada visitor, pero igual hay lío porque esos visitors llaman a su padre. Y todos los nodos tienen también definido un tipo específico de excepción en los métodos accept y visit.
