@@ -43,8 +43,11 @@ public class GeneradorDeCodigo extends Visitor {
         put(Tipo.FLOAT, new Pair<>("float", "0.0"));
     }};
 
-    /* Función para no tener fija la arquitectura y SO destino
-     * Es un hack, pero mejor que poner ifs...
+    public static boolean targetEsWindows() {
+        return System.getProperty("os.name").startsWith("Windows");
+    }
+
+    /* Función para no tener fija la arquitectura y SO destino.
      * El triple se puede sacar de  "llvm-config --host-target"
      * o "clang -print-target-triple", pero el datalayout no se.
      * Compilar un programa básico en C a IR y fijarse.
@@ -87,11 +90,11 @@ public class GeneradorDeCodigo extends Visitor {
     }
 
     private void grarCodSaltoInc(String etiquetaDestino) {
-        codigo.append(String.format("br label %%%s\n", etiquetaDestino));
+        codigo.append("\t" + String.format("br label %%%s\n", etiquetaDestino));
     }
 
     private void grarCodSaltoCond(String cond, String etiquetaTrue, String etiquetaFalse) {
-        codigo.append(String.format("br %s, label %%%s, label %%%s\n", cond, etiquetaTrue, etiquetaFalse));
+        codigo.append("\t" + String.format("br %s, label %%%s, label %%%s\n", cond, etiquetaTrue, etiquetaFalse));
     }
 
     private String grarStrParams(ArrayList<Param> arrParams) {
@@ -109,7 +112,7 @@ public class GeneradorDeCodigo extends Visitor {
             String sep = i != cantParams - 1 ? ", " : "";
 
             // Añado el argumento a la lista
-            strParams.append(String.format("%s %s%s", tipoRetornoArg, argNombreIR, sep));
+            strParams.append("\t" + String.format("%s %s%s", tipoRetornoArg, argNombreIR, sep));
         }
 
         return strParams.toString();
@@ -144,7 +147,7 @@ public class GeneradorDeCodigo extends Visitor {
             codigo.append(getHostTarget());
         } catch (IOException | InterruptedException e) {
             // algo falló... dejarlo hardcodeado
-            if (System.getProperty("os.name").startsWith("Windows")) {
+            if (targetEsWindows()) {
                 // Target Bruno
                 codigo.append("target datalayout = \"e-m:w-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128\"\n")
                       .append("target triple = \"x86_64-pc-windows-msvc19.28.29335\"\n");
@@ -178,7 +181,7 @@ public class GeneradorDeCodigo extends Visitor {
         if (b.esProgramaPrincipal()) {
             codigo.append("\ndefine i32 @main(i32, i8**) {\n");
             super.visit(b);
-            codigo.append("ret i32 0\n");
+            codigo.append("\tret i32 0\n");
             codigo.append("}\n\n");
         } else {
             super.visit(b);
@@ -202,9 +205,9 @@ public class GeneradorDeCodigo extends Visitor {
         // tipoOrigen y tipoDestino deberían ser iguales, pero lo dejo así para detectar algún error
         // y de paso usar los nombres de las variables para que quede un poco más claro lo que se hace
 
-        codigo.append(String.format("; visit(Asignacion sobre %s)\n", svDestino.getNombre()));
+        codigo.append(String.format("\t; visit(Asignacion sobre %s)\n", svDestino.getNombre()));
 
-        codigo.append(String.format("store %1$s %2$s, %3$s* %4$s ; %4$s = %2$s\n",
+        codigo.append(String.format("\tstore %1$s %2$s, %3$s* %4$s\t; %4$s = %2$s\n",
                 tipoOrigen, origen, tipoDestino, destino));
     }
 
@@ -224,8 +227,8 @@ public class GeneradorDeCodigo extends Visitor {
         // y de paso usar los nombres de las variables para que quede un poco más claro lo que se hace
 
         // TODO: Comentario
-        codigo.append(String.format("\n; Asignacion\n"));
-        codigo.append(String.format("store %1$s %2$s, %3$s* %4$s ; %4$s = %2$s\n",
+        codigo.append(String.format("\n\t; Asignacion\n"));
+        codigo.append(String.format("\tstore %1$s %2$s, %3$s* %4$s ; %4$s = %2$s\n",
                 tipoOrigen, origen, tipoDestino, destino));
     }
     */
@@ -245,14 +248,14 @@ public class GeneradorDeCodigo extends Visitor {
         String valorIR = TIPO_IR.get(dv.getTipo()).snd;
 
         // Mostrar comentario con la declaración en el lenguaje original
-        codigo.append(String.format("\n; DecVar: variable %s is %s = %s\n",
+        codigo.append(String.format("\n\t; DecVar: variable %s is %s = %s\n",
                 sv.getNombre(), sv.getTipo(), valorIR));
 
         if (esGlobal) {
-            codigo.append(String.format("%s = global %s %s\n", nombreIR, tipoIR, valorIR));
+            codigo.append(String.format("\t%s = global %s %s\n", nombreIR, tipoIR, valorIR));
         } else {
-            codigo.append(String.format("%s = alloca %s\n", nombreIR, tipoIR));
-            codigo.append(String.format("store %2$s %3$s, %2$s* %1$s\n", nombreIR, tipoIR, valorIR));
+            codigo.append(String.format("\t%s = alloca %s\n", nombreIR, tipoIR));
+            codigo.append(String.format("\tstore %2$s %3$s, %2$s* %1$s\n", nombreIR, tipoIR, valorIR));
         }
 
         codigo.append("\n");
@@ -276,10 +279,10 @@ public class GeneradorDeCodigo extends Visitor {
             valorIR = "globalIni";
 
             // Mostrar comentario con la declaración en el lenguaje original
-            codigo.append(String.format("\n; DecVarIni: variable %s is %s = %s\n",
+            codigo.append(String.format("\n\t; DecVarIni: variable %s is %s = %s\n",
                     sv.getNombre(), sv.getTipo(), valorIR));
 
-            codigo.append(String.format("%s = global %s %s\n", nombreIR, tipoIR, valorIR));
+            codigo.append(String.format("\t%s = global %s %s\n", nombreIR, tipoIR, valorIR));
         } else {
             // Visito a la expresión para generar la declaración de referencias necesarias
             dvi.getExpresion().accept(this);
@@ -288,11 +291,11 @@ public class GeneradorDeCodigo extends Visitor {
             valorIR = dvi.getExpresion().getRefIR();
 
             // Mostrar comentario con la declaración en el lenguaje original
-            codigo.append(String.format("\n; DecVarIni: variable %s is %s = %s\n",
+            codigo.append(String.format("\n\t; DecVarIni: variable %s is %s = %s\n",
                     sv.getNombre(), sv.getTipo(), valorIR));
 
-            codigo.append(String.format("%s = alloca %s\n", nombreIR, tipoIR));
-            codigo.append(String.format("store %2$s %3$s, %2$s* %1$s\n", nombreIR, tipoIR, valorIR));
+            codigo.append(String.format("\t%s = alloca %s\n", nombreIR, tipoIR));
+            codigo.append(String.format("\tstore %2$s %3$s, %2$s* %1$s\n", nombreIR, tipoIR, valorIR));
         }
 
         codigo.append("\n");
@@ -340,15 +343,15 @@ public class GeneradorDeCodigo extends Visitor {
         sv.setRefIR(refIR);
         sv.setNombreIR(nombreIR);
 
-        codigo.append(String.format("; visit(Param %s)\n", sv.getNombre()));
-        codigo.append(String.format("%s = alloca %s\n", nombreIR, tipoIR));
-        codigo.append(String.format("store %2$s %3$s, %2$s* %1$s ; %1$s = %3$s\n", nombreIR, tipoIR, nombreFormal));
+        codigo.append(String.format("\t; visit(Param %s)\n", sv.getNombre()));
+        codigo.append(String.format("\t%s = alloca %s\n", nombreIR, tipoIR));
+        codigo.append(String.format("\tstore %2$s %3$s, %2$s* %1$s\t; %1$s = %3$s\n", nombreIR, tipoIR, nombreFormal));
     }
 
     @Override
-    public void visit(ParamDef pi) throws ExcepcionDeAlcance {
+    public void visit(ParamDef pd) throws ExcepcionDeAlcance {
         // TODO
-        codigo.append("; visit(ParamDef) sin implementar");
+        codigo.append("\t; visit(ParamDef) sin implementar");
     }
 
 
@@ -438,7 +441,7 @@ public class GeneradorDeCodigo extends Visitor {
         String tipoRetorno = TIPO_IR.get(r.getExpr().getTipo()).fst;
         String refRetorno = r.getExpr().getRefIR();
 
-        codigo.append(String.format("ret %s %s\n", tipoRetorno, refRetorno));
+        codigo.append(String.format("\tret %s %s\n", tipoRetorno, refRetorno));
     }
 
     @Override
@@ -467,15 +470,15 @@ public class GeneradorDeCodigo extends Visitor {
 
         if (ob instanceof OperacionBinariaAritmetica) {
             // Por ej.: %aux.ob.11 = add i32 %aux.sv.9, %aux.ref.10 ; %aux.ob.11 = %aux.sv.9 + %aux.ref.10
-            codigo.append(String.format("%1$s = %2$s %3$s %4$s, %5$s ; %1$s = %4$s %6$s %5$s\n",
+            codigo.append(String.format("\t%1$s = %2$s %3$s %4$s, %5$s\t; %1$s = %4$s %6$s %5$s\n",
                     refIR, instIR, tipoIR, refIzqIR, refDerIR, operadorParser));
         } else if (ob instanceof Relacion) {
             String tipoCmp = ((Relacion)ob).getTipoCmp();
             // Por ej.: %aux.ob.15 = icmp sgt i32 %aux.sv.13, %aux.sv.14 ; %aux.sv.13 > %aux.sv.14
-            codigo.append(String.format("%1$s = %2$s %3$s %4$s %5$s, %6$s ; %5$s %7$s %6$s",
+            codigo.append(String.format("\t%1$s = %2$s %3$s %4$s %5$s, %6$s\t; %5$s %7$s %6$s",
                     refIR, tipoCmp, instIR, tipoIR, refIzqIR, refDerIR, operadorParser));
         } else if (ob instanceof OperacionBinariaLogica) {
-            codigo.append("; OperacionBinaria -> OpBinLog sin implementar");
+            codigo.append("\t; OperacionBinaria -> OpBinLog sin implementar");
         }
     }
 
@@ -513,9 +516,9 @@ public class GeneradorDeCodigo extends Visitor {
 
         lit.setRefIR(refIR);
 
-        codigo.append(String.format("\n; visit(Literal %s)\n", valorParser));
+        codigo.append(String.format("\n\t; visit(Literal %s)\n", valorParser));
         // Hack para generar vars. auxs. en una línea (le sumo 0 al valor que quiero guardar)
-        codigo.append(String.format("%s = add %s %s, 0\n", refIR, tipoIR, valorIR));
+        codigo.append(String.format("\t%s = add %s %s, 0\n", refIR, tipoIR, valorIR));
     }
 
     @Override
@@ -531,8 +534,8 @@ public class GeneradorDeCodigo extends Visitor {
         String refIR = Normalizador.getNvoNomVarAux("sv");
         sv.setRefIR(refIR);
 
-        codigo.append(String.format("; visit(Identificador %s)\n", sv.getNombre()));
-        codigo.append(String.format("%1$s = load %2$s, %2$s* %3$s\n", refIR, tipoIR, nombreIR));
+        codigo.append(String.format("\t; visit(Identificador %s)\n", sv.getNombre()));
+        codigo.append(String.format("\t%1$s = load %2$s, %2$s* %3$s\n", refIR, tipoIR, nombreIR));
     }
 
     @Override
@@ -540,6 +543,9 @@ public class GeneradorDeCodigo extends Visitor {
         super.visit(i);
 
         // TODO
-        codigo.append(String.format("; Invocación a %s()\n", i.getNombre()));
+        codigo.append(String.format("\t; Invocación a %s()\n", i.getNombre()));
+        if (i.getEsPredefinida()) {
+
+        }
     }
 }

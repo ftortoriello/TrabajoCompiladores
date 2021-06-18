@@ -1,0 +1,24 @@
+function factorial(n is integer) return integer
+	if n > 1 then
+		return n * factorial(n - 1)
+	else
+		return 1;
+
+main is
+	variable n is integer;
+	variable valido is boolean = false;
+
+	while not valido do
+	begin
+		n = read_integer();	# Leer entero
+		# Fijarse que se pueda calcular
+		valido = n >= 0 and n <= 11;
+		if not valido then
+			writeln("El número debe ser entre 0 y 11");
+	end;
+
+	write("Resultado: ");
+	writeln(factorial(n));
+end.
+
+# vim: ts=4 sw=4 syntax=compilador

@@ -1,0 +1,20 @@
+function factorial(n is integer) return integer
+	if n > 1 then
+		return n * factorial(n - 1)
+	else
+		return 1;
+
+main is
+	variable n is integer;
+
+	writeln("Tabla de factoriales\n--------------------");
+	writeln("n\tn!");
+	writeln("~~\t~~~~~~~~");
+	for n from 0 to 11 by 1 do
+	begin
+		if n < 10 then write(" ");
+		write(n); write("\t"); write(factorial(n));
+	end;
+end.
+
+# vim: ts=4 sw=4 syntax=compilador

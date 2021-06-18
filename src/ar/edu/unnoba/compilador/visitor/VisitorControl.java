@@ -28,10 +28,10 @@ public class VisitorControl extends Visitor {
 
     // continue
     @Override
-    public void visit(Continuar r) throws ExcepcionDeAlcance {
+    public void visit(Continuar c) throws ExcepcionDeAlcance {
         if (!isEnBucle()) {
             throw new ExcepcionDeAlcance("Se encontró «continue» fuera de un bucle for o while");
         }
-        super.visit(r);
+        super.visit(c);
     }
 }

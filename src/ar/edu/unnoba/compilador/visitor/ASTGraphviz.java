@@ -170,18 +170,18 @@ public class ASTGraphviz extends Visitor {
     }
 
     @Override
-    public void visit(Param df) throws ExcepcionDeAlcance {
-        armarStrDec(df.getEtiqueta());
+    public void visit(Param p) throws ExcepcionDeAlcance {
+        armarStrDec(p.getEtiqueta());
         padres.push(idNodoActual);
-        super.visit(df);
+        super.visit(p);
         padres.pop();
     }
 
     @Override
-    public void visit(ParamDef df) throws ExcepcionDeAlcance {
-        armarStrDec(df.getEtiqueta());
+    public void visit(ParamDef pd) throws ExcepcionDeAlcance {
+        armarStrDec(pd.getEtiqueta());
         padres.push(idNodoActual);
-        super.visit(df);
+        super.visit(pd);
         padres.pop();
     }
 

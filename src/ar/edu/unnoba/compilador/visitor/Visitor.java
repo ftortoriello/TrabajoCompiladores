@@ -108,9 +108,9 @@ public abstract class Visitor {
         p.getIdent().accept(this);
     }
 
-    public void visit(ParamDef p) throws ExcepcionDeAlcance {
-        p.getIdent().accept(this);
-        p.getExpresion().accept(this);
+    public void visit(ParamDef pd) throws ExcepcionDeAlcance {
+        pd.getIdent().accept(this);
+        pd.getExpresion().accept(this);
     }
 
 

@@ -26,15 +26,11 @@ public class Compilar {
         pw.println(new ASTGraphviz(etiqueta).generarCodigo(programa));
         pw.close();
 
-        String cmd[] = new String[5];
-        cmd[0] = "dot";
-        cmd[1] = "-T" + formatoImg;
-        // entrada
-        cmd[2] = nombreArchivo + ".dot";
-        // salida
-        cmd[3] = "-o";
-        cmd[4] = nombreArchivo + "." + formatoImg;
-        int exitCode = Util.ejecutar(cmd);
+        int exitCode = Util.ejecutar(new String[] {
+                "dot", "-T" + formatoImg,
+                nombreArchivo + ".dot",
+                "-o", nombreArchivo + "." + formatoImg
+        });
         if (exitCode == 0) {
             System.out.println("Se graficó el AST «" + nombreArchivo + "».");
         } else {
@@ -51,21 +47,32 @@ public class Compilar {
 
     private static void compilarExe(String nombre) throws IOException, InterruptedException {
         final String nombreExe;
-        if (System.getProperty("os.name").startsWith("Windows")) {
+        int exitCode;
+
+        if (GeneradorDeCodigo.targetEsWindows()) {
             nombreExe = nombre + ".exe";
+
+            // en Windows hay que enlazarlo con scanf.o para permitir leer entradas del teclado
+            // TODO: una vez que implementemos las funciones read, probar si esto es necesario para Windows y no los demás
+
+            // generar objeto con la salida de nuestro compilador
+            exitCode = Util.ejecutar(new String[] {
+                    "clang", "-c", "-o", nombre + ".o", nombre + ".ll"
+            });
+            if (exitCode == 0) {
+                // generar exe enlazado al objeto anterior y a scanf
+                exitCode = Util.ejecutar(new String[]{
+                        "clang", "-o", nombreExe, nombre + ".o", "scanf.o"
+                });
+            }
         } else {
-            // Unix
+            // asumimos Unix
             nombreExe = nombre;
+            exitCode = Util.ejecutar(new String[] {
+                    "clang", "-o", nombreExe, nombre + ".ll"
+            });
         }
 
-        String[] cmd = new String[4];
-        cmd[0] = "clang";
-        // entrada
-        cmd[1] = nombre + ".ll";
-        // salida
-        cmd[2] = "-o";
-        cmd[3] = nombreExe;
-        int exitCode = Util.ejecutar(cmd);
         if (exitCode == 0) {
             System.out.format("Ejecutable generado exitosamente en «%s».\n", nombreExe);
         } else {
