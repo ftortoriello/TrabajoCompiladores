@@ -20,7 +20,6 @@ import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
-import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 
 import java.util.ArrayList;
 
@@ -81,7 +80,7 @@ public class ConversorDeEstructuras extends Transformer {
         bloqueNuevo.setAlcance(new Alcance("Alcance conversión WHEN -> IF"));
 
         // La expresión del case pasa a estar en una nueva variable temporal, para la cual tengo que crear su símbolo
-        String nombreVarAux = Normalizador.getNvoNomVarAux("when");
+        String nombreVarAux = Normalizador.crearNomRef("when");
         Identificador identTemp = new Identificador(nombreVarAux, c.getCondicion().getTipo());
         DecVarIni decVarTemp  = new DecVarIni(nombreVarAux, identTemp, c.getCondicion());
         Boolean esGlobal = false;
