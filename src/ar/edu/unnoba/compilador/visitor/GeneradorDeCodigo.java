@@ -322,21 +322,27 @@ public class GeneradorDeCodigo extends Visitor {
 
     @Override
     public void visit(Param p) throws ExcepcionDeAlcance {
-        /* Para poder utilizar un parámetro tengo que hacer un store
-         * en una variable temporal, en la cual almaceno su valor.
+        /* Para poder utilizar el parámetro creo una variable auxiliar,
+         * para la cual genero un nombreIR y un refIR, que pisan al que
+         * viene en el objeto SimboloVariable del parámetro. Después
+         * guardo el valor que viene en el parámetro en esta "nueva" var.
+         * Esto supone que el pasaje es por valor y no por referencia.
          */
 
         SimboloVariable sv = (SimboloVariable) p.getIdent();
 
-        String nombreIR = sv.getNombreIR();
-        String refIR = Normalizador.getNvoNomVarLcl("param");
+        // Guardo el nombre formal acá para poder extraer el valor, después lo piso
+        String nombreFormal = sv.getNombreIR();
+        String refIR = Normalizador.getNvoNomVarLcl("ref");
+        String nombreIR = Normalizador.getNvoNomVarLcl("param");
         String tipoIR = TIPO_IR.get(p.getTipo()).fst;
 
         sv.setRefIR(refIR);
+        sv.setNombreIR(nombreIR);
 
         codigo.append(String.format("; visit(Param %s)\n", sv.getNombre()));
-        codigo.append(String.format("%s = alloca %s\n", refIR, tipoIR));
-        codigo.append(String.format("store %2$s %3$s, %2$s* %1$s ; %1$s = %3$s\n", refIR, tipoIR, nombreIR));
+        codigo.append(String.format("%s = alloca %s\n", nombreIR, tipoIR));
+        codigo.append(String.format("store %2$s %3$s, %2$s* %1$s ; %1$s = %3$s\n", nombreIR, tipoIR, nombreFormal));
     }
 
     @Override
