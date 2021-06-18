@@ -335,7 +335,7 @@ public class GeneradorDeCodigo extends Visitor {
         String etiBlqThen = getNuevaEtiqueta("blq_then");
         String etiFin = getNuevaEtiqueta("fin_if");
 
-        codigo.append("; visit(SiEntonces\n");
+        codigo.append("\t; visit(SiEntonces\n");
 
         // Salto condicional
         se.getCondicion().accept(this);
@@ -357,7 +357,7 @@ public class GeneradorDeCodigo extends Visitor {
         String etiBlqElse = getNuevaEtiqueta("blq_else");
         String etiFin = getNuevaEtiqueta("fin_if");
 
-        codigo.append("; visit(SiEntoncesSino)\n");
+        codigo.append("\t; visit(SiEntoncesSino)\n");
 
         // Salto condicional
         ses.getCondicion().accept(this);
@@ -387,7 +387,7 @@ public class GeneradorDeCodigo extends Visitor {
         String etiBucleWhile = getNuevaEtiqueta("bucle_while");
         String etiFinWhile = getNuevaEtiqueta("fin_while");
 
-        codigo.append("; visit(Mientras)\n");
+        codigo.append("\t; visit(Mientras)\n");
         grarCodSaltoInc(etiInicioWhile);
         imprimirEtiqueta(etiInicioWhile);
 
@@ -527,7 +527,7 @@ public class GeneradorDeCodigo extends Visitor {
         // TODO
         codigo.append(String.format("\t; Invocación a %s()\n", i.getNombre()));
         if (i.getEsPredefinida()) {
-
+            // write o read
         }
     }
 }
