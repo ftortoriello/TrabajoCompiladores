@@ -62,7 +62,7 @@ public class Compilar {
             if (exitCode == 0) {
                 // generar exe enlazado al objeto anterior y a scanf
                 exitCode = Util.ejecutar(new String[]{
-                        "clang", "-o", nombreExe, nombre + ".o", "scanf.o"
+                        "clang", "-o", nombreExe, nombre + ".o", "lib/scanf.o"
                 });
             }
         } else {
