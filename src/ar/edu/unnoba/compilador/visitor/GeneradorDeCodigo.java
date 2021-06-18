@@ -16,20 +16,18 @@ import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Salir;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
-import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
-import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
-import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntonces;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
 import jflex.base.Pair;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class GeneradorDeCodigo extends Visitor {
-    // TODO: esta clase hay que revisarla toda, la adapté rápido del ejemplo original para que compile
     // TODO: ver excepciones, las que van acá serían ExcepcionDeCompilacion (aunque hacen exactamente lo mismo)
+    // TODO: conversiones implícitas
 
     private StringBuilder codigo;
     private String nombreArchivoFuente;
@@ -96,12 +94,26 @@ public class GeneradorDeCodigo extends Visitor {
         codigo.append(String.format("br %s, label %%%s, label %%%s\n", cond, etiquetaTrue, etiquetaFalse));
     }
 
-    private void grarCodFuncion(String tipoRetorno, String nombreIR, String params, String cuerpo) {
-        codigo.append(String.format("\ndefine %s @%s(%s) {\n", tipoRetorno, nombreIR, params));
-        codigo.append(cuerpo);
-        codigo.append("}\n\n");
-    }
+    private String grarStrParams(ArrayList<Param> arrParams) {
+        // Genere una lista de parámetros de acuerdo a lo requerido por IR
+        StringBuilder strParams = new StringBuilder();
 
+        int cantParams = arrParams.size();
+
+        for (int i = 0; i < cantParams; i++) {
+            SimboloVariable simboloArg = (SimboloVariable) arrParams.get(i).getIdent();
+            String tipoRetornoArg = TIPO_IR.get(simboloArg.getTipo()).fst;
+            String argNombreIR = simboloArg.getNombreIR();
+
+            // Para separar los argumentos mediante comas, excepto el final
+            String sep = i != cantParams - 1 ? ", " : "";
+
+            // Añado el argumento a la lista
+            strParams.append(String.format("%s %s%s", tipoRetornoArg, argNombreIR, sep));
+        }
+
+        return strParams.toString();
+    }
 
     /*** Función principal ***/
     public String generarCodigo(Programa p, String nombreArchivoFuente) throws ExcepcionDeAlcance {
@@ -116,6 +128,11 @@ public class GeneradorDeCodigo extends Visitor {
     /**** Visitors ***/
 
     /* Base */
+    private String grarCodRefIR() {
+        return "";
+    }
+
+    // *** VISITORS ***
 
     @Override
     public void visit(Programa p) throws ExcepcionDeAlcance {
@@ -168,16 +185,31 @@ public class GeneradorDeCodigo extends Visitor {
         }
     }
 
-
     /* Sentencia de asignación */
 
     @Override
     public void visit(Asignacion asig) throws ExcepcionDeAlcance {
-        super.visit(asig);
+        SimboloVariable svDestino = (SimboloVariable) asig.getIdent();
 
-        // FIXME: acá no funcionan las conversiones implícitas
+        // Anexar declaración de referencias necesarias para la parte derecha de la asig.
+        asig.getExpresion().accept(this);
 
-        // TODO: De donde sacamos esto? Es de tipo expresion.....
+        // origen va a contener la referencia al valor de la expresión
+        String origen = asig.getExpresion().getRefIR();
+        String tipoOrigen = TIPO_IR.get(asig.getExpresion().getTipo()).fst;
+        String destino = svDestino.getNombreIR();
+        String tipoDestino = TIPO_IR.get(svDestino.getTipo()).fst;
+        // tipoOrigen y tipoDestino deberían ser iguales, pero lo dejo así para detectar algún error
+        // y de paso usar los nombres de las variables para que quede un poco más claro lo que se hace
+
+        codigo.append(String.format("; visit(Asignacion sobre %s)\n", svDestino.getNombre()));
+
+        codigo.append(String.format("store %1$s %2$s, %3$s* %4$s ; %4$s = %2$s\n",
+                tipoOrigen, origen, tipoDestino, destino));
+    }
+
+    /*
+    protected String procesarAsignacion(Asignacion asig, String sinUso, String decRefs) {
         // Quedaría horrible poner un atributo "esAsignacion" en las expresiones...
         // Anexo la generación de las vars. auxs. necesarias
         //codigo.append(decRefs);
@@ -196,13 +228,12 @@ public class GeneradorDeCodigo extends Visitor {
         codigo.append(String.format("store %1$s %2$s, %3$s* %4$s ; %4$s = %2$s\n",
                 tipoOrigen, origen, tipoDestino, destino));
     }
+    */
 
     /* Sentencias de declaración */
 
     @Override
     public void visit(DecVar dv) throws ExcepcionDeAlcance {
-        super.visit(dv);
-
         // Genera la declaración de una variable que no fue inicializada
 
         SimboloVariable sv = (SimboloVariable) dv.getIdent();
@@ -228,7 +259,7 @@ public class GeneradorDeCodigo extends Visitor {
     }
 
     @Override
-    public void visit(DecVarIni dvi) {
+    public void visit(DecVarIni dvi) throws ExcepcionDeAlcance {
         // Genera la declaración de una variable que sí fue inicializada
 
         SimboloVariable sv = (SimboloVariable) dvi.getIdent();
@@ -236,10 +267,9 @@ public class GeneradorDeCodigo extends Visitor {
         // Parámetros que necesito para declarar la variable
         String nombreIR = sv.getNombreIR();
         String tipoIR = TIPO_IR.get(sv.getTipo()).fst;
-        Boolean esGlobal = sv.getEsGlobal();
         String valorIR;
 
-        if (esGlobal) {
+        if (sv.getEsGlobal()) {
             // TODO
             // Tengo que armar una función que me retorne el valor para poder asignarla
             // valorIR = el return de la funcion que hay que crear
@@ -251,11 +281,10 @@ public class GeneradorDeCodigo extends Visitor {
 
             codigo.append(String.format("%s = global %s %s\n", nombreIR, tipoIR, valorIR));
         } else {
-            // decsRefs contiene las declaraciones que necesito para acceder al valor de la expresión
-            // TODO: Ver como resolver esto
-            //codigo.append(decsRefs);
+            // Visito a la expresión para generar la declaración de referencias necesarias
+            dvi.getExpresion().accept(this);
 
-            // El resultado final del valor de la expresión ya viene seteado gracias a los visitors
+            // El refIR con el valor de la expresión ya viene seteado gracias a la visita anterior
             valorIR = dvi.getExpresion().getRefIR();
 
             // Mostrar comentario con la declaración en el lenguaje original
@@ -271,42 +300,43 @@ public class GeneradorDeCodigo extends Visitor {
 
     @Override
     public void visit(DecFun df) throws ExcepcionDeAlcance {
-        super.visit(df);
-
         SimboloFuncion simboloFun = tablaFunciones.get(df.getNombre());
 
         // Elementos que necesito para definir la función: tipo de retorno, nombre, parámetros y el cuerpo
-        String funTipoRet = TIPO_IR.get(simboloFun.getTipo()).fst;
+        String funTipoRetIR = TIPO_IR.get(simboloFun.getTipo()).fst;
         String funNombreIR = simboloFun.getNombreIR();
-        // Añado al principio del cuerpo la declaración de los parámetros
-        // cuerpo = String.join("", decArgs) + cuerpo;
 
         // Formatear la lista de parámetros de acuerdo a lo requerido por IR
-        // Tengo que hacerlo acá porque el argumento es un nodo DecVar, y al
-        // visitor de DecVar ya lo usamos para generar la declaración.
-        StringBuilder params = new StringBuilder();
-        for (int i = 0; i < df.getParams().size(); i++) {
-            SimboloVariable simboloArg = (SimboloVariable) df.getParams().get(i).getIdent();
-            String tipoRetornoArg = TIPO_IR.get(simboloArg.getTipo()).fst;
-            String argNombreIR = simboloArg.getNombreIR();
+        String params = grarStrParams(df.getParams());
+        codigo.append(String.format("\ndefine %s @%s(%s) {\n", funTipoRetIR, funNombreIR, params));
 
-            // Para separar los argumentos mediante comas, excepto el final
-            String sep = i != df.getParams().size() - 1 ? ", " : "";
-
-            // Añado el argumento a la lista
-            params.append(String.format("%s %s%s", tipoRetornoArg, argNombreIR, sep));
+        // Anexar referencias de los parámetros al principio de la función
+        for (Param param : df.getParams()) {
+            param.accept(this);
         }
 
-        // Cuando tengo lo que necesito, llamo a esta función para que imprima la función
-        // FIXME: ver de donde sacar "cuerpo"
-        //grarCodFuncion(funTipoRet, funNombreIR, params.toString(), cuerpo);
-        grarCodFuncion(funTipoRet, funNombreIR, params.toString(), "");
+        // Anexar cuerpo de la función y cerrar
+        df.getBloque().accept(this);
+        codigo.append("}\n\n");
     }
 
     @Override
     public void visit(Param p) throws ExcepcionDeAlcance {
-        // TODO
-        codigo.append("; visit(Param) sin implementar");
+        /* Para poder utilizar un parámetro tengo que hacer un store
+         * en una variable temporal, en la cual almaceno su valor.
+         */
+
+        SimboloVariable sv = (SimboloVariable) p.getIdent();
+
+        String nombreIR = sv.getNombreIR();
+        String refIR = Normalizador.getNvoNomVarLcl("param");
+        String tipoIR = TIPO_IR.get(p.getTipo()).fst;
+
+        sv.setRefIR(refIR);
+
+        codigo.append(String.format("; visit(Param %s)\n", sv.getNombre()));
+        codigo.append(String.format("%s = alloca %s\n", refIR, tipoIR));
+        codigo.append(String.format("store %2$s %3$s, %2$s* %1$s ; %1$s = %3$s\n", refIR, tipoIR, nombreIR));
     }
 
     @Override
@@ -320,8 +350,6 @@ public class GeneradorDeCodigo extends Visitor {
 
     @Override
     public void visit(SiEntonces se) throws ExcepcionDeAlcance {
-        super.visit(se);
-
         String etiBlqThen = getNuevaEtiqueta("blq_then");
         String etiFin = getNuevaEtiqueta("fin_if");
 
@@ -341,8 +369,6 @@ public class GeneradorDeCodigo extends Visitor {
 
     @Override
     public void visit(SiEntoncesSino ses) throws ExcepcionDeAlcance {
-        super.visit(ses);
-
         String etiBlqThen = getNuevaEtiqueta("blq_then");
         String etiBlqElse = getNuevaEtiqueta("blq_else");
         String etiFin = getNuevaEtiqueta("fin_if");
@@ -367,23 +393,10 @@ public class GeneradorDeCodigo extends Visitor {
         codigo.append(formatearEtiqueta(etiFin));
     }
 
-    @Override
-    public void visit(Cuando c) throws ExcepcionDeAlcance {
-        super.visit(c);
-    }
-
-    @Override
-    public void visit(CasoCuando cc) throws ExcepcionDeAlcance {
-        super.visit(cc);
-    }
-
-
     /* Sentencias de iteración */
 
     @Override
     public void visit(Mientras m) throws ExcepcionDeAlcance {
-        super.visit(m);
-
         String etiInicioWhile = getNuevaEtiqueta("inicio_while");
         String etiBucleWhile = getNuevaEtiqueta("bucle_while");
         String etiFinWhile = getNuevaEtiqueta("fin_while");
@@ -407,23 +420,18 @@ public class GeneradorDeCodigo extends Visitor {
     /* Sentencias de control */
 
     @Override
-    public void visit(Para p) throws ExcepcionDeAlcance {
-        super.visit(p);
-    }
-
-    @Override
     public void visit(Continuar c) throws ExcepcionDeAlcance {
         super.visit(c);
     }
 
     @Override
     public void visit(Retorno r) throws ExcepcionDeAlcance {
-        super.visit(r);
+        // Generar refIR para la expresión de retorno
+        r.getExpr().accept(this);
 
         String tipoRetorno = TIPO_IR.get(r.getExpr().getTipo()).fst;
         String refRetorno = r.getExpr().getRefIR();
-        // TODO: Ver
-        //codigo.append(decsRefs);
+
         codigo.append(String.format("ret %s %s\n", tipoRetorno, refRetorno));
     }
 
@@ -437,21 +445,19 @@ public class GeneradorDeCodigo extends Visitor {
 
     @Override
     public void visit(OperacionBinaria ob) throws ExcepcionDeAlcance {
-        super.visit(ob);
-
         // Defino un nombre auxiliar con el cual puedo referenciar el valor de la expr.
         String refIR = Normalizador.getNvoNomVarAux("ob");
         ob.setRefIR(refIR);
+
+        // Visito a las exprs. para generar la declaración de referencias
+        ob.getIzquierda().accept(this);
+        ob.getDerecha().accept(this);
+
         String refIzqIR = ob.getIzquierda().getRefIR();
         String refDerIR = ob.getDerecha().getRefIR();
         String instIR = ob.getInstruccionIR();
         String tipoIR = TIPO_IR.get(ob.getIzquierda().getTipo()).fst;
         String operadorParser = ob.getNombre();
-
-        // En decAuxIzq y decAuxDer vienen las declaraciones de variables auxiliares que voy a necesitar
-        // TODO: Ver como resolverlo
-        //codigo.append(decAuxIzq);
-        //codigo.append(decAuxDer);
 
         if (ob instanceof OperacionBinariaAritmetica) {
             // Por ej.: %aux.ob.11 = add i32 %aux.sv.9, %aux.ref.10 ; %aux.ob.11 = %aux.sv.9 + %aux.ref.10
@@ -478,7 +484,7 @@ public class GeneradorDeCodigo extends Visitor {
     @Override
     public void visit(Literal lit) throws ExcepcionDeAlcance {
         // Este visitor genere una variable auxiliar para utilizar los valores literales
-        // Como alternativa a generar la variable, podríamos guardar el valor en refIR
+        // Como alternativa a generar la variable, podríamos guardar directamente el valor
         // pero de esta manera queda más uniforme con la forma en la que hacemos lo otro.
 
         // TODO ver acá el tema ese de truncar los valores
@@ -502,7 +508,7 @@ public class GeneradorDeCodigo extends Visitor {
         lit.setRefIR(refIR);
 
         codigo.append(String.format("\n; visit(Literal %s)\n", valorParser));
-        // Hack para generar vars. auxs. en una linea (le sumo 0 al valor que quiero guardar)
+        // Hack para generar vars. auxs. en una línea (le sumo 0 al valor que quiero guardar)
         codigo.append(String.format("%s = add %s %s, 0\n", refIR, tipoIR, valorIR));
     }
 
@@ -519,7 +525,7 @@ public class GeneradorDeCodigo extends Visitor {
         String refIR = Normalizador.getNvoNomVarAux("sv");
         sv.setRefIR(refIR);
 
-        codigo.append(String.format("; visit(SimboloVariable %s)\n", sv.getNombre()));
+        codigo.append(String.format("; visit(Identificador %s)\n", sv.getNombre()));
         codigo.append(String.format("%1$s = load %2$s, %2$s* %3$s\n", refIR, tipoIR, nombreIR));
     }
 

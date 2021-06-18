@@ -5,8 +5,8 @@ import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
 
 public abstract class Declaracion extends Sentencia {
-    // Clase que engloba a las variables inicializadas y a los
-    // parámetros de funciones con valores por defecto.
+    // Clase que engloba a la declaración de variables, a los
+    // parámetros de funciones y la declaración de funciones.
 
     private Identificador ident;
 

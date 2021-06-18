@@ -17,6 +17,10 @@ public class SimboloVariable extends Identificador {
         return nombreIR;
     }
 
+    public void setNombreIR(String nombreIR) {
+        this.nombreIR = nombreIR;
+    }
+
     public Boolean getEsGlobal() {
         return esGlobal;
     }
