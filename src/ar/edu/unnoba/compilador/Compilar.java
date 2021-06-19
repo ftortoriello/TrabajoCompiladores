@@ -41,7 +41,7 @@ public class Compilar {
     private static void generarCodigoIR(Programa p, String archivoEntrada, String archivoSalida)
             throws IOException, ExcepcionDeAlcance {
         PrintWriter pw = new PrintWriter(new FileWriter(archivoSalida));
-        pw.println(new GeneradorDeCodigo().generarCodigo(p, archivoEntrada));
+        pw.println(new GeneradorDeCodigo().generarCodigo(p, archivoEntrada, false));
         pw.close();
     }
 

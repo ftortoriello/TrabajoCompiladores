@@ -49,7 +49,7 @@ public class InvocacionFuncion extends Valor {
                 .replace("[", "")
                 .replace("]", "");
 
-        if (nombre.equals("write") || nombre.equals("writeln")) {
+        if (!(nombre.equals("write") || nombre.equals("writeln"))) {
             return String.format("%s(%s)\n<%s>", nombre, args, getTipo());
         }
 

@@ -45,7 +45,7 @@ public class Normalizador {
 
     // Genera un nombre para una función
     public static String crearNomFun(String nombreOrigFun) {
-        return String.format("%s.%s", normalizar(nombreOrigFun), getIdFuncion());
+        return String.format("@%s.%s", normalizar(nombreOrigFun), getIdFuncion());
     }
 
     // Genera un nombre para una nueva variable global tipo puntero de IR (gralmente. usado para el atrib. nombreIR)
@@ -58,7 +58,8 @@ public class Normalizador {
         return String.format("%%ptro.%s.%s", normalizar(nombreOrigVar), getIdVarLcl());
     }
 
-    // Genera un nombre para una variable que contenga el valor de un puntero (gralmente. usado para los refIR)
+    // Genera un nombre para una variable que contenga el valor referenciado
+    // por un puntero (gralmente. usado para el atrib refIR)
     public static String crearNomRef(String nombreOrigVar) {
         return String.format("%%ref.%s.%s", nombreOrigVar, getIdVarRef());
     }
