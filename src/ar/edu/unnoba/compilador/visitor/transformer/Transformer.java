@@ -72,7 +72,7 @@ public abstract class Transformer {
     }
 
     public Sentencia transform(CasoCuando cc) throws ExcepcionDeTipos {
-        cc.setExpr(cc.getExpr().accept(this));
+        cc.setExpr(cc.getExpresion().accept(this));
         cc.setBloque(cc.getBloque().accept(this));
         return cc;
     }
@@ -206,7 +206,7 @@ public abstract class Transformer {
     }
 
     public Retorno transform(Retorno r) throws ExcepcionDeTipos {
-        r.setExpr(r.getExpr().accept(this));
+        r.setExpr(r.getExpresion().accept(this));
         return r;
     }
 

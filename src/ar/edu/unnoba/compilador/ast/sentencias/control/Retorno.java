@@ -14,7 +14,7 @@ public class Retorno extends Control {
         this.expr = expr;
     }
 
-    public Expresion getExpr() {
+    public Expresion getExpresion() {
         return expr;
     }
 

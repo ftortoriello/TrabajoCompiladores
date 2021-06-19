@@ -136,7 +136,7 @@ public abstract class Visitor {
     }
 
     public void visit(CasoCuando cc) throws ExcepcionDeAlcance {
-        cc.getExpr().accept(this);
+        cc.getExpresion().accept(this);
         cc.getBloque().accept(this);
     }
 
@@ -161,7 +161,7 @@ public abstract class Visitor {
     /* Sentencias de control */
 
     public void visit(Retorno r) throws ExcepcionDeAlcance {
-        r.getExpr().accept(this);
+        r.getExpresion().accept(this);
     }
 
     public void visit(Continuar c) throws ExcepcionDeAlcance {

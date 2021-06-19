@@ -177,25 +177,16 @@ public class GeneradorDeCodigo extends Visitor {
         return strArgs.toString();
     }
 
-    /* Generar y apilar etiquetas de expresiones binarias lógicas.
-     * Usado para el cortocircuito booleano. */
-    private void grarEtiIniOpBinLog(String etiqueta) {
-        String etiInicio = getNuevaEtiqueta("inicio_" + etiqueta);
-        String etiFin = getNuevaEtiqueta("fin_" + etiqueta);
-        etiquetasOpBinLog.push(new Pair<>(etiInicio, etiFin));
+    /*** Funciones auxiliares para generar el cortocircuito booleano ***/
 
-        grarCodSaltoInc(etiInicio);
-        imprimirEtiqueta(etiInicio);
-    }
-
-    private void grarCortocircuitoBooleano(OperacionBinariaLogica ob) throws ExcepcionDeAlcance {
+    private void grarCortocircuito(OperacionBinariaLogica ob) throws ExcepcionDeAlcance {
         // TODO: NegacionLogica. Habría que ver acá si el lado izquierdo es not? E ignorarlo después?
 
         Pair<String, String> etiquetas = etiquetasOpBinLog.peek();
         String etiVerdadero = etiquetas.fst;
         String etiFalso = etiquetas.snd;
 
-        codigo.append(String.format("\t; Cortocircuito booleano: %s\n", ob));
+        grarComent(String.format("Cortocircuito booleano: %s", ob));
 
         Expresion expIzquierda = ob.getIzquierda();
         expIzquierda.accept(this);
@@ -220,6 +211,37 @@ public class GeneradorDeCodigo extends Visitor {
         // asignar el nombre de la variable de la expresión derecha al resultado de la operación
         ob.setRefIR(expDerecha.getRefIR());
     }
+
+    /* Generar y apilar etiquetas para asignaciones de expresiones binarias lógicas. */
+    private void grarEtiCortocircuitoAsig(String etiqueta) {
+        String etiVerdadero = getNuevaEtiqueta(etiqueta + "_verdadero");
+        String etiFalso = getNuevaEtiqueta(etiqueta + "_falso");
+        etiquetasOpBinLog.push(new Pair<>(etiVerdadero, etiFalso));
+    }
+
+    private void finalizarCortocircuitoAsig(String refIR, String nombreIR) throws ExcepcionDeAlcance {
+        // Obtener y desapilar las etiquetas de esta asignación
+        Pair<String, String> parEtiquetas = etiquetasOpBinLog.pop();
+
+        String etiFin = getNuevaEtiqueta("asig_fin");
+
+        // Con el visit de expresión ya se generó el código para el cortocircuito.
+        // Hay que agregar el último salto.
+        grarCodSaltoCond(refIR, parEtiquetas.fst, parEtiquetas.snd);
+
+        // Resultado verdadero
+        imprimirEtiqueta(parEtiquetas.fst);
+        codigo.append(String.format("\tstore i1 1, i1* %s\n", nombreIR));
+        grarCodSaltoInc(etiFin);
+
+        // Resultado falso
+        imprimirEtiqueta(parEtiquetas.snd);
+        codigo.append(String.format("\tstore i1 0, i1* %s\n", nombreIR));
+        grarCodSaltoInc(etiFin);
+
+        imprimirEtiqueta(etiFin);
+    }
+
 
     /*** Función principal ***/
 
@@ -293,31 +315,42 @@ public class GeneradorDeCodigo extends Visitor {
 
     /* Sentencia de asignación */
 
+    /* FIXME: En algún lado se rompe con esta entrada:
+      variable b is boolean; b = false == true;
+      Toma los booleanos como flotante creo
+     */
+
     @Override
     public void visit(Asignacion asig) throws ExcepcionDeAlcance {
+        Expresion expr = asig.getExpresion();
         SimboloVariable svDestino = (SimboloVariable) asig.getIdent();
 
-        Expresion exp = asig.getExpresion();
-        // TODO
-        boolean aplicarCortocircuito = (exp instanceof OperacionBinariaLogica);
-        if (aplicarCortocircuito) grarEtiIniOpBinLog("asig");
+        boolean aplicarCortocircuito = (expr instanceof OperacionBinariaLogica);
+        if (aplicarCortocircuito) {
+            grarEtiCortocircuitoAsig("asig");
+        }
 
         // Anexar declaración de referencias necesarias para la parte derecha de la asig.
-        exp.accept(this);
+        expr.accept(this);
 
-        // origen va a contener la referencia al valor de la expresión
-        String origen = exp.getRefIR();
-        String tipoOrigen = TIPO_IR.get(exp.getTipo()).fst;
+        // Origen va a contener la referencia al valor de la expresión
+        String origen = expr.getRefIR();
         String destino = svDestino.getNombreIR();
-        String tipoDestino = TIPO_IR.get(svDestino.getTipo()).fst;
-        // tipoOrigen y tipoDestino deberían ser iguales, pero lo dejo así para detectar algún error
-        // y de paso usar los nombres de las variables para que quede un poco más claro lo que se hace
 
-        grarComent(String.format("visit(Asignacion): %s = %s", svDestino.getNombre(), asig.getExpresion().toString()));
+        grarComent(String.format("visit(Asignacion)%s: %s = %s",
+                aplicarCortocircuito ? " con cortocircuito booleano" : "",
+                svDestino.getNombre(), expr));
 
-        codigo.append(String.format("\tstore %s %s, %s* %s\n", tipoOrigen, origen, tipoDestino, destino));
+        if (aplicarCortocircuito) {
+            finalizarCortocircuitoAsig(origen, destino);
+        } else {
+            String tipoOrigen = TIPO_IR.get(expr.getTipo()).fst;
+            String tipoDestino = TIPO_IR.get(svDestino.getTipo()).fst;
+            // TipoOrigen y tipoDestino deberían ser iguales, pero lo dejo así para detectar algún error
+            // y de paso usar los nombres de las variables para que quede un poco más claro lo que se hace
 
-        if (aplicarCortocircuito) etiquetasOpBinLog.pop();
+            codigo.append(String.format("\tstore %s %s, %s* %s\n", tipoOrigen, origen, tipoDestino, destino));
+        }
     }
 
 
@@ -349,22 +382,22 @@ public class GeneradorDeCodigo extends Visitor {
     public void visit(DecVarIni dvi) throws ExcepcionDeAlcance {
         // Genera la declaración de una variable que sí fue inicializada
 
-        Expresion exp = dvi.getExpresion();
-        boolean aplicarCortocircuito = (exp instanceof OperacionBinariaLogica);
-        if (aplicarCortocircuito) grarEtiIniOpBinLog("decvarini");
-
+        Expresion expr = dvi.getExpresion();
         SimboloVariable sv = (SimboloVariable) dvi.getIdent();
+
+        boolean aplicarCortocircuito = (expr instanceof OperacionBinariaLogica);
+        if (aplicarCortocircuito) {
+            grarEtiCortocircuitoAsig("decvarini");
+        }
 
         // Parámetros que necesito para declarar la variable
         String nombreIR = sv.getNombreIR();
         String tipoIR = TIPO_IR.get(sv.getTipo()).fst;
 
         if (sv.getEsGlobal()) {
-
-            if (comentariosOn) {
-                codigo.append(String.format("\n;visit(DecVarIni): variable %s is %s = %s",
-                        sv.getNombre(), sv.getTipo(), dvi.getExpresion().toString()));
-            }
+            grarComent(String.format("\n;visit(DecVarIni)%s: variable %s is %s = %s",
+                    aplicarCortocircuito ? " con cortocircuito booleano" : "",
+                    sv.getNombre(), sv.getTipo(), expr));
 
             // Le asigno temporalmente a la var. el valor por defecto según
             // su tipo, porque no puedo inicializarla en el alcance global.
@@ -374,29 +407,41 @@ public class GeneradorDeCodigo extends Visitor {
             // Creo una función que se va a llamar en el main para inicializar la var. con el valor correspondiente
             String nomFunAux = Normalizador.crearNomFun(String.format("init.var.gbl"));
             codigo.append(String.format("define void %s() {\n", nomFunAux));
-            dvi.getExpresion().accept(this);
-            String refIR = dvi.getExpresion().getRefIR();
-            codigo.append(String.format("\tstore %1$s %2$s, %1s* %3$s\n", tipoIR, refIR, nombreIR));
-            codigo.append("\tret void\n");
-            codigo.append("}\n");
+            expr.accept(this);
+            String refIR = expr.getRefIR();
 
-            // Guardo el nombre de la función para invocarla en el main
-            varGblInit.add(nomFunAux);
+            if (aplicarCortocircuito) {
+                finalizarCortocircuitoAsig(refIR, sv.getNombre());
+            } else {
+                codigo.append(String.format("\tstore %1$s %2$s, %1s* %3$s\n", tipoIR, refIR, nombreIR));
+                codigo.append("\tret void\n");
+                codigo.append("}\n");
+
+                // Guardo el nombre de la función para invocarla en el main
+                varGblInit.add(nomFunAux);
+            }
         } else {
+            // Variable local
+
             // Visito a la expresión para generar la declaración de referencias necesarias
-            exp.accept(this);
+            expr.accept(this);
 
             // El refIR con el valor de la expresión viene resuelto gracias a la visita anterior
             String refIR;
-            refIR = exp.getRefIR();
+            refIR = expr.getRefIR();
 
-            grarComent(String.format("visit(DecVarIni): variable %s is %s = %s", sv.getNombre(), sv.getTipo(), refIR));
+            grarComent(String.format("visit(DecVarIni)%s: variable %s is %s = %s",
+                    aplicarCortocircuito ? " con cortocircuito booleano" : "",
+                    sv.getNombre(), sv.getTipo(), refIR));
 
-            codigo.append(String.format("\t%s = alloca %s\n", nombreIR, tipoIR));
-            codigo.append(String.format("\tstore %2$s %3$s, %2$s* %1$s\n", nombreIR, tipoIR, refIR));
+            // FIXME
+            if (aplicarCortocircuito) {
+                finalizarCortocircuitoAsig(refIR, sv.getNombre());
+            } else {
+                codigo.append(String.format("\t%s = alloca %s\n", nombreIR, tipoIR));
+                codigo.append(String.format("\tstore %2$s %3$s, %2$s* %1$s\n", nombreIR, tipoIR, refIR));
+            }
         }
-
-        if (aplicarCortocircuito) etiquetasOpBinLog.pop();
     }
 
     @Override
@@ -461,7 +506,6 @@ public class GeneradorDeCodigo extends Visitor {
         // El valor del parámetro ya debería venir resuelto desde la invocación,
         // por lo que puedo llamar a visit(Param) directamente.
         visit((Param) pi);
-        // TODO etiquetas para el cortocircuito
     }
 
 
@@ -573,13 +617,20 @@ public class GeneradorDeCodigo extends Visitor {
 
     @Override
     public void visit(Retorno r) throws ExcepcionDeAlcance {
-        // Generar refIR para la expresión de retorno
-        r.getExpr().accept(this);
+        Expresion expr = r.getExpresion();
 
-        String tipoRetorno = TIPO_IR.get(r.getExpr().getTipo()).fst;
-        String refRetorno = r.getExpr().getRefIR();
+        boolean aplicarCortocircuito = (expr instanceof OperacionBinariaLogica);
+        if (aplicarCortocircuito) grarEtiCortocircuitoAsig("decvarini");
+
+        // Generar refIR para la expresión de retorno
+        expr.accept(this);
+
+        String tipoRetorno = TIPO_IR.get(expr.getTipo()).fst;
+        String refRetorno = expr.getRefIR();
 
         codigo.append(String.format("\tret %s %s\n", tipoRetorno, refRetorno));
+
+        if (aplicarCortocircuito) etiquetasOpBinLog.pop();
     }
 
     @Override
@@ -594,7 +645,7 @@ public class GeneradorDeCodigo extends Visitor {
     public void visit(OperacionBinaria ob) throws ExcepcionDeAlcance {
         if (ob instanceof OperacionBinariaLogica) {
             // Manejar operaciones lógicas usando cortocircuito booleano.
-            grarCortocircuitoBooleano((OperacionBinariaLogica) ob);
+            grarCortocircuito((OperacionBinariaLogica) ob);
             return;
         }
 

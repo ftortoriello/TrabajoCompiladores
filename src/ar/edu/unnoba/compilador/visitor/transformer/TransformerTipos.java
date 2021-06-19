@@ -234,7 +234,7 @@ public class TransformerTipos extends Transformer {
             return null;
         }
         ultFunVisitada.setTieneRetorno(true);
-        r.setExpr(convertirATipo(r.getExpr(), ultFunVisitada.getTipo()));
+        r.setExpr(convertirATipo(r.getExpresion(), ultFunVisitada.getTipo()));
         return r;
     }
 

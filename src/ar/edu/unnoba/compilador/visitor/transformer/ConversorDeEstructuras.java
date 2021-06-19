@@ -103,7 +103,7 @@ public class ConversorDeEstructuras extends Transformer {
 
         for (CasoCuando cc : c.getCasos()) {
             // Crear la condición del if en base a la del when y el case
-            Relacion cond = Relacion.getClaseRel(cc.getOp(), c.getCondicion(), cc.getExpr());
+            Relacion cond = Relacion.getClaseRel(cc.getOp(), c.getCondicion(), cc.getExpresion());
             cond.setTipo(Tipo.BOOLEAN);
             if (seActual == null) {
                 // Primera vez que entro al for, creo el if principal

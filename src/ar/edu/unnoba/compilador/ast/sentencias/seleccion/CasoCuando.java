@@ -29,7 +29,7 @@ public class CasoCuando extends Sentencia {
         this.op = op;
     }
 
-    public Expresion getExpr() {
+    public Expresion getExpresion() {
         return expr;
     }
 
