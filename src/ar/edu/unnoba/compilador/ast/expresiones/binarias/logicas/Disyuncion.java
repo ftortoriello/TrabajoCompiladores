@@ -11,4 +11,10 @@ public class Disyuncion extends OperacionBinariaLogica {
     public String getInstruccionIR() {
         return "or";
     }
+
+    @Override
+    protected Boolean calcularResultado(Boolean litIzq, Boolean litDer) {
+        return litIzq || litDer;
+    }
+
 }

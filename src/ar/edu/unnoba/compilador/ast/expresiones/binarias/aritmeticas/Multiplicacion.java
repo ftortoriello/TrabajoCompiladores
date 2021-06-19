@@ -12,4 +12,9 @@ public class Multiplicacion extends OperacionBinariaAritmetica {
     public String getInstruccionIR() {
         return getTipo() == Tipo.INTEGER ? "mul" : "fmul";
     }
+
+    @Override
+    protected Float calcularResultado(Float fIzq, Float fDer) {
+        return fIzq * fDer;
+    }
 }

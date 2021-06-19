@@ -28,14 +28,5 @@ public abstract class OperacionBinariaAritmetica extends OperacionBinaria {
         }
     }
 
-    private Float calcularResultado(Float fIzq, Float fDer) {
-        switch (getNombre()) {
-            case "+": return fIzq + fDer;
-            case "-": return fIzq - fDer;
-            case "*": return fIzq * fDer;
-            case "/": return fIzq / fDer;
-            default:
-                throw new IllegalStateException("Operador inesperado al aplicar Constant Folding: " + getNombre());
-        }
-    }
+    protected abstract Float calcularResultado(Float fIzq, Float fDer);
 }

@@ -24,12 +24,5 @@ public abstract class OperacionBinariaLogica extends OperacionBinaria {
         return new Literal(String.valueOf(resultado), Tipo.BOOLEAN, "Literal BOOLEAN");
     }
 
-    private Boolean calcularResultado(Boolean litIzq, Boolean litDer) {
-        switch (getNombre()) {
-            case "AND": return litIzq && litDer;
-            case "OR":  return litIzq || litDer;
-            default:
-                throw new IllegalStateException("Operador inesperado al aplicar Constant Folding: " + getNombre());
-        }
-    }
+    protected abstract Boolean calcularResultado(Boolean litIzq, Boolean litDer);
 }

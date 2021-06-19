@@ -12,4 +12,9 @@ public class Division extends OperacionBinariaAritmetica {
     public String getInstruccionIR() {
         return getTipo() == Tipo.INTEGER ? "sdiv" : "fdiv";
     }
+
+    @Override
+    protected Float calcularResultado(Float fIzq, Float fDer) {
+        return fIzq / fDer;
+    }
 }

@@ -12,4 +12,9 @@ public class Resta extends OperacionBinariaAritmetica {
     public String getInstruccionIR() {
         return getTipo() == Tipo.INTEGER ? "sub" : "fsub";
     }
+
+    @Override
+    protected Float calcularResultado(Float fIzq, Float fDer) {
+        return fIzq - fDer;
+    }
 }

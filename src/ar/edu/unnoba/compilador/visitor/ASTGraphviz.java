@@ -40,7 +40,7 @@ public class ASTGraphviz extends Visitor {
     // Genera un ID nuevo, agrega al código dot un nodo, y lo conecta a su padre si lo tiene.
     private void armarStrNodo(String etiqueta, Integer tamanhoFuente, Integer color) {
         idNodoActual = getID();
-        Integer idNodoPadre = padres.peekFirst();  // el que está en el tope ahora
+        Integer idNodoPadre = padres.peek();  // el que está en el tope ahora
 
         if (idNodoPadre == null) {
             // nodo raíz

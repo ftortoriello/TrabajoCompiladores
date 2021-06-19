@@ -11,4 +11,9 @@ public class Conjuncion extends OperacionBinariaLogica {
     public String getInstruccionIR() {
         return "and";
     }
+
+    @Override
+    protected Boolean calcularResultado(Boolean litIzq, Boolean litDer) {
+        return litIzq && litDer;
+    }
 }

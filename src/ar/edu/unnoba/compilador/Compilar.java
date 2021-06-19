@@ -162,8 +162,8 @@ public class Compilar {
             // Error sintáctico probablemente
             e.printStackTrace(System.out);
         } catch (Exception e) {
-            //e.printStackTrace(System.out);
-            System.out.printf("%s: %s%n", e.getClass().getSimpleName(), e.getLocalizedMessage());
+            e.printStackTrace(System.out);
+            //System.out.printf("%s: %s%n", e.getClass().getSimpleName(), e.getLocalizedMessage());
         }
     }
 }

@@ -3,12 +3,16 @@ package ar.edu.unnoba.compilador.visitor;
 import ar.edu.unnoba.compilador.Normalizador;
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
+import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.OperacionBinariaAritmetica;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.Conjuncion;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.Disyuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.OperacionBinariaLogica;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
+import ar.edu.unnoba.compilador.ast.expresiones.unarias.logicas.NegacionLogica;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.*;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Continuar;
@@ -21,9 +25,7 @@ import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
 import jflex.base.Pair;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class GeneradorDeCodigo extends Visitor {
     // TODO: ver excepciones, las que van acá serían ExcepcionDeCompilacion (aunque hacen exactamente lo mismo)
@@ -41,11 +43,21 @@ public class GeneradorDeCodigo extends Visitor {
         put(Tipo.FLOAT, new Pair<>("float", "0.0"));
     }};
 
-    /*** Funciones auxiliares ***/
+    /* Pila de pares de etiquetas para saber a donde saltar cuando se encuentra break o continue
+     * dentro de un while.
+     * La primer etiqueta del par representa el comienzo del bloque si la condición es verdadera,
+     * y la segunda si es falsa (o el fin del bloque).
+     */
+    private Deque<Pair<String, String>> etiquetasMientras = new ArrayDeque<>();
+
+    /* Pila de pares de etiquetas usada para el cortocircuito booleano */
+    private Deque<Pair<String, String>> etiquetasOpBinLog = new ArrayDeque<>();
 
     public static boolean targetEsWindows() {
         return System.getProperty("os.name").startsWith("Windows");
     }
+
+    /*** Funciones auxiliares ***/
 
     /* Función para no tener fija la arquitectura y SO destino.
      * El triple se puede sacar de  "llvm-config --host-target"
@@ -82,12 +94,18 @@ public class GeneradorDeCodigo extends Visitor {
 
     // Genera un nombre único para una nueva etiqueta
     private String getNuevaEtiqueta(String nombreEtiqueta) {
+        // TODO: Yo sacaría la e_:
+        //return String.format("%s_%s", nombreEtiqueta, getID());
+        // TODO: Estaría bueno que los ID sean por cada etiqueta y no globales??
+        // (ej: inicio_while_1, bucle_while_1, inicio_while_2... se podría hacer con un mapa por ahí)
         return String.format("e_%s_%s", nombreEtiqueta, getID());
     }
 
     private void imprimirEtiqueta(String nombreEtiqueta) {
         codigo.append(String.format("\n%s:\n", nombreEtiqueta));
     }
+
+    // TODO: función que imprima una línea con un comentario, así quedan alineados?
 
     private void grarCodSaltoInc(String etiquetaDestino) {
         codigo.append("\t" + String.format("br label %%%s\n", etiquetaDestino));
@@ -97,12 +115,11 @@ public class GeneradorDeCodigo extends Visitor {
         codigo.append(String.format("\tbr i1 %s, label %%%s, label %%%s\n", cond, etiquetaTrue, etiquetaFalse));
     }
 
+    /* Devuelve una lista de parámetros de acuerdo a lo requerido por IR */
     private String grarStrParams(ArrayList<Param> arrParams) {
-        // Genera una lista de parámetros de acuerdo a lo requerido por IR
         StringBuilder strParams = new StringBuilder();
 
         int cantParams = arrParams.size();
-
         for (int i = 0; i < cantParams; i++) {
             SimboloVariable simboloArg = (SimboloVariable) arrParams.get(i).getIdent();
             String tipoRetornoArg = TIPO_IR.get(simboloArg.getTipo()).fst;
@@ -118,6 +135,52 @@ public class GeneradorDeCodigo extends Visitor {
         return strParams.toString();
     }
 
+    /*** Funciones auxiliares para el cortocircuito booleano ***/
+
+    /* Generar y apilar etiquetas de expresiones binarias lógicas */
+    private void grarEtiIniOpBinLog(String etiqueta) {
+        // generar etiquetas para el cortocircuito
+        String etiInicio = getNuevaEtiqueta("inicio_" + etiqueta);
+        String etiFin = getNuevaEtiqueta("fin_" + etiqueta);
+        etiquetasOpBinLog.push(new Pair<>(etiInicio, etiFin));
+
+        grarCodSaltoInc(etiInicio);
+        imprimirEtiqueta(etiInicio);
+    }
+
+    private void grarCortocircuitoBooleano(OperacionBinariaLogica ob) throws ExcepcionDeAlcance {
+        // TODO: NegacionLogica. Habría que ver acá si el lado izquierdo es not? E ignorarlo después?
+
+        Pair<String, String> etiquetas = etiquetasOpBinLog.peek();
+        String etiVerdadero = etiquetas.fst;
+        String etiFalso = etiquetas.snd;
+
+        codigo.append(String.format("\t; Cortocircuito booleano: %s\n", ob));
+
+        Expresion expIzquierda = ob.getIzquierda();
+        expIzquierda.accept(this);
+
+        final String etiTmp;
+        if (ob instanceof Conjuncion) { // AND
+            // Si el operador izquierdo es falso, esta operación es falsa
+            etiTmp = getNuevaEtiqueta("and_verdadero");
+            grarCodSaltoCond(expIzquierda.getRefIR(), etiTmp, etiFalso);
+        } else if (ob instanceof Disyuncion) { // OR
+            // Si el operador izquierdo es verdadero, esta operación es verdadera
+            etiTmp = getNuevaEtiqueta("or_falso");
+            grarCodSaltoCond(expIzquierda.getRefIR(), etiVerdadero, etiTmp);
+        } else {
+            throw new ExcepcionDeAlcance("Tipo de operación binaria lógica inesperado.");
+        }
+
+        imprimirEtiqueta(etiTmp);
+
+        Expresion expDerecha = ob.getDerecha();
+        expDerecha.accept(this);
+        // asignar el nombre de la variable de la expresión derecha al resultado de la operación
+        ob.setRefIR(expDerecha.getRefIR());
+    }
+
     /*** Función principal ***/
     public String generarCodigo(Programa p, String nombreArchivoFuente) throws ExcepcionDeAlcance {
         this.nombreArchivoFuente = nombreArchivoFuente;
@@ -126,7 +189,6 @@ public class GeneradorDeCodigo extends Visitor {
         super.procesar(p);
         return codigo.toString();
     }
-
 
     /**** Visitors ***/
 
@@ -190,12 +252,17 @@ public class GeneradorDeCodigo extends Visitor {
     public void visit(Asignacion asig) throws ExcepcionDeAlcance {
         SimboloVariable svDestino = (SimboloVariable) asig.getIdent();
 
+        Expresion exp = asig.getExpresion();
+        // TODO
+        boolean aplicarCortocircuito = (exp instanceof OperacionBinariaLogica);
+        if (aplicarCortocircuito) grarEtiIniOpBinLog("asig");
+
         // Anexar declaración de referencias necesarias para la parte derecha de la asig.
-        asig.getExpresion().accept(this);
+        exp.accept(this);
 
         // origen va a contener la referencia al valor de la expresión
-        String origen = asig.getExpresion().getRefIR();
-        String tipoOrigen = TIPO_IR.get(asig.getExpresion().getTipo()).fst;
+        String origen = exp.getRefIR();
+        String tipoOrigen = TIPO_IR.get(exp.getTipo()).fst;
         String destino = svDestino.getNombreIR();
         String tipoDestino = TIPO_IR.get(svDestino.getTipo()).fst;
         // tipoOrigen y tipoDestino deberían ser iguales, pero lo dejo así para detectar algún error
@@ -205,6 +272,8 @@ public class GeneradorDeCodigo extends Visitor {
 
         codigo.append(String.format("\tstore %1$s %2$s, %3$s* %4$s\t; %4$s = %2$s\n",
                 tipoOrigen, origen, tipoDestino, destino));
+
+        if (aplicarCortocircuito) etiquetasOpBinLog.pop();
     }
 
 
@@ -240,6 +309,10 @@ public class GeneradorDeCodigo extends Visitor {
     public void visit(DecVarIni dvi) throws ExcepcionDeAlcance {
         // Genera la declaración de una variable que sí fue inicializada
 
+        Expresion exp = dvi.getExpresion();
+        boolean aplicarCortocircuito = (exp instanceof OperacionBinariaLogica);
+        if (aplicarCortocircuito) grarEtiIniOpBinLog("decvarini");
+
         SimboloVariable sv = (SimboloVariable) dvi.getIdent();
 
         // Parámetros que necesito para declarar la variable
@@ -260,10 +333,10 @@ public class GeneradorDeCodigo extends Visitor {
             codigo.append(String.format("\t%s = global %s %s\n", nombreIR, tipoIR, valorIR));
         } else {
             // Visito a la expresión para generar la declaración de referencias necesarias
-            dvi.getExpresion().accept(this);
+            exp.accept(this);
 
             // El refIR con el valor de la expresión ya viene seteado gracias a la visita anterior
-            valorIR = dvi.getExpresion().getRefIR();
+            valorIR = exp.getRefIR();
 
             // Mostrar comentario con la declaración en el lenguaje original
             codigo.append(String.format("\t; DecVarIni: variable %s is %s = %s\n",
@@ -272,6 +345,8 @@ public class GeneradorDeCodigo extends Visitor {
             codigo.append(String.format("\t%s = alloca %s\n", nombreIR, tipoIR));
             codigo.append(String.format("\tstore %2$s %3$s, %2$s* %1$s\n", nombreIR, tipoIR, valorIR));
         }
+
+        if (aplicarCortocircuito) etiquetasOpBinLog.pop();
     }
 
     @Override
@@ -325,6 +400,7 @@ public class GeneradorDeCodigo extends Visitor {
     public void visit(ParamDef pd) throws ExcepcionDeAlcance {
         // TODO
         codigo.append("\t; visit(ParamDef) sin implementar");
+        // TODO etiquetas para el cortocircuito
     }
 
 
@@ -334,8 +410,9 @@ public class GeneradorDeCodigo extends Visitor {
     public void visit(SiEntonces se) throws ExcepcionDeAlcance {
         String etiBlqThen = getNuevaEtiqueta("blq_then");
         String etiFin = getNuevaEtiqueta("fin_if");
+        etiquetasOpBinLog.push(new Pair<>(etiBlqThen, etiFin));
 
-        codigo.append("\t; visit(SiEntonces\n");
+        codigo.append("\t; visit(SiEntonces)\n");
 
         // Salto condicional
         se.getCondicion().accept(this);
@@ -349,6 +426,8 @@ public class GeneradorDeCodigo extends Visitor {
 
         // Fin if
         imprimirEtiqueta(etiFin);
+
+        etiquetasOpBinLog.pop();
     }
 
     @Override
@@ -386,17 +465,28 @@ public class GeneradorDeCodigo extends Visitor {
         String etiInicioWhile = getNuevaEtiqueta("inicio_while");
         String etiBucleWhile = getNuevaEtiqueta("bucle_while");
         String etiFinWhile = getNuevaEtiqueta("fin_while");
+        Pair<String, String> parEtiquetas = new Pair<>(etiBucleWhile, etiFinWhile);
+        etiquetasMientras.push(parEtiquetas);
 
         codigo.append("\t; visit(Mientras)\n");
         grarCodSaltoInc(etiInicioWhile);
         imprimirEtiqueta(etiInicioWhile);
 
+        Expresion condicion = m.getCondicion();
+        boolean aplicarCortocircuito = (condicion instanceof OperacionBinariaLogica);
+        if (aplicarCortocircuito) etiquetasOpBinLog.push(parEtiquetas);
+
         // Generar ref. al resultado de la condición
-        m.getCondicion().accept(this);
-        String refCond = m.getCondicion().getRefIR();
+        condicion.accept(this);
+        String refCond = condicion.getRefIR();
 
         // Se evalúa la condición, si es verdadera se salta al bucle y si es falsa al fin
-        grarCodSaltoCond(refCond, etiBucleWhile, etiFinWhile);
+        // TODO: NegacionLogica
+        if (condicion instanceof NegacionLogica) {
+            grarCodSaltoCond(refCond, etiFinWhile, etiBucleWhile);
+        } else {
+            grarCodSaltoCond(refCond, etiBucleWhile, etiFinWhile);
+        }
         imprimirEtiqueta(etiBucleWhile);
 
         // Generar cuerpo del while
@@ -406,6 +496,9 @@ public class GeneradorDeCodigo extends Visitor {
         grarCodSaltoInc(etiInicioWhile);
 
         imprimirEtiqueta(etiFinWhile);
+
+        etiquetasMientras.pop();
+        if (aplicarCortocircuito) etiquetasOpBinLog.pop();
     }
 
 
@@ -437,6 +530,12 @@ public class GeneradorDeCodigo extends Visitor {
 
     @Override
     public void visit(OperacionBinaria ob) throws ExcepcionDeAlcance {
+        if (ob instanceof OperacionBinariaLogica) {
+            // Manejar operaciones lógicas usando cortocircuito booleano.
+            grarCortocircuitoBooleano((OperacionBinariaLogica) ob);
+            return;
+        }
+
         // Defino un nombre auxiliar con el cual puedo referenciar el valor de la expr.
         String refIR = Normalizador.crearNomRef("ob");
         ob.setRefIR(refIR);
@@ -455,12 +554,18 @@ public class GeneradorDeCodigo extends Visitor {
             codigo.append(String.format("\t%1$s = %2$s %3$s %4$s, %5$s\t; %1$s = %4$s %6$s %5$s\n",
                     refIR, instIR, tipoIR, refIzqIR, refDerIR, operadorParser));
         } else if (ob instanceof Relacion) {
-            String tipoCmp = ((Relacion)ob).getTipoCmp();
+            String tipoCmp = ((Relacion) ob).getTipoCmp();
             // Por ej.: %aux.ob.15 = icmp sgt i32 %aux.sv.13, %aux.sv.14 ; %aux.sv.13 > %aux.sv.14
             codigo.append(String.format("\t%1$s = %2$s %3$s %4$s %5$s, %6$s ; %5$s %7$s %6$s\n",
                     refIR, tipoCmp, instIR, tipoIR, refIzqIR, refDerIR, operadorParser));
+        /* // implementado con cortocircuito booleano
         } else if (ob instanceof OperacionBinariaLogica) {
-            codigo.append("\t; OperacionBinaria -> OpBinLog sin implementar\n");
+            // Por ej.: %aux.ob.3 = and i1 %aux.sv.1, %aux.sv.2
+            codigo.append(String.format("\t%1$s = %2$s %3$s %4$s, %5$s ; %4$s %6$s %5$s\n",
+                    refIR, instIR, tipoIR, refIzqIR, refDerIR, operadorParser));
+        */
+        } else {
+            throw new ExcepcionDeAlcance("Tipo de operación binaria inesperado.");
         }
     }
 

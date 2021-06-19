@@ -47,9 +47,4 @@ out/
 /src/ar/edu/unnoba/compilador/sintaxis/Parser.java
 /src/ar/edu/unnoba/compilador/sintaxis/ParserSym.java
 /salida
-*.dot
-*.png
-*.svg
-*.ll
-*.exe
 

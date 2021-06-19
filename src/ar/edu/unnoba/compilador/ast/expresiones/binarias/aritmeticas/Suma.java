@@ -12,4 +12,9 @@ public class Suma extends OperacionBinariaAritmetica {
     public String getInstruccionIR() {
         return getTipo() == Tipo.INTEGER ? "add" : "fadd";
     }
+
+    @Override
+    protected Float calcularResultado(Float fIzq, Float fDer) {
+        return fIzq + fDer;
+    }
 }
