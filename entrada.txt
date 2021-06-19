@@ -1,11 +1,15 @@
+variable a is integer = 3;
+variable z is integer = a * 2;
+
 function inc(a is integer) return integer
-    return a + 1;
+    return a * 2 + 1;
 
 function def(a is integer) return integer
     writeln("Esta función retorna 0 de forma implícita");
 
 main is
-    variable i is integer = inc(-1);
+    variable i is integer = inc(a);
+    a = i + 1;
     while i < 10 do
         if i / 2 == 0 then
             i = i + 1;

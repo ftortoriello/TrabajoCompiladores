@@ -79,15 +79,14 @@ Fecha de entrega: 25/06/2021
 Requisitos:
 * Estructura gral. del programa: :white_check_mark:
 * Declaración de funciones: :white_check_mark:
-  * Parámetros opcionales: white_check_mark
+  * Parámetros opcionales: :white_check_mark:
   * Valor de retorno por defecto (si no hay return): :white_check_mark:
-  * Procedimientos (tipo de retorno void): esto no sé bien qué hacer, los menciona Germán en un video pero no tenemos tipo void así que.
 * Funciones predefinidas o externas:
   * Read: :x:
   * Write: :x:
+* Declaración de variables (locales y globales, inicializadas y no inicializadas): :x:
+  * Valores por defecto para las no inicializadas: :white_check_mark:
 * Bloques de código:
-  * Declaración de variables, locales y globales e inicializadas y no: :x:
-    * Valores por defecto para las no inicializadas: white_check_mark
   * Asignaciones: :white_check_mark:
   * Operaciones lógicas: :x:
   * Operaciones relacionales: :white_check_mark:
