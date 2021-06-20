@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class Util {
-    // Ejecutar un comando, mostrar su salida y cuando finalice retornar su código de salida
+    /* Ejecutar un comando, mostrar su salida y cuando finalice retornar su código de salida */
     public static int ejecutar(String[] cmd) throws IOException, InterruptedException {
         Process proc = Runtime.getRuntime().exec(cmd);
 

@@ -149,7 +149,7 @@ public class Compilar {
             graficarArbol(programa, carpetaSalida + "3_ast-optimizado",
                     "AST optimizado (Conti - Tortoriello)");
 
-            final String nombreArchivo = "4_entrada";
+            final String nombreArchivo = "4_llvm-ir";
 
             System.out.println("\nIniciando traducción a código IR...");
             generarCodigoIR(programa, rutaEntrada,  carpetaSalida + nombreArchivo + ".ll");

@@ -82,6 +82,9 @@ public class ASTGraphviz extends Visitor {
     private void armarStrOpLogica(String etiqueta) {
         armarStrNodo(etiqueta, 28, 5);
     }
+    private void armarStrRelacion(String etiqueta) {
+        armarStrNodo(etiqueta, 26, 6);
+    }
 
 
     /* Base */
@@ -214,7 +217,7 @@ public class ASTGraphviz extends Visitor {
 
     @Override
     public void visit(CasoCuando cc) throws ExcepcionDeAlcance {
-        armarStrNodo(cc.getEtiqueta(), 26, 6);
+        armarStrRelacion(cc.getEtiqueta());
         padres.push(idNodoActual);
         super.visit(cc);
         padres.pop();
@@ -266,8 +269,7 @@ public class ASTGraphviz extends Visitor {
     @Override
     public void visit(OperacionBinaria ob) throws ExcepcionDeAlcance {
         if (ob instanceof Relacion) {
-            // TODO: Buscar otro color no usado?
-            armarStrNodo(ob.getEtiqueta(), 26, 6);
+            armarStrRelacion(ob.getEtiqueta());
         } else if (ob instanceof OperacionBinariaLogica) {
             armarStrOpLogica(ob.getEtiqueta());
         } else {
