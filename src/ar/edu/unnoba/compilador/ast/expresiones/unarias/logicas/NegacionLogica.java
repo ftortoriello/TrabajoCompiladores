@@ -16,7 +16,7 @@ public class NegacionLogica extends OperacionUnaria {
             return this;
         }
 
-        boolean valorNegado = !(Boolean.parseBoolean(((Literal) getExpresion().evaluar()).getValor()));
+        boolean valorNegado = !((Literal) getExpresion().evaluar()).getValorBooleano();
         return new Literal(String.valueOf(valorNegado), Tipo.BOOLEAN);
     }
 }

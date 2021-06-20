@@ -12,16 +12,16 @@ public class NegacionAritmetica extends OperacionUnaria {
     }
 
     public Expresion evaluar() throws ExcepcionTransformer {
-        if (!(getExpresion() instanceof Literal)) {
+        Expresion expresion = getExpresion().evaluar();
+        if (!(expresion instanceof Literal)) {
             return this;
         }
 
-        if (getExpresion().getTipo() == Tipo.INTEGER) {
-            String valorNegado = String.valueOf(Integer.parseInt(getExpresion().evaluar().toString()) * -1);
-            return new Literal(valorNegado, Tipo.INTEGER);
+        Number valor = ((Literal) expresion).getValorNumerico();
+        if (expresion.getTipo() == Tipo.INTEGER) {
+            return new Literal(-valor.intValue(), Tipo.INTEGER);
         } else {
-            String valorNegado = String.valueOf(Float.parseFloat(getExpresion().evaluar().toString()) * -1);
-            return new Literal(valorNegado, Tipo.FLOAT);
+            return new Literal(-valor.floatValue(), Tipo.FLOAT);
         }
     }
 }

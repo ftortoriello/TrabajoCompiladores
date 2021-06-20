@@ -33,9 +33,7 @@ public abstract class OperacionBinariaAritmetica extends OperacionBinaria {
             valorDer = ((Literal) derecha).getValorNumerico();
             if (esElementoNeutroDer(valorDer)) return izquierda;
             if (esElementoNuloDer(valorDer)) return new Literal(0, tipo);
-        }
-
-        if (!(derecha instanceof Literal)) {
+        } else {
             // El operando derecho no es constante; no se puede seguir evaluando
             return this;
         }
@@ -62,15 +60,18 @@ public abstract class OperacionBinariaAritmetica extends OperacionBinaria {
             valorIzq = ((Literal) subexprIzq).getValorNumerico();
             // Reemplazar el nodo izquierdo por el derecho del subárbol (el que NO tiene el literal)
             setIzquierda(subexprDer);
-            // Y hacer constant folding con el literal encontrado
-            return new Literal(calcularResultado(valorIzq, valorDer), tipo);
+            // Y hacer constant folding del lado derecho con el literal encontrado
+            setDerecha(new Literal(calcularResultado(valorIzq, valorDer), tipo));
+            return this;
         }
 
         // Hacer lo mismo con el hijo derecho
         if (subexprDer instanceof Literal) {
             valorIzq = ((Literal) subexprDer).getValorNumerico();
+            if (izquierda instanceof Resta) valorIzq = -valorIzq.floatValue();
             setIzquierda(subexprIzq);
-            return new Literal(calcularResultado(valorIzq, valorDer), tipo);
+            setDerecha(new Literal(calcularResultado(valorIzq, valorDer), tipo));
+            return this;
         }
 
         return this;
