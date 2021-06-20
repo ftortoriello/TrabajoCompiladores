@@ -30,14 +30,15 @@ import java.util.*;
 /* Clase para genera código de LLVM IR a partir del AST */
 
 public class GeneradorDeCodigo extends Visitor {
-    // TODO: conversiones implícitas
-
+    // Sobre «codigo» vamos anexando lo que va a ser el resultado final en IR
     private StringBuilder codigo;
+
     private String nombreArchivoFuente;
 
-    // Para imprimir o no los comentarios del recorrido, a veces molestan cuando se quiere ver el código
+    // Para imprimir o no los comentarios del recorrido.
     private Boolean comentariosOn;
 
+    // Tabla con las funciones definidas por el usuario. Se extrae del objeto Programa al entrar en esta clase
     private Map<String, SimboloFuncion> tablaFunciones;
 
     // Lista para guardar los nombres de las funciones que inicializan a las variables globales
@@ -112,7 +113,8 @@ public class GeneradorDeCodigo extends Visitor {
     /* Generar código con un comentarios alineados, si es posible */
     private void imprimirCodigo(String codigo, String comentario) {
         int cantEspacios = 70 - codigo.length();
-	if (cantEspacios < 1) cantEspacios = 1;
+
+        if (cantEspacios < 1) cantEspacios = 1;
 
         String espacios = " ".repeat(cantEspacios);
         imprimirCodigo(codigo + espacios + "; " + comentario);
@@ -133,6 +135,75 @@ public class GeneradorDeCodigo extends Visitor {
             codigo.append("\n");
             imprimirCodigo(String.format("; %s", comentario));
         }
+    }
+
+    /* Para tratar los casos de invocaciones a write */
+    private void imprimirWrite(InvocacionFuncion i) throws ExcepcionVisitor {
+
+        Expresion arg = i.getArgs().get(0);
+        // TODO las cadenas no tienen visitor, necesitamos uno o generar acá la ref a mano
+        arg.accept(this);
+        String refIR = arg.getRefIR();
+
+        String refTemp = Normalizador.crearNomRef("temp");
+
+        String nombreFun, argsFun, tipoPtro;
+
+        if (arg instanceof Cadena) {
+            // TODO
+            nombreFun = "@puts";
+            argsFun = "???"; // problema: @str
+            // STRING:  %temp = call i32 @puts(i8* getelementptr ([11 x i8], [11 x i8]* @str, i32 0, i32 0))
+        } else {
+            // Es un número
+            nombreFun = "@printf";
+            String tipoIR;
+            if (arg.getTipo() == Tipo.INTEGER) {
+                tipoPtro = "integer";
+                tipoIR = "i32";
+            } else {
+                // Es float
+                tipoPtro = "float";
+                tipoIR = "double";
+                String refExt = Normalizador.crearNomRef("trunc");
+
+                /* No lo terminé de entender, pero printf() castea los floats a double (porque
+                 * es una función "variadic"), entonces tengo que convertirlo antes de poder
+                 * usarlo, sino muestra 0.0000
+                 */
+                imprimirCodigo(String.format("%s = fpext float %s to double", refExt, refIR));
+                refIR = refExt;
+            }
+
+            argsFun = String.format("i8* getelementptr([4 x i8], [4 x i8]* @.%s, i32 0, i32 0), %s %s",
+                    tipoPtro, tipoIR, refIR);
+
+
+
+        }
+
+        imprimirCodigo(String.format("%s = call i32 (i8*, ...) %s(%s)", refTemp, nombreFun, argsFun));
+    }
+
+    /* Para tratar los casos de invocaciones a read */
+    private void imprimirRead(InvocacionFuncion i) {
+        // TODO
+
+        // enteros
+        /*
+        %dest = alloca i32
+        %temp = call i32 (i8*, ...) @scanf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @int_read_format, i64 0, i64 0), i32* %dest)
+        */
+        // float
+        /*
+        %dest = alloca float
+        %destaux = alloca double
+        %temp = call i32 (i8*, ...) @scanf(i8* getelementptr inbounds ([4 x i8], [4 x i8]*
+        @double_read_format, i64 0, i64 0), double* %dest_aux)
+        %temp_double = load double, double* %dest_aux
+        %temp_float = fptrunc double %temp_double to float :trucamos double a float
+        %dest = store float %temp_float, float* %dest
+        */
     }
 
     /* Devuelve una lista de parámetros de acuerdo a lo requerido por IR.
@@ -264,7 +335,6 @@ public class GeneradorDeCodigo extends Visitor {
     /**** Visitors ***/
 
     /* Base */
-
     @Override
     public void visit(Programa p) throws ExcepcionVisitor {
         codigo = new StringBuilder();
@@ -286,9 +356,13 @@ public class GeneradorDeCodigo extends Visitor {
             }
         }
 
-        codigo.append("\n")
+        codigo.append("\n\n")
               .append("declare i32 @puts(i8*)\n")
               .append("declare i32 @printf(i8*, ...)\n")
+              .append("declare i32 @scanf(i8*, ...)\n")
+              .append("\n")
+              .append("@int_read_format = unnamed_addr constant [3 x i8] c\"%d\\00\"\n")
+              .append("@double_read_format = unnamed_addr constant [4 x i8] c\"%lf\\00\"\n")
               .append("\n")
               .append("@.true = private constant[4 x i8] c\".T.\\00\"\n")
               .append("@.false = private constant[4 x i8] c\".F.\\00\"\n")
@@ -298,7 +372,7 @@ public class GeneradorDeCodigo extends Visitor {
 
         super.visit(p);
     }
-    
+
     @Override
     public void visit(Encabezado e) throws ExcepcionVisitor {
         super.visit(e);
@@ -472,7 +546,7 @@ public class GeneradorDeCodigo extends Visitor {
         df.getBloque().accept(this);
 
         if (!(df.getTieneRetorno())) {
-            // Para evitar comportamientos indefinidos, si la función no tiene retorno definido,
+            // Para evitar comportamientos indefinidos, si la función no tiene retorno,
             // le genero uno en base al valor por defecto asociado a su tipo.
             String valorPorDef = TIPO_IR.get(df.getTipo()).snd;
             imprimirCodigo(String.format("ret %s %s", funTipoRetIR, valorPorDef));
@@ -702,8 +776,6 @@ public class GeneradorDeCodigo extends Visitor {
         // Como alternativa a generar la variable, podríamos guardar directamente el valor
         // pero de esta manera queda más uniforme con la forma en la que hacemos lo otro.
 
-        // TODO ver acá el tema ese de truncar los valores
-
         String refIR = Normalizador.crearNomRef("lit");
         lit.setRefIR(refIR);
 
@@ -715,7 +787,9 @@ public class GeneradorDeCodigo extends Visitor {
         if (tipoParser == Tipo.INTEGER) {
             valorIR = valorParser;
         } else if (tipoParser == Tipo.FLOAT) {
-            valorIR = String.valueOf(valorParser);
+            // ??? De verdad que no se puede hacer más simple esto, cuando imprimo tengo que volver a convertirlo
+            double temp = Float.parseFloat(valorParser);
+            valorIR = Double.toString(temp);
         } else if (tipoParser == Tipo.BOOLEAN) {
             valorIR = valorParser.equals("false") ? "0" : "1";
         } else {
@@ -725,7 +799,9 @@ public class GeneradorDeCodigo extends Visitor {
         imprimirComent(String.format("visit(Literal): %s", valorParser));
 
         // Hack para generar referencias a valores en una línea (le sumo 0 al valor que quiero guardar)
-        imprimirCodigo(String.format("%s = add %s %s, 0", refIR, tipoIR, valorIR));
+        String valorNeutro = lit.getTipo() == Tipo.FLOAT ? "0.0" : "0";
+        String instSuma = lit.getTipo() == Tipo.FLOAT ? "fadd" : "add";
+        imprimirCodigo(String.format("%s = %s %s %s, %s", refIR, instSuma, tipoIR, valorIR, valorNeutro));
     }
 
     @Override
@@ -748,26 +824,34 @@ public class GeneradorDeCodigo extends Visitor {
 
     @Override
     public void visit(InvocacionFuncion i) throws ExcepcionVisitor {
-        // TODO los nombres de los argumentos tienen que ser locales
-        // o sea que si se pasa una variable global tiene generarse
-        // una referencia y pasarse esto como parámetro
+        imprimirComent(String.format("visitInvocacionFuncion: %s()", i.getNombre()));
 
-        if (i.getEsPredefinida()) {
-            // TODO write o read
-            // si las agregamos a la tabla de funciones, le asignamos un nombreIR y generamos la
-            // declaración dinámicamente como si fueran una fun. más podemos eliminar este if creo
-            imprimirCodigo(String.format("; %s()", i.getNombre()));
-            return;
-        }
-
-        SimboloFuncion sf = tablaFunciones.get(i.getNombre());
-
-        String refIR = Normalizador.crearNomRef("fun");
+        // El refIR que va a contener el valor de la invocación a la función
+        String refIR = Normalizador.crearNomRef("invo");
         i.setRefIR(refIR);
 
-        String tipoIR = TIPO_IR.get(sf.getTipo()).fst;
-        String nombreIR = sf.getNombreIR();
+        if (i.getEsPredefinida()) {
+            // Las funciones predefinidas (write, read) las manejamos aparte
+            if (i.getNombre().startsWith("write")) {
+                imprimirWrite(i);
+                return;
+            } else if (i.getNombre().startsWith("read")) {
+                imprimirRead(i);
+                return;
+            } else {
+                throw new ExcepcionVisitor("Nombre de función predefinida inesperado: " + i.getNombre());
+            }
+        }
+
+        // La función fue definida por el programador, la busco en la tabla
+        SimboloFuncion sf = tablaFunciones.get(i.getNombre());
+
+        String nombreFun = sf.getNombreIR();
+        String tipoFun = TIPO_IR.get(sf.getTipo()).fst;
+
+        // Generar la lista de argumentos, además de visitarlos para generar las refs.
         String args = grarStrArgs(i.getArgs());
-        imprimirCodigo(String.format("%s = call %s %s(%s)", refIR, tipoIR, nombreIR, args));
+
+        imprimirCodigo(String.format("%s = call %s %s(%s)", refIR, tipoFun, nombreFun, args));
     }
 }

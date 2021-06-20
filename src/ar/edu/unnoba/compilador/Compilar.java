@@ -158,6 +158,10 @@ public class Compilar {
             System.out.println("\nConvirtiendo el código IR en un programa ejecutable...");
             compilarExe(carpetaSalida + nombreArchivo);
 
+            // TODO no entrar acá si hubo un error al convertir
+            System.out.println("\nEjecutando el programa...");
+            Util.ejecutar("./" + carpetaSalida + nombreArchivo);
+
         } catch (ClassCastException e) {
             // Error sintáctico probablemente
             e.printStackTrace(System.out);

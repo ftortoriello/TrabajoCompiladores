@@ -13,9 +13,13 @@ public class FlotanteAEntero extends OperacionConversion {
     @Override
     public Expresion evaluar() throws ExcepcionTransformer {
         Expresion expr = getExpresion().evaluar();
-        if (expr instanceof Literal) {
-            expr =  new Literal(((Literal) expr).getValorNumerico().intValue(), Tipo.INTEGER);
+        if (!(expr instanceof Literal)) {
+            // TODO si no es literal se rompe
+            return this;
         }
-        return expr;
+
+        float nroOriginal = ((Literal) expr).getValorNumerico().floatValue();
+        Number nroConvertido = Math.round(nroOriginal);
+        return new Literal(nroConvertido, Tipo.INTEGER);
     }
 }

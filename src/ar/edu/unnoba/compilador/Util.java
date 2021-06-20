@@ -32,4 +32,11 @@ public class Util {
         proc.waitFor(); // esperar que finalice el proceso
         return proc.exitValue();
     }
+
+    /* Si hay solo un arg. (para no tener que crear el String[] cuando se invoca) */
+    public static void ejecutar(String cmd) throws IOException, InterruptedException {
+        ejecutar(new String[] {
+                cmd
+        });
+    }
 }
