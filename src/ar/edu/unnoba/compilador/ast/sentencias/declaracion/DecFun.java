@@ -3,8 +3,8 @@ package ar.edu.unnoba.compilador.ast.sentencias.declaracion;
 import ar.edu.unnoba.compilador.ast.base.Alcance;
 import ar.edu.unnoba.compilador.ast.base.Bloque;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
@@ -83,12 +83,12 @@ public class DecFun extends Declaracion {
     }
 
     @Override
-    public void accept(Visitor v) throws ExcepcionDeAlcance {
+    public void accept(Visitor v) throws ExcepcionVisitor {
         v.visit(this);
     }
 
     @Override
-    public DecFun accept(Transformer t) throws ExcepcionDeTipos {
+    public DecFun accept(Transformer t) throws ExcepcionTransformer {
         return t.transform(this);
     }
 

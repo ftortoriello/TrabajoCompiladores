@@ -17,7 +17,7 @@ Estado: :white_check_mark:, menos casos raros (00, 10variable, etc.) que tratamo
 Estado: :white_check_mark:
 
 ### Análisis sintáctico
-Estado: :white_check_mark:, pero hay cuestiones pendientes con los operadores (ver más abajo).
+Estado: :white_check_mark:
 
 #### Una expresión de selección
 * if: :white_check_mark:
@@ -59,11 +59,11 @@ Requisitos:
 Opcional: 
 * Conversiones implícitas de tipo: :white_check_mark:
 * Transformación de estruras when y for:  :white_check_mark: 
-* Constant folding: :white_check_mark:. Pero solo casos básicos (por ej. 1 + x + 2 no se simplifica).
-  
+* Constant folding: :white_check_mark:
+
 Más que opcional:
-* Constant folding más potente. 
 * Reemplazo de constantes por su valor.
+* Eliminación de asignaciones redundantes (ej: x = x).
 * Eliminación de las declaraciones de variables sin uso.
 * Código inaccesible.
 

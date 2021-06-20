@@ -11,4 +11,9 @@ public class Mayor extends Relacion {
     public String getInstruccionIR() {
         return getIzquierda().getTipo() == Tipo.INTEGER ? "sgt" : "ogt";
     }
+
+    @Override
+    protected boolean calcularResultado(Float litIzq, Float litDer) {
+        return litIzq > litDer;
+    }
 }

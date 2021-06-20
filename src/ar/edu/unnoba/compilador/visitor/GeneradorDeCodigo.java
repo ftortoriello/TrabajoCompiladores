@@ -2,7 +2,7 @@ package ar.edu.unnoba.compilador.visitor;
 
 import ar.edu.unnoba.compilador.Normalizador;
 import ar.edu.unnoba.compilador.ast.base.*;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
@@ -30,7 +30,6 @@ import java.util.*;
 /* Clase para genera código de LLVM IR a partir del AST */
 
 public class GeneradorDeCodigo extends Visitor {
-    // TODO: ver excepciones, las que van acá serían ExcepcionDeCompilacion (aunque hacen exactamente lo mismo)
     // TODO: conversiones implícitas
 
     private StringBuilder codigo;
@@ -158,7 +157,7 @@ public class GeneradorDeCodigo extends Visitor {
         return strParams.toString();
     }
 
-    private String grarStrArgs(List<Expresion> arrArgs) throws ExcepcionDeAlcance {
+    private String grarStrArgs(List<Expresion> arrArgs) throws ExcepcionVisitor {
         // Similar a grarStrParams, pero esta lista es utilizada por las invocaciones, o sea el
         // argumento puede ser una variable, un literal o una expresión más compleja, mientras
         // que en la declaración de la función eso va a ser siempre un objeto de tipo Param.
@@ -187,7 +186,7 @@ public class GeneradorDeCodigo extends Visitor {
 
     /*** Funciones auxiliares para generar el cortocircuito booleano ***/
 
-    private void imprimirCortocircuito(OperacionBinariaLogica ob) throws ExcepcionDeAlcance {
+    private void imprimirCortocircuito(OperacionBinariaLogica ob) throws ExcepcionVisitor {
         // TODO: NegacionLogica. Habría que ver acá si el lado izquierdo es not? E ignorarlo después?
 
         Pair<String, String> etiquetas = etiquetasOpBinLog.peek();
@@ -209,7 +208,7 @@ public class GeneradorDeCodigo extends Visitor {
             etiTmp = Normalizador.crearNomEtiqueta("or_falso");
             imprimirCodSaltoCond(expIzquierda.getRefIR(), etiVerdadero, etiTmp);
         } else {
-            throw new ExcepcionDeAlcance("Tipo de operación binaria lógica inesperado.");
+            throw new ExcepcionVisitor("Tipo de operación binaria lógica inesperado.");
         }
 
         imprimirEtiqueta(etiTmp);
@@ -227,7 +226,7 @@ public class GeneradorDeCodigo extends Visitor {
         etiquetasOpBinLog.push(new Pair<>(etiVerdadero, etiFalso));
     }
 
-    private void finalizarCortocircuitoAsig(String refIR, String nombreIR) throws ExcepcionDeAlcance {
+    private void finalizarCortocircuitoAsig(String refIR, String nombreIR) throws ExcepcionVisitor {
         // Obtener y desapilar las etiquetas de esta asignación
         Pair<String, String> parEtiquetas = etiquetasOpBinLog.pop();
 
@@ -253,7 +252,7 @@ public class GeneradorDeCodigo extends Visitor {
 
     /*** Función principal ***/
 
-    public String generarCodigo(Programa p, String nombreArchivoFuente, Boolean comentariosOn) throws ExcepcionDeAlcance {
+    public String generarCodigo(Programa p, String nombreArchivoFuente, Boolean comentariosOn) throws ExcepcionVisitor {
         this.nombreArchivoFuente = nombreArchivoFuente;
         tablaFunciones = p.getTablaFunciones();
         this.comentariosOn = comentariosOn;
@@ -267,7 +266,7 @@ public class GeneradorDeCodigo extends Visitor {
     /* Base */
 
     @Override
-    public void visit(Programa p) throws ExcepcionDeAlcance {
+    public void visit(Programa p) throws ExcepcionVisitor {
         codigo = new StringBuilder();
         codigo.append(String.format("; Programa: %s\n", p.getNombre()))
               .append(String.format("source_filename = \"%s\"\n", nombreArchivoFuente));
@@ -301,12 +300,12 @@ public class GeneradorDeCodigo extends Visitor {
     }
     
     @Override
-    public void visit(Encabezado e) throws ExcepcionDeAlcance {
+    public void visit(Encabezado e) throws ExcepcionVisitor {
         super.visit(e);
     }
 
     @Override
-    public void visit(Bloque b) throws ExcepcionDeAlcance {
+    public void visit(Bloque b) throws ExcepcionVisitor {
         if (b.esProgramaPrincipal()) {
             codigo.append("\ndefine i32 @main(i32, i8**) {\n");
             varGblInit.forEach(fun -> {
@@ -329,7 +328,7 @@ public class GeneradorDeCodigo extends Visitor {
      */
 
     @Override
-    public void visit(Asignacion asig) throws ExcepcionDeAlcance {
+    public void visit(Asignacion asig) throws ExcepcionVisitor {
         Expresion expr = asig.getExpresion();
         SimboloVariable svDestino = (SimboloVariable) asig.getIdent();
 
@@ -365,7 +364,7 @@ public class GeneradorDeCodigo extends Visitor {
     /* Sentencias de declaración */
 
     @Override
-    public void visit(DecVar dv) throws ExcepcionDeAlcance {
+    public void visit(DecVar dv) throws ExcepcionVisitor {
         // Genera la declaración de una variable que no fue inicializada
 
         SimboloVariable sv = (SimboloVariable) dv.getIdent();
@@ -387,7 +386,7 @@ public class GeneradorDeCodigo extends Visitor {
     }
 
     @Override
-    public void visit(DecVarIni dvi) throws ExcepcionDeAlcance {
+    public void visit(DecVarIni dvi) throws ExcepcionVisitor {
         // Genera la declaración de una variable que sí fue inicializada
 
         Expresion expr = dvi.getExpresion();
@@ -453,7 +452,7 @@ public class GeneradorDeCodigo extends Visitor {
     }
 
     @Override
-    public void visit(DecFun df) throws ExcepcionDeAlcance {
+    public void visit(DecFun df) throws ExcepcionVisitor {
         SimboloFuncion simboloFun = tablaFunciones.get(df.getNombre());
 
         // Elementos que necesito para definir la función: tipo de retorno, nombre, parámetros y el cuerpo
@@ -483,7 +482,7 @@ public class GeneradorDeCodigo extends Visitor {
     }
 
     @Override
-    public void visit(Param p) throws ExcepcionDeAlcance {
+    public void visit(Param p) throws ExcepcionVisitor {
         /* Para poder utilizar el parámetro creo una variable auxiliar,
          * para la cual genero un nombreIR y un refIR, que pisan al que
          * viene en el objeto SimboloVariable del parámetro. Después
@@ -511,7 +510,7 @@ public class GeneradorDeCodigo extends Visitor {
     }
 
     @Override
-    public void visit(ParamDef pi) throws ExcepcionDeAlcance {
+    public void visit(ParamDef pi) throws ExcepcionVisitor {
         // El valor del parámetro ya debería venir resuelto desde la invocación,
         // por lo que puedo llamar a visit(Param) directamente.
         visit((Param) pi);
@@ -521,7 +520,7 @@ public class GeneradorDeCodigo extends Visitor {
     /* Sentencias de selección */
 
     @Override
-    public void visit(SiEntonces se) throws ExcepcionDeAlcance {
+    public void visit(SiEntonces se) throws ExcepcionVisitor {
         String etiBlqThen = Normalizador.crearNomEtiqueta("blq_then");
         String etiFin = Normalizador.crearNomEtiqueta("fin_if");
         etiquetasOpBinLog.push(new Pair<>(etiBlqThen, etiFin));
@@ -545,7 +544,7 @@ public class GeneradorDeCodigo extends Visitor {
     }
 
     @Override
-    public void visit(SiEntoncesSino ses) throws ExcepcionDeAlcance {
+    public void visit(SiEntoncesSino ses) throws ExcepcionVisitor {
         String etiBlqThen = Normalizador.crearNomEtiqueta("blq_then");
         String etiBlqElse = Normalizador.crearNomEtiqueta("blq_else");
         String etiFin = Normalizador.crearNomEtiqueta("fin_if");
@@ -575,7 +574,7 @@ public class GeneradorDeCodigo extends Visitor {
     /* Sentencias de iteración */
 
     @Override
-    public void visit(Mientras m) throws ExcepcionDeAlcance {
+    public void visit(Mientras m) throws ExcepcionVisitor {
         String etiInicioWhile = Normalizador.crearNomEtiqueta("inicio_while");
         String etiBucleWhile = Normalizador.crearNomEtiqueta("bucle_while");
         String etiFinWhile = Normalizador.crearNomEtiqueta("fin_while");
@@ -620,12 +619,12 @@ public class GeneradorDeCodigo extends Visitor {
     /* Sentencias de control */
 
     @Override
-    public void visit(Continuar c) throws ExcepcionDeAlcance {
+    public void visit(Continuar c) throws ExcepcionVisitor {
         super.visit(c);
     }
 
     @Override
-    public void visit(Retorno r) throws ExcepcionDeAlcance {
+    public void visit(Retorno r) throws ExcepcionVisitor {
         Expresion expr = r.getExpresion();
 
         boolean aplicarCortocircuito = (expr instanceof OperacionBinariaLogica);
@@ -643,7 +642,7 @@ public class GeneradorDeCodigo extends Visitor {
     }
 
     @Override
-    public void visit(Salir s) throws ExcepcionDeAlcance {
+    public void visit(Salir s) throws ExcepcionVisitor {
         super.visit(s);
     }
 
@@ -651,7 +650,7 @@ public class GeneradorDeCodigo extends Visitor {
     /* Operaciones */
 
     @Override
-    public void visit(OperacionBinaria ob) throws ExcepcionDeAlcance {
+    public void visit(OperacionBinaria ob) throws ExcepcionVisitor {
         if (ob instanceof OperacionBinariaLogica) {
             // Manejar operaciones lógicas usando cortocircuito booleano.
             imprimirCortocircuito((OperacionBinariaLogica) ob);
@@ -685,12 +684,12 @@ public class GeneradorDeCodigo extends Visitor {
                                          refIR, tipoCmp, instIR, tipoIR, refIzqIR, refDerIR),
                            String.format("%s %s %s", refIzqIR, operadorParser, refDerIR));
         } else {
-            throw new ExcepcionDeAlcance("Tipo de operación binaria inesperado.");
+            throw new ExcepcionVisitor("Tipo de operación binaria inesperado.");
         }
     }
 
     @Override
-    public void visit(OperacionUnaria ou) throws ExcepcionDeAlcance {
+    public void visit(OperacionUnaria ou) throws ExcepcionVisitor {
         super.visit(ou);
     }
 
@@ -698,7 +697,7 @@ public class GeneradorDeCodigo extends Visitor {
     /* Valores */
 
     @Override
-    public void visit(Literal lit) throws ExcepcionDeAlcance {
+    public void visit(Literal lit) throws ExcepcionVisitor {
         // Este visitor genere una variable auxiliar para utilizar los valores literales
         // Como alternativa a generar la variable, podríamos guardar directamente el valor
         // pero de esta manera queda más uniforme con la forma en la que hacemos lo otro.
@@ -720,7 +719,7 @@ public class GeneradorDeCodigo extends Visitor {
         } else if (tipoParser == Tipo.BOOLEAN) {
             valorIR = valorParser.equals("false") ? "0" : "1";
         } else {
-            throw new ExcepcionDeAlcance("Valor de tipo inesperado: " + lit.getTipo());
+            throw new ExcepcionVisitor("Valor de tipo inesperado: " + lit.getTipo());
         }
 
         imprimirComent(String.format("visit(Literal): %s", valorParser));
@@ -748,7 +747,7 @@ public class GeneradorDeCodigo extends Visitor {
     }
 
     @Override
-    public void visit(InvocacionFuncion i) throws ExcepcionDeAlcance {
+    public void visit(InvocacionFuncion i) throws ExcepcionVisitor {
         // TODO los nombres de los argumentos tienen que ser locales
         // o sea que si se pasa una variable global tiene generarse
         // una referencia y pasarse esto como parámetro

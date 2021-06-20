@@ -1,8 +1,8 @@
 package ar.edu.unnoba.compilador.ast.expresiones;
 
 import ar.edu.unnoba.compilador.ast.base.Nodo;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
@@ -49,13 +49,13 @@ public abstract class Expresion extends Nodo {
     }
 
     @Override
-    public void accept(Visitor v) throws ExcepcionDeAlcance {
+    public void accept(Visitor v) throws ExcepcionVisitor {
     }
 
     @Override
-    public Expresion accept(Transformer t) throws ExcepcionDeTipos {
+    public Expresion accept(Transformer t) throws ExcepcionTransformer {
         return null;
     }
 
-    public abstract Expresion evaluar();
+    public abstract Expresion evaluar() throws ExcepcionTransformer;
 }

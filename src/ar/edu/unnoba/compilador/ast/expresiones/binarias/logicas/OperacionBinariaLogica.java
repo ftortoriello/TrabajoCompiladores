@@ -1,5 +1,6 @@
 package ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas;
 
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
@@ -12,17 +13,24 @@ public abstract class OperacionBinariaLogica extends OperacionBinaria {
     }
 
     @Override
-    public Expresion evaluar() {
-        if (!(getIzquierda().evaluar() instanceof Literal) || !(getDerecha().evaluar() instanceof Literal)) {
-            return this;
+    public Expresion evaluar() throws ExcepcionTransformer {
+        final Tipo tipo = Tipo.BOOLEAN;
+        Expresion izquierda = getIzquierda().evaluar();
+        Expresion derecha = getDerecha().evaluar();
+
+        if (izquierda instanceof Literal) {
+            // Si el valor determina a la expresión (ej: true and...), retornar un nuevo literal.
+            // Si no, es neutro (ej: or and...). En ese caso, retornar el otro operando.
+            return transformarResultado(((Literal) izquierda).getValorBooleano(), derecha);
         }
 
-        boolean litIzq = Boolean.parseBoolean(((Literal) getIzquierda().evaluar()).getValor());
-        boolean litDer = Boolean.parseBoolean(((Literal) getDerecha().evaluar()).getValor());
-        boolean resultado = calcularResultado(litIzq, litDer);
+        if (derecha instanceof Literal) {
+            return transformarResultado(((Literal) derecha).getValorBooleano(), izquierda);
+        }
 
-        return new Literal(String.valueOf(resultado), Tipo.BOOLEAN, "Literal BOOLEAN");
+        // Ningún operando es literal
+        return this;
     }
 
-    protected abstract Boolean calcularResultado(Boolean litIzq, Boolean litDer);
+    protected abstract Expresion transformarResultado(boolean valor, Expresion otroOperando);
 }

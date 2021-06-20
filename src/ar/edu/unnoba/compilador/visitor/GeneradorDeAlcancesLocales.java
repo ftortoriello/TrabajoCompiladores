@@ -2,7 +2,7 @@ package ar.edu.unnoba.compilador.visitor;
 
 import ar.edu.unnoba.compilador.Normalizador;
 import ar.edu.unnoba.compilador.ast.base.*;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.*;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
 
@@ -17,7 +17,7 @@ public class GeneradorDeAlcancesLocales extends Visitor {
     private Map<String, SimboloFuncion> tablaFunciones;
 
     // Agregar la declaración al ámbito en el que se encuentra
-    private void agregarSimbolo(Declaracion d) throws ExcepcionDeAlcance {
+    private void agregarSimbolo(Declaracion d) throws ExcepcionVisitor {
         if (alcanceGlobal == alcanceActual) {
             // Este Visitor sólo agrega símbolos locales, los globales ya los agregó el visitor
             // de alcance global
@@ -31,7 +31,7 @@ public class GeneradorDeAlcancesLocales extends Visitor {
         // Dar error si ya existía un símbolo con este nombre en este ámbito o
         // en los ámbitos superiores.
         if (alcanceActual.containsKey(nombre)) {
-            throw new ExcepcionDeAlcance(
+            throw new ExcepcionVisitor(
                     String.format("La variable local «%s» de tipo %s ya fue declarada previamente con tipo %s.",
                             nombre, id.getTipo(),
                             alcanceActual.get(nombre).getTipo()));
@@ -54,7 +54,7 @@ public class GeneradorDeAlcancesLocales extends Visitor {
 
 
     @Override
-    public void visit(Programa p) throws ExcepcionDeAlcance {
+    public void visit(Programa p) throws ExcepcionVisitor {
         // Comenzar con alcance global para el encabezado.
         // Ya tiene el alcance establecido por el Visitor de alcance global.
         alcanceGlobal = alcanceActual = p.getAlcance();
@@ -64,7 +64,7 @@ public class GeneradorDeAlcancesLocales extends Visitor {
     }
 
     @Override
-    public void visit(Bloque b) throws ExcepcionDeAlcance {
+    public void visit(Bloque b) throws ExcepcionVisitor {
         // Establecer el alcance de cada bloque.
         // Crearlo como hijo del alcance actual
         alcanceActual = new Alcance(String.format("%d-%s", getID(), b.getNombre()), alcanceActual);
@@ -78,7 +78,7 @@ public class GeneradorDeAlcancesLocales extends Visitor {
     }
 
     @Override
-    public void visit(DecFun df) throws ExcepcionDeAlcance {
+    public void visit(DecFun df) throws ExcepcionVisitor {
         // Generar un alcance nuevo para los parámetros
         alcanceActual = new Alcance(String.format("%d-%s", getID(), df.getNombre()), alcanceActual);
         df.setAlcance(alcanceActual);
@@ -86,39 +86,39 @@ public class GeneradorDeAlcancesLocales extends Visitor {
         alcanceActual = alcanceActual.getPadre();
     }
 
-    public void visit(Param p) throws ExcepcionDeAlcance {
+    public void visit(Param p) throws ExcepcionVisitor {
         agregarSimbolo(p);
         super.visit(p);
     }
 
     @Override
-    public void visit(ParamDef pd) throws ExcepcionDeAlcance {
+    public void visit(ParamDef pd) throws ExcepcionVisitor {
         agregarSimbolo(pd);
         super.visit(pd);
     }
 
     @Override
-    public void visit(DecVar dv) throws ExcepcionDeAlcance {
+    public void visit(DecVar dv) throws ExcepcionVisitor {
         agregarSimbolo(dv);
         super.visit(dv);
     }
 
     @Override
-    public void visit(DecVarIni dvi) throws ExcepcionDeAlcance {
+    public void visit(DecVarIni dvi) throws ExcepcionVisitor {
         agregarSimbolo(dvi);
         super.visit(dvi);
     }
 
     @Override
-    public void visit(Identificador i) throws ExcepcionDeAlcance {
+    public void visit(Identificador i) throws ExcepcionVisitor {
         if (!estaEnElAlcance(i)) {
-            throw new ExcepcionDeAlcance(String.format("No se declaró la variable «%s»", i.getNombre()));
+            throw new ExcepcionVisitor(String.format("No se declaró la variable «%s»", i.getNombre()));
         }
         super.visit(i);
     }
 
     @Override
-    public void visit(InvocacionFuncion i) throws ExcepcionDeAlcance {
+    public void visit(InvocacionFuncion i) throws ExcepcionVisitor {
         // Si es predefinida ya está limitado por el parser, no es necesario realizar estas validaciones
         if (i.getEsPredefinida()) {
             super.visit(i);
@@ -127,7 +127,7 @@ public class GeneradorDeAlcancesLocales extends Visitor {
 
         // Validar definición contra la tabla de funciones
         if (!estaEnElAlcance(i)) {
-            throw new ExcepcionDeAlcance(String.format("La función «%s» no está definida", i.getNombre()));
+            throw new ExcepcionVisitor(String.format("La función «%s» no está definida", i.getNombre()));
         }
 
         // Validar que la cantidad de argumentos pasados sea por lo menos la cantidad obligaria,
@@ -138,7 +138,7 @@ public class GeneradorDeAlcancesLocales extends Visitor {
         int cantMinArgs = decFun.getCantArgsObligatorios();
         int cantMaxArgs = decFun.getParams().size();
         if (cantArgsInvo < cantMinArgs || cantArgsInvo > cantMaxArgs) {
-            throw new ExcepcionDeAlcance(String.format(
+            throw new ExcepcionVisitor(String.format(
                     "La función «%s» fue invocada con %d " + (cantArgsInvo == 1 ? "parámetro" : "parámetros") +
                             ", cuando requiere " + (cantMinArgs == cantMaxArgs ? "%d" : "entre %d y %d") + ".",
                     decFun.getNombre(), cantArgsInvo, cantMinArgs, cantMaxArgs));

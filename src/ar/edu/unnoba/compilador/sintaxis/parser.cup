@@ -482,17 +482,17 @@ factor ::=
 
 literal ::=
         LIT_ENTERO:litInt {:
-            Literal lit = new Literal(litInt, Tipo.INTEGER, "Literal INTEGER");
+            Literal lit = new Literal(litInt, Tipo.INTEGER);
             imprimirEtiqueta(lit);
             RESULT = lit;
         :} |
         LIT_FLOTANTE:litFloat {:
-            Literal lit = new Literal(litFloat, Tipo.FLOAT, "Literal FLOAT");
+            Literal lit = new Literal(litFloat, Tipo.FLOAT);
             imprimirEtiqueta(lit);
             RESULT = lit;
         :} |
         LIT_BOOLEANO:litBoolean {:
-            Literal lit = new Literal(litBoolean, Tipo.BOOLEAN, "Literal BOOLEAN");
+            Literal lit = new Literal(litBoolean, Tipo.BOOLEAN);
             imprimirEtiqueta(lit);
             RESULT = lit;
         :};

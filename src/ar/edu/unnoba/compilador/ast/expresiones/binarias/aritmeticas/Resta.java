@@ -14,7 +14,25 @@ public class Resta extends OperacionBinariaAritmetica {
     }
 
     @Override
-    protected Float calcularResultado(Float fIzq, Float fDer) {
-        return fIzq - fDer;
+    protected Number calcularResultado(Number izq, Number der) {
+        return izq.floatValue() - der.floatValue();
+    }
+
+    @Override
+    protected boolean esElementoNeutroIzq(Number numero) {
+        return numero.equals(0);
+    }
+    @Override
+    protected boolean esElementoNeutroDer(Number numero) {
+        return numero.equals(0);
+    }
+
+    @Override
+    protected boolean esElementoNuloIzq(Number numero) {
+        return false;
+    }
+    @Override
+    protected boolean esElementoNuloDer(Number numero) {
+        return false;
     }
 }

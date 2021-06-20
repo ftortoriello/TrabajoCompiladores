@@ -11,4 +11,9 @@ public class Menor extends Relacion {
     public String getInstruccionIR() {
         return getIzquierda().getTipo() == Tipo.INTEGER ? "slt" : "olt";
     }
+
+    @Override
+    protected boolean calcularResultado(Float litIzq, Float litDer) {
+        return litIzq < litDer;
+    }
 }

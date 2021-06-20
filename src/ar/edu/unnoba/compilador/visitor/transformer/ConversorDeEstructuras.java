@@ -4,7 +4,7 @@ import ar.edu.unnoba.compilador.Normalizador;
 import ar.edu.unnoba.compilador.ast.base.Alcance;
 import ar.edu.unnoba.compilador.ast.base.Bloque;
 import ar.edu.unnoba.compilador.ast.base.Nodo;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Suma;
@@ -33,7 +33,7 @@ public class ConversorDeEstructuras extends Transformer {
     // setear el padre de los alcances, setear los tipos y creo que nada más.
 
     @Override
-    public Bloque transform(Para p) throws ExcepcionDeTipos {
+    public Bloque transform(Para p) throws ExcepcionTransformer {
         p = (Para) super.transform(p);
 
         // bloqueNuevo va a contener el while equivalente al for
@@ -72,7 +72,7 @@ public class ConversorDeEstructuras extends Transformer {
     }
 
     @Override
-    public Bloque transform(Cuando c) throws ExcepcionDeTipos {
+    public Bloque transform(Cuando c) throws ExcepcionTransformer {
         c = (Cuando) super.transform(c);
 
         // El bloque que va a contener la estructura equivalente al when

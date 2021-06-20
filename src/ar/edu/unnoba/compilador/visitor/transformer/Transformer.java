@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ar.edu.unnoba.compilador.ast.base.*;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
@@ -41,19 +41,19 @@ public abstract class Transformer {
     }
 
 
-    public Programa procesar(Programa p) throws ExcepcionDeTipos {
+    public Programa procesar(Programa p) throws ExcepcionTransformer {
         return p.accept(this);
     }
 
     // Transforms base
 
-    public Programa transform(Programa p) throws ExcepcionDeTipos {
+    public Programa transform(Programa p) throws ExcepcionTransformer {
         p.setEncabezado(p.getEncabezado().accept(this));
         p.setCuerpo(p.getCuerpo().accept(this));
         return p;
     }
 
-    public Encabezado transform(Encabezado e) throws ExcepcionDeTipos {
+    public Encabezado transform(Encabezado e) throws ExcepcionTransformer {
         List<Declaracion> declaraciones = new ArrayList<>();
         for (Declaracion d : e.getDeclaraciones()) {
             declaraciones.add((Declaracion) d.accept(this));
@@ -62,7 +62,7 @@ public abstract class Transformer {
         return e;
     }
 
-    public Bloque transform(Bloque b) throws ExcepcionDeTipos {
+    public Bloque transform(Bloque b) throws ExcepcionTransformer {
         List<Nodo> sentencias = new ArrayList<>();
         for (Nodo sentencia : b.getSentencias()) {
             sentencias.add(sentencia.accept(this));
@@ -71,7 +71,7 @@ public abstract class Transformer {
         return b;
     }
 
-    public Sentencia transform(CasoCuando cc) throws ExcepcionDeTipos {
+    public Sentencia transform(CasoCuando cc) throws ExcepcionTransformer {
         cc.setExpr(cc.getExpresion().accept(this));
         cc.setBloque(cc.getBloque().accept(this));
         return cc;
@@ -81,11 +81,11 @@ public abstract class Transformer {
         return c;
     }
 
-    public Identificador transform(Identificador i) throws ExcepcionDeTipos {
+    public Identificador transform(Identificador i) throws ExcepcionTransformer {
         return i;
     }
 
-    public InvocacionFuncion transform(InvocacionFuncion invo) throws ExcepcionDeTipos {
+    public InvocacionFuncion transform(InvocacionFuncion invo) throws ExcepcionTransformer {
         List<Expresion> argumentos = new ArrayList<>();
         for (Expresion argumento : invo.getArgs()) {
             argumentos.add(argumento.accept(this));
@@ -97,64 +97,64 @@ public abstract class Transformer {
 
     // Transforms de operaciones
 
-    public FlotanteAEntero transform(FlotanteAEntero fae) throws ExcepcionDeTipos {
+    public FlotanteAEntero transform(FlotanteAEntero fae) throws ExcepcionTransformer {
         fae.setExpresion(fae.getExpresion().accept(this));
         return fae;
     }
 
-    public EnteroAFlotante transform(EnteroAFlotante eaf) throws ExcepcionDeTipos {
+    public EnteroAFlotante transform(EnteroAFlotante eaf) throws ExcepcionTransformer {
         eaf.setExpresion(eaf.getExpresion().accept(this));
         return eaf;
     }
 
-    public Expresion transform(OperacionBinaria ob) throws ExcepcionDeTipos {
+    public Expresion transform(OperacionBinaria ob) throws ExcepcionTransformer {
         ob.setIzquierda(ob.getIzquierda().accept(this));
         ob.setDerecha(ob.getDerecha().accept(this));
         return ob;
     }
 
-    public Expresion transform(Relacion r) throws ExcepcionDeTipos {
+    public Expresion transform(Relacion r) throws ExcepcionTransformer {
         r.setIzquierda(r.getIzquierda().accept(this));
         r.setDerecha(r.getDerecha().accept(this));
         return r;
     }
 
-    public Expresion transform(OperacionUnaria ou) throws ExcepcionDeTipos {
+    public Expresion transform(OperacionUnaria ou) throws ExcepcionTransformer {
         ou.setExpresion(ou.getExpresion().accept(this));
         return ou;
     }
 
     // Transforms de sentencias
 
-    public Asignacion transform(Asignacion a) throws ExcepcionDeTipos {
+    public Asignacion transform(Asignacion a) throws ExcepcionTransformer {
         a.setIdent(a.getIdent().accept(this));
         a.setExpresion(a.getExpresion().accept(this));
         return a;
     }
 
-    public DecVar transform(DecVar dv) throws ExcepcionDeTipos {
+    public DecVar transform(DecVar dv) throws ExcepcionTransformer {
         dv.setIdent(dv.getIdent().accept(this));
         return dv;
     }
 
-    public DecVarIni transform(DecVarIni dvi) throws ExcepcionDeTipos {
+    public DecVarIni transform(DecVarIni dvi) throws ExcepcionTransformer {
         dvi.setIdent(dvi.getIdent().accept(this));
         dvi.setExpresion(dvi.getExpresion().accept(this));
         return dvi;
     }
 
-    public Param transform(Param p) throws ExcepcionDeTipos {
+    public Param transform(Param p) throws ExcepcionTransformer {
         p.setIdent(p.getIdent().accept(this));
         return p;
     }
 
-    public ParamDef transform(ParamDef pi) throws ExcepcionDeTipos {
+    public ParamDef transform(ParamDef pi) throws ExcepcionTransformer {
         pi.setIdent(pi.getIdent().accept(this));
         pi.setExpresion(pi.getExpresion().accept(this));
         return pi;
     }
 
-    public DecFun transform(DecFun df) throws ExcepcionDeTipos {
+    public DecFun transform(DecFun df) throws ExcepcionTransformer {
         setUltFunVisitada(df);
 
         ArrayList<Param> params = new ArrayList<>();
@@ -167,20 +167,20 @@ public abstract class Transformer {
         return df;
     }
 
-    public SiEntonces transform(SiEntonces se) throws ExcepcionDeTipos {
+    public SiEntonces transform(SiEntonces se) throws ExcepcionTransformer {
         se.setCondicion(se.getCondicion().accept(this));
         se.setBloqueSiEntonces(se.getBloqueSiEntonces().accept(this));
         return se;
     }
 
-    public SiEntoncesSino transform(SiEntoncesSino ses) throws ExcepcionDeTipos {
+    public SiEntoncesSino transform(SiEntoncesSino ses) throws ExcepcionTransformer {
         ses.setCondicion(ses.getCondicion().accept(this));
         ses.setBloqueSiEntonces(ses.getBloqueSiEntonces().accept(this));
         ses.setBloqueSino(ses.getBloqueSino().accept(this));
         return ses;
     }
 
-    public Nodo transform(Cuando c) throws ExcepcionDeTipos {
+    public Nodo transform(Cuando c) throws ExcepcionTransformer {
         c.setCondicion(c.getCondicion().accept(this));
 
         List<CasoCuando> casosCuando = new ArrayList<>();
@@ -193,28 +193,28 @@ public abstract class Transformer {
         return c;
     }
 
-    public Mientras transform(Mientras m) throws ExcepcionDeTipos {
+    public Mientras transform(Mientras m) throws ExcepcionTransformer {
         m.setCondicion(m.getCondicion().accept(this));
         m.setBloqueSentencias(m.getBloqueSentencias().accept(this));
         return m;
     }
 
-    public Nodo transform(Para p) throws ExcepcionDeTipos {
+    public Nodo transform(Para p) throws ExcepcionTransformer {
         p.setIdent(p.getIdent().accept(this));
         p.setBloqueSentencias(p.getBloqueSentencias().accept(this));
         return p;
     }
 
-    public Retorno transform(Retorno r) throws ExcepcionDeTipos {
+    public Retorno transform(Retorno r) throws ExcepcionTransformer {
         r.setExpr(r.getExpresion().accept(this));
         return r;
     }
 
-    public Salir transform(Salir s) throws ExcepcionDeTipos {
+    public Salir transform(Salir s) throws ExcepcionTransformer {
         return s;
     }
 
-    public Continuar transform(Continuar c) throws ExcepcionDeTipos {
+    public Continuar transform(Continuar c) throws ExcepcionTransformer {
         return c;
     }
 }

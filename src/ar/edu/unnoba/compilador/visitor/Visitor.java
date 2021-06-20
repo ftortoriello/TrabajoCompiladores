@@ -1,7 +1,7 @@
 package ar.edu.unnoba.compilador.visitor;
 
 import ar.edu.unnoba.compilador.ast.base.*;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.*;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.*;
@@ -51,25 +51,25 @@ public abstract class Visitor {
 
 
     /*** Inicio del Visitor ***/
-    public void procesar(Programa p) throws ExcepcionDeAlcance {
+    public void procesar(Programa p) throws ExcepcionVisitor {
         p.accept(this);
     }
 
 
     /* Base */
 
-    public void visit(Programa p) throws ExcepcionDeAlcance {
+    public void visit(Programa p) throws ExcepcionVisitor {
         p.getEncabezado().accept(this);
         p.getCuerpo().accept(this);
     }
 
-    public void visit(Encabezado e) throws ExcepcionDeAlcance {
+    public void visit(Encabezado e) throws ExcepcionVisitor {
         for (Declaracion d : e.getDeclaraciones()) {
             d.accept(this);
         }
     }
 
-    public void visit(Bloque b) throws ExcepcionDeAlcance {
+    public void visit(Bloque b) throws ExcepcionVisitor {
         for (Nodo sentencia : b.getSentencias()) {
             sentencia.accept(this);
         }
@@ -78,7 +78,7 @@ public abstract class Visitor {
 
     /* Sentencia de asignación */
 
-    public void visit(Asignacion a) throws ExcepcionDeAlcance {
+    public void visit(Asignacion a) throws ExcepcionVisitor {
         a.getIdent().accept(this);
         a.getExpresion().accept(this);
     }
@@ -86,16 +86,16 @@ public abstract class Visitor {
 
     /* Sentencias de declaración */
 
-    public void visit(DecVar dv) throws ExcepcionDeAlcance {
+    public void visit(DecVar dv) throws ExcepcionVisitor {
         dv.getIdent().accept(this);
     }
 
-    public void visit(DecVarIni dvi) throws ExcepcionDeAlcance {
+    public void visit(DecVarIni dvi) throws ExcepcionVisitor {
         dvi.getIdent().accept(this);
         dvi.getExpresion().accept(this);
     }
 
-    public void visit(DecFun df) throws ExcepcionDeAlcance {
+    public void visit(DecFun df) throws ExcepcionVisitor {
         setEnFuncion(true);
         for (Param p : df.getParams()) {
             p.accept(this);
@@ -104,11 +104,11 @@ public abstract class Visitor {
         setEnFuncion(false);
     }
 
-    public void visit(Param p) throws ExcepcionDeAlcance {
+    public void visit(Param p) throws ExcepcionVisitor {
         p.getIdent().accept(this);
     }
 
-    public void visit(ParamDef pd) throws ExcepcionDeAlcance {
+    public void visit(ParamDef pd) throws ExcepcionVisitor {
         pd.getIdent().accept(this);
         pd.getExpresion().accept(this);
     }
@@ -116,18 +116,18 @@ public abstract class Visitor {
 
     /* Sentencias de selección */
 
-    public void visit(SiEntonces se) throws ExcepcionDeAlcance {
+    public void visit(SiEntonces se) throws ExcepcionVisitor {
         se.getCondicion().accept(this);
         se.getBloqueSiEntonces().accept(this);
     }
 
-    public void visit(SiEntoncesSino ses) throws ExcepcionDeAlcance {
+    public void visit(SiEntoncesSino ses) throws ExcepcionVisitor {
         ses.getCondicion().accept(this);
         ses.getBloqueSiEntonces().accept(this);
         ses.getBloqueSino().accept(this);
     }
 
-    public void visit(Cuando c) throws ExcepcionDeAlcance {
+    public void visit(Cuando c) throws ExcepcionVisitor {
         c.getCondicion().accept(this);
         for (CasoCuando caso : c.getCasos()) {
             caso.accept(this);
@@ -135,7 +135,7 @@ public abstract class Visitor {
         c.getBloqueElse().accept(this);
     }
 
-    public void visit(CasoCuando cc) throws ExcepcionDeAlcance {
+    public void visit(CasoCuando cc) throws ExcepcionVisitor {
         cc.getExpresion().accept(this);
         cc.getBloque().accept(this);
     }
@@ -143,14 +143,14 @@ public abstract class Visitor {
 
     /* Sentencias de iteración */
 
-    public void visit(Mientras m) throws ExcepcionDeAlcance {
+    public void visit(Mientras m) throws ExcepcionVisitor {
         setEnBucle(true);
         m.getCondicion().accept(this);
         m.getBloqueSentencias().accept(this);
         setEnBucle(false);
     }
 
-    public void visit(Para p) throws ExcepcionDeAlcance {
+    public void visit(Para p) throws ExcepcionVisitor {
         setEnBucle(true);
         p.getIdent().accept(this);
         p.getBloqueSentencias().accept(this);
@@ -160,38 +160,38 @@ public abstract class Visitor {
 
     /* Sentencias de control */
 
-    public void visit(Retorno r) throws ExcepcionDeAlcance {
+    public void visit(Retorno r) throws ExcepcionVisitor {
         r.getExpresion().accept(this);
     }
 
-    public void visit(Continuar c) throws ExcepcionDeAlcance {
+    public void visit(Continuar c) throws ExcepcionVisitor {
     }
 
-    public void visit(Salir s) throws ExcepcionDeAlcance {
+    public void visit(Salir s) throws ExcepcionVisitor {
     }
 
 
     /* Operaciones */
 
-    public void visit(OperacionBinaria ob) throws ExcepcionDeAlcance {
+    public void visit(OperacionBinaria ob) throws ExcepcionVisitor {
         ob.getIzquierda().accept(this);
         ob.getDerecha().accept(this);
     }
 
-    public void visit(OperacionUnaria ou) throws ExcepcionDeAlcance {
+    public void visit(OperacionUnaria ou) throws ExcepcionVisitor {
         ou.getExpresion().accept(this);
     }
 
 
     /* Valores */
 
-    public void visit(Literal l) throws ExcepcionDeAlcance {
+    public void visit(Literal l) throws ExcepcionVisitor {
     }
 
-    public void visit(Identificador i) throws ExcepcionDeAlcance {
+    public void visit(Identificador i) throws ExcepcionVisitor {
     }
 
-    public void visit(InvocacionFuncion i) throws ExcepcionDeAlcance {
+    public void visit(InvocacionFuncion i) throws ExcepcionVisitor {
         for (Expresion argumento : i.getArgs()) {
             argumento.accept(this);
         }

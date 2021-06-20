@@ -1,7 +1,7 @@
 package ar.edu.unnoba.compilador;
 
 import ar.edu.unnoba.compilador.ast.base.Programa;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.lexico.Lexer;
 import ar.edu.unnoba.compilador.sintaxis.Parser;
 import ar.edu.unnoba.compilador.visitor.*;
@@ -17,7 +17,7 @@ import java.nio.file.Paths;
 /* Clase principal que realiza todos los pasos para convertir código fuente en un ejecutable */
 
 public class Compilar {
-    private static void graficarArbol(Programa programa, String nombreArchivo, String etiqueta) throws IOException, InterruptedException, ExcepcionDeAlcance {
+    private static void graficarArbol(Programa programa, String nombreArchivo, String etiqueta) throws IOException, InterruptedException, ExcepcionVisitor {
         final String formatoImg = "png";
         //final String formatoImg = "svg";
 
@@ -39,7 +39,7 @@ public class Compilar {
     }
 
     private static void generarCodigoIR(Programa p, String archivoEntrada, String archivoSalida)
-            throws IOException, ExcepcionDeAlcance {
+            throws IOException, ExcepcionVisitor {
         PrintWriter pw = new PrintWriter(new FileWriter(archivoSalida));
         pw.println(new GeneradorDeCodigo().generarCodigo(p, archivoEntrada, true));
         pw.close();

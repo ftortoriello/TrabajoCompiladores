@@ -3,7 +3,7 @@ package ar.edu.unnoba.compilador.visitor.transformer;
 import ar.edu.unnoba.compilador.ast.base.Alcance;
 import ar.edu.unnoba.compilador.ast.base.Bloque;
 import ar.edu.unnoba.compilador.ast.base.Programa;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
@@ -33,7 +33,7 @@ public class TransformerTipos extends Transformer {
 
     // Métodos auxiliares
 
-    private static Tipo getTipoEnComun(Tipo tipo1, Tipo tipo2) throws ExcepcionDeTipos {
+    private static Tipo getTipoEnComun(Tipo tipo1, Tipo tipo2) throws ExcepcionTransformer {
         if (tipo1 == tipo2) {
             return tipo1;
         }
@@ -43,11 +43,11 @@ public class TransformerTipos extends Transformer {
         if (tipo1 == Tipo.FLOAT && tipo2 == Tipo.INTEGER) {
             return tipo1;
         }
-        throw new ExcepcionDeTipos(
+        throw new ExcepcionTransformer(
                 String.format("No existe un tipo común entre %s y %s", tipo1, tipo2));
     }
 
-    private static Expresion convertirATipo(Expresion expresion, Tipo tipoDestino) throws ExcepcionDeTipos {
+    private static Expresion convertirATipo(Expresion expresion, Tipo tipoDestino) throws ExcepcionTransformer {
         Tipo tipoOrigen = expresion.getTipo();
         if (tipoOrigen == tipoDestino) {
             return expresion;
@@ -60,7 +60,7 @@ public class TransformerTipos extends Transformer {
             System.out.println(String.format("Advertencia: convirtiendo «%s» de float a integer", expresion));
             return new FlotanteAEntero(expresion);
         }
-        throw new ExcepcionDeTipos(
+        throw new ExcepcionTransformer(
                 String.format("No existe un tipo común entre %s y %s", tipoOrigen, tipoDestino));
     }
 
@@ -94,7 +94,7 @@ public class TransformerTipos extends Transformer {
     }
 
     // Retorna el tipo en común
-    private static Tipo transformOperacionBinaria(OperacionBinaria ob) throws ExcepcionDeTipos {
+    private static Tipo transformOperacionBinaria(OperacionBinaria ob) throws ExcepcionTransformer {
         Expresion expIzquierda = ob.getIzquierda();
         Expresion expDerecha = ob.getDerecha();
 
@@ -111,7 +111,7 @@ public class TransformerTipos extends Transformer {
     // Transforms
 
     @Override
-    public Programa transform(Programa p) throws ExcepcionDeTipos {
+    public Programa transform(Programa p) throws ExcepcionTransformer {
         alcanceActual = p.getAlcance();
         tablaFunciones = p.getTablaFunciones();
         p = super.transform(p);
@@ -120,14 +120,14 @@ public class TransformerTipos extends Transformer {
     }
 
     @Override
-    public DecVarIni transform(DecVarIni dvi) throws ExcepcionDeTipos {
+    public DecVarIni transform(DecVarIni dvi) throws ExcepcionTransformer {
         dvi = super.transform(dvi);
         dvi.setExpresion(convertirATipo(dvi.getExpresion(), dvi.getIdent().getTipo()));
         return dvi;
     }
 
     @Override
-    public DecFun transform(DecFun df) throws ExcepcionDeTipos {
+    public DecFun transform(DecFun df) throws ExcepcionTransformer {
         alcanceActual = df.getAlcance();
         df = super.transform(df);
         alcanceActual = alcanceActual.getPadre();
@@ -135,7 +135,7 @@ public class TransformerTipos extends Transformer {
     }
 
     @Override
-    public Bloque transform(Bloque b) throws ExcepcionDeTipos {
+    public Bloque transform(Bloque b) throws ExcepcionTransformer {
         alcanceActual = b.getAlcance();
         b = super.transform(b);
         alcanceActual = alcanceActual.getPadre();
@@ -143,18 +143,18 @@ public class TransformerTipos extends Transformer {
     }
 
     @Override
-    public Identificador transform(Identificador i) throws ExcepcionDeTipos {
+    public Identificador transform(Identificador i) throws ExcepcionTransformer {
         i = super.transform(i);
         SimboloVariable s = cambiarTipoVariable(i);
         if (s == null) {
-            throw new ExcepcionDeTipos(String.format("No se pudo asignar un tipo a la variable «%s»", i.getNombre()));
+            throw new ExcepcionTransformer(String.format("No se pudo asignar un tipo a la variable «%s»", i.getNombre()));
         }
         // Reemplazar cada Identificador por el SimboloVariable correspondiente
         return s;
     }
 
     @Override
-    public InvocacionFuncion transform(InvocacionFuncion i) throws ExcepcionDeTipos {
+    public InvocacionFuncion transform(InvocacionFuncion i) throws ExcepcionTransformer {
         i = super.transform(i);
 
         // No buscar en el alcance las funciones predefinidas.
@@ -164,7 +164,7 @@ public class TransformerTipos extends Transformer {
 
         SimboloFuncion s = cambiarTipoFuncion(i);
         if (s == null) {
-            throw new ExcepcionDeTipos(String.format("No se pudo asignar un tipo a la función «%s»", i.getNombre()));
+            throw new ExcepcionTransformer(String.format("No se pudo asignar un tipo a la función «%s»", i.getNombre()));
         }
 
         DecFun decFun = s.getDeclaracion();
@@ -183,14 +183,14 @@ public class TransformerTipos extends Transformer {
     }
 
     @Override
-    public Asignacion transform(Asignacion a) throws ExcepcionDeTipos {
+    public Asignacion transform(Asignacion a) throws ExcepcionTransformer {
         a = super.transform(a);
         a.setExpresion(convertirATipo(a.getExpresion(), a.getIdent().getTipo()));
         return a;
     }
 
     @Override
-    public Expresion transform(OperacionBinaria ob) throws ExcepcionDeTipos {
+    public Expresion transform(OperacionBinaria ob) throws ExcepcionTransformer {
         ob = (OperacionBinaria) super.transform(ob);
         Tipo tipoEnComun = transformOperacionBinaria(ob);
         ob.setTipo(tipoEnComun);
@@ -199,20 +199,20 @@ public class TransformerTipos extends Transformer {
 
     // Las relaciones son como las operaciones binarias, pero su tipo siempre es boolean
     @Override
-    public Relacion transform(Relacion r) throws ExcepcionDeTipos {
+    public Relacion transform(Relacion r) throws ExcepcionTransformer {
         r = (Relacion) super.transform(r);
         Tipo tipoEnComun = transformOperacionBinaria(r);
         // Sólo las relaciones de igualdad y desigualdad aceptan operandos booleanos
         if ((tipoEnComun == Tipo.BOOLEAN) && !(
                 r instanceof Igualdad || r instanceof Desigualdad)) {
-            throw new ExcepcionDeTipos(String.format("No se puede realizar una comparación \"%s\" entre tipos boolean", r.getNombre()));
+            throw new ExcepcionTransformer(String.format("No se puede realizar una comparación \"%s\" entre tipos boolean", r.getNombre()));
         }
         r.setTipo(Tipo.BOOLEAN);
         return r;
     }
 
     @Override
-    public Expresion transform(OperacionUnaria ou) throws ExcepcionDeTipos {
+    public Expresion transform(OperacionUnaria ou) throws ExcepcionTransformer {
         ou = (OperacionUnaria) super.transform(ou);
         if (ou.getTipo() == Tipo.UNKNOWN) {
             ou.setTipo(ou.getExpresion().getTipo());
@@ -223,7 +223,7 @@ public class TransformerTipos extends Transformer {
     }
 
     @Override
-    public Retorno transform(Retorno r) throws ExcepcionDeTipos {
+    public Retorno transform(Retorno r) throws ExcepcionTransformer {
         // Transformar la expresión interna del return
         r = super.transform(r);
         // Y compararla con el de la función a la que pertenece
@@ -239,22 +239,22 @@ public class TransformerTipos extends Transformer {
     }
 
     @Override
-    public Mientras transform(Mientras m) throws ExcepcionDeTipos {
+    public Mientras transform(Mientras m) throws ExcepcionTransformer {
         m = super.transform(m);
         if (m.getCondicion().getTipo() != Tipo.BOOLEAN) {
-            throw new ExcepcionDeTipos("El tipo de la condición de «while» no es boolean");
+            throw new ExcepcionTransformer("El tipo de la condición de «while» no es boolean");
         }
         return m;
     }
 
     @Override
-    public Sentencia transform(Para p) throws ExcepcionDeTipos {
+    public Sentencia transform(Para p) throws ExcepcionTransformer {
         p = (Para) super.transform(p);
         // No se puede convertir OperacionConversion a Identificador acá.
         // Para que soporte conversiones implícitas de flotante a entero
         // tendríamos que reemplazar en Para el Identificador por Expresion.
         if (p.getIdent().getTipo() != Tipo.INTEGER) {
-            throw new ExcepcionDeTipos("El tipo de la variable a iterar en «for» no es integer");
+            throw new ExcepcionTransformer("El tipo de la variable a iterar en «for» no es integer");
         }
         return p;
     }

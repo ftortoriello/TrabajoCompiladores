@@ -1,7 +1,7 @@
 package ar.edu.unnoba.compilador.ast.base;
 
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
@@ -56,12 +56,12 @@ public class Bloque extends Nodo {
     }
 
     @Override
-    public void accept(Visitor v) throws ExcepcionDeAlcance {
+    public void accept(Visitor v) throws ExcepcionVisitor {
         v.visit(this);
     }
 
     @Override
-    public Bloque accept(Transformer t) throws ExcepcionDeTipos {
+    public Bloque accept(Transformer t) throws ExcepcionTransformer {
         return t.transform(this);
     }
 }

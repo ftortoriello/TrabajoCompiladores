@@ -1,6 +1,6 @@
 package ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones;
 
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.OperadorCmp;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
@@ -15,12 +15,12 @@ public abstract class Relacion extends OperacionBinaria {
     }
 
     @Override
-    public Expresion accept(Transformer t) throws ExcepcionDeTipos {
+    public Expresion accept(Transformer t) throws ExcepcionTransformer {
         return t.transform(this);
     }
 
     @Override
-    public Expresion evaluar() {
+    public Expresion evaluar() throws ExcepcionTransformer {
         if (!(getIzquierda().evaluar() instanceof Literal) || !(getDerecha().evaluar() instanceof Literal)) {
             return this;
         }
@@ -29,51 +29,23 @@ public abstract class Relacion extends OperacionBinaria {
         float litDer = Float.parseFloat(((Literal) getDerecha().evaluar()).getValor());
         boolean resultado = calcularResultado(litIzq, litDer);
 
-        return new Literal(String.valueOf(resultado), Tipo.BOOLEAN, "Literal BOOLEAN");
+        return new Literal(String.valueOf(resultado), Tipo.BOOLEAN);
     }
 
-    private Boolean calcularResultado(Float litIzq, Float litDer) {
-        switch (getNombre()) {
-            case "!=":  return litIzq != litDer;
-            case "==":  return litIzq.equals(litDer);
-            case ">":   return litIzq > litDer;
-            case ">=":  return litIzq >= litDer;
-            case "<":   return litIzq < litDer;
-            case "<=":  return litIzq <= litDer;
-            default:
-                throw new IllegalStateException("Operador inesperado al aplicar Constant Folding: " + getNombre());
-        }
-    }
+    protected abstract boolean calcularResultado(Float litIzq, Float litDer);
 
     // Crea una clase según sea el operador utilizado
     // Si se utiliza el operador de IGUALDAD, devuelvo una clase Igualdad, etc.
     public static Relacion getClaseRel(OperadorCmp op, Expresion expr1, Expresion expr2) {
-        Relacion comp;
-
         switch (op) {
-            case IGUALDAD:
-                comp = new Igualdad(expr1, expr2);
-                break;
-            case DESIGUALDAD:
-                comp = new Desigualdad(expr1, expr2);
-                break;
-            case MAYOR:
-                comp = new Mayor(expr1, expr2);
-                break;
-            case MAYOR_IGUAL:
-                comp = new MayorIgual(expr1, expr2);
-                break;
-            case MENOR:
-                comp = new Menor(expr1, expr2);
-                break;
-            case MENOR_IGUAL:
-                comp = new MenorIgual(expr1, expr2);
-                break;
-            default:
-                throw new IllegalStateException("Operador inesperado: " + op);
+            case IGUALDAD:    return new Igualdad(expr1, expr2);
+            case DESIGUALDAD: return new Desigualdad(expr1, expr2);
+            case MAYOR:       return new Mayor(expr1, expr2);
+            case MAYOR_IGUAL: return new MayorIgual(expr1, expr2);
+            case MENOR:       return new Menor(expr1, expr2);
+            case MENOR_IGUAL: return new MenorIgual(expr1, expr2);
+            default: throw new IllegalStateException("Operador inesperado: " + op);
         }
-
-        return comp;
     }
 
     /* Retorna el tipo de relación usado en el IR */

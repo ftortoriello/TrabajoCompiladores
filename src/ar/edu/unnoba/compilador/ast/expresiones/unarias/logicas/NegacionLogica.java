@@ -1,5 +1,6 @@
 package ar.edu.unnoba.compilador.ast.expresiones.unarias.logicas;
 
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
@@ -10,12 +11,12 @@ public class NegacionLogica extends OperacionUnaria {
         super("NOT", expresion);
     }
 
-    public Expresion evaluar() {
+    public Expresion evaluar() throws ExcepcionTransformer {
         if (!(getExpresion() instanceof Literal)) {
             return this;
         }
 
         boolean valorNegado = !(Boolean.parseBoolean(((Literal) getExpresion().evaluar()).getValor()));
-        return new Literal(String.valueOf(valorNegado), Tipo.BOOLEAN, "Literal BOOLEAN");
+        return new Literal(String.valueOf(valorNegado), Tipo.BOOLEAN);
     }
 }

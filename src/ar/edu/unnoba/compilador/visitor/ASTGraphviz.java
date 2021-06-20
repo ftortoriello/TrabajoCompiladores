@@ -4,7 +4,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 import ar.edu.unnoba.compilador.ast.base.*;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.OperacionBinariaLogica;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
@@ -32,7 +32,7 @@ public class ASTGraphviz extends Visitor {
     }
 
     /*** Función principal ***/
-    public String generarCodigo(Programa p) throws ExcepcionDeAlcance {
+    public String generarCodigo(Programa p) throws ExcepcionVisitor {
         super.procesar(p);
         return codigo.toString();
     }
@@ -90,7 +90,7 @@ public class ASTGraphviz extends Visitor {
     /* Base */
 
     @Override
-    public void visit(Programa p) throws ExcepcionDeAlcance {
+    public void visit(Programa p) throws ExcepcionVisitor {
         codigo = new StringBuilder();
 
         codigo.append("graph Programa {\n")
@@ -114,7 +114,7 @@ public class ASTGraphviz extends Visitor {
     }
 
     @Override
-    public void visit(Encabezado e) throws ExcepcionDeAlcance {
+    public void visit(Encabezado e) throws ExcepcionVisitor {
         armarStrEncabezado(e.getEtiqueta());
         padres.push(idNodoActual);
         super.visit(e);
@@ -122,7 +122,7 @@ public class ASTGraphviz extends Visitor {
     }
 
     @Override
-    public void visit(Bloque b) throws ExcepcionDeAlcance {
+    public void visit(Bloque b) throws ExcepcionVisitor {
         if (b.esProgramaPrincipal()) {
             armarStrEncabezado(b.getEtiqueta());
         } else {
@@ -138,7 +138,7 @@ public class ASTGraphviz extends Visitor {
     /* Sentencia de asignación */
 
     @Override
-    public void visit(Asignacion a) throws ExcepcionDeAlcance {
+    public void visit(Asignacion a) throws ExcepcionVisitor {
         armarStrNodo(a.getEtiqueta());
         padres.push(idNodoActual);
         super.visit(a);
@@ -149,7 +149,7 @@ public class ASTGraphviz extends Visitor {
     /* Sentencias de declaración */
 
     @Override
-    public void visit(DecVar dv) throws ExcepcionDeAlcance {
+    public void visit(DecVar dv) throws ExcepcionVisitor {
         armarStrDec(dv.getEtiqueta());
         padres.push(idNodoActual);
         super.visit(dv);
@@ -157,7 +157,7 @@ public class ASTGraphviz extends Visitor {
     }
 
     @Override
-    public void visit(DecVarIni dvi) throws ExcepcionDeAlcance {
+    public void visit(DecVarIni dvi) throws ExcepcionVisitor {
         armarStrDec(dvi.getEtiqueta());
         padres.push(idNodoActual);
         super.visit(dvi);
@@ -165,7 +165,7 @@ public class ASTGraphviz extends Visitor {
     }
 
     @Override
-    public void visit(DecFun df) throws ExcepcionDeAlcance {
+    public void visit(DecFun df) throws ExcepcionVisitor {
         armarStrDec(df.getEtiqueta());
         padres.push(idNodoActual);
         super.visit(df);
@@ -173,7 +173,7 @@ public class ASTGraphviz extends Visitor {
     }
 
     @Override
-    public void visit(Param p) throws ExcepcionDeAlcance {
+    public void visit(Param p) throws ExcepcionVisitor {
         armarStrDec(p.getEtiqueta());
         padres.push(idNodoActual);
         super.visit(p);
@@ -181,7 +181,7 @@ public class ASTGraphviz extends Visitor {
     }
 
     @Override
-    public void visit(ParamDef pd) throws ExcepcionDeAlcance {
+    public void visit(ParamDef pd) throws ExcepcionVisitor {
         armarStrDec(pd.getEtiqueta());
         padres.push(idNodoActual);
         super.visit(pd);
@@ -192,7 +192,7 @@ public class ASTGraphviz extends Visitor {
     /* Sentencias de selección */
 
     @Override
-    public void visit(SiEntonces se) throws ExcepcionDeAlcance {
+    public void visit(SiEntonces se) throws ExcepcionVisitor {
         armarStrEstructura(se.getEtiqueta());
         padres.push(idNodoActual);
         super.visit(se);
@@ -200,7 +200,7 @@ public class ASTGraphviz extends Visitor {
     }
 
     @Override
-    public void visit(SiEntoncesSino ses) throws ExcepcionDeAlcance {
+    public void visit(SiEntoncesSino ses) throws ExcepcionVisitor {
         armarStrEstructura(ses.getEtiqueta());
         padres.push(idNodoActual);
         super.visit(ses);
@@ -208,7 +208,7 @@ public class ASTGraphviz extends Visitor {
     }
 
     @Override
-    public void visit(Cuando c) throws ExcepcionDeAlcance {
+    public void visit(Cuando c) throws ExcepcionVisitor {
         armarStrNodo(c.getEtiqueta());
         padres.push(idNodoActual);
         super.visit(c);
@@ -216,7 +216,7 @@ public class ASTGraphviz extends Visitor {
     }
 
     @Override
-    public void visit(CasoCuando cc) throws ExcepcionDeAlcance {
+    public void visit(CasoCuando cc) throws ExcepcionVisitor {
         armarStrRelacion(cc.getEtiqueta());
         padres.push(idNodoActual);
         super.visit(cc);
@@ -227,7 +227,7 @@ public class ASTGraphviz extends Visitor {
     /* Sentencias de iteración */
 
     @Override
-    public void visit(Mientras m) throws ExcepcionDeAlcance {
+    public void visit(Mientras m) throws ExcepcionVisitor {
         armarStrEstructura(m.getEtiqueta());
         padres.push(idNodoActual);
         super.visit(m);
@@ -235,7 +235,7 @@ public class ASTGraphviz extends Visitor {
     }
 
     @Override
-    public void visit(Para p) throws ExcepcionDeAlcance {
+    public void visit(Para p) throws ExcepcionVisitor {
         armarStrEstructura(p.getEtiqueta());
         padres.push(idNodoActual);
         super.visit(p);
@@ -246,7 +246,7 @@ public class ASTGraphviz extends Visitor {
     /* Sentencias de control */
 
     @Override
-    public void visit(Retorno r) throws ExcepcionDeAlcance {
+    public void visit(Retorno r) throws ExcepcionVisitor {
         armarStrControl(r.getEtiqueta());
         padres.push(idNodoActual);
         super.visit(r);
@@ -254,12 +254,12 @@ public class ASTGraphviz extends Visitor {
     }
 
     @Override
-    public void visit(Continuar c) throws ExcepcionDeAlcance {
+    public void visit(Continuar c) throws ExcepcionVisitor {
         armarStrControl(c.getEtiqueta());
     }
 
     @Override
-    public void visit(Salir s) throws ExcepcionDeAlcance {
+    public void visit(Salir s) throws ExcepcionVisitor {
         armarStrControl(s.getEtiqueta());
     }
 
@@ -267,7 +267,7 @@ public class ASTGraphviz extends Visitor {
     /* Operaciones */
 
     @Override
-    public void visit(OperacionBinaria ob) throws ExcepcionDeAlcance {
+    public void visit(OperacionBinaria ob) throws ExcepcionVisitor {
         if (ob instanceof Relacion) {
             armarStrRelacion(ob.getEtiqueta());
         } else if (ob instanceof OperacionBinariaLogica) {
@@ -282,7 +282,7 @@ public class ASTGraphviz extends Visitor {
     }
 
     @Override
-    public void visit(OperacionUnaria ou) throws ExcepcionDeAlcance {
+    public void visit(OperacionUnaria ou) throws ExcepcionVisitor {
         if (ou instanceof NegacionLogica) {
             armarStrOpLogica(ou.getEtiqueta());
         } else {

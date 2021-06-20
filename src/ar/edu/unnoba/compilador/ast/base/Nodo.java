@@ -1,7 +1,7 @@
 package ar.edu.unnoba.compilador.ast.base;
 
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.visitor.*;
 import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 
@@ -30,9 +30,9 @@ public abstract class Nodo {
         return this.getClass().getSimpleName();
     }
 
-    public abstract void accept(Visitor v) throws ExcepcionDeAlcance;
+    public abstract void accept(Visitor v) throws ExcepcionVisitor;
 
-    public abstract Nodo accept(Transformer t) throws ExcepcionDeTipos;
+    public abstract Nodo accept(Transformer t) throws ExcepcionTransformer;
 
     @Override
     public String toString() {

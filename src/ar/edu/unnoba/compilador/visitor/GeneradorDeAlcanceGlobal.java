@@ -5,7 +5,7 @@ import java.util.Map;
 
 import ar.edu.unnoba.compilador.Normalizador;
 import ar.edu.unnoba.compilador.ast.base.*;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.SimboloFuncion;
@@ -20,12 +20,12 @@ public class GeneradorDeAlcanceGlobal extends Visitor {
     private Map<String, SimboloFuncion> tablaFunciones;
 
     // Agregar el símbolo de la variable al ámbito global
-    private void agregarSimboloVarGlobal(Declaracion d) throws ExcepcionDeAlcance {
+    private void agregarSimboloVarGlobal(Declaracion d) throws ExcepcionVisitor {
         Identificador id = d.getIdent();
         String nombre = id.getNombre();
 
         if (alcanceGlobal.containsKey(nombre)) {
-            throw new ExcepcionDeAlcance(
+            throw new ExcepcionVisitor(
                     String.format("La variable global «%s» de tipo %s ya fue declarada previamente con tipo %s.",
                             nombre, id.getTipo(),
                             alcanceGlobal.get(nombre).getTipo()));
@@ -40,12 +40,12 @@ public class GeneradorDeAlcanceGlobal extends Visitor {
         alcanceGlobal.put(nombre, simbolo);
     }
 
-    private void agregarSimboloFuncion(DecFun d) throws ExcepcionDeAlcance {
+    private void agregarSimboloFuncion(DecFun d) throws ExcepcionVisitor {
         Identificador id = d.getIdent();
         String nombre = id.getNombre();
 
         if (tablaFunciones.containsKey(nombre)) {
-            throw new ExcepcionDeAlcance(
+            throw new ExcepcionVisitor(
                     String.format("La función «%s» de tipo %s ya fue declarada previamente con tipo %s.",
                             nombre, id.getTipo(), tablaFunciones.get(nombre).getTipo()));
         }
@@ -56,7 +56,7 @@ public class GeneradorDeAlcanceGlobal extends Visitor {
     }
 
     @Override
-    public void visit(Programa p) throws ExcepcionDeAlcance {
+    public void visit(Programa p) throws ExcepcionVisitor {
         alcanceGlobal = new Alcance("global");
         p.setAlcance(alcanceGlobal);
 
@@ -72,7 +72,7 @@ public class GeneradorDeAlcanceGlobal extends Visitor {
     }
 
     @Override
-    public void visit(DecFun df) throws ExcepcionDeAlcance {
+    public void visit(DecFun df) throws ExcepcionVisitor {
         // Agregar a la tabla la declaración de la función
         agregarSimboloFuncion(df);
         // No visitar los parámetros ni el cuerpo
@@ -80,15 +80,15 @@ public class GeneradorDeAlcanceGlobal extends Visitor {
 
     // Visit de declaraciones de variables globales (en el encabezado).
     @Override
-    public void visit(DecVar dv) throws ExcepcionDeAlcance {
+    public void visit(DecVar dv) throws ExcepcionVisitor {
         agregarSimboloVarGlobal(dv);
         super.visit(dv);
     }
 
     @Override
-    public void visit(DecVarIni dvi) throws ExcepcionDeAlcance {
+    public void visit(DecVarIni dvi) throws ExcepcionVisitor {
         if (dvi.getExpresion() instanceof InvocacionFuncion) {
-            throw new ExcepcionDeAlcance(String.format(
+            throw new ExcepcionVisitor(String.format(
                     "«%s»: No se puede invocar a una función desde la inicialización de una variable global.",
                     dvi.getIdent()));
         }

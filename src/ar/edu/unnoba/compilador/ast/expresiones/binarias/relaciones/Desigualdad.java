@@ -11,4 +11,9 @@ public class Desigualdad extends Relacion {
     public String getInstruccionIR() {
         return getIzquierda().getTipo() == Tipo.INTEGER ? "ne" : "one";
     }
+
+    @Override
+    protected boolean calcularResultado(Float litIzq, Float litDer) {
+        return !litIzq.equals(litDer);
+    }
 }

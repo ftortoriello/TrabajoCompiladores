@@ -1,6 +1,6 @@
 package ar.edu.unnoba.compilador.visitor;
 
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Continuar;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Salir;
@@ -10,27 +10,27 @@ import ar.edu.unnoba.compilador.ast.sentencias.control.Salir;
  */
 public class VisitorControl extends Visitor {
     @Override
-    public void visit(Retorno r) throws ExcepcionDeAlcance {
+    public void visit(Retorno r) throws ExcepcionVisitor {
         if (!isEnFuncion()) {
-            throw new ExcepcionDeAlcance("Se encontró «return» fuera de una función");
+            throw new ExcepcionVisitor("Se encontró «return» fuera de una función");
         }
         super.visit(r);
     }
 
     // break
     @Override
-    public void visit(Salir s) throws ExcepcionDeAlcance {
+    public void visit(Salir s) throws ExcepcionVisitor {
         if (!isEnBucle()) {
-            throw new ExcepcionDeAlcance("Se encontró «break» fuera de un bucle for o while");
+            throw new ExcepcionVisitor("Se encontró «break» fuera de un bucle for o while");
         }
         super.visit(s);
     }
 
     // continue
     @Override
-    public void visit(Continuar c) throws ExcepcionDeAlcance {
+    public void visit(Continuar c) throws ExcepcionVisitor {
         if (!isEnBucle()) {
-            throw new ExcepcionDeAlcance("Se encontró «continue» fuera de un bucle for o while");
+            throw new ExcepcionVisitor("Se encontró «continue» fuera de un bucle for o while");
         }
         super.visit(c);
     }

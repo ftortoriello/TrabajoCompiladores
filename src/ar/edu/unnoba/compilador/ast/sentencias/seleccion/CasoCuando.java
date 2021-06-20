@@ -2,8 +2,8 @@ package ar.edu.unnoba.compilador.ast.sentencias.seleccion;
 
 import ar.edu.unnoba.compilador.ast.base.Bloque;
 import ar.edu.unnoba.compilador.ast.expresiones.OperadorCmp;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeAlcance;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionDeTipos;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
 import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
@@ -51,12 +51,12 @@ public class CasoCuando extends Sentencia {
     }
 
     @Override
-    public void accept(Visitor v) throws ExcepcionDeAlcance {
+    public void accept(Visitor v) throws ExcepcionVisitor {
         v.visit(this);
     }
 
     @Override
-    public Sentencia accept(Transformer t) throws ExcepcionDeTipos {
+    public Sentencia accept(Transformer t) throws ExcepcionTransformer {
         return t.transform(this);
     }
 }
