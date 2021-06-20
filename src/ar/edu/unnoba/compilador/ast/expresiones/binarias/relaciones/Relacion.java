@@ -21,13 +21,15 @@ public abstract class Relacion extends OperacionBinaria {
 
     @Override
     public Expresion evaluar() throws ExcepcionTransformer {
-        if (!(getIzquierda().evaluar() instanceof Literal) || !(getDerecha().evaluar() instanceof Literal)) {
+        Expresion izquierda = getIzquierda().evaluar();
+        Expresion derecha = getDerecha().evaluar();
+        if (!(izquierda instanceof Literal) || !(derecha instanceof Literal)) {
             return this;
         }
 
-        float litIzq = Float.parseFloat(((Literal) getIzquierda().evaluar()).getValor());
-        float litDer = Float.parseFloat(((Literal) getDerecha().evaluar()).getValor());
-        boolean resultado = calcularResultado(litIzq, litDer);
+        float valorIzq = ((Literal) izquierda).getValorNumerico().floatValue();
+        float valorDer = ((Literal) derecha).getValorNumerico().floatValue();
+        boolean resultado = calcularResultado(valorIzq, valorDer);
 
         return new Literal(String.valueOf(resultado), Tipo.BOOLEAN);
     }

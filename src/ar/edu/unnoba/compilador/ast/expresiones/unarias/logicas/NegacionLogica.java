@@ -12,11 +12,18 @@ public class NegacionLogica extends OperacionUnaria {
     }
 
     public Expresion evaluar() throws ExcepcionTransformer {
-        if (!(getExpresion() instanceof Literal)) {
+        Expresion expr = getExpresion();
+        if (expr instanceof NegacionLogica) {
+            // cancelar "not not"
+            return ((NegacionLogica) expr).getExpresion();
+        }
+
+        if (!(expr instanceof Literal)) {
+            // TODO si no es literal se rompe
             return this;
         }
 
-        boolean valorNegado = !((Literal) getExpresion().evaluar()).getValorBooleano();
+        boolean valorNegado = !((Literal) getExpresion()).getValorBooleano();
         return new Literal(String.valueOf(valorNegado), Tipo.BOOLEAN);
     }
 }

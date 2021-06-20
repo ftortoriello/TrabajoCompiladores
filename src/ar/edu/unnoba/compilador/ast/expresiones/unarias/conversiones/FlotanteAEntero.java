@@ -15,7 +15,7 @@ public class FlotanteAEntero extends OperacionConversion {
         Expresion expr = getExpresion().evaluar();
         if (!(expr instanceof Literal)) {
             // TODO si no es literal se rompe
-            return this;
+            return expr;
         }
 
         float nroOriginal = ((Literal) expr).getValorNumerico().floatValue();

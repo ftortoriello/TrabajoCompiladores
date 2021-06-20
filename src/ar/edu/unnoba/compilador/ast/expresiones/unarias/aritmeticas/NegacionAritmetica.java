@@ -14,6 +14,7 @@ public class NegacionAritmetica extends OperacionUnaria {
     public Expresion evaluar() throws ExcepcionTransformer {
         Expresion expresion = getExpresion().evaluar();
         if (!(expresion instanceof Literal)) {
+            // TODO si no es literal se rompe
             return this;
         }
 
