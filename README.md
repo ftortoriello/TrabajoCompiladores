@@ -83,8 +83,8 @@ Requisitos:
   * Valor de retorno por defecto (si no hay return): :white_check_mark:
 * Funciones predefinidas o externas:
   * Read: :x:
-    * Truncamiento o conversiones: :x:
   * Write: :x:
+  * Truncamiento o conversiones: :x:
 * Declaración de variables (locales y globales, inicializadas y no inicializadas): :white_check_mark:
   * Valores por defecto para las no inicializadas: :white_check_mark:
 * Bloques de código:

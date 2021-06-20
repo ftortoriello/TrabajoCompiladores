@@ -1,8 +1,11 @@
-
 variable a is integer = 3;
+variable b is float;
+
 variable z is integer = a * 2;
 
-function inc(a is integer) return integer
+# esta rompe al cambiarle el tipo del param a float
+# no sabe como convertir el tipo de la expresion del return
+function inc(a is float) return integer
     return a * 2 + 1;
 
 {
@@ -21,14 +24,11 @@ main is
     a = i + 1;
     writeln(a);
 
-    {
-    a = 5.0; #Tendría que convertir 5.0 a 5 pero algo queda mal
+    b = 1;
+    a = 5;
     writeln(a);
-    }
 
-    {
-    writeln(inc(1.0 + 1.0)); # Tampoco funciona hay problema con los tipos
-    }
+    writeln(inc(1.0 + 1.0));
 
     # Esto cuelga la ejecución
     {
