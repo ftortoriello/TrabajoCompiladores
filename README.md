@@ -83,25 +83,24 @@ Requisitos:
   * Valor de retorno por defecto (si no hay return): :white_check_mark:
 * Funciones predefinidas o externas:
   * Read: :x:
+    * Truncamiento o conversiones: :x:
   * Write: :x:
-* Declaración de variables (locales y globales, inicializadas y no inicializadas): :x:
+* Declaración de variables (locales y globales, inicializadas y no inicializadas): :white_check_mark:
   * Valores por defecto para las no inicializadas: :white_check_mark:
 * Bloques de código:
   * Asignaciones: :white_check_mark:
   * Operaciones lógicas: :x:
+    * Cortocircuito: :x:
   * Operaciones relacionales: :white_check_mark:
-  * Cortocircuito para expresiones lógicas y relacionales: :x:
   * Operaciones aritméticas: :white_check_mark:
   * Invocación de funciones definidas en el lenguaje: :white_check_mark:
   * Literales: :white_check_mark:
-    * Truncamiento o conversiones: :x:
   * If: :white_check_mark:
   * While: :white_check_mark:
     * Sentencias de control (continue y break): :x:
-    * While anidado (ver etiquetas y demás): :x:
 
 Cosas secundarias:
-* Ver excepciones en GeneradorDeCodigo.java. Está usando ExcepcionDeAlcance porque el visitor abstracto tiene esas definidad en la firma de los métodos. Probé cambiarlas por Exception para que quede más abstracto y poder definir excepciones específicas en cada visitor, pero igual hay lío porque esos visitors llaman a su padre. Y todos los nodos tienen también definido un tipo específico de excepción en los métodos accept y visit.
 * Estaría bueno ver si podemos indentar el código IR producido. Pero tiene que ser una forma genérica sino es una locura, por ej. cuando hacemos el return del visit del bloque. Estuve viendo y hay una función `indent` que lo hace prácticamente solo (hasta tiene en cuenta los saltos de línea), el tema es que la estructura de bloques que tenemos no es muy consistente y a veces indenta y a veces no. Pero por lo menos indentar 1 nivel (porque no sé si habría más) todo lo que está dentro de las funciones.
   Ahora estoy poniendo tabulaciones "a mano" en todo lo que no es global, una etiqueta o una declaración o cierre de función. Pensé y empecé a hacer indentar por niveles de bloque del código de entrada (con un contador de nivel, también es manual), pero no creo que quede bien, porque en el IR no van a existir esos niveles.
-* Eliminar clase "Para" y "Cuando". Generar la transformación de esas estructuras en el propio parser (posiblemente creando un constructor nuevo en las clases Cuando e If, cosa de tirarlo ahí y resolverlo en la propia clase).
+* Eliminar clase "Para" y "Cuando". Generar la transformación de esas estructuras en el propio parser (posiblemente creando un constructor nuevo en las clases Mientras y SiEntonces, cosa de tirarlo ahí y resolverlo en la propia clase).
+* Ver de crear métodos para instrucciones comunes del IR (store, load, etc.), cosa de que queden todas centralizadas en un lugar y no andar creando los strings por todos lados. Por ej. podríamos tener imprimirAlloca(nombre, tipo), y que se encargue esa función del string cosa de que el resto sea más fácil de leer.

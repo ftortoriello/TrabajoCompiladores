@@ -36,6 +36,10 @@ public abstract class Expresion extends Nodo {
     }
 
     public String getRefIR() {
+        if (refIR == null) {
+            throw new IllegalStateException(String.format("Se hizo getRefIR sobre un objeto de tipo %s, " +
+                            "pero el refIR es nulo.", getClass().getSimpleName()));
+        }
         return refIR;
     }
 

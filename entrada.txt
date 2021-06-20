@@ -1,18 +1,42 @@
+
 variable a is integer = 3;
 variable z is integer = a * 2;
 
 function inc(a is integer) return integer
     return a * 2 + 1;
 
+{
 function def(a is integer) return integer
     writeln("Esta función retorna 0 de forma implícita");
+}
 
 main is
-    variable i is integer = inc(a);
+    # def(1); # Me permite invocar esto, debería?
+
+    writeln(inc(a));
+
+    variable i is integer = inc(z);
+    writeln(i);
+
     a = i + 1;
+    writeln(a);
+
+    {
+    a = 5.0; #Tendría que convertir 5.0 a 5 pero algo queda mal
+    writeln(a);
+    }
+
+    {
+    writeln(inc(1.0 + 1.0)); # Tampoco funciona hay problema con los tipos
+    }
+
+    # Esto cuelga la ejecución
+    {
     while i < 10 do
-        if i / 2 == 0 then
+        if i / 2 == 0 then begin
             i = i + 1;
+        end;
+    }
 end.
 
 {
