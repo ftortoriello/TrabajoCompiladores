@@ -11,6 +11,14 @@ public class NegacionLogica extends OperacionUnaria {
         super("NOT", expresion);
     }
 
+    @Override
+    public String getRefIR() {
+        // Como implementamos cortocircuito booleano, no le generamos una referencia a los NOT,
+        // invertimos las etiquetas de salto.
+        // Retornar la referencia de la expresión.
+        return getExpresion().getRefIR();
+    }
+
     public Expresion evaluar() throws ExcepcionTransformer {
         Expresion expr = getExpresion();
         if (expr instanceof NegacionLogica) {
@@ -19,7 +27,6 @@ public class NegacionLogica extends OperacionUnaria {
         }
 
         if (!(expr instanceof Literal)) {
-            // TODO si no es literal se rompe
             return this;
         }
 

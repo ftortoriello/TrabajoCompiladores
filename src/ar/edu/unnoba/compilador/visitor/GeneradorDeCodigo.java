@@ -233,12 +233,13 @@ public class GeneradorDeCodigo extends Visitor {
         // argumento puede ser una variable, un literal o una expresión más compleja, mientras
         // que en la declaración de la función eso va a ser siempre un objeto de tipo Param.
 
+        // FIXME: Parámetros por defecto
+
         StringBuilder strArgs = new StringBuilder();
 
         int cantArgs = arrArgs.size();
 
         for (int i = 0; i < cantArgs; i++) {
-
             Expresion exprArg = arrArgs.get(i);
             String tipoRetornoArg = TIPO_IR.get(exprArg.getTipo()).fst;
             // Evaluar la expr. y generar el refIR
@@ -258,8 +259,6 @@ public class GeneradorDeCodigo extends Visitor {
     /*** Funciones auxiliares para generar el cortocircuito booleano ***/
 
     private void imprimirCortocircuito(OperacionBinariaLogica ob) throws ExcepcionVisitor {
-        // TODO: NegacionLogica. Habría que ver acá si el lado izquierdo es not? E ignorarlo después?
-
         Pair<String, String> etiquetas = etiquetasOpBinLog.peek();
         String etiVerdadero = etiquetas.fst;
         String etiFalso = etiquetas.snd;
@@ -269,15 +268,25 @@ public class GeneradorDeCodigo extends Visitor {
         Expresion expIzquierda = ob.getIzquierda();
         expIzquierda.accept(this);
 
+        final String refIR = expIzquierda.getRefIR();
         final String etiTmp;
+
         if (ob instanceof Conjuncion) { // AND
             // Si el operador izquierdo es falso, esta operación es falsa
             etiTmp = Normalizador.crearNomEtiqueta("and_verdadero");
-            imprimirCodSaltoCond(expIzquierda.getRefIR(), etiTmp, etiFalso);
+            if (expIzquierda instanceof NegacionLogica) {
+                imprimirCodSaltoCond(refIR, etiFalso, etiTmp);
+            } else {
+                imprimirCodSaltoCond(refIR, etiTmp, etiFalso);
+            }
         } else if (ob instanceof Disyuncion) { // OR
             // Si el operador izquierdo es verdadero, esta operación es verdadera
             etiTmp = Normalizador.crearNomEtiqueta("or_falso");
-            imprimirCodSaltoCond(expIzquierda.getRefIR(), etiVerdadero, etiTmp);
+            if (expIzquierda instanceof NegacionLogica) {
+                imprimirCodSaltoCond(refIR, etiTmp, etiVerdadero);
+            } else {
+                imprimirCodSaltoCond(refIR, etiVerdadero, etiTmp);
+            }
         } else {
             throw new ExcepcionVisitor("Tipo de operación binaria lógica inesperado.");
         }
@@ -375,6 +384,7 @@ public class GeneradorDeCodigo extends Visitor {
 
     @Override
     public void visit(Encabezado e) throws ExcepcionVisitor {
+        // TODO: Sacar si no se usa
         super.visit(e);
     }
 
@@ -487,7 +497,7 @@ public class GeneradorDeCodigo extends Visitor {
             String refIR = expr.getRefIR();
 
             if (aplicarCortocircuito) {
-                finalizarCortocircuitoAsig(refIR, sv.getNombre());
+                finalizarCortocircuitoAsig(refIR, sv.getNombreIR());
             } else {
                 imprimirCodigo(String.format("store %1$s %2$s, %1s* %3$s", tipoIR, refIR, nombreIR));
                 imprimirCodigo("ret void");
@@ -512,7 +522,7 @@ public class GeneradorDeCodigo extends Visitor {
 
             // FIXME
             if (aplicarCortocircuito) {
-                finalizarCortocircuitoAsig(refIR, sv.getNombre());
+                finalizarCortocircuitoAsig(refIR, sv.getNombreIR());
             } else {
                 imprimirCodigo(String.format("%s = alloca %s", nombreIR, tipoIR));
                 imprimirCodigo(String.format("store %2$s %3$s, %2$s* %1$s", nombreIR, tipoIR, refIR));
@@ -661,14 +671,13 @@ public class GeneradorDeCodigo extends Visitor {
 
         // Generar ref. al resultado de la condición
         condicion.accept(this);
-        String refCond = condicion.getRefIR();
 
         // Se evalúa la condición, si es verdadera se salta al bucle y si es falsa al fin
-        // TODO: NegacionLogica
         if (condicion instanceof NegacionLogica) {
-            imprimirCodSaltoCond(refCond, etiFinWhile, etiBucleWhile);
+            // Invertir etiquetas de salto
+            imprimirCodSaltoCond(condicion.getRefIR(), etiFinWhile, etiBucleWhile);
         } else {
-            imprimirCodSaltoCond(refCond, etiBucleWhile, etiFinWhile);
+            imprimirCodSaltoCond(condicion.getRefIR(), etiBucleWhile, etiFinWhile);
         }
         imprimirEtiqueta(etiBucleWhile);
 
@@ -689,6 +698,7 @@ public class GeneradorDeCodigo extends Visitor {
 
     @Override
     public void visit(Continuar c) throws ExcepcionVisitor {
+        // TODO: Sacar si no se usa
         super.visit(c);
     }
 
@@ -712,6 +722,7 @@ public class GeneradorDeCodigo extends Visitor {
 
     @Override
     public void visit(Salir s) throws ExcepcionVisitor {
+        // TODO: Sacar si no se usa
         super.visit(s);
     }
 
@@ -759,6 +770,7 @@ public class GeneradorDeCodigo extends Visitor {
 
     @Override
     public void visit(OperacionUnaria ou) throws ExcepcionVisitor {
+        // TODO: Sacar si no se usa
         super.visit(ou);
     }
 
