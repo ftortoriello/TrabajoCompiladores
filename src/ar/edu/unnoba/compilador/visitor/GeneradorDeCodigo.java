@@ -145,45 +145,55 @@ public class GeneradorDeCodigo extends Visitor {
         arg.accept(this);
         String refIR = arg.getRefIR();
 
-        String nombreFun, argsFun, tipoPtro;
-
-        // Uso printf(), excepto cuando tengo que generar saltos de línea
-        nombreFun = i.getNombre().equals("writeln") ? "@puts" : "@printf";
+        String formato, argsFun;
 
         if (arg instanceof Cadena) {
             Cadena cad = (Cadena) arg;
             String nombreIR = cad.getNombreIR();
             int longStr = cad.getLongitudIR();
             argsFun = String.format("i8* getelementptr([%1$s x i8], [%1$s x i8]* %2$s, i32 0, i32 0)",
-                                    longStr, nombreIR);
-        } else {
-            // Es un número
-            String tipoIR;
-            if (arg.getTipo() == Tipo.INTEGER) {
-                tipoPtro = "integer";
-                tipoIR = "i32";
-            } else {
-                // Es float
-                tipoPtro = "float";
-                tipoIR = "double";
-                String refExt = Normalizador.crearNomRef("trunc");
+                    longStr, nombreIR);
+        } else if (arg.getTipo().equals(Tipo.BOOLEAN)) {
+            // Extiendo el i1 a i32 para poder imprimirlo
+            String refExt = Normalizador.crearNomRef("ext");
+            imprimirCodigo(String.format("%s = zext i1 %s to i32", refExt, refIR));
+            refIR = refExt;
 
-                /* No lo terminé de entender, pero printf() castea los floats a double (porque
-                 * es una función "variadic"), entonces tengo que convertirlo antes de poder
-                 * usarlo, sino muestra 0.0000
-                 */
+            if (i.getNombre().equals("write")) {
+                argsFun = String.format("i8* getelementptr([3 x i8], [3 x i8]* @.boolean, i32 0, i32 0), i32 %s", refIR);
+            } else {
+                argsFun = String.format("i8* getelementptr([4 x i8], [4 x i8]* @.booleanNL, i32 0, i32 0), i32 %s", refIR);
+            }
+        } else {
+            // Es un número entero o flotante
+
+            if (i.getNombre().equals("write") && arg.getTipo().equals(Tipo.INTEGER)) {
+                formato = "[3 x i8], [3 x i8]* @.integer";
+            } else if (i.getNombre().equals("write") && arg.getTipo().equals(Tipo.FLOAT)) {
+                formato = "[5 x i8], [5 x i8]* @.float";
+            } else if (i.getNombre().equals("writeln") && arg.getTipo().equals(Tipo.INTEGER)) {
+                formato = "[4 x i8], [4 x i8]* @.integerNL";
+            } else {
+                formato = "[6 x i8], [6 x i8]* @.floatNL";
+            }
+
+            String tipoIR = arg.getTipo().equals(Tipo.INTEGER) ? "i32" : "double";
+
+            if (arg.getTipo().equals(Tipo.FLOAT)) {
+                // Si es float, para que pueda imprimirse extiendo el número a double y actualizo la ref.
+
+                String refExt = Normalizador.crearNomRef("ext");
                 imprimirCodigo(String.format("%s = fpext float %s to double", refExt, refIR));
                 refIR = refExt;
             }
 
-            argsFun = String.format("i8* getelementptr([4 x i8], [4 x i8]* @.%s, i32 0, i32 0), %s %s",
-                    tipoPtro, tipoIR, refIR);
+            argsFun = String.format("i8* getelementptr(%s, i32 0, i32 0), %s %s",
+                    formato, tipoIR, refIR);
         }
 
-        String refTemp = Normalizador.crearNomRef("temp");
+        String refTemp = Normalizador.crearNomRef("aux");
 
-        imprimirCodigo(String.format("%s = call i32 (i8*, ...) %s(%s)", refTemp, nombreFun, argsFun));
-
+        imprimirCodigo(String.format("%s = call i32 (i8*, ...) @printf(%s)", refTemp, argsFun));
     }
 
     /* Para tratar los casos de invocaciones a read */
@@ -341,10 +351,10 @@ public class GeneradorDeCodigo extends Visitor {
     /* Inicializa las cadenas que van a usarse en el programa
      */
     private void declararVarsStrs() {
-        // Por ej.: @ptro.str.2 = private unnamed_addr constant [5 x i8]c"Hola\00"
+        // Por ej.: @ptro.str.2 = private unnamed_addr constant [5 x i8] c"Hola\00"
         arrCadenas.forEach(cad -> {
-            codigo.append(String.format("%s = private unnamed_addr constant [%s x i8] " +
-                    "c\"%s\"\n", cad.getNombreIR(), cad.getLongitudIR(), cad.getValorIR()));
+            codigo.append(String.format("%s = private unnamed_addr constant [%s x i8] c\"%s\"\n",
+                    cad.getNombreIR(), cad.getLongitudIR(), cad.getValorIR()));
         });
     }
 
@@ -393,11 +403,15 @@ public class GeneradorDeCodigo extends Visitor {
               .append("@int_read_format = unnamed_addr constant [3 x i8] c\"%d\\00\"\n")
               .append("@double_read_format = unnamed_addr constant [4 x i8] c\"%lf\\00\"\n")
               .append("\n")
-              .append("@.true = private constant[4 x i8] c\".T.\\00\"\n")
-              .append("@.false = private constant[4 x i8] c\".F.\\00\"\n")
+              .append("; Constantes para formatear valores booleanos:\n")
+              .append("@.boolean = private constant[3 x i8] c\"%d\\00\"\n")
+              .append("@.booleanNL = private constant[4 x i8] c\"%d\\0A\\00\"\n")
               .append("\n")
-              .append("@.integer = private constant [4 x i8] c\"%d\\0A\\00\"\n")
-              .append("@.float = private constant [4 x i8] c\"%f\\0A\\00\"\n\n");
+              .append("; Constantes para formatear valores numéricos:\n")
+              .append("@.integer = private constant [3 x i8] c\"%d\\00\"\n")
+              .append("@.float = private constant [5 x i8] c\"%.2f\\00\"\n")
+              .append("@.integerNL = private constant [4 x i8] c\"%d\\0A\\00\"\n")
+              .append("@.floatNL = private constant [6 x i8] c\"%.2f\\0A\\00\"\n\n");
 
         declararVarsStrs();
 
@@ -790,9 +804,10 @@ public class GeneradorDeCodigo extends Visitor {
 
     @Override
     public void visit(Literal lit) throws ExcepcionVisitor {
-        // Este visitor genere una variable auxiliar para utilizar los valores literales
-        // Como alternativa a generar la variable, podríamos guardar directamente el valor
-        // pero de esta manera queda más uniforme con la forma en la que hacemos lo otro.
+        /* Este visitor genera una variable auxiliar para utilizar los valores literales.
+         * Como alternativa a generar la variable podríamos utilizar directamente el valor,
+         * pero de esta manera queda más uniforme con la forma en la que hacemos lo otro.
+         */
 
         String refIR = Normalizador.crearNomRef("lit");
         lit.setRefIR(refIR);
@@ -816,9 +831,9 @@ public class GeneradorDeCodigo extends Visitor {
 
         imprimirComent(String.format("visit(Literal): %s", valorParser));
 
-        // Hack para generar referencias a valores en una línea (le sumo 0 al valor que quiero guardar)
         String valorNeutro = lit.getTipo() == Tipo.FLOAT ? "0.0" : "0";
         String instSuma = lit.getTipo() == Tipo.FLOAT ? "fadd" : "add";
+        // Hack para generar referencias a valores en una línea (le sumo 0 al valor que quiero guardar)
         imprimirCodigo(String.format("%s = %s %s %s, %s", refIR, instSuma, tipoIR, valorIR, valorNeutro));
     }
 
@@ -832,7 +847,12 @@ public class GeneradorDeCodigo extends Visitor {
 
         String nombreIR = sv.getNombreIR();
         String tipoIR = TIPO_IR.get(sv.getTipo()).fst;
-        String refIR = Normalizador.crearNomRef("sv");
+
+        String nombreVar = sv.getTipo().equals(Tipo.INTEGER) ? "int" :
+                sv.getTipo().equals(Tipo.FLOAT) ? "dbl" :
+                sv.getTipo().equals(Tipo.BOOLEAN) ? "bln" : "unknown";
+
+        String refIR = Normalizador.crearNomRef(nombreVar);
         sv.setRefIR(refIR);
 
         imprimirComent(String.format("visit(Identificador): %s", sv.getNombre()));
