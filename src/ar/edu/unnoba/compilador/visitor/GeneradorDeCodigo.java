@@ -11,7 +11,6 @@ import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.Conjuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.Disyuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.OperacionBinariaLogica;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
-import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.logicas.NegacionLogica;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.*;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
@@ -383,12 +382,6 @@ public class GeneradorDeCodigo extends Visitor {
     }
 
     @Override
-    public void visit(Encabezado e) throws ExcepcionVisitor {
-        // TODO: Sacar si no se usa
-        super.visit(e);
-    }
-
-    @Override
     public void visit(Bloque b) throws ExcepcionVisitor {
         if (b.esProgramaPrincipal()) {
             codigo.append("\ndefine i32 @main(i32, i8**) {\n");
@@ -520,7 +513,6 @@ public class GeneradorDeCodigo extends Visitor {
                     aplicarCortocircuito ? " con cortocircuito booleano" : "",
                     sv.getNombre(), sv.getTipo(), refIR));
 
-            // FIXME
             if (aplicarCortocircuito) {
                 finalizarCortocircuitoAsig(refIR, sv.getNombreIR());
             } else {
@@ -697,12 +689,6 @@ public class GeneradorDeCodigo extends Visitor {
     /* Sentencias de control */
 
     @Override
-    public void visit(Continuar c) throws ExcepcionVisitor {
-        // TODO: Sacar si no se usa
-        super.visit(c);
-    }
-
-    @Override
     public void visit(Retorno r) throws ExcepcionVisitor {
         Expresion expr = r.getExpresion();
 
@@ -721,9 +707,19 @@ public class GeneradorDeCodigo extends Visitor {
     }
 
     @Override
+    public void visit(Continuar c) throws ExcepcionVisitor {
+        imprimirComent("visit(Continuar)");
+        Pair<String, String> etiquetas = etiquetasMientras.peek();
+        // Saltar al principio del while
+        imprimirCodSaltoInc(etiquetas.fst);
+    }
+
+    @Override
     public void visit(Salir s) throws ExcepcionVisitor {
-        // TODO: Sacar si no se usa
-        super.visit(s);
+        imprimirComent("visit(Salir)");
+        Pair<String, String> etiquetas = etiquetasMientras.peek();
+        // Saltar al final del while
+        imprimirCodSaltoInc(etiquetas.snd);
     }
 
 
@@ -766,12 +762,6 @@ public class GeneradorDeCodigo extends Visitor {
         } else {
             throw new ExcepcionVisitor("Tipo de operación binaria inesperado.");
         }
-    }
-
-    @Override
-    public void visit(OperacionUnaria ou) throws ExcepcionVisitor {
-        // TODO: Sacar si no se usa
-        super.visit(ou);
     }
 
 
