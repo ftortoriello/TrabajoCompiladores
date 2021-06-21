@@ -18,7 +18,7 @@ import java.nio.file.Paths;
 /* Clase principal que realiza todos los pasos para convertir código fuente en un ejecutable */
 
 public class Compilar {
-    private static void graficarArbol(Programa programa, String nombreArchivo, String etiqueta) throws IOException, InterruptedException, ExcepcionVisitor {
+    private static boolean graficarArbol(Programa programa, String nombreArchivo, String etiqueta) throws IOException, InterruptedException, ExcepcionVisitor {
         final String formatoImg = "png";
         //final String formatoImg = "svg";
 
@@ -34,8 +34,10 @@ public class Compilar {
         });
         if (exitCode == 0) {
             System.out.println("Se graficó el AST «" + nombreArchivo + "».");
+            return true;
         } else {
             System.out.println("Ha ocurrido un error al graficar el AST «" + nombreArchivo + "».");
+            return false;
         }
     }
 
@@ -46,7 +48,7 @@ public class Compilar {
         pw.close();
     }
 
-    private static void compilarExe(String nombre) throws IOException, InterruptedException {
+    private static boolean compilarExe(String nombre) throws IOException, InterruptedException {
         final String nombreExe;
         int exitCode;
 
@@ -76,8 +78,10 @@ public class Compilar {
 
         if (exitCode == 0) {
             System.out.format("Ejecutable generado exitosamente en «%s».\n", nombreExe);
+            return true;
         } else {
             System.out.format("Código de salida %d al generar el ejecutable.\n", exitCode);
+            return false;
         }
     }
 
@@ -160,10 +164,10 @@ public class Compilar {
             System.out.println("\nTraducción a código IR finalizada");
 
             System.out.println("\nConvirtiendo el código IR en un programa ejecutable...");
-            compilarExe(carpetaSalida + nombreArchivo);
+            boolean compilado = compilarExe(carpetaSalida + nombreArchivo);
+            if (!compilado) return;
 
-            // TODO no entrar acá si hubo un error al convertir
-            System.out.println("\nEjecutando el programa...");
+            System.out.println("\nEjecutando el programa compilado...");
             Util.ejecutar("./" + carpetaSalida + nombreArchivo);
 
         } catch (ClassCastException e) {

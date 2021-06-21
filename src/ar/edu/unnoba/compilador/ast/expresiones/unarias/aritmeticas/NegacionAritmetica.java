@@ -14,7 +14,7 @@ public class NegacionAritmetica extends OperacionUnaria {
     public Expresion evaluar() throws ExcepcionTransformer {
         Expresion expresion = getExpresion().evaluar();
         if (!(expresion instanceof Literal)) {
-            // TODO si no es literal se rompe
+            // TODO Si no es literal se rompe. Si la transformamos en Resta de 0 - expresion, para evitar más excepciones en el generador de código?
             return this;
         }
 
