@@ -44,7 +44,7 @@ public class Compilar {
     private static void generarCodigoIR(Programa p, String archivoEntrada, String archivoSalida)
             throws IOException, ExcepcionVisitor {
         PrintWriter pw = new PrintWriter(new FileWriter(archivoSalida));
-        pw.println(new GeneradorDeCodigo().generarCodigo(p, archivoEntrada, true));
+        pw.println(new GeneradorDeCodigo().generarCodigo(p, archivoEntrada, false));
         pw.close();
     }
 

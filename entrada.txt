@@ -1,4 +1,4 @@
-{
+
 variable a is integer = 3;
 variable b is float;
 
@@ -12,7 +12,7 @@ function inc(a is integer) return integer
 
 function def(a is integer) return integer
     writeln("Esta función retorna 0 de forma implícita");
-}
+
 
 main is
     # def(1); # Me permite invocar esto, debería?
@@ -28,12 +28,13 @@ main is
     variable ss is integer = 2;
     writeln(ss);
 }
+    #writeln(inc(1));
+
+    #writeln(1);
     variable bool1 is boolean = true;
     variable bool2 is boolean = false;
-
     writeln(bool1);
     writeln(bool2);
-
 
     {
     variable c is integer = 0;

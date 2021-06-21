@@ -154,25 +154,16 @@ public class GeneradorDeCodigo extends Visitor {
             argsFun = String.format("i8* getelementptr([%1$s x i8], [%1$s x i8]* %2$s, i32 0, i32 0)",
                     longStr, nombreIR);
         } else if (arg.getTipo().equals(Tipo.BOOLEAN)) {
-            // TODO
-            // Necesito el valor booleano pero no lo tengo acá
-            argsFun = "";
-            /*
-            if (i.getNombre().equals("write") && arg) {
-                formato = "[3 x i8], [3 x i8]* @.integer";
-            } else if (i.getNombre().equals("write") && arg.getTipo().equals(Tipo.FLOAT)) {
-                formato = "[5 x i8], [5 x i8]* @.float";
+            // Extiendo el i1 a i32 para poder imprimirlo
+            String refExt = Normalizador.crearNomRef("ext");
+            imprimirCodigo(String.format("%s = zext i1 %s to i32", refExt, refIR));
+            refIR = refExt;
 
-                argsFun = String.format("i8* getelementptr([4 x i8], [4 x i8]* @true, i32 0, i32 0)",
-                    longStr, nombreIR);
-
-             */
-            /*
-              .append("@.true = private constant[4 x i8] c\".T.\\00\"\n")
-              .append("@.false = private constant[4 x i8] c\".F.\\00\"\n")
-              .append("@.trueNL = private constant[5 x i8] c\".T.\\0A\\00\"\n")
-              .append("@.falseNL = private constant[5 x i8] c\".F.\\0A\\00\"\n")
-             */
+            if (i.getNombre().equals("write")) {
+                argsFun = String.format("i8* getelementptr([3 x i8], [3 x i8]* @.boolean, i32 0, i32 0), i32 %s", refIR);
+            } else {
+                argsFun = String.format("i8* getelementptr([4 x i8], [4 x i8]* @.booleanNL, i32 0, i32 0), i32 %s", refIR);
+            }
         } else {
             // Es un número entero o flotante
 
@@ -414,10 +405,8 @@ public class GeneradorDeCodigo extends Visitor {
               .append("@double_read_format = unnamed_addr constant [4 x i8] c\"%lf\\00\"\n")
               .append("\n")
               .append("; Constantes para formatear valores booleanos:\n")
-              .append("@.true = private constant[4 x i8] c\".T.\\00\"\n")
-              .append("@.false = private constant[4 x i8] c\".F.\\00\"\n")
-              .append("@.trueNL = private constant[5 x i8] c\".T.\\0A\\00\"\n")
-              .append("@.falseNL = private constant[5 x i8] c\".F.\\0A\\00\"\n")
+              .append("@.boolean = private constant[3 x i8] c\"%d\\00\"\n")
+              .append("@.booleanNL = private constant[4 x i8] c\"%d\\0A\\00\"\n")
               .append("\n")
               .append("; Constantes para formatear valores numéricos:\n")
               .append("@.integer = private constant [3 x i8] c\"%d\\00\"\n")
@@ -859,7 +848,12 @@ public class GeneradorDeCodigo extends Visitor {
 
         String nombreIR = sv.getNombreIR();
         String tipoIR = TIPO_IR.get(sv.getTipo()).fst;
-        String refIR = Normalizador.crearNomRef("sv");
+
+        String nombreVar = sv.getTipo().equals(Tipo.INTEGER) ? "int" :
+                sv.getTipo().equals(Tipo.FLOAT) ? "dbl" :
+                sv.getTipo().equals(Tipo.BOOLEAN) ? "bln" : "unknown";
+
+        String refIR = Normalizador.crearNomRef(nombreVar);
         sv.setRefIR(refIR);
 
         imprimirComent(String.format("visit(Identificador): %s", sv.getNombre()));
