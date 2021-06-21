@@ -26,7 +26,6 @@ public class ReconocedorCadenas extends Visitor {
     @Override
     public void visit(Cadena c) throws ExcepcionVisitor {
         c.setValor(c.getValor().replace("\\\"", ""));
-        c.setValor(Normalizador.normalizar(c.getValor()));
         c.setNombreIR(Normalizador.crearNomPtroGbl("str"));
         c.setRefIR(Normalizador.crearNomPtroLcl("str"));
         arrCadenas.add(c);

@@ -153,7 +153,7 @@ public class GeneradorDeCodigo extends Visitor {
         if (arg instanceof Cadena) {
             Cadena cad = (Cadena) arg;
             String nombreIR = cad.getNombreIR();
-            int longStr = cad.getValor().length() + 1;
+            int longStr = cad.getLongitudIR();
             argsFun = String.format("i8* getelementptr([%1$s x i8], [%1$s x i8]* %2$s, i32 0, i32 0)",
                                     longStr, nombreIR);
         } else {
@@ -344,7 +344,7 @@ public class GeneradorDeCodigo extends Visitor {
         // Por ej.: @ptro.str.2 = private unnamed_addr constant [5 x i8]c"Hola\00"
         arrCadenas.forEach(cad -> {
             codigo.append(String.format("%s = private unnamed_addr constant [%s x i8] " +
-                    "c\"%s\\00\"\n", cad.getNombreIR(), cad.getValor().length() + 1, cad.getValor()));
+                    "c\"%s\"\n", cad.getNombreIR(), cad.getLongitudIR(), cad.getValorIR()));
         });
     }
 
