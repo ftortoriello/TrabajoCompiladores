@@ -7,6 +7,7 @@ import ar.edu.unnoba.compilador.sintaxis.Parser;
 import ar.edu.unnoba.compilador.visitor.*;
 import ar.edu.unnoba.compilador.visitor.transformer.ConversorDeEstructuras;
 import ar.edu.unnoba.compilador.visitor.transformer.Optimizador;
+import ar.edu.unnoba.compilador.visitor.transformer.ReconocedorCadenas;
 import ar.edu.unnoba.compilador.visitor.transformer.TransformerTipos;
 import java_cup.runtime.Symbol;
 
@@ -150,6 +151,9 @@ public class Compilar {
                     "AST optimizado (Conti - Tortoriello)");
 
             final String nombreArchivo = "4_llvm-ir";
+
+            System.out.println("\nRecorriendo el programa para detectar cadenas...");
+            new ReconocedorCadenas().procesar(programa);
 
             System.out.println("\nIniciando traducción a código IR...");
             generarCodigoIR(programa, rutaEntrada,  carpetaSalida + nombreArchivo + ".ll");

@@ -196,4 +196,8 @@ public abstract class Visitor {
             argumento.accept(this);
         }
     }
+
+    public void visit(Cadena c) throws ExcepcionVisitor {
+
+    }
 }

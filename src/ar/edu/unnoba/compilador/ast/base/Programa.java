@@ -2,10 +2,13 @@ package ar.edu.unnoba.compilador.ast.base;
 
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Cadena;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.SimboloFuncion;
 import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class Programa extends Nodo {
@@ -13,6 +16,7 @@ public class Programa extends Nodo {
     private Bloque cuerpo;
     private Alcance alcance;
     private Map<String, SimboloFuncion> tablaFunciones;
+    private List<Cadena> arrCadenas = new ArrayList<>();
 
     public Programa(String nombre, Encabezado encabezado, Bloque cuerpo) {
         super(nombre);
@@ -50,6 +54,14 @@ public class Programa extends Nodo {
 
     public void setTablaFunciones(Map<String, SimboloFuncion> tablaFunciones) {
         this.tablaFunciones = tablaFunciones;
+    }
+
+    public List<Cadena> getArrCadenas() {
+        return arrCadenas;
+    }
+
+    public void setArrCadenas(List<Cadena> arrCadenas) {
+        this.arrCadenas = arrCadenas;
     }
 
     @Override

@@ -45,6 +45,8 @@ public class GeneradorDeCodigo extends Visitor {
     // Se añaden en el visit(DecVarIni), y se procesa una vez que se alcanza el main
     private List<String> varGblInit = new ArrayList<>();
 
+    private List<Cadena> arrCadenas;
+
     // Mapa para relacionar nuestros tipos con los del IR (y además definir valores por defecto)
     private final Map<Tipo, Pair<String, String>> TIPO_IR = new HashMap<>() {{
         put(Tipo.BOOLEAN, new Pair<>("i1", "0"));
@@ -141,22 +143,22 @@ public class GeneradorDeCodigo extends Visitor {
     private void imprimirWrite(InvocacionFuncion i) throws ExcepcionVisitor {
 
         Expresion arg = i.getArgs().get(0);
-        // TODO las cadenas no tienen visitor, necesitamos uno o generar acá la ref a mano
         arg.accept(this);
         String refIR = arg.getRefIR();
 
-        String refTemp = Normalizador.crearNomRef("temp");
-
         String nombreFun, argsFun, tipoPtro;
 
+        // Uso printf(), excepto cuando tengo que generar saltos de línea
+        nombreFun = i.getNombre().equals("writeln") ? "@puts" : "@printf";
+
         if (arg instanceof Cadena) {
-            // TODO
-            nombreFun = "@puts";
-            argsFun = "???"; // problema: @str
-            // STRING:  %temp = call i32 @puts(i8* getelementptr ([11 x i8], [11 x i8]* @str, i32 0, i32 0))
+            Cadena cad = (Cadena) arg;
+            String nombreIR = cad.getNombreIR();
+            int longStr = cad.getValor().length() + 1;
+            argsFun = String.format("i8* getelementptr([%1$s x i8], [%1$s x i8]* %2$s, i32 0, i32 0)",
+                                    longStr, nombreIR);
         } else {
             // Es un número
-            nombreFun = "@printf";
             String tipoIR;
             if (arg.getTipo() == Tipo.INTEGER) {
                 tipoPtro = "integer";
@@ -177,12 +179,12 @@ public class GeneradorDeCodigo extends Visitor {
 
             argsFun = String.format("i8* getelementptr([4 x i8], [4 x i8]* @.%s, i32 0, i32 0), %s %s",
                     tipoPtro, tipoIR, refIR);
-
-
-
         }
 
+        String refTemp = Normalizador.crearNomRef("temp");
+
         imprimirCodigo(String.format("%s = call i32 (i8*, ...) %s(%s)", refTemp, nombreFun, argsFun));
+
     }
 
     /* Para tratar los casos de invocaciones a read */
@@ -329,12 +331,31 @@ public class GeneradorDeCodigo extends Visitor {
         imprimirEtiqueta(etiFin);
     }
 
+    /* Invoca a las funciones que asignan a las variables
+     * globales el valor con el que fueron declaradas */
+    private void inicializarVarsGbls() {
+        varGblInit.forEach(fun -> {
+            imprimirCodigo(String.format("call void %s()", fun));
+        });
+    }
+
+    /* Inicializa las cadenas que van a usarse en el programa
+     */
+    private void declararVarsStrs() {
+        // Por ej.: @ptro.str.2 = private unnamed_addr constant [5 x i8]c"Hola\00"
+        arrCadenas.forEach(cad -> {
+            codigo.append(String.format("%s = private unnamed_addr constant [%s x i8] " +
+                    "c\"%s\\00\"\n", cad.getNombreIR(), cad.getValor().length() + 1, cad.getValor()));
+        });
+    }
+
 
     /*** Función principal ***/
 
     public String generarCodigo(Programa p, String nombreArchivoFuente, Boolean comentariosOn) throws ExcepcionVisitor {
         this.nombreArchivoFuente = nombreArchivoFuente;
-        tablaFunciones = p.getTablaFunciones();
+        this.tablaFunciones = p.getTablaFunciones();
+        this.arrCadenas = p.getArrCadenas();
         this.comentariosOn = comentariosOn;
 
         super.procesar(p);
@@ -366,7 +387,7 @@ public class GeneradorDeCodigo extends Visitor {
         }
 
         codigo.append("\n\n")
-              .append("declare i32 @puts(i8*)\n")
+              .append("declare i32 @puts(i8*, ...)\n")
               .append("declare i32 @printf(i8*, ...)\n")
               .append("declare i32 @scanf(i8*, ...)\n")
               .append("\n")
@@ -377,7 +398,9 @@ public class GeneradorDeCodigo extends Visitor {
               .append("@.false = private constant[4 x i8] c\".F.\\00\"\n")
               .append("\n")
               .append("@.integer = private constant [4 x i8] c\"%d\\0A\\00\"\n")
-              .append("@.float = private constant [4 x i8] c\"%f\\0A\\00\"\n");
+              .append("@.float = private constant [4 x i8] c\"%f\\0A\\00\"\n\n");
+
+        declararVarsStrs();
 
         super.visit(p);
     }
@@ -392,9 +415,7 @@ public class GeneradorDeCodigo extends Visitor {
     public void visit(Bloque b) throws ExcepcionVisitor {
         if (b.esProgramaPrincipal()) {
             codigo.append("\ndefine i32 @main(i32, i8**) {\n");
-            varGblInit.forEach(fun -> {
-                imprimirCodigo(String.format("call void %s()", fun));
-            });
+            inicializarVarsGbls();
             super.visit(b);
             imprimirCodigo("ret i32 0");
             codigo.append("}\n");

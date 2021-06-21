@@ -1,3 +1,4 @@
+{
 variable a is integer = 3;
 variable b is float;
 
@@ -5,37 +6,30 @@ variable z is integer = a * 2;
 
 # esta rompe al cambiarle el tipo del param a float
 # no sabe como convertir el tipo de la expresion del return
-function inc(a is float) return integer
+function inc(a is integer) return integer
     return a * 2 + 1;
 
-{
+
 function def(a is integer) return integer
     writeln("Esta función retorna 0 de forma implícita");
 }
 
 main is
     # def(1); # Me permite invocar esto, debería?
+    write("write() no genera salto de línea. ");
+    writeln("Hola, soy de Yangüés.\nY tengo un ñandú.");
+    writeln(1);
+    writeln(1.0);
+    write(1);
+    write(1.0);
 
-    writeln(inc(a));
-
-    variable i is integer = inc(z);
-    writeln(i);
-
-    a = i + 1;
-    writeln(a);
-
-    b = 1;
-    a = 5;
-    writeln(a);
-
-    writeln(inc(1.0 + 1.0));
-
-    # Esto cuelga la ejecución
     {
-    while i < 10 do
-        if i / 2 == 0 then begin
-            i = i + 1;
-        end;
+    variable c is integer = 0;
+    while c < 10 do
+    begin
+        if c / 2 == 0 then writeln(c); ## El if hace algo raro, solo imprime las dos primeras iteraciones
+        c = c + 1;
+    end;
     }
 end.
 
