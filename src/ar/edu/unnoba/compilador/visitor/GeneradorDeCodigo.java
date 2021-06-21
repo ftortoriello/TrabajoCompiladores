@@ -140,60 +140,58 @@ public class GeneradorDeCodigo extends Visitor {
 
     /* Para tratar los casos de invocaciones a write */
     private void imprimirWrite(InvocacionFuncion i) throws ExcepcionVisitor {
-
         Expresion arg = i.getArgs().get(0);
         arg.accept(this);
         String refIR = arg.getRefIR();
 
-        String formato, argsFun;
+        String paramsPrintf;
 
         if (arg instanceof Cadena) {
             Cadena cad = (Cadena) arg;
-            String nombreIR = cad.getNombreIR();
-            int longStr = cad.getLongitudIR();
-            argsFun = String.format("i8* getelementptr([%1$s x i8], [%1$s x i8]* %2$s, i32 0, i32 0)",
-                    longStr, nombreIR);
+            paramsPrintf = grarParamsPrintf(cad.getLongitudIR(), cad.getNombreIR());
         } else if (arg.getTipo().equals(Tipo.BOOLEAN)) {
             // Extiendo el i1 a i32 para poder imprimirlo
             String refExt = Normalizador.crearNomRef("ext");
             imprimirCodigo(String.format("%s = zext i1 %s to i32", refExt, refIR));
             refIR = refExt;
-
-            if (i.getNombre().equals("write")) {
-                argsFun = String.format("i8* getelementptr([3 x i8], [3 x i8]* @.boolean, i32 0, i32 0), i32 %s", refIR);
-            } else {
-                argsFun = String.format("i8* getelementptr([4 x i8], [4 x i8]* @.booleanNL, i32 0, i32 0), i32 %s", refIR);
-            }
+            paramsPrintf = grarParamsPrintfConRef(3, "@.boolean", "i32", refIR);
         } else {
             // Es un número entero o flotante
-
-            if (i.getNombre().equals("write") && arg.getTipo().equals(Tipo.INTEGER)) {
-                formato = "[3 x i8], [3 x i8]* @.integer";
-            } else if (i.getNombre().equals("write") && arg.getTipo().equals(Tipo.FLOAT)) {
-                formato = "[5 x i8], [5 x i8]* @.float";
-            } else if (i.getNombre().equals("writeln") && arg.getTipo().equals(Tipo.INTEGER)) {
-                formato = "[4 x i8], [4 x i8]* @.integerNL";
-            } else {
-                formato = "[6 x i8], [6 x i8]* @.floatNL";
-            }
-
             String tipoIR = arg.getTipo().equals(Tipo.INTEGER) ? "i32" : "double";
 
             if (arg.getTipo().equals(Tipo.FLOAT)) {
-                // Si es float, para que pueda imprimirse extiendo el número a double y actualizo la ref.
-
+                // Si es float, para que pueda imprimirse, extiendo el número a double y actualizo la ref.
                 String refExt = Normalizador.crearNomRef("ext");
                 imprimirCodigo(String.format("%s = fpext float %s to double", refExt, refIR));
                 refIR = refExt;
             }
 
-            argsFun = String.format("i8* getelementptr(%s, i32 0, i32 0), %s %s",
-                    formato, tipoIR, refIR);
+            if (arg.getTipo().equals(Tipo.INTEGER)) {
+                paramsPrintf = grarParamsPrintfConRef(3, "@.integer", tipoIR, refIR);
+            } else {
+                paramsPrintf = grarParamsPrintfConRef(5, "@.float", tipoIR, refIR);
+            }
         }
 
-        String refTemp = Normalizador.crearNomRef("aux");
+        imprimirCodigo(String.format("%s = call i32 (i8*, ...) @printf(%s)",
+                Normalizador.crearNomRef("aux"), paramsPrintf));
 
-        imprimirCodigo(String.format("%s = call i32 (i8*, ...) @printf(%s)", refTemp, argsFun));
+        if (i.getNombre().equals("writeln")) {
+            // Genero un salto de línea
+            paramsPrintf = grarParamsPrintf(2, "@.salto");
+            imprimirCodigo(String.format("%s = call i32 (i8*, ...) @printf(%s)",
+                    Normalizador.crearNomRef("aux"), paramsPrintf));
+        }
+    }
+
+    private String grarParamsPrintf(int tamanho, String str) {
+        return String.format("i8* getelementptr([%1$s x i8], [%1$s x i8]* %2$s, i32 0, i32 0)",
+                tamanho, str);
+    }
+
+    private String grarParamsPrintfConRef(int tamanho, String str, String tipoIR, String refIR) {
+        return String.format("i8* getelementptr([%1$s x i8], [%1$s x i8]* %2$s, i32 0, i32 0), %3$s %4$s",
+                tamanho, str, tipoIR, refIR);
     }
 
     /* Para tratar los casos de invocaciones a read */
@@ -351,9 +349,9 @@ public class GeneradorDeCodigo extends Visitor {
     /* Inicializa las cadenas que van a usarse en el programa
      */
     private void declararVarsStrs() {
-        // Por ej.: @ptro.str.2 = private unnamed_addr constant [5 x i8] c"Hola\00"
+        // Por ej.: @ptro.str.2 = private constant [5 x i8] c"Hola\00"
         arrCadenas.forEach(cad -> {
-            codigo.append(String.format("%s = private unnamed_addr constant [%s x i8] c\"%s\"\n",
+            codigo.append(String.format("%s = private constant [%s x i8] c\"%s\"\n",
                     cad.getNombreIR(), cad.getLongitudIR(), cad.getValorIR()));
         });
     }
@@ -396,22 +394,17 @@ public class GeneradorDeCodigo extends Visitor {
         }
 
         codigo.append("\n\n")
-              .append("declare i32 @puts(i8*, ...)\n")
               .append("declare i32 @printf(i8*, ...)\n")
               .append("declare i32 @scanf(i8*, ...)\n")
               .append("\n")
               .append("@int_read_format = unnamed_addr constant [3 x i8] c\"%d\\00\"\n")
               .append("@double_read_format = unnamed_addr constant [4 x i8] c\"%lf\\00\"\n")
               .append("\n")
-              .append("; Constantes para formatear valores booleanos:\n")
+              .append("; Constantes para salidas:\n")
+              .append("@.salto = private constant [2 x i8] c\"\\0A\\00\"\n")
               .append("@.boolean = private constant[3 x i8] c\"%d\\00\"\n")
-              .append("@.booleanNL = private constant[4 x i8] c\"%d\\0A\\00\"\n")
-              .append("\n")
-              .append("; Constantes para formatear valores numéricos:\n")
               .append("@.integer = private constant [3 x i8] c\"%d\\00\"\n")
-              .append("@.float = private constant [5 x i8] c\"%.2f\\00\"\n")
-              .append("@.integerNL = private constant [4 x i8] c\"%d\\0A\\00\"\n")
-              .append("@.floatNL = private constant [6 x i8] c\"%.2f\\0A\\00\"\n\n");
+              .append("@.float = private constant [5 x i8] c\"%.2f\\00\"\n\n");
 
         declararVarsStrs();
 

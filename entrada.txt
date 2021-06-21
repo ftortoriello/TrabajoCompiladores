@@ -28,13 +28,29 @@ main is
     variable ss is integer = 2;
     writeln(ss);
 }
-    #writeln(inc(1));
 
-    #writeln(1);
+
+    write("a");
+    write("b");
+
+    writeln("a");
+    writeln("b");
+
     variable bool1 is boolean = true;
     variable bool2 is boolean = false;
+
+    write(bool1);
+    write(bool2);
+
     writeln(bool1);
     writeln(bool2);
+
+
+    write(1);
+    write(1.0);
+
+    writeln(1);
+    writeln(1.0);
 
     {
     variable c is integer = 0;
