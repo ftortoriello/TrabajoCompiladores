@@ -396,11 +396,6 @@ public class GeneradorDeCodigo extends Visitor {
 
     /* Sentencia de asignación */
 
-    /* FIXME: En algún lado se rompe con esta entrada:
-      variable b is boolean; b = false == true;
-      Toma los booleanos como flotante creo
-     */
-
     @Override
     public void visit(Asignacion asig) throws ExcepcionVisitor {
         Expresion expr = asig.getExpresion();

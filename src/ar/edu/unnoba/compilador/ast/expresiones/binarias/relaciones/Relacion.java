@@ -27,14 +27,23 @@ public abstract class Relacion extends OperacionBinaria {
             return this;
         }
 
-        float valorIzq = ((Literal) izquierda).getValorNumerico().floatValue();
-        float valorDer = ((Literal) derecha).getValorNumerico().floatValue();
-        boolean resultado = calcularResultado(valorIzq, valorDer);
+        boolean resultado;
+        if (getTipo().equals(Tipo.BOOLEAN)) {
+            boolean valorIzq = ((Literal) izquierda).getValorBooleano();
+            boolean valorDer = ((Literal) derecha).getValorBooleano();
+            resultado = calcularResultado(valorIzq, valorDer);
+        } else {
+            float valorIzq = ((Literal) izquierda).getValorNumerico().floatValue();
+            float valorDer = ((Literal) derecha).getValorNumerico().floatValue();
+            resultado = calcularResultado(valorIzq, valorDer);
+        }
 
         return new Literal(String.valueOf(resultado), Tipo.BOOLEAN);
     }
 
-    protected abstract boolean calcularResultado(Float litIzq, Float litDer);
+    protected abstract boolean calcularResultado(float izq, float der);
+
+    protected abstract boolean calcularResultado(boolean izq, boolean der);
 
     // Crea una clase según sea el operador utilizado
     // Si se utiliza el operador de IGUALDAD, devuelvo una clase Igualdad, etc.
@@ -52,6 +61,6 @@ public abstract class Relacion extends OperacionBinaria {
 
     /* Retorna el tipo de relación usado en el IR */
     public String getTipoCmp() {
-        return getIzquierda().getTipo() == Tipo.INTEGER ? "icmp" : "fcmp";
+        return getIzquierda().getTipo() == Tipo.FLOAT ? "fcmp" : "icmp";
     }
 }

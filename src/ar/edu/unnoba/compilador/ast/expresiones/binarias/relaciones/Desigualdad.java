@@ -9,11 +9,16 @@ public class Desigualdad extends Relacion {
     }
 
     public String getInstruccionIR() {
-        return getIzquierda().getTipo() == Tipo.INTEGER ? "ne" : "one";
+        return getIzquierda().getTipo() == Tipo.FLOAT ? "one" : "ne";
     }
 
     @Override
-    protected boolean calcularResultado(Float litIzq, Float litDer) {
-        return !litIzq.equals(litDer);
+    protected boolean calcularResultado(float litIzq, float litDer) {
+        return litIzq != litDer;
+    }
+
+    @Override
+    protected boolean calcularResultado(boolean izq, boolean der) {
+        return izq != der;
     }
 }

@@ -9,11 +9,17 @@ public class Mayor extends Relacion {
     }
 
     public String getInstruccionIR() {
-        return getIzquierda().getTipo() == Tipo.INTEGER ? "sgt" : "ogt";
+        return getIzquierda().getTipo() == Tipo.FLOAT ? "ogt" : "sgt";
     }
 
     @Override
-    protected boolean calcularResultado(Float litIzq, Float litDer) {
-        return litIzq > litDer;
+    protected boolean calcularResultado(float izq, float der) {
+        return izq > der;
+    }
+
+    @Override
+    protected boolean calcularResultado(boolean izq, boolean der) {
+        // Esto ya viene validado desde el transformer de tipos
+        throw new IllegalStateException("No se puede comparar entre BOOLEAN: " + izq + " > " + der);
     }
 }

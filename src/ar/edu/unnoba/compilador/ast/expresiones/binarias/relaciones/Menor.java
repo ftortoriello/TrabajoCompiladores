@@ -9,11 +9,16 @@ public class Menor extends Relacion {
     }
 
     public String getInstruccionIR() {
-        return getIzquierda().getTipo() == Tipo.INTEGER ? "slt" : "olt";
+        return getIzquierda().getTipo() == Tipo.FLOAT ? "olt" : "slt";
     }
 
     @Override
-    protected boolean calcularResultado(Float litIzq, Float litDer) {
-        return litIzq < litDer;
+    protected boolean calcularResultado(float izq, float der) {
+        return izq < der;
+    }
+
+    @Override
+    protected boolean calcularResultado(boolean izq, boolean der) {
+        throw new IllegalStateException("No se puede comparar entre BOOLEAN: " + izq + " < " + der);
     }
 }

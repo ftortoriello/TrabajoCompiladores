@@ -9,11 +9,16 @@ public class Igualdad extends Relacion {
     }
 
     public String getInstruccionIR() {
-        return getIzquierda().getTipo() == Tipo.INTEGER ? "eq" : "oeq";
+        return getIzquierda().getTipo() == Tipo.FLOAT ? "oeq" : "eq";
     }
 
     @Override
-    protected boolean calcularResultado(Float litIzq, Float litDer) {
-        return litIzq.equals(litDer);
+    protected boolean calcularResultado(float izq, float der) {
+        return izq == der;
+    }
+
+    @Override
+    protected boolean calcularResultado(boolean izq, boolean der) {
+        return izq == der;
     }
 }
