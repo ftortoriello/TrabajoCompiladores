@@ -38,12 +38,16 @@ public class Cadena extends Expresion {
         byte[] utf8bytes = valor.getBytes(StandardCharsets.UTF_8);
         StringBuilder sb = new StringBuilder();
         for (byte b : utf8bytes) {
-            if (b >= 0) {
-                // Es ASCII (entre 0 y y 7F)
+            if (b >= 0x20 && b <= 0x7E && b != 0x22) {
+                // Es ASCII imprimible y no es una comilla; dejarlo legible
                 byte[] byteASCII = { b };
                 sb.append(new String(byteASCII));
             } else {
-                String hex = Integer.toHexString(Byte.toUnsignedInt(b)).toUpperCase();
+                // Convertirlo a código
+                int code = Byte.toUnsignedInt(b);
+                String hex = Integer.toHexString(code).toUpperCase();
+                // Tiene que tener dos dígitos
+                if (code < 16) hex = "0" + hex;
                 sb.append("\\" + hex);
             }
         }
