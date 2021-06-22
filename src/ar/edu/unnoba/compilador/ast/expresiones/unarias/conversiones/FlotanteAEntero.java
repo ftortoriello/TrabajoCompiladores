@@ -14,7 +14,7 @@ public class FlotanteAEntero extends OperacionConversion {
     public Expresion evaluar() throws ExcepcionTransformer {
         Expresion expr = getExpresion().evaluar();
         if (!(expr instanceof Literal)) {
-            // TODO si no es literal se rompe
+            // TODO si no es literal se rompe; falta implementar en GeneradorDeCodigo.
             return expr;
         }
 

@@ -144,15 +144,14 @@ public class GeneradorDeCodigo extends Visitor {
             Cadena cad = (Cadena) arg;
             paramsPrintf = grarParamsPrintf(cad.getLongitudIR(), cad.getNombreIR());
         } else if (arg.getTipo().equals(Tipo.BOOLEAN)) {
-            // TODO: Probar. A mí me funciona bien sin esto.
-            /*
+            // FIXME: Tendría que ser así directamente, pero por algún motivo imprime cualquier cosa en Windows
+            //paramsPrintf = grarParamsPrintfConRef(3, "@.int_format", "i1", refIR);
+
             // Extiendo el i1 a i32 para poder imprimirlo
             String refExt = Normalizador.crearNomRef("ext");
             imprimirCodigo(String.format("%s = zext i1 %s to i32", refExt, refIR));
             refIR = refExt;
             paramsPrintf = grarParamsPrintfConRef(3, "@.int_format", "i32", refIR);
-            */
-            paramsPrintf = grarParamsPrintfConRef(3, "@.int_format", "i1", refIR);
         } else {
             // Es un número entero o flotante
             String tipoIR = arg.getTipo().equals(Tipo.INTEGER) ? "i32" : "double";
@@ -343,7 +342,6 @@ public class GeneradorDeCodigo extends Visitor {
 
     /* Invoca a las funciones que asignan a las variables
      * globales el valor con el que fueron declaradas */
-    // TODO: Podemos directamente asignarle el valor cuando se definen y eliminar esto
     private void inicializarVarsGbls() {
         varGblInit.forEach(fun -> {
             imprimirCodigo(String.format("call void %s()", fun));
@@ -893,7 +891,7 @@ public class GeneradorDeCodigo extends Visitor {
         }
         // A las funciones read las definimos como funciones en IR, y las invocamos normalmente
 
-        // La función fue definida por el programador, la busco en la tabla
+        // Buscar la función en la tabla
         SimboloFuncion sf = tablaFunciones.get(i.getNombre());
 
         String nombreFun = sf.getNombreIR();

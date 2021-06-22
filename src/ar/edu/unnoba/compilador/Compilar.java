@@ -27,11 +27,9 @@ public class Compilar {
         pw.println(new ASTGraphviz(etiqueta).generarCodigo(programa));
         pw.close();
 
-        int exitCode = Util.ejecutar(new String[] {
-                "dot", "-T" + formatoImg,
+        int exitCode = Util.ejecutar("dot", "-T" + formatoImg,
                 nombreArchivo + ".dot",
-                "-o", nombreArchivo + "." + formatoImg
-        });
+                "-o", nombreArchivo + "." + formatoImg);
         if (exitCode == 0) {
             System.out.println("Se graficó el AST «" + nombreArchivo + "».");
             return true;
@@ -56,24 +54,18 @@ public class Compilar {
             nombreExe = nombre + ".exe";
 
             // en Windows hay que enlazarlo con scanf.o para permitir leer entradas del teclado
-            // TODO: una vez que implementemos las funciones read, probar si esto es necesario para Windows y no los demás
+            // TODO: Probar si es así
 
             // generar objeto con la salida de nuestro compilador
-            exitCode = Util.ejecutar(new String[] {
-                    "clang", "-c", "-o", nombre + ".o", nombre + ".ll"
-            });
+            exitCode = Util.ejecutar("clang", "-c", "-o", nombre + ".o", nombre + ".ll");
             if (exitCode == 0) {
                 // generar exe enlazado al objeto anterior y a scanf
-                exitCode = Util.ejecutar(new String[]{
-                        "clang", "-o", nombreExe, nombre + ".o", "lib/scanf.o"
-                });
+                exitCode = Util.ejecutar("clang", "-o", nombreExe, nombre + ".o", "lib/scanf.o");
             }
         } else {
             // asumimos Unix
             nombreExe = nombre;
-            exitCode = Util.ejecutar(new String[] {
-                    "clang", "-o", nombreExe, nombre + ".ll"
-            });
+            exitCode = Util.ejecutar("clang", "-o", nombreExe, nombre + ".ll");
         }
 
         if (exitCode == 0) {

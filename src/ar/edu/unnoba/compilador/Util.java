@@ -1,42 +1,28 @@
 package ar.edu.unnoba.compilador;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 public class Util {
-    /* Ejecutar un comando, mostrar su salida y cuando finalice retornar su código de salida */
-    public static int ejecutar(String[] cmd) throws IOException, InterruptedException {
-        Process proc = Runtime.getRuntime().exec(cmd);
 
-        String line;
-        BufferedReader reader;
+    /* Ejecutar un comando, gestionar su entrada/salida, esperar que finalice y cuando lo haga
+     * retornar su código de salida. */
+    public static int ejecutar(String... cmd) throws IOException, InterruptedException {
+        ProcessBuilder pb = new ProcessBuilder(cmd);
 
-        // stdout
-        reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-        while ((line = reader.readLine()) != null) {
-            System.out.println(line);
-        }
+        // Usar la I/O del proceso actual
+        pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+        pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+        pb.redirectInput(ProcessBuilder.Redirect.INHERIT);
 
-        // stderr
-        boolean error = false;
-        reader = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
-        while ((line = reader.readLine()) != null) {
-            if (!error) {
-                // mostrar título
-                System.out.println("ERRORES:");
-                error = true;
-            }
-            System.out.println(line);
-        }
-        proc.waitFor(); // esperar que finalice el proceso
+        // Iniciar proceso
+        Process proc = pb.start();
+
+        // Esperar que finalice el proceso
+        proc.waitFor();
         return proc.exitValue();
     }
 
-    /* Si hay solo un arg. (para no tener que crear el String[] cuando se invoca) */
-    public static void ejecutar(String cmd) throws IOException, InterruptedException {
-        ejecutar(new String[] {
-                cmd
-        });
-    }
 }
