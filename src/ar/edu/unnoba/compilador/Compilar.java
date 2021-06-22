@@ -7,7 +7,7 @@ import ar.edu.unnoba.compilador.sintaxis.Parser;
 import ar.edu.unnoba.compilador.visitor.*;
 import ar.edu.unnoba.compilador.visitor.transformer.ConversorDeEstructuras;
 import ar.edu.unnoba.compilador.visitor.transformer.Optimizador;
-import ar.edu.unnoba.compilador.visitor.transformer.ReconocedorCadenas;
+import ar.edu.unnoba.compilador.visitor.ReconocedorCadenas;
 import ar.edu.unnoba.compilador.visitor.transformer.TransformerTipos;
 import java_cup.runtime.Symbol;
 
@@ -42,7 +42,7 @@ public class Compilar {
     private static void generarCodigoIR(Programa p, String archivoEntrada, String archivoSalida)
             throws IOException, ExcepcionVisitor {
         PrintWriter pw = new PrintWriter(new FileWriter(archivoSalida));
-        pw.println(new GeneradorDeCodigo().generarCodigo(p, archivoEntrada, false));
+        pw.println(new GeneradorDeCodigo().generarCodigo(p, archivoEntrada, true));
         pw.close();
     }
 

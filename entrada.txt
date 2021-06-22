@@ -1,56 +1,32 @@
-
+{
 variable a is integer = 3;
 variable b is float;
 
 variable z is integer = a * 2;
 
-# esta rompe al cambiarle el tipo del param a float
-# no sabe como convertir el tipo de la expresion del return
 function inc(a is integer) return integer
     return a * 2 + 1;
 
 
 function def(a is integer) return integer
     writeln("Esta función retorna 0 de forma implícita");
-
+}
 
 main is
     # def(1); # Me permite invocar esto, debería?
+
 {
-    write("write() no genera salto de línea. ");
-    writeln("Hola, soy de Yangüés.\nY tengo un ñandú.");
-
-    writeln(1);
-    writeln(1.0);
-    write(1);
-    write(1.0);
-
-    variable ss is integer = 2;
-    writeln(ss);
+    variable a is integer;
+    variable b is float;
+    b = a;
+    writeln(b);
 }
-
-
-    write("a");
-    write("b");
-
-    writeln("a");
-    writeln("b");
 
     variable bool1 is boolean = true;
     variable bool2 is boolean = false;
-
-    write(bool1);
-    write(bool2);
-
     writeln(bool1);
     writeln(bool2);
 
-
-    write(1);
-    write(1.0);
-
-    writeln(1);
-    writeln(1.0);
 
     {
     variable c is integer = 0;

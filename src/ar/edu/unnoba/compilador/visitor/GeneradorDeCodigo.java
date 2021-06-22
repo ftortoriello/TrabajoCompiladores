@@ -143,6 +143,9 @@ public class GeneradorDeCodigo extends Visitor {
         if (arg instanceof Cadena) {
             Cadena cad = (Cadena) arg;
             paramsPrintf = grarParamsPrintf(cad.getLongitudIR(), cad.getNombreIR());
+
+            imprimirCodigo(String.format("%s = call i32 (i8*, ...) @printf(%s)",
+                    Normalizador.crearNomRef("aux"), paramsPrintf));
         } else if (arg.getTipo().equals(Tipo.BOOLEAN)) {
             // FIXME: Tendría que ser así directamente, pero por algún motivo imprime cualquier cosa en Windows
             //paramsPrintf = grarParamsPrintfConRef(3, "@.int_format", "i1", refIR);
@@ -151,7 +154,31 @@ public class GeneradorDeCodigo extends Visitor {
             String refExt = Normalizador.crearNomRef("ext");
             imprimirCodigo(String.format("%s = zext i1 %s to i32", refExt, refIR));
             refIR = refExt;
-            paramsPrintf = grarParamsPrintfConRef(3, "@.int_format", "i32", refIR);
+
+            // Ahora se evalúa el valor del booleano para imprimir "true" o "false".
+            String casoTrue = Normalizador.crearNomEtiqueta("bln_true");
+            String casoFalse = Normalizador.crearNomEtiqueta("bln_false");
+            String fin = Normalizador.crearNomEtiqueta("fin_eval_bln");
+
+            String refAux = Normalizador.crearNomRef("aux");
+
+            // Guardo en refAux el valor de la comparación
+            imprimirCodigo(String.format("%s = icmp eq i32 %s, 1", refAux, refIR));
+            imprimirCodSaltoCond(refAux, casoTrue, casoFalse);
+
+            imprimirEtiqueta(casoTrue);
+            imprimirCodigo(String.format("%s = call i32 (i8*, ...) @printf(%s)",
+                    Normalizador.crearNomRef("aux"),
+                    grarParamsPrintfConRef(5, "@.bln_true_format", "i32", refIR)));
+            imprimirCodSaltoInc(fin);
+
+            imprimirEtiqueta(casoFalse);
+            imprimirCodigo(String.format("%s = call i32 (i8*, ...) @printf(%s)",
+                    Normalizador.crearNomRef("aux"),
+                    grarParamsPrintfConRef(6, "@.bln_false_format", "i32", refIR)));
+            imprimirCodSaltoInc(fin);
+
+            imprimirEtiqueta(fin);
         } else {
             // Es un número entero o flotante
             String tipoIR = arg.getTipo().equals(Tipo.INTEGER) ? "i32" : "double";
@@ -161,10 +188,10 @@ public class GeneradorDeCodigo extends Visitor {
             } else {
                 paramsPrintf = grarParamsPrintfConRef(6, "@.double_print_format", tipoIR, refIR);
             }
-        }
 
-        imprimirCodigo(String.format("%s = call i32 (i8*, ...) @printf(%s)",
-                Normalizador.crearNomRef("aux"), paramsPrintf));
+            imprimirCodigo(String.format("%s = call i32 (i8*, ...) @printf(%s)",
+                    Normalizador.crearNomRef("aux"), paramsPrintf));
+        }
 
         if (i.getNombre().equals("writeln")) {
             // Genero un salto de línea
@@ -414,9 +441,11 @@ public class GeneradorDeCodigo extends Visitor {
         if (usaWrite || usaRead) {
             codigo.append("\n; Constantes para entradas y salidas\n")
                   .append("@.int_format = private constant [3 x i8] c\"%d\\00\"\n")
-                  .append("@.double_format = private unnamed_addr constant [4 x i8] c\"%lf\\00\"\n")
+                  .append("@.double_format = private constant [4 x i8] c\"%lf\\00\"\n")
                   // Imprimir floats siempre con dos decimales
-                  .append("@.double_print_format = private constant [6 x i8] c\"%.2lf\\00\"\n");
+                  .append("@.double_print_format = private constant [6 x i8] c\"%.2lf\\00\"\n")
+                  .append("@.bln_true_format = private constant [5 x i8] c\"true\\00\"\n")
+                  .append("@.bln_false_format = private constant [6 x i8] c\"false\\00\"\n");
         }
         if (usaWriteln) {
             codigo.append("@.salto_linea = private constant [2 x i8] c\"\\0A\\00\"\n");

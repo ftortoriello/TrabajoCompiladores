@@ -1,4 +1,4 @@
-package ar.edu.unnoba.compilador.visitor.transformer;
+package ar.edu.unnoba.compilador.visitor;
 
 import ar.edu.unnoba.compilador.Normalizador;
 import ar.edu.unnoba.compilador.ast.base.Programa;
