@@ -218,7 +218,7 @@ public class GeneradorDeCodigo extends Visitor {
                 // Leemos un carácter. Si es 't' o 'T' (por ejemplo, si el usuario ingresó "true")
                 // asumimos que es true.
                 tipoLeido = "i8";
-                formatoScanf = "[3 x i8], [3 x i8]* @.char_format";
+                formatoScanf = "[4 x i8], [4 x i8]* @.char_format";
                 break;
             case INTEGER:
                 tipoLeido = "i32";
@@ -466,8 +466,9 @@ public class GeneradorDeCodigo extends Visitor {
                   .append("@.double_format = private constant [4 x i8] c\"%lf\\00\"\n");
         }
         if (usaRead) {
-            // Para leer chars y convertirlos a boolean
-            codigo.append("@.char_format = private constant [3 x i8] c\"%c\\00\"\n");
+            // Para leer char y convertirlo a boolean.
+            // El espacio antes de %c es para que no consuma caracteres especiales.
+            codigo.append("@.char_format = private constant [4 x i8] c\" %c\\00\"\n");
         }
         if (usaWrite) {
             // Imprimir double siempre con dos decimales
@@ -794,7 +795,7 @@ public class GeneradorDeCodigo extends Visitor {
 
     /* Sentencias de control */
 
-    // FIXME: Se rompe si no hay un return al final. Tendría que retornar el valor por defecto.
+    // FIXME: Se rompe si no hay un return al final
     @Override
     public void visit(Retorno r) throws ExcepcionVisitor {
         Expresion expr = r.getExpresion();
@@ -893,7 +894,7 @@ public class GeneradorDeCodigo extends Visitor {
             valorIR = valorParser;
         } else if (tipoParser == Tipo.FLOAT) {
             // ??? De verdad que no se puede hacer más simple esto, cuando imprimo tengo que volver a convertirlo
-            // TODO ???
+            // FIXME: Se puede mejorar? Agregando un 0 a mano si empieza con .?
             double temp = Float.parseFloat(valorParser);
             valorIR = Double.toString(temp);
         } else if (tipoParser == Tipo.BOOLEAN) {
