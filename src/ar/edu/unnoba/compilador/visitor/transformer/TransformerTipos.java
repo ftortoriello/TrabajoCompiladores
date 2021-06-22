@@ -157,7 +157,7 @@ public class TransformerTipos extends Transformer {
     public InvocacionFuncion transform(InvocacionFuncion i) throws ExcepcionTransformer {
         i = super.transform(i);
 
-        // No buscar en el alcance las funciones predefinidas.
+        // No es necesario buscar en el alcance las funciones predefinidas
         if (i.getEsPredefinida()) {
             return i;
         }

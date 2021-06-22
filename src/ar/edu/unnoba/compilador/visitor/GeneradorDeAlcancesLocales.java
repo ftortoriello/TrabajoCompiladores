@@ -6,7 +6,9 @@ import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.*;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /* Visitor para generar los alcances de los bloques, construir la tabla de
  * símbolos locales y verificar los alcances.
@@ -15,6 +17,7 @@ public class GeneradorDeAlcancesLocales extends Visitor {
     private Alcance alcanceGlobal;
     private Alcance alcanceActual;
     private Map<String, SimboloFuncion> tablaFunciones;
+    private Set<String> funPredefUsadas;
 
     // Agregar la declaración al ámbito en el que se encuentra
     private void agregarSimbolo(Declaracion d) throws ExcepcionVisitor {
@@ -59,7 +62,11 @@ public class GeneradorDeAlcancesLocales extends Visitor {
         // Ya tiene el alcance establecido por el Visitor de alcance global.
         alcanceGlobal = alcanceActual = p.getAlcance();
         tablaFunciones = p.getTablaFunciones();
+        funPredefUsadas = new HashSet<>();
+        p.setFunPredefUsadas(funPredefUsadas);
+
         super.visit(p);
+
         alcanceActual = null;
     }
 
@@ -119,9 +126,11 @@ public class GeneradorDeAlcancesLocales extends Visitor {
 
     @Override
     public void visit(InvocacionFuncion i) throws ExcepcionVisitor {
-        // Si es predefinida ya está limitado por el parser, no es necesario realizar estas validaciones
         if (i.getEsPredefinida()) {
+            funPredefUsadas.add(i.getNombre());
             super.visit(i);
+
+            // Si es predefinida ya están limitados los parámetros por el parser, no es necesario validarlos acá
             return;
         }
 

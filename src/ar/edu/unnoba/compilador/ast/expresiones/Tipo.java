@@ -20,4 +20,25 @@ public enum Tipo {
             default:        return Tipo.UNKNOWN;
         }
     }
+
+    /* Retorna el tipo usado en el lenguaje IR */
+    public String getIR() {
+        switch (this) {
+            case BOOLEAN: return "i1";
+            case INTEGER: return "i32";
+            case FLOAT: return "double";
+            default: throw new IllegalStateException(
+                    String.format("getTipoIR(): Tipo %s inesperado", this));
+        }
+    }
+
+    /* Retorna el String del valor predeterminado usado en IR */
+    public String getValorDefIR() {
+        switch (this) {
+            case BOOLEAN, INTEGER: return "0";
+            case FLOAT: return "0.0";
+            default: throw new IllegalStateException(
+                    String.format("getTipoIR(): Tipo %s inesperado", this));
+        }
+    }
 }

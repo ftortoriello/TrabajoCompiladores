@@ -39,7 +39,7 @@ public class Cadena extends Expresion {
         StringBuilder sb = new StringBuilder();
         for (byte b : utf8bytes) {
             if (b >= 0x20 && b <= 0x7E && b != 0x22) {
-                // Es ASCII imprimible y no es una comilla; dejarlo legible
+                // Es ASCII imprimible y no es comilla doble; dejarlo legible
                 byte[] byteASCII = { b };
                 sb.append(new String(byteASCII));
             } else {

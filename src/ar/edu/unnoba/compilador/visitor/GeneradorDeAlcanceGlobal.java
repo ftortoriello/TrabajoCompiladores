@@ -1,11 +1,13 @@
 package ar.edu.unnoba.compilador.visitor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import ar.edu.unnoba.compilador.Normalizador;
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
+import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.SimboloFuncion;
@@ -32,8 +34,8 @@ public class GeneradorDeAlcanceGlobal extends Visitor {
         }
 
         // Defino de antemano los nombres que necesitamos para el IR
-        String nombreIR = Normalizador.crearNomPtroGbl(nombre);
-        Boolean esGlobal = true;
+        final String nombreIR = Normalizador.crearNomPtroGbl(nombre);
+        final Boolean esGlobal = true;
 
         SimboloVariable simbolo = new SimboloVariable(d, nombreIR, esGlobal);
 
@@ -55,6 +57,13 @@ public class GeneradorDeAlcanceGlobal extends Visitor {
         tablaFunciones.put(nombre, simbolo);
     }
 
+    private void agregarFuncionPredefinida(String nombre, Tipo tipo) {
+        Identificador id = new Identificador(nombre, tipo);
+        DecFun d = new DecFun(id, new ArrayList<>(), new Bloque(nombre, false));
+        SimboloFuncion simbolo = new SimboloFuncion(d, "@" + nombre);
+        tablaFunciones.put(nombre, simbolo);
+    }
+
     @Override
     public void visit(Programa p) throws ExcepcionVisitor {
         alcanceGlobal = new Alcance("global");
@@ -62,6 +71,15 @@ public class GeneradorDeAlcanceGlobal extends Visitor {
 
         tablaFunciones = new HashMap<>();
         p.setTablaFunciones(tablaFunciones);
+
+        // Agregar funciones predefinidas a la tabla de funciones
+        agregarFuncionPredefinida("read_boolean", Tipo.BOOLEAN);
+        agregarFuncionPredefinida("read_integer", Tipo.INTEGER);
+        agregarFuncionPredefinida("read_float", Tipo.FLOAT);
+
+        // No es necesario agregar estas, pero para que quede completo
+        agregarFuncionPredefinida("write", Tipo.UNKNOWN);
+        agregarFuncionPredefinida("writeln", Tipo.UNKNOWN);
 
         super.visit(p);
     }

@@ -10,12 +10,15 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class Programa extends Nodo {
     private Encabezado encabezado;
     private Bloque cuerpo;
     private Alcance alcance;
     private Map<String, SimboloFuncion> tablaFunciones;
+    // Para generar código IR sólo si se usan las funciones
+    private Set<String> funPredefUsadas;
     private List<Cadena> arrCadenas = new ArrayList<>();
 
     public Programa(String nombre, Encabezado encabezado, Bloque cuerpo) {
@@ -54,6 +57,14 @@ public class Programa extends Nodo {
 
     public void setTablaFunciones(Map<String, SimboloFuncion> tablaFunciones) {
         this.tablaFunciones = tablaFunciones;
+    }
+
+    public Set<String> getFunPredefUsadas() {
+        return funPredefUsadas;
+    }
+
+    public void setFunPredefUsadas(Set<String> funPredefUsadas) {
+        this.funPredefUsadas = funPredefUsadas;
     }
 
     public List<Cadena> getArrCadenas() {

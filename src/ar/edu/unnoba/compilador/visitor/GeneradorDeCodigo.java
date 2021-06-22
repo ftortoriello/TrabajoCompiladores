@@ -46,13 +46,6 @@ public class GeneradorDeCodigo extends Visitor {
 
     private List<Cadena> arrCadenas;
 
-    // Mapa para relacionar nuestros tipos con los del IR (y además definir valores por defecto)
-    private final Map<Tipo, Pair<String, String>> TIPO_IR = new HashMap<>() {{
-        put(Tipo.BOOLEAN, new Pair<>("i1", "0"));
-        put(Tipo.INTEGER, new Pair<>("i32", "0"));
-        put(Tipo.FLOAT, new Pair<>("float", "0.0"));
-    }};
-
     /* Pila de pares de etiquetas para saber a donde saltar cuando se encuentra break o continue
      * dentro de un while.
      * La primer etiqueta del par representa el comienzo del bloque si la condición es verdadera,
@@ -138,6 +131,7 @@ public class GeneradorDeCodigo extends Visitor {
         }
     }
 
+
     /* Para tratar los casos de invocaciones a write */
     private void imprimirWrite(InvocacionFuncion i) throws ExcepcionVisitor {
         Expresion arg = i.getArgs().get(0);
@@ -150,26 +144,23 @@ public class GeneradorDeCodigo extends Visitor {
             Cadena cad = (Cadena) arg;
             paramsPrintf = grarParamsPrintf(cad.getLongitudIR(), cad.getNombreIR());
         } else if (arg.getTipo().equals(Tipo.BOOLEAN)) {
+            // TODO: Probar. A mí me funciona bien sin esto.
+            /*
             // Extiendo el i1 a i32 para poder imprimirlo
             String refExt = Normalizador.crearNomRef("ext");
             imprimirCodigo(String.format("%s = zext i1 %s to i32", refExt, refIR));
             refIR = refExt;
-            paramsPrintf = grarParamsPrintfConRef(3, "@.boolean", "i32", refIR);
+            paramsPrintf = grarParamsPrintfConRef(3, "@.int_format", "i32", refIR);
+            */
+            paramsPrintf = grarParamsPrintfConRef(3, "@.int_format", "i1", refIR);
         } else {
             // Es un número entero o flotante
             String tipoIR = arg.getTipo().equals(Tipo.INTEGER) ? "i32" : "double";
 
-            if (arg.getTipo().equals(Tipo.FLOAT)) {
-                // Si es float, para que pueda imprimirse, extiendo el número a double y actualizo la ref.
-                String refExt = Normalizador.crearNomRef("ext");
-                imprimirCodigo(String.format("%s = fpext float %s to double", refExt, refIR));
-                refIR = refExt;
-            }
-
             if (arg.getTipo().equals(Tipo.INTEGER)) {
-                paramsPrintf = grarParamsPrintfConRef(3, "@.integer", tipoIR, refIR);
+                paramsPrintf = grarParamsPrintfConRef(3, "@.int_format", tipoIR, refIR);
             } else {
-                paramsPrintf = grarParamsPrintfConRef(5, "@.float", tipoIR, refIR);
+                paramsPrintf = grarParamsPrintfConRef(6, "@.double_print_format", tipoIR, refIR);
             }
         }
 
@@ -178,7 +169,7 @@ public class GeneradorDeCodigo extends Visitor {
 
         if (i.getNombre().equals("writeln")) {
             // Genero un salto de línea
-            paramsPrintf = grarParamsPrintf(2, "@.salto");
+            paramsPrintf = grarParamsPrintf(2, "@.salto_linea");
             imprimirCodigo(String.format("%s = call i32 (i8*, ...) @printf(%s)",
                     Normalizador.crearNomRef("aux"), paramsPrintf));
         }
@@ -194,25 +185,37 @@ public class GeneradorDeCodigo extends Visitor {
                 tamanho, str, tipoIR, refIR);
     }
 
-    /* Para tratar los casos de invocaciones a read */
-    private void imprimirRead(InvocacionFuncion i) {
-        // TODO
+    private void imprimirDefinicionLeer(Tipo tipo) {
+        final String nombre = tipo.toString();
+        final String tipoRet = tipo.getIR();
+        final String tipoLeido;
+        final String formatoScanf;
+        if (tipo.equals(Tipo.FLOAT)) {
+            // leer double para perder menos precisión
+            tipoLeido = "double";
+            formatoScanf = "([4 x i8], [4 x i8]* @.double_format";
+        } else {
+            // ya sea integer o boolean leer i32
+            tipoLeido = "i32";
+            formatoScanf = "([3 x i8], [3 x i8]* @.int_format";
+        }
 
-        // enteros
-        /*
-        %dest = alloca i32
-        %temp = call i32 (i8*, ...) @scanf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @int_read_format, i64 0, i64 0), i32* %dest)
-        */
-        // float
-        /*
-        %dest = alloca float
-        %destaux = alloca double
-        %temp = call i32 (i8*, ...) @scanf(i8* getelementptr inbounds ([4 x i8], [4 x i8]*
-        @double_read_format, i64 0, i64 0), double* %dest_aux)
-        %temp_double = load double, double* %dest_aux
-        %temp_float = fptrunc double %temp_double to float :trucamos double a float
-        %dest = store float %temp_float, float* %dest
-        */
+        codigo.append(String.format("define %s @read_%s() {\n", tipoRet, nombre));
+        imprimirCodigo("%ptro.valor_leido = alloca " + tipoLeido);
+        imprimirCodigo("%ref.ret_scanf = call i32 (i8*, ...) @scanf(i8* getelementptr inbounds " +
+                formatoScanf + ", i64 0, i64 0), " + tipoLeido + "* %ptro.valor_leido)");
+        imprimirCodigo("%ref.valor_leido = load " + tipoLeido + ", " + tipoLeido +
+                "* %ptro.valor_leido");
+
+        if (tipo.equals(Tipo.BOOLEAN)) {
+            // TODO: Mejorar. Ahora toma nro. impar = verdadero, cualquier otra cosa = falso
+            imprimirCodigo("%ref.valor_convertido = trunc i32 %ref.valor_leido to i1");
+            imprimirCodigo("ret " + tipoRet + " %ref.valor_convertido");
+        } else {
+            imprimirCodigo("ret " + tipoRet + " %ref.valor_leido");
+        }
+
+        codigo.append("}\n\n");
     }
 
     /* Devuelve una lista de parámetros de acuerdo a lo requerido por IR.
@@ -224,7 +227,7 @@ public class GeneradorDeCodigo extends Visitor {
         int cantParams = arrParams.size();
         for (int i = 0; i < cantParams; i++) {
             SimboloVariable simboloParam = (SimboloVariable) arrParams.get(i).getIdent();
-            String tipoParam = TIPO_IR.get(simboloParam.getTipo()).fst;
+            String tipoParam = simboloParam.getTipo().getIR();
             String paramNombreIR = simboloParam.getNombreIR();
 
             // Para separar los parámetros mediante comas, excepto el final
@@ -250,7 +253,7 @@ public class GeneradorDeCodigo extends Visitor {
 
         for (int i = 0; i < cantArgs; i++) {
             Expresion exprArg = arrArgs.get(i);
-            String tipoRetornoArg = TIPO_IR.get(exprArg.getTipo()).fst;
+            String tipoRetornoArg = exprArg.getTipo().getIR();
             // Evaluar la expr. y generar el refIR
             exprArg.accept(this);
             String argRefIR = exprArg.getRefIR();
@@ -340,6 +343,7 @@ public class GeneradorDeCodigo extends Visitor {
 
     /* Invoca a las funciones que asignan a las variables
      * globales el valor con el que fueron declaradas */
+    // TODO: Podemos directamente asignarle el valor cuando se definen y eliminar esto
     private void inicializarVarsGbls() {
         varGblInit.forEach(fun -> {
             imprimirCodigo(String.format("call void %s()", fun));
@@ -393,18 +397,39 @@ public class GeneradorDeCodigo extends Visitor {
             }
         }
 
-        codigo.append("\n\n")
-              .append("declare i32 @printf(i8*, ...)\n")
-              .append("declare i32 @scanf(i8*, ...)\n")
-              .append("\n")
-              .append("@int_read_format = unnamed_addr constant [3 x i8] c\"%d\\00\"\n")
-              .append("@double_read_format = unnamed_addr constant [4 x i8] c\"%lf\\00\"\n")
-              .append("\n")
-              .append("; Constantes para salidas:\n")
-              .append("@.salto = private constant [2 x i8] c\"\\0A\\00\"\n")
-              .append("@.boolean = private constant[3 x i8] c\"%d\\00\"\n")
-              .append("@.integer = private constant [3 x i8] c\"%d\\00\"\n")
-              .append("@.float = private constant [5 x i8] c\"%.2f\\00\"\n\n");
+        codigo.append("\n\n");
+
+        // Definir globalmente sólo lo necesario
+
+        Set<String> funPredefUsadas = p.getFunPredefUsadas();
+        final boolean usaWriteln = funPredefUsadas.contains("writeln");
+        final boolean usaWrite = funPredefUsadas.contains("write") || usaWriteln;
+        final boolean usaReadBoolean = funPredefUsadas.contains("read_boolean");
+        final boolean usaReadInteger = funPredefUsadas.contains("read_integer");
+        final boolean usaReadFloat = funPredefUsadas.contains("read_float");
+        final boolean usaRead = usaReadBoolean || usaReadInteger || usaReadFloat;
+
+        if (usaWrite) {
+            codigo.append("declare i32 @printf(i8*, ...)\n");
+        }
+        if (usaRead) {
+            codigo.append("declare i32 @scanf(i8*, ...)\n");
+        }
+        if (usaWrite || usaRead) {
+            codigo.append("\n; Constantes para entradas y salidas\n")
+                  .append("@.int_format = private constant [3 x i8] c\"%d\\00\"\n")
+                  .append("@.double_format = private unnamed_addr constant [4 x i8] c\"%lf\\00\"\n")
+                  // Imprimir floats siempre con dos decimales
+                  .append("@.double_print_format = private constant [6 x i8] c\"%.2lf\\00\"\n");
+        }
+        if (usaWriteln) {
+            codigo.append("@.salto_linea = private constant [2 x i8] c\"\\0A\\00\"\n");
+        }
+        codigo.append("\n");
+
+        if (usaReadBoolean) imprimirDefinicionLeer(Tipo.BOOLEAN);
+        if (usaReadInteger) imprimirDefinicionLeer(Tipo.INTEGER);
+        if (usaReadFloat) imprimirDefinicionLeer(Tipo.FLOAT);
 
         declararVarsStrs();
 
@@ -451,8 +476,8 @@ public class GeneradorDeCodigo extends Visitor {
         if (aplicarCortocircuito) {
             finalizarCortocircuitoAsig(origen, destino);
         } else {
-            String tipoOrigen = TIPO_IR.get(expr.getTipo()).fst;
-            String tipoDestino = TIPO_IR.get(svDestino.getTipo()).fst;
+            String tipoOrigen = expr.getTipo().getIR();
+            String tipoDestino = svDestino.getTipo().getIR();
             // TipoOrigen y tipoDestino deberían ser iguales, pero lo dejo así para detectar algún error
             // y de paso usar los nombres de las variables para que quede un poco más claro lo que se hace
 
@@ -471,14 +496,14 @@ public class GeneradorDeCodigo extends Visitor {
 
         // Parámetros que necesito para declarar la variable
         String nombreIR = sv.getNombreIR();
-        String tipoIR = TIPO_IR.get(sv.getTipo()).fst;
+        String tipoIR = sv.getTipo().getIR();
         Boolean esGlobal = sv.getEsGlobal();
-        String valorIR = TIPO_IR.get(dv.getTipo()).snd;
+        String valorIR = dv.getTipo().getValorDefIR();
 
         imprimirComent(String.format("visit(DecVar): variable %s is %s = %s", sv.getNombre(), sv.getTipo(), valorIR));
 
         if (esGlobal) {
-            imprimirCodigo(String.format("%s = global %s %s", nombreIR, tipoIR, valorIR));
+            codigo.append(String.format("%s = global %s %s\n", nombreIR, tipoIR, valorIR));
         } else {
             imprimirCodigo(String.format("%s = alloca %s", nombreIR, tipoIR));
             imprimirCodigo(String.format("store %2$s %3$s, %2$s* %1$s", nombreIR, tipoIR, valorIR));
@@ -499,7 +524,7 @@ public class GeneradorDeCodigo extends Visitor {
 
         // Parámetros que necesito para declarar la variable
         String nombreIR = sv.getNombreIR();
-        String tipoIR = TIPO_IR.get(sv.getTipo()).fst;
+        String tipoIR = sv.getTipo().getIR();
 
         if (sv.getEsGlobal()) {
             imprimirComent(String.format("\n;visit(DecVarIni)%s: variable %s is %s = %s",
@@ -508,7 +533,7 @@ public class GeneradorDeCodigo extends Visitor {
 
             // Le asigno temporalmente a la var. el valor por defecto según
             // su tipo, porque no puedo inicializarla en el alcance global.
-            String valorDef = TIPO_IR.get(sv.getTipo()).snd;
+            String valorDef = sv.getTipo().getValorDefIR();
             codigo.append(String.format("\n%s = global %s %s\n", nombreIR, tipoIR, valorDef));
 
             // Creo una función que se va a llamar en el main para inicializar la var. con el valor correspondiente
@@ -555,7 +580,7 @@ public class GeneradorDeCodigo extends Visitor {
         SimboloFuncion simboloFun = tablaFunciones.get(df.getNombre());
 
         // Elementos que necesito para definir la función: tipo de retorno, nombre, parámetros y el cuerpo
-        String funTipoRetIR = TIPO_IR.get(simboloFun.getTipo()).fst;
+        String funTipoRetIR = simboloFun.getTipo().getIR();
         String funNombreIR = simboloFun.getNombreIR();
 
         // Formatear la lista de parámetros de acuerdo a lo requerido por IR
@@ -573,8 +598,8 @@ public class GeneradorDeCodigo extends Visitor {
         if (!(df.getTieneRetorno())) {
             // Para evitar comportamientos indefinidos, si la función no tiene retorno,
             // le genero uno en base al valor por defecto asociado a su tipo.
-            String valorPorDef = TIPO_IR.get(df.getTipo()).snd;
-            imprimirCodigo(String.format("ret %s %s", funTipoRetIR, valorPorDef));
+            String valorDef = df.getTipo().getValorDefIR();
+            imprimirCodigo(String.format("ret %s %s", funTipoRetIR, valorDef));
         }
 
         codigo.append("}\n");
@@ -596,7 +621,7 @@ public class GeneradorDeCodigo extends Visitor {
         String nombreOriginal = sv.getNombreIR();
         String refIR = Normalizador.crearNomPtroLcl("ref");
         String nombreIR = Normalizador.crearNomPtroLcl("param");
-        String tipoIR = TIPO_IR.get(p.getTipo()).fst;
+        String tipoIR = p.getTipo().getIR();
 
         sv.setRefIR(refIR);
         sv.setNombreIR(nombreIR);
@@ -726,7 +751,7 @@ public class GeneradorDeCodigo extends Visitor {
         // Generar refIR para la expresión de retorno
         expr.accept(this);
 
-        String tipoRetorno = TIPO_IR.get(expr.getTipo()).fst;
+        String tipoRetorno = expr.getTipo().getIR();
         String refRetorno = expr.getRefIR();
 
         imprimirCodigo(String.format("ret %s %s", tipoRetorno, refRetorno));
@@ -774,7 +799,7 @@ public class GeneradorDeCodigo extends Visitor {
         String refIzqIR = ob.getIzquierda().getRefIR();
         String refDerIR = ob.getDerecha().getRefIR();
         String instIR = ob.getInstruccionIR();
-        String tipoIR = TIPO_IR.get(ob.getIzquierda().getTipo()).fst;
+        String tipoIR = ob.getIzquierda().getTipo().getIR();
         String operadorParser = ob.getNombre();
 
         if (ob instanceof OperacionBinariaAritmetica) {
@@ -806,7 +831,7 @@ public class GeneradorDeCodigo extends Visitor {
         lit.setRefIR(refIR);
 
         Tipo tipoParser = lit.getTipo();
-        String tipoIR = TIPO_IR.get(tipoParser).fst;
+        String tipoIR = tipoParser.getIR();
         String valorParser = lit.getValor();
         String valorIR;
 
@@ -839,7 +864,7 @@ public class GeneradorDeCodigo extends Visitor {
         SimboloVariable sv = (SimboloVariable) ident;
 
         String nombreIR = sv.getNombreIR();
-        String tipoIR = TIPO_IR.get(sv.getTipo()).fst;
+        String tipoIR = sv.getTipo().getIR();
 
         String nombreVar = sv.getTipo().equals(Tipo.INTEGER) ? "int" :
                 sv.getTipo().equals(Tipo.FLOAT) ? "dbl" :
@@ -861,24 +886,18 @@ public class GeneradorDeCodigo extends Visitor {
         String refIR = Normalizador.crearNomRef("invo");
         i.setRefIR(refIR);
 
-        if (i.getEsPredefinida()) {
-            // Las funciones predefinidas (write, read) las manejamos aparte
-            if (i.getNombre().startsWith("write")) {
-                imprimirWrite(i);
-                return;
-            } else if (i.getNombre().startsWith("read")) {
-                imprimirRead(i);
-                return;
-            } else {
-                throw new ExcepcionVisitor("Nombre de función predefinida inesperado: " + i.getNombre());
-            }
+        // A las invocaciones a write las manejamos aparte
+        if (i.getNombre().equals("write") || i.getNombre().equals("writeln")) {
+            imprimirWrite(i);
+            return;
         }
+        // A las funciones read las definimos como funciones en IR, y las invocamos normalmente
 
         // La función fue definida por el programador, la busco en la tabla
         SimboloFuncion sf = tablaFunciones.get(i.getNombre());
 
         String nombreFun = sf.getNombreIR();
-        String tipoFun = TIPO_IR.get(sf.getTipo()).fst;
+        String tipoFun = sf.getTipo().getIR();
 
         // Generar la lista de argumentos, además de visitarlos para generar las refs.
         String args = grarStrArgs(i.getArgs());
