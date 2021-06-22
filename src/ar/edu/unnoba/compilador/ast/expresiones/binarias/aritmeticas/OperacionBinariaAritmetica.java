@@ -28,7 +28,7 @@ public abstract class OperacionBinariaAritmetica extends OperacionBinaria {
             if (esElementoNuloIzq(valorIzq)) return new Literal(0, tipo);
         }
 
-        Number valorDer = 0;
+        Number valorDer;
         if (derecha instanceof Literal) {
             valorDer = ((Literal) derecha).getValorNumerico();
             if (esElementoNeutroDer(valorDer)) return izquierda;

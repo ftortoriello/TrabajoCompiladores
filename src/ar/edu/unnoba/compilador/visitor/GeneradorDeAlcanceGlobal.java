@@ -35,7 +35,7 @@ public class GeneradorDeAlcanceGlobal extends Visitor {
 
         // Defino de antemano los nombres que necesitamos para el IR
         final String nombreIR = Normalizador.crearNomPtroGbl(nombre);
-        final Boolean esGlobal = true;
+        final boolean esGlobal = true;
 
         SimboloVariable simbolo = new SimboloVariable(d, nombreIR, esGlobal);
 

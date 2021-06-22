@@ -9,11 +9,11 @@ import java.util.Map;
  */
 public class Normalizador {
 
-    private static Map<String, Long> etiquetas = new HashMap<>();
-    private static Map<String, Long> varGbls = new HashMap<>();
-    private static Map<String, Long> varLcls = new HashMap<>();
-    private static Map<String, Long> varRefs = new HashMap<>();
-    private static Map<String, Long> funciones = new HashMap<>();
+    private static final Map<String, Long> etiquetas = new HashMap<>();
+    private static final Map<String, Long> varGbls = new HashMap<>();
+    private static final Map<String, Long> varLcls = new HashMap<>();
+    private static final Map<String, Long> varRefs = new HashMap<>();
+    private static final Map<String, Long> funciones = new HashMap<>();
 
     private Normalizador() {
     }

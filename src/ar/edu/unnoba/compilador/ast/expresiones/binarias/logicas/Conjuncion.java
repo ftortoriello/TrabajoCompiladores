@@ -16,6 +16,6 @@ public class Conjuncion extends OperacionBinariaLogica {
 
     @Override
     protected Expresion transformarResultado(boolean valor, Expresion otroOperando) {
-        return valor == true ? otroOperando : new Literal(false, Tipo.BOOLEAN);
+        return valor ? otroOperando : new Literal(false, Tipo.BOOLEAN);
     }
 }

@@ -16,6 +16,6 @@ public class Disyuncion extends OperacionBinariaLogica {
 
     @Override
     protected Expresion transformarResultado(boolean valor, Expresion otroOperando) {
-        return valor == true ? new Literal(true, Tipo.BOOLEAN) : otroOperando;
+        return valor ? new Literal(true, Tipo.BOOLEAN) : otroOperando;
     }
 }

@@ -53,11 +53,11 @@ public class TransformerTipos extends Transformer {
             return expresion;
         }
         if (tipoOrigen == Tipo.INTEGER && tipoDestino == Tipo.FLOAT) {
-            System.out.println(String.format("Advertencia: convirtiendo «%s» de integer a float", expresion));
+            System.out.printf("Advertencia: convirtiendo «%s» de integer a float%n", expresion);
             return new EnteroAFlotante(expresion);
         }
         if (tipoOrigen == Tipo.FLOAT && tipoDestino == Tipo.INTEGER) {
-            System.out.println(String.format("Advertencia: convirtiendo «%s» de float a integer", expresion));
+            System.out.printf("Advertencia: convirtiendo «%s» de float a integer%n", expresion);
             return new FlotanteAEntero(expresion);
         }
         throw new ExcepcionTransformer(

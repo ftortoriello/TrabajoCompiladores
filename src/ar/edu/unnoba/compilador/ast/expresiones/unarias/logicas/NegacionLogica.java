@@ -19,7 +19,7 @@ public class NegacionLogica extends OperacionUnaria {
         return getExpresion().getRefIR();
     }
 
-    public Expresion evaluar() throws ExcepcionTransformer {
+    public Expresion evaluar() {
         Expresion expr = getExpresion();
         if (expr instanceof NegacionLogica) {
             // cancelar "not not"

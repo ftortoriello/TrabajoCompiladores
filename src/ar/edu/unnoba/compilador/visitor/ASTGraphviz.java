@@ -254,12 +254,12 @@ public class ASTGraphviz extends Visitor {
     }
 
     @Override
-    public void visit(Continuar c) throws ExcepcionVisitor {
+    public void visit(Continuar c) {
         armarStrControl(c.getEtiqueta());
     }
 
     @Override
-    public void visit(Salir s) throws ExcepcionVisitor {
+    public void visit(Salir s) {
         armarStrControl(s.getEtiqueta());
     }
 

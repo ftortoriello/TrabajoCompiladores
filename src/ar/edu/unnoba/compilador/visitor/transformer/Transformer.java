@@ -210,11 +210,11 @@ public abstract class Transformer {
         return r;
     }
 
-    public Salir transform(Salir s) throws ExcepcionTransformer {
+    public Salir transform(Salir s) {
         return s;
     }
 
-    public Continuar transform(Continuar c) throws ExcepcionTransformer {
+    public Continuar transform(Continuar c) {
         return c;
     }
 }

@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class ReconocedorCadenas extends Visitor {
 
-    private List<Cadena> arrCadenas = new ArrayList<>();
+    private final List<Cadena> arrCadenas = new ArrayList<>();
 
     public void procesar(Programa p) throws ExcepcionVisitor {
         super.visit(p);
@@ -24,7 +24,7 @@ public class ReconocedorCadenas extends Visitor {
     }
 
     @Override
-    public void visit(Cadena c) throws ExcepcionVisitor {
+    public void visit(Cadena c) {
         c.setValor(c.getValor().replace("\\\"", ""));
         c.setNombreIR(Normalizador.crearNomPtroGbl("str"));
         c.setRefIR(Normalizador.crearNomPtroLcl("str"));

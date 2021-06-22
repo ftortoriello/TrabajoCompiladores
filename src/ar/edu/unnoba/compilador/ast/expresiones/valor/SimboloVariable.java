@@ -10,7 +10,7 @@ public class SimboloVariable extends Identificador {
     // El nombre original, pero único y normalizado para usarse en IR.
     private String nombreIR;
 
-    private Boolean esGlobal;
+    private final Boolean esGlobal;
 
     public SimboloVariable(Declaracion d, String nombreIR, Boolean esGlobal) {
         super(d.getIdent().getNombre(), d.getIdent().getTipo());

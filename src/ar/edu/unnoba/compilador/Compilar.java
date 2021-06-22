@@ -18,7 +18,7 @@ import java.nio.file.Paths;
 /* Clase principal que realiza todos los pasos para convertir código fuente en un ejecutable */
 
 public class Compilar {
-    private static boolean graficarArbol(Programa programa, String nombreArchivo, String etiqueta) throws IOException, InterruptedException, ExcepcionVisitor {
+    private static boolean graficarArbol(Programa programa, String nombreArchivo, String etiqueta) throws IOException, ExcepcionVisitor {
         final String formatoImg = "png";
         //final String formatoImg = "svg";
 
@@ -46,7 +46,7 @@ public class Compilar {
         pw.close();
     }
 
-    private static boolean compilarExe(String nombre) throws IOException, InterruptedException {
+    private static boolean compilarExe(String nombre) {
         final String nombreExe;
         int exitCode;
 
@@ -165,9 +165,9 @@ public class Compilar {
         } catch (ClassCastException e) {
             // Error sintáctico probablemente
             e.printStackTrace(System.out);
+            //System.out.printf("%s: %s%n", e.getClass().getSimpleName(), e.getLocalizedMessage());
         } catch (Exception e) {
             e.printStackTrace(System.out);
-            //System.out.printf("%s: %s%n", e.getClass().getSimpleName(), e.getLocalizedMessage());
         }
     }
 }

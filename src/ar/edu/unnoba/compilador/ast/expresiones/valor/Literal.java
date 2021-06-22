@@ -63,11 +63,10 @@ public class Literal extends Valor {
     }
 
     public boolean getValorBooleano() {
-        switch (getTipo()) {
-            case BOOLEAN: return Boolean.parseBoolean(valor);
-            default: throw new IllegalStateException(
-                    String.format("%s no es de tipo booleano.", this));
-        }
+        if (getTipo().equals(Tipo.BOOLEAN))
+            return Boolean.parseBoolean(valor);
+        else
+            throw new IllegalStateException(String.format("%s no es de tipo booleano.", this));
     }
 
     @Override
@@ -86,7 +85,7 @@ public class Literal extends Valor {
     }
 
     @Override
-    public Literal accept(Transformer t) throws ExcepcionTransformer {
+    public Literal accept(Transformer t) {
         return t.transform(this);
     }
 

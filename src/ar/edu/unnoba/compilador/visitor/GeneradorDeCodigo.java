@@ -42,7 +42,7 @@ public class GeneradorDeCodigo extends Visitor {
 
     // Lista para guardar los nombres de las funciones que inicializan a las variables globales
     // Se añaden en el visit(DecVarIni), y se procesa una vez que se alcanza el main
-    private List<String> varGblInit = new ArrayList<>();
+    private final List<String> varGblInit = new ArrayList<>();
 
     private List<Cadena> arrCadenas;
 
@@ -51,10 +51,10 @@ public class GeneradorDeCodigo extends Visitor {
      * La primer etiqueta del par representa el comienzo del bloque si la condición es verdadera,
      * y la segunda si es falsa (o el fin del bloque).
      */
-    private Deque<Pair<String, String>> etiquetasMientras = new ArrayDeque<>();
+    private final Deque<Pair<String, String>> etiquetasMientras = new ArrayDeque<>();
 
     /* Pila de pares de etiquetas usada para el cortocircuito booleano */
-    private Deque<Pair<String, String>> etiquetasOpBinLog = new ArrayDeque<>();
+    private final Deque<Pair<String, String>> etiquetasOpBinLog = new ArrayDeque<>();
 
     public static boolean targetEsWindows() {
         return System.getProperty("os.name").startsWith("Windows");
@@ -101,7 +101,7 @@ public class GeneradorDeCodigo extends Visitor {
 
     /* Agregar una línea de código indentado */
     private void imprimirCodigo(String codigo) {
-        this.codigo.append("\t" + codigo + "\n");
+        this.codigo.append("\t").append(codigo).append("\n");
     }
 
     /* Generar código con un comentarios alineados, si es posible */
@@ -271,6 +271,7 @@ public class GeneradorDeCodigo extends Visitor {
 
     private void imprimirCortocircuito(OperacionBinariaLogica ob) throws ExcepcionVisitor {
         Pair<String, String> etiquetas = etiquetasOpBinLog.peek();
+        assert etiquetas != null;
         String etiVerdadero = etiquetas.fst;
         String etiFalso = etiquetas.snd;
 
@@ -317,7 +318,7 @@ public class GeneradorDeCodigo extends Visitor {
         etiquetasOpBinLog.push(new Pair<>(etiVerdadero, etiFalso));
     }
 
-    private void finalizarCortocircuitoAsig(String refIR, String nombreIR) throws ExcepcionVisitor {
+    private void finalizarCortocircuitoAsig(String refIR, String nombreIR) {
         // Obtener y desapilar las etiquetas de esta asignación
         Pair<String, String> parEtiquetas = etiquetasOpBinLog.pop();
 
@@ -343,19 +344,16 @@ public class GeneradorDeCodigo extends Visitor {
     /* Invoca a las funciones que asignan a las variables
      * globales el valor con el que fueron declaradas */
     private void inicializarVarsGbls() {
-        varGblInit.forEach(fun -> {
-            imprimirCodigo(String.format("call void %s()", fun));
-        });
+        varGblInit.forEach(fun -> imprimirCodigo(String.format("call void %s()", fun)));
     }
 
     /* Inicializa las cadenas que van a usarse en el programa
      */
     private void declararVarsStrs() {
         // Por ej.: @ptro.str.2 = private constant [5 x i8] c"Hola\00"
-        arrCadenas.forEach(cad -> {
-            codigo.append(String.format("%s = private constant [%s x i8] c\"%s\"\n",
-                    cad.getNombreIR(), cad.getLongitudIR(), cad.getValorIR()));
-        });
+        arrCadenas.forEach(cad ->
+                codigo.append(String.format("%s = private constant [%s x i8] c\"%s\"\n",
+                cad.getNombreIR(), cad.getLongitudIR(), cad.getValorIR())));
     }
 
 
@@ -487,7 +485,7 @@ public class GeneradorDeCodigo extends Visitor {
     /* Sentencias de declaración */
 
     @Override
-    public void visit(DecVar dv) throws ExcepcionVisitor {
+    public void visit(DecVar dv) {
         // Genera la declaración de una variable que no fue inicializada
 
         SimboloVariable sv = (SimboloVariable) dv.getIdent();
@@ -535,7 +533,7 @@ public class GeneradorDeCodigo extends Visitor {
             codigo.append(String.format("\n%s = global %s %s\n", nombreIR, tipoIR, valorDef));
 
             // Creo una función que se va a llamar en el main para inicializar la var. con el valor correspondiente
-            String nomFunAux = Normalizador.crearNomFun(String.format("init.var.gbl"));
+            String nomFunAux = Normalizador.crearNomFun("init.var.gbl");
             codigo.append(String.format("define void %s() {\n", nomFunAux));
             expr.accept(this);
             String refIR = expr.getRefIR();
@@ -604,7 +602,7 @@ public class GeneradorDeCodigo extends Visitor {
     }
 
     @Override
-    public void visit(Param p) throws ExcepcionVisitor {
+    public void visit(Param p) {
         /* Para poder utilizar el parámetro creo una variable auxiliar,
          * para la cual genero un nombreIR y un refIR, que pisan al que
          * viene en el objeto SimboloVariable del parámetro. Después
@@ -758,7 +756,7 @@ public class GeneradorDeCodigo extends Visitor {
     }
 
     @Override
-    public void visit(Continuar c) throws ExcepcionVisitor {
+    public void visit(Continuar c) {
         imprimirComent("visit(Continuar)");
         Pair<String, String> etiquetas = etiquetasMientras.peek();
         // Saltar al principio del while
@@ -766,7 +764,7 @@ public class GeneradorDeCodigo extends Visitor {
     }
 
     @Override
-    public void visit(Salir s) throws ExcepcionVisitor {
+    public void visit(Salir s) {
         imprimirComent("visit(Salir)");
         Pair<String, String> etiquetas = etiquetasMientras.peek();
         // Saltar al final del while

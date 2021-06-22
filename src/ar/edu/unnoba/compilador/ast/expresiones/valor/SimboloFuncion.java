@@ -8,7 +8,7 @@ import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFun;
 public class SimboloFuncion extends InvocacionFuncion {
     private DecFun declaracion;
 
-    private String nombreIR;
+    private final String nombreIR;
 
     public String getNombreIR() {
         return nombreIR;

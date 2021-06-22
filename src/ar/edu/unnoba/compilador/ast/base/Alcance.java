@@ -2,9 +2,11 @@ package ar.edu.unnoba.compilador.ast.base;
 
 import ar.edu.unnoba.compilador.ast.expresiones.valor.SimboloVariable;
 
+import java.io.Serial;
 import java.util.TreeMap;
 
 public class Alcance extends TreeMap<String, SimboloVariable> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     // El "nombre" del alcance puede ser "global", el nombre de la función en la que está incluido, etc...

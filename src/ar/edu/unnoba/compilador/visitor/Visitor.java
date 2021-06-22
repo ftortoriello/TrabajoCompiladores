@@ -197,7 +197,7 @@ public abstract class Visitor {
         }
     }
 
-    public void visit(Cadena c) throws ExcepcionVisitor {
+    public void visit(Cadena c) {
 
     }
 }
