@@ -147,10 +147,7 @@ public class GeneradorDeCodigo extends Visitor {
             imprimirCodigo(String.format("%s = call i32 (i8*, ...) @printf(%s)",
                     Normalizador.crearNomRef("aux"), paramsPrintf));
         } else if (arg.getTipo().equals(Tipo.BOOLEAN)) {
-            // FIXME: Tendría que ser así directamente, pero por algún motivo imprime cualquier cosa en Windows
-            //paramsPrintf = grarParamsPrintfConRef(3, "@.int_format", "i1", refIR);
-
-            // Extiendo el i1 a i32 para poder imprimirlo
+            // Extiendo el i1 a i32 para poder compararlo
             String refExt = Normalizador.crearNomRef("ext");
             imprimirCodigo(String.format("%s = zext i1 %s to i32", refExt, refIR));
             refIR = refExt;
@@ -169,13 +166,13 @@ public class GeneradorDeCodigo extends Visitor {
             imprimirEtiqueta(casoTrue);
             imprimirCodigo(String.format("%s = call i32 (i8*, ...) @printf(%s)",
                     Normalizador.crearNomRef("aux"),
-                    grarParamsPrintfConRef(5, "@.bln_true_format", "i32", refIR)));
+                    grarParamsPrintf(5, "@.bln_true_format")));
             imprimirCodSaltoInc(fin);
 
             imprimirEtiqueta(casoFalse);
             imprimirCodigo(String.format("%s = call i32 (i8*, ...) @printf(%s)",
                     Normalizador.crearNomRef("aux"),
-                    grarParamsPrintfConRef(6, "@.bln_false_format", "i32", refIR)));
+                    grarParamsPrintf(6, "@.bln_false_format")));
             imprimirCodSaltoInc(fin);
 
             imprimirEtiqueta(fin);
@@ -184,9 +181,9 @@ public class GeneradorDeCodigo extends Visitor {
             String tipoIR = arg.getTipo().equals(Tipo.INTEGER) ? "i32" : "double";
 
             if (arg.getTipo().equals(Tipo.INTEGER)) {
-                paramsPrintf = grarParamsPrintfConRef(3, "@.int_format", tipoIR, refIR);
+                paramsPrintf = grarParamsPrintf(3, "@.int_format", tipoIR, refIR);
             } else {
-                paramsPrintf = grarParamsPrintfConRef(6, "@.double_print_format", tipoIR, refIR);
+                paramsPrintf = grarParamsPrintf(6, "@.double_print_format", tipoIR, refIR);
             }
 
             imprimirCodigo(String.format("%s = call i32 (i8*, ...) @printf(%s)",
@@ -206,37 +203,62 @@ public class GeneradorDeCodigo extends Visitor {
                 tamanho, str);
     }
 
-    private String grarParamsPrintfConRef(int tamanho, String str, String tipoIR, String refIR) {
-        return String.format("i8* getelementptr([%1$s x i8], [%1$s x i8]* %2$s, i32 0, i32 0), %3$s %4$s",
-                tamanho, str, tipoIR, refIR);
+    private String grarParamsPrintf(int tamanho, String str, String tipoIR, String refIR) {
+        return grarParamsPrintf(tamanho, str) + String.format(", %s %s", tipoIR, refIR);
     }
 
-    private void imprimirDefinicionLeer(Tipo tipo) {
+    private void imprimirDefinicionLeer(Tipo tipo) throws ExcepcionVisitor {
         final String nombre = tipo.toString();
         final String tipoRet = tipo.getIR();
         final String tipoLeido;
         final String formatoScanf;
-        if (tipo.equals(Tipo.FLOAT)) {
-            // leer double para perder menos precisión
-            tipoLeido = "double";
-            formatoScanf = "([4 x i8], [4 x i8]* @.double_format";
-        } else {
-            // ya sea integer o boolean leer i32
-            tipoLeido = "i32";
-            formatoScanf = "([3 x i8], [3 x i8]* @.int_format";
+
+        switch (tipo) {
+            case BOOLEAN:
+                // Leemos un carácter. Si es 't' o 'T' (por ejemplo, si el usuario ingresó "true")
+                // asumimos que es true.
+                tipoLeido = "i8";
+                formatoScanf = "[3 x i8], [3 x i8]* @.char_format";
+                break;
+            case INTEGER:
+                tipoLeido = "i32";
+                formatoScanf = "[3 x i8], [3 x i8]* @.int_format";
+                break;
+            case FLOAT:
+                tipoLeido = "double";
+                formatoScanf = "[4 x i8], [4 x i8]* @.double_format";
+                break;
+            default:
+                throw new ExcepcionVisitor("Tipo de función read inesperado: " + tipo);
         }
 
         codigo.append(String.format("define %s @read_%s() {\n", tipoRet, nombre));
+        // No hace falta generarles un id a los registros y etiquetas, son únicas dentro de la función IR
         imprimirCodigo("%ptro.valor_leido = alloca " + tipoLeido);
-        imprimirCodigo("%ref.ret_scanf = call i32 (i8*, ...) @scanf(i8* getelementptr inbounds " +
+        imprimirCodigo("%ref.ret_scanf = call i32 (i8*, ...) @scanf(i8* getelementptr inbounds (" +
                 formatoScanf + ", i64 0, i64 0), " + tipoLeido + "* %ptro.valor_leido)");
         imprimirCodigo("%ref.valor_leido = load " + tipoLeido + ", " + tipoLeido +
                 "* %ptro.valor_leido");
 
         if (tipo.equals(Tipo.BOOLEAN)) {
-            // TODO: Mejorar. Ahora toma nro. impar = verdadero, cualquier otra cosa = falso
-            imprimirCodigo("%ref.valor_convertido = trunc i32 %ref.valor_leido to i1");
-            imprimirCodigo("ret " + tipoRet + " %ref.valor_convertido");
+            // Extender a i32 para compararlo
+            imprimirCodigo("%ref.char_ext = sext i8 %ref.valor_leido to i32");
+
+            imprimirCodigo("%ref.cmp.1 = icmp eq i32 %ref.char_ext, 116",
+                    "comparar con 't'");
+            imprimirCodSaltoCond("%ref.cmp.1", "verdadero", "no_es_t");
+
+            imprimirEtiqueta("no_es_t");
+            imprimirCodigo("%ref.cmp.2 = icmp eq i32 %ref.char_ext, 84",
+                    "comparar con 'T'");
+            imprimirCodSaltoCond("%ref.cmp.2", "verdadero", "falso");
+
+            imprimirEtiqueta("verdadero");
+            imprimirCodigo("ret i1 1");
+
+            imprimirEtiqueta("falso");
+            imprimirCodigo("ret i1 0");
+
         } else {
             imprimirCodigo("ret " + tipoRet + " %ref.valor_leido");
         }
@@ -441,9 +463,15 @@ public class GeneradorDeCodigo extends Visitor {
         if (usaWrite || usaRead) {
             codigo.append("\n; Constantes para entradas y salidas\n")
                   .append("@.int_format = private constant [3 x i8] c\"%d\\00\"\n")
-                  .append("@.double_format = private constant [4 x i8] c\"%lf\\00\"\n")
-                  // Imprimir floats siempre con dos decimales
-                  .append("@.double_print_format = private constant [6 x i8] c\"%.2lf\\00\"\n")
+                  .append("@.double_format = private constant [4 x i8] c\"%lf\\00\"\n");
+        }
+        if (usaRead) {
+            // Para leer chars y convertirlos a boolean
+            codigo.append("@.char_format = private constant [3 x i8] c\"%c\\00\"\n");
+        }
+        if (usaWrite) {
+            // Imprimir double siempre con dos decimales
+            codigo.append("@.double_print_format = private constant [6 x i8] c\"%.2lf\\00\"\n")
                   .append("@.bln_true_format = private constant [5 x i8] c\"true\\00\"\n")
                   .append("@.bln_false_format = private constant [6 x i8] c\"false\\00\"\n");
         }
@@ -766,6 +794,7 @@ public class GeneradorDeCodigo extends Visitor {
 
     /* Sentencias de control */
 
+    // FIXME: Se rompe si no hay un return al final. Tendría que retornar el valor por defecto.
     @Override
     public void visit(Retorno r) throws ExcepcionVisitor {
         Expresion expr = r.getExpresion();
@@ -864,6 +893,7 @@ public class GeneradorDeCodigo extends Visitor {
             valorIR = valorParser;
         } else if (tipoParser == Tipo.FLOAT) {
             // ??? De verdad que no se puede hacer más simple esto, cuando imprimo tengo que volver a convertirlo
+            // TODO ???
             double temp = Float.parseFloat(valorParser);
             valorIR = Double.toString(temp);
         } else if (tipoParser == Tipo.BOOLEAN) {

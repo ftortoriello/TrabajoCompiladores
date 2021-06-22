@@ -26,6 +26,7 @@ public enum Tipo {
         switch (this) {
             case BOOLEAN: return "i1";
             case INTEGER: return "i32";
+            // Usamos double para representar nros. con punto flotante, para no perder tanta precisión
             case FLOAT: return "double";
             default: throw new IllegalStateException(
                     String.format("getTipoIR(): Tipo %s inesperado", this));

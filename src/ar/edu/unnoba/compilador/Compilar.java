@@ -53,13 +53,10 @@ public class Compilar {
         if (GeneradorDeCodigo.targetEsWindows()) {
             nombreExe = nombre + ".exe";
 
-            // en Windows hay que enlazarlo con scanf.o para permitir leer entradas del teclado
-            // TODO: Probar si es así
-
             // generar objeto con la salida de nuestro compilador
             exitCode = Util.ejecutar("clang", "-c", "-o", nombre + ".o", nombre + ".ll");
             if (exitCode == 0) {
-                // generar exe enlazado al objeto anterior y a scanf
+                // En Windows no se puede usar la función scanf directamente; generar .exe enlazado a scanf.o
                 exitCode = Util.ejecutar("clang", "-o", nombreExe, nombre + ".o", "lib/scanf.o");
             }
         } else {
@@ -159,6 +156,7 @@ public class Compilar {
             boolean compilado = compilarExe(carpetaSalida + nombreArchivo);
             if (!compilado) return;
 
+            // Para probar, pero desde los IDE primero espera las entradas y después muestra las salidas.
             System.out.println("\nEjecutando el programa compilado...");
             Util.ejecutar("./" + carpetaSalida + nombreArchivo);
 

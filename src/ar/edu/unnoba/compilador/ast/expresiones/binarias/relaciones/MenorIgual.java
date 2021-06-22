@@ -9,7 +9,7 @@ public class MenorIgual extends Relacion {
     }
 
     public String getInstruccionIR() {
-        return getIzquierda().getTipo() == Tipo.INTEGER ? "ole" : "sle";
+        return getIzquierda().getTipo() == Tipo.FLOAT ? "ole" : "sle";
     }
 
     @Override
