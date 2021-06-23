@@ -101,7 +101,6 @@ Requisitos:
 
 Cosas secundarias:
 * Eliminar clase "Para" y "Cuando". Generar la transformación de esas estructuras en el propio parser (posiblemente creando un constructor nuevo en las clases Mientras y SiEntonces, cosa de tirarlo ahí y resolverlo en la propia clase).
-* Ver de crear métodos para instrucciones comunes del IR (store, load, etc.), cosa de que queden todas centralizadas en un lugar y no andar creando los strings por todos lados. Por ej. podríamos tener imprimirAlloca(nombre, tipo), y que se encargue esa función del string cosa de que el resto sea más fácil de leer.
 * Para reducir un poco el uso de instanceOf e ifs, podríamos generar más métodos en el visitor. Por ej. si creamos uno para OperacionBinariaAritmetica, en el visitor abstracto llamaría al de OperacionBinaria para que siga funcionando como hasta ahora, pero en el de GeneradorDeCodigo hacemos un overwrite.
 * Podríamos dejar en el IR como comentario de cada línea la línea del programa original?
 

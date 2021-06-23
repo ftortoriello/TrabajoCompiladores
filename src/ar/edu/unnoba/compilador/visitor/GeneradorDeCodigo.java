@@ -35,7 +35,7 @@ import java.util.*;
 public class GeneradorDeCodigo extends Visitor {
     private String nombreArchivoFuente;
 
-    private GenerarIR grar = new GenerarIR();
+    private GenerarIR grar;
 
     // Tabla con las funciones definidas por el usuario. Se extrae del objeto Programa al entrar en esta clase
     private Map<String, SimboloFuncion> tablaFunciones;
@@ -140,11 +140,11 @@ public class GeneradorDeCodigo extends Visitor {
 
         if (arg instanceof Cadena) {
             Cadena cad = (Cadena) arg;
-            grar.printf(cad.getNombreIR(), cad.getLongitudIR());
+            grar.print(cad.getNombreIR(), cad.getLongitudIR());
         } else if (arg.getTipo().equals(Tipo.BOOLEAN)) {
             // Extender el i1 a i32 para poder compararlo
             String refExt = Normalizador.crearNomRef("ext");
-            grar.asig(refExt, "zext", "i1", refIR + " to i32");
+            grar.zext(refExt, "i1", refIR);
             refIR = refExt;
 
             // Ahora se evalúa el valor del booleano para imprimir "true" o "false".
@@ -155,15 +155,14 @@ public class GeneradorDeCodigo extends Visitor {
             String refAux = Normalizador.crearNomRef("aux");
 
             // Guardo en refAux el valor de la comparación
-            grar.icmpEq(refAux, refIR, "1");
-            grar.salto(refAux, casoTrue, casoFalse);
+            grar.saltoIgual(refAux, "i32", refIR, "1", casoTrue, casoFalse);
 
             grar.etiqueta(casoTrue);
-            grar.printf("@.bln_true_format", 5);
+            grar.print("@.bln_true_format", 5);
             grar.salto(fin);
 
             grar.etiqueta(casoFalse);
-            grar.printf("@.bln_false_format", 6);
+            grar.print("@.bln_false_format", 6);
             grar.salto(fin);
 
             grar.etiqueta(fin);
@@ -172,78 +171,79 @@ public class GeneradorDeCodigo extends Visitor {
             String tipoIR = arg.getTipo().equals(Tipo.INTEGER) ? "i32" : "double";
 
             if (arg.getTipo().equals(Tipo.INTEGER)) {
-                grar.printf("@.int_format", 3, tipoIR, refIR);
+                grar.print("@.int_format", 3, tipoIR, refIR);
             } else {
-                grar.printf("@.double_print_format", 6, tipoIR, refIR);
+                grar.print("@.double_print_format", 6, tipoIR, refIR);
             }
         }
 
         if (i.getNombre().equals("writeln")) {
             // Genero un salto de línea
-            grar.printf("@.salto_linea", 2);
+            grar.print("@.salto_linea", 2);
         }
     }
 
     private void imprimirDefinicionLeer(Tipo tipo) throws ExcepcionVisitor {
-        final String nombre = tipo.toString();
         final String tipoRet = tipo.getIR();
-        final String tipoLeido;
-        final String formatoScanf;
+        grar.defFuncion("@read_" + tipo.toString(), tipoRet, "");
+
+        // No hace falta generarles un id a los registros y etiquetas;
+        // son únicas dentro de la función IR
+        final String ptroValor = "%ptro.valor_leido";
+        final String refValor = "%ref.valor_leido";
+
+        final String tipoLeido = tipo.equals(Tipo.BOOLEAN) ? "i8" : tipo.getIR();
+        grar.alloca(ptroValor, tipoLeido);
 
         switch (tipo) {
             case BOOLEAN:
-                // Leemos un carácter. Si es 't' o 'T' (por ejemplo, si el usuario ingresó "true")
-                // asumimos que es true.
-                tipoLeido = "i8";
-                formatoScanf = "[4 x i8], [4 x i8]* @.char_format";
+                grar.scan("@.char_format", 4, tipoLeido, ptroValor);
                 break;
             case INTEGER:
-                tipoLeido = "i32";
-                formatoScanf = "[3 x i8], [3 x i8]* @.int_format";
+                grar.scan("@.int_format", 3, tipoLeido, ptroValor);
                 break;
             case FLOAT:
-                tipoLeido = "double";
-                formatoScanf = "[4 x i8], [4 x i8]* @.double_format";
+                grar.scan("@.double_format", 4, tipoLeido, ptroValor);
                 break;
             default:
                 throw new ExcepcionVisitor("Tipo de función read inesperado: " + tipo);
         }
 
-        grar.defFuncion(nombre, tipoRet);
-        // No hace falta generarles un id a los registros y etiquetas;
-        // son únicas dentro de la función IR
-        // TODO: Seguir refactorizando desde acá
-        grar.alloca("%ptro.valor_leido", tipoLeido);
+        grar.load(refValor, tipoLeido, ptroValor);
 
-        imprimirCodigo("%ref.ret_scanf = call i32 (i8*, ...) @scanf(i8* getelementptr inbounds (" +
-                formatoScanf + ", i64 0, i64 0), " + tipoLeido + "* %ptro.valor_leido)");
-        imprimirCodigo("%ref.valor_leido = load " + tipoLeido + ", " + tipoLeido +
-                "* %ptro.valor_leido");
-
+        // TODO: Test
         if (tipo.equals(Tipo.BOOLEAN)) {
-            // Extender a i32 para compararlo
-            imprimirCodigo("%ref.char_ext = sext i8 %ref.valor_leido to i32");
+            // Para los boolean, leemos un carácter. Si es 't' o 'T' (por ejemplo,
+            // si el usuario ingresó "true") asumimos que es true.
 
-            imprimirCodigo("%ref.cmp.1 = icmp eq i32 %ref.char_ext, 116",
-                    "comparar con 't'");
-            imprimirCodSaltoCond("%ref.cmp.1", "verdadero", "no_es_t");
+            // Extender a i32 para compararlo
+            final String refExt = "%ref.char_ext";
+            grar.sext(refExt, tipoLeido, ptroValor);
+
+            grar.setComentLinea("comparar con 't'");
+            grar.saltoIgual("%ref.cmp.1", "i32", refExt, "116", "verdadero", "no_es_t");
 
             grar.etiqueta("no_es_t");
-            imprimirCodigo("%ref.cmp.2 = icmp eq i32 %ref.char_ext, 84",
-                    "comparar con 'T'");
-            imprimirCodSaltoCond("%ref.cmp.2", "verdadero", "falso");
+            grar.setComentLinea("comparar con 'T'");
+            grar.saltoIgual("%ref.cmp.2", "i32", refExt, "84", "verdadero", "falso");
 
+            final String refRet = "%ref.ret_read_boolean";
             grar.etiqueta("verdadero");
-            imprimirCodigo("ret i1 1");
+            grar.suma(refRet, "i1", "true", "false");
+            grar.salto("ret_read_boolean");
 
             grar.etiqueta("falso");
-            imprimirCodigo("ret i1 0");
+            grar.suma(refRet, "i1", "false", "false");
+            grar.salto("ret_read_boolean");
+
+            grar.etiqueta("ret_read_boolean");
+            grar.ret("i1", refRet);
 
         } else {
-            imprimirCodigo("ret " + tipoRet + " %ref.valor_leido");
+            grar.ret(tipoRet, refValor);
         }
 
-        codigo.append("}\n\n");
+        grar.cierreBloque();
     }
 
     /* Devuelve una lista de parámetros de acuerdo a lo requerido por IR.
@@ -304,7 +304,7 @@ public class GeneradorDeCodigo extends Visitor {
         String etiVerdadero = etiquetas.fst;
         String etiFalso = etiquetas.snd;
 
-        imprimirComent(String.format("Cortocircuito booleano: %s", ob));
+        grar.coment(String.format("Cortocircuito booleano: %s", ob));
 
         Expresion expIzquierda = ob.getIzquierda();
         if (expIzquierda instanceof NegacionLogica) ((NegacionLogica) expIzquierda).setEnCortocircuito(true);
@@ -318,17 +318,17 @@ public class GeneradorDeCodigo extends Visitor {
             // Si el operador izquierdo es falso, esta operación es falsa
             etiTmp = Normalizador.crearNomEtiqueta("and_verdadero");
             if (expIzquierda instanceof NegacionLogica) {
-                imprimirCodSaltoCond(refIR, etiFalso, etiTmp);
+                grar.salto(refIR, etiFalso, etiTmp);
             } else {
-                imprimirCodSaltoCond(refIR, etiTmp, etiFalso);
+                grar.salto(refIR, etiTmp, etiFalso);
             }
         } else if (ob instanceof Disyuncion) { // OR
             // Si el operador izquierdo es verdadero, esta operación es verdadera
             etiTmp = Normalizador.crearNomEtiqueta("or_falso");
             if (expIzquierda instanceof NegacionLogica) {
-                imprimirCodSaltoCond(refIR, etiTmp, etiVerdadero);
+                grar.salto(refIR, etiTmp, etiVerdadero);
             } else {
-                imprimirCodSaltoCond(refIR, etiVerdadero, etiTmp);
+                grar.salto(refIR, etiVerdadero, etiTmp);
             }
         } else {
             throw new ExcepcionVisitor("Tipo de operación binaria lógica inesperado.");
@@ -357,17 +357,17 @@ public class GeneradorDeCodigo extends Visitor {
 
         // Con el visit de expresión ya se generó el código para el cortocircuito.
         // Hay que agregar el último salto.
-        imprimirCodSaltoCond(refIR, parEtiquetas.fst, parEtiquetas.snd);
+        grar.salto(refIR, parEtiquetas.fst, parEtiquetas.snd);
 
         // Resultado verdadero
         grar.etiqueta(parEtiquetas.fst);
-        imprimirCodigo(String.format("store i1 1, i1* %s", nombreIR));
-        imprimirCodSaltoInc(etiFin);
+        grar.store(nombreIR, "i1", "1");
+        grar.salto(etiFin);
 
         // Resultado falso
         grar.etiqueta(parEtiquetas.snd);
-        imprimirCodigo(String.format("store i1 0, i1* %s", nombreIR));
-        imprimirCodSaltoInc(etiFin);
+        grar.store(nombreIR, "i1", "0");
+        grar.salto(etiFin);
 
         grar.etiqueta(etiFin);
     }
@@ -375,7 +375,7 @@ public class GeneradorDeCodigo extends Visitor {
     /* Invoca a las funciones que asignan a las variables
      * globales el valor con el que fueron declaradas */
     private void inicializarVarsGbls() {
-        varGblInit.forEach(fun -> imprimirCodigo(String.format("call void %s()", fun)));
+        varGblInit.forEach(fun -> grar.invocacion(fun, ""));
     }
 
     /* Inicializa las cadenas que van a usarse en el programa
@@ -383,8 +383,7 @@ public class GeneradorDeCodigo extends Visitor {
     private void declararVarsStrs() {
         // Por ej.: @ptro.str.2 = private constant [5 x i8] c"Hola\00"
         arrCadenas.forEach(cad ->
-                codigo.append(String.format("%s = private constant [%s x i8] c\"%s\"\n",
-                cad.getNombreIR(), cad.getLongitudIR(), cad.getValorIR())));
+                grar.cadena(cad.getNombreIR(), cad.getValorIR(), cad.getLongitudIR()));
     }
 
 
@@ -395,6 +394,7 @@ public class GeneradorDeCodigo extends Visitor {
         this.tablaFunciones = p.getTablaFunciones();
         this.arrCadenas = p.getArrCadenas();
 
+        grar = new GenerarIR();
         super.procesar(p);
         return grar.getCodigo();
     }
@@ -404,26 +404,29 @@ public class GeneradorDeCodigo extends Visitor {
     /* Base */
     @Override
     public void visit(Programa p) throws ExcepcionVisitor {
-        codigo = new StringBuilder();
-        codigo.append(String.format("; Programa: %s\n", p.getNombre()))
-              .append(String.format("source_filename = \"%s\"\n", nombreArchivoFuente));
+        StringBuilder sb = new StringBuilder();
 
+        String target;
         try {
-            codigo.append(getHostTarget());
+            target = getHostTarget();
         } catch (IOException | InterruptedException e) {
-            // algo falló... dejarlo hardcodeado
+            // algo falló... dejarlo fijo
             if (targetEsWindows()) {
                 // Target Bruno
-                codigo.append("target datalayout = \"e-m:w-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128\"\n")
-                      .append("target triple = \"x86_64-pc-windows-msvc19.28.29335\"\n");
+                target = "target datalayout = \"e-m:w-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128\"\n" +
+                        "target triple = \"x86_64-pc-windows-msvc19.28.29335\"\n";
             } else {
                 // Target Franco
-                codigo.append("target datalayout = \"e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128\"\n")
-                      .append("target triple = \"x86_64-pc-linux-gnu\"\n");
+                target = "target datalayout = \"e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128\"\n" +
+                        "target triple = \"x86_64-pc-linux-gnu\"\n";
             }
         }
 
-        codigo.append("\n\n");
+        // Generar encabezado
+
+        sb.append(String.format("; Programa: %s\n", p.getNombre()))
+                .append(String.format("source_filename = \"%s\"\n", nombreArchivoFuente))
+                .append(target);
 
         // Definir globalmente sólo lo necesario
 
@@ -436,49 +439,50 @@ public class GeneradorDeCodigo extends Visitor {
         final boolean usaRead = usaReadBoolean || usaReadInteger || usaReadFloat;
 
         if (usaWrite) {
-            codigo.append("declare i32 @printf(i8*, ...)\n");
+            sb.append("declare i32 @printf(i8*, ...)\n");
         }
         if (usaRead) {
-            codigo.append("declare i32 @scanf(i8*, ...)\n");
+            sb.append("declare i32 @scanf(i8*, ...)\n");
         }
         if (usaWrite || usaRead) {
-            codigo.append("\n; Constantes para entradas y salidas\n")
-                  .append("@.int_format = private constant [3 x i8] c\"%d\\00\"\n")
-                  .append("@.double_format = private constant [4 x i8] c\"%lf\\00\"\n");
+            sb.append("\n; Constantes para entradas y salidas\n")
+                    .append("@.int_format = private constant [3 x i8] c\"%d\\00\"\n")
+                    .append("@.double_format = private constant [4 x i8] c\"%lf\\00\"\n");
         }
         if (usaRead) {
             // Para leer char y convertirlo a boolean.
             // El espacio antes de %c es para que no consuma caracteres especiales.
-            codigo.append("@.char_format = private constant [4 x i8] c\" %c\\00\"\n");
+            sb.append("@.char_format = private constant [4 x i8] c\" %c\\00\"\n");
         }
         if (usaWrite) {
             // Imprimir double siempre con dos decimales
-            codigo.append("@.double_print_format = private constant [6 x i8] c\"%.2lf\\00\"\n")
-                  .append("@.bln_true_format = private constant [5 x i8] c\"true\\00\"\n")
-                  .append("@.bln_false_format = private constant [6 x i8] c\"false\\00\"\n");
+            sb.append("@.double_print_format = private constant [6 x i8] c\"%.2lf\\00\"\n")
+                    .append("@.bln_true_format = private constant [5 x i8] c\"true\\00\"\n")
+                    .append("@.bln_false_format = private constant [6 x i8] c\"false\\00\"\n");
         }
         if (usaWriteln) {
-            codigo.append("@.salto_linea = private constant [2 x i8] c\"\\0A\\00\"\n");
+            sb.append("@.salto_linea = private constant [2 x i8] c\"\\0A\\00\"\n");
         }
-        codigo.append("\n");
+        sb.append("\n");
+
+        grar.codigo(sb.toString(), false);
 
         if (usaReadBoolean) imprimirDefinicionLeer(Tipo.BOOLEAN);
         if (usaReadInteger) imprimirDefinicionLeer(Tipo.INTEGER);
         if (usaReadFloat) imprimirDefinicionLeer(Tipo.FLOAT);
 
         declararVarsStrs();
-
         super.visit(p);
     }
 
     @Override
     public void visit(Bloque b) throws ExcepcionVisitor {
         if (b.esProgramaPrincipal()) {
-            codigo.append("\ndefine i32 @main(i32, i8**) {\n");
+            grar.defFuncion("@main", "i32", "i32, i8**");
             inicializarVarsGbls();
             super.visit(b);
-            imprimirCodigo("ret i32 0");
-            codigo.append("}\n");
+            grar.ret("i32", "0");
+            grar.cierreBloque();
         } else {
             super.visit(b);
         }
@@ -504,7 +508,7 @@ public class GeneradorDeCodigo extends Visitor {
         String origen = expr.getRefIR();
         String destino = svDestino.getNombreIR();
 
-        imprimirComent(String.format("visit(Asignacion)%s: %s = %s",
+        grar.coment(String.format("visit(Asignacion)%s: %s = %s",
                 aplicarCortocircuito ? " con cortocircuito booleano" : "",
                 svDestino.getNombre(), expr));
 
@@ -515,8 +519,9 @@ public class GeneradorDeCodigo extends Visitor {
             String tipoDestino = svDestino.getTipo().getIR();
             // TipoOrigen y tipoDestino deberían ser iguales, pero lo dejo así para detectar algún error
             // y de paso usar los nombres de las variables para que quede un poco más claro lo que se hace
-
-            imprimirCodigo(String.format("store %s %s, %s* %s", tipoOrigen, origen, tipoDestino, destino));
+            // TODO funca esto?
+            assert origen == destino;
+            grar.store(destino, tipoDestino, origen);
         }
     }
 
@@ -535,13 +540,13 @@ public class GeneradorDeCodigo extends Visitor {
         Boolean esGlobal = sv.getEsGlobal();
         String valorIR = dv.getTipo().getValorDefIR();
 
-        imprimirComent(String.format("visit(DecVar): variable %s is %s = %s", sv.getNombre(), sv.getTipo(), valorIR));
+        grar.coment(String.format("visit(DecVar): variable %s is %s = %s", sv.getNombre(), sv.getTipo(), valorIR));
 
         if (esGlobal) {
-            codigo.append(String.format("%s = global %s %s\n", nombreIR, tipoIR, valorIR));
+            grar.global(nombreIR, tipoIR, valorIR);
         } else {
-            imprimirCodigo(String.format("%s = alloca %s", nombreIR, tipoIR));
-            imprimirCodigo(String.format("store %2$s %3$s, %2$s* %1$s", nombreIR, tipoIR, valorIR));
+            grar.alloca(nombreIR, tipoIR);
+            grar.store(nombreIR, tipoIR, valorIR);
         }
     }
 
@@ -562,27 +567,27 @@ public class GeneradorDeCodigo extends Visitor {
         String tipoIR = sv.getTipo().getIR();
 
         if (sv.getEsGlobal()) {
-            imprimirComent(String.format("\n;visit(DecVarIni)%s: variable %s is %s = %s",
+            grar.coment(String.format("\n;visit(DecVarIni)%s: variable %s is %s = %s",
                     aplicarCortocircuito ? " con cortocircuito booleano" : "",
                     sv.getNombre(), sv.getTipo(), expr));
 
             // Le asigno temporalmente a la var. el valor por defecto según
             // su tipo, porque no puedo inicializarla en el alcance global.
             String valorDef = sv.getTipo().getValorDefIR();
-            codigo.append(String.format("\n%s = global %s %s\n", nombreIR, tipoIR, valorDef));
+            grar.global(nombreIR, tipoIR, valorDef);
 
             // Creo una función que se va a llamar en el main para inicializar la var. con el valor correspondiente
             String nomFunAux = Normalizador.crearNomFun("init.var.gbl");
-            codigo.append(String.format("define void %s() {\n", nomFunAux));
+            grar.defFuncion(nomFunAux, "void", "");
             expr.accept(this);
             String refIR = expr.getRefIR();
 
             if (aplicarCortocircuito) {
                 finalizarCortocircuitoAsig(refIR, sv.getNombreIR());
             } else {
-                imprimirCodigo(String.format("store %1$s %2$s, %1s* %3$s", tipoIR, refIR, nombreIR));
-                imprimirCodigo("ret void");
-                codigo.append("}\n");
+                grar.store(nombreIR, tipoIR, refIR);
+                grar.ret();
+                grar.cierreBloque();
 
                 // Guardo el nombre de la función para invocarla en el main
                 varGblInit.add(nomFunAux);
@@ -597,15 +602,15 @@ public class GeneradorDeCodigo extends Visitor {
             String refIR;
             refIR = expr.getRefIR();
 
-            imprimirComent(String.format("visit(DecVarIni)%s: variable %s is %s = %s",
+            grar.coment(String.format("visit(DecVarIni)%s: variable %s is %s = %s",
                     aplicarCortocircuito ? " con cortocircuito booleano" : "",
                     sv.getNombre(), sv.getTipo(), refIR));
 
             if (aplicarCortocircuito) {
                 finalizarCortocircuitoAsig(refIR, sv.getNombreIR());
             } else {
-                imprimirCodigo(String.format("%s = alloca %s", nombreIR, tipoIR));
-                imprimirCodigo(String.format("store %2$s %3$s, %2$s* %1$s", nombreIR, tipoIR, refIR));
+                grar.alloca(nombreIR, tipoIR);
+                grar.store(nombreIR, tipoIR, refIR);
             }
         }
     }
@@ -625,11 +630,11 @@ public class GeneradorDeCodigo extends Visitor {
 
         // Formatear la lista de parámetros de acuerdo a lo requerido por IR
         String params = grarStrParams(df.getParams());
-        codigo.append(String.format("\ndefine %s %s(%s) {\n", tipoRet, nombreFun, params));
+        grar.defFuncion(nombreFun, tipoRet, params);
 
         // Inicializo el retorno de la función con el valor por defecto
-        imprimirCodigo(String.format("%s = alloca %s", ptroRet, tipoRet));
-        imprimirCodigo(String.format("store %1$s %2$s, %1$s* %3$s", tipoRet, valorPorDef, ptroRet));
+        grar.alloca(ptroRet, tipoRet);
+        grar.store(ptroRet, tipoRet, valorPorDef);
 
         // Generar referencias a los parámetros
         for (Param param : df.getParams()) {
@@ -643,12 +648,12 @@ public class GeneradorDeCodigo extends Visitor {
          * en algun visit(Retorno), se devuelve el valor por defecto que fue asignado al
          * inicio de la declaración para evitar comportamientos indefinidos.
          */
-        imprimirCodSaltoInc(etiquetaFin);
+        grar.salto(etiquetaFin);
         grar.etiqueta(etiquetaFin);
 
-        imprimirCodigo(String.format("%1$s = load %2$s, %2$s* %3$s", refRet, tipoRet, ptroRet));
-        imprimirCodigo(String.format("ret %s %s", tipoRet, refRet));
-        codigo.append("}\n");
+        grar.load(refRet, tipoRet, ptroRet);
+        grar.ret(tipoRet, refRet);
+        grar.cierreBloque();
     }
 
     @Override
@@ -672,11 +677,11 @@ public class GeneradorDeCodigo extends Visitor {
         sv.setRefIR(refIR);
         sv.setNombreIR(nombreIR);
 
-        imprimirComent(String.format("visit(Param): %s", sv.getNombre()));
+        grar.coment(String.format("visit(Param): %s", sv.getNombre()));
 
-        imprimirCodigo(String.format("%s = alloca %s", nombreIR, tipoIR));
-        imprimirCodigo(String.format("store %2$s %3$s, %2$s* %1$s", nombreIR, tipoIR, nombreOriginal),
-                       String.format("%1$s = %2$s", nombreIR, nombreOriginal));
+        grar.alloca(nombreIR, tipoIR);
+        grar.setComentLinea(String.format("%1$s = %2$s", nombreIR, nombreOriginal));
+        grar.store(nombreIR, tipoIR, nombreOriginal);
     }
 
     @Override
@@ -695,17 +700,17 @@ public class GeneradorDeCodigo extends Visitor {
         String etiFin = Normalizador.crearNomEtiqueta("fin_if");
         etiquetasOpBinLog.push(new Pair<>(etiBlqThen, etiFin));
 
-        imprimirComent("visit(SiEntonces)");
+        grar.coment("visit(SiEntonces)");
 
         // Salto condicional
         se.getCondicion().accept(this);
         String refCond = se.getCondicion().getRefIR();
-        imprimirCodSaltoCond(refCond, etiBlqThen, etiFin);
+        grar.salto(refCond, etiBlqThen, etiFin);
 
         // Caso true
         grar.etiqueta(etiBlqThen);
         se.getBloqueSiEntonces().accept(this);
-        imprimirCodSaltoInc(etiFin);
+        grar.salto(etiFin);
 
         // Fin if
         grar.etiqueta(etiFin);
@@ -719,22 +724,22 @@ public class GeneradorDeCodigo extends Visitor {
         String etiBlqElse = Normalizador.crearNomEtiqueta("blq_else");
         String etiFin = Normalizador.crearNomEtiqueta("fin_if");
 
-        imprimirComent("visit(SiEntoncesSino)");
+        grar.coment("visit(SiEntoncesSino)");
 
         // Salto condicional
         ses.getCondicion().accept(this);
         String refCond = ses.getCondicion().getRefIR();
-        imprimirCodSaltoCond(refCond, etiBlqThen, etiBlqElse);
+        grar.salto(refCond, etiBlqThen, etiBlqElse);
 
         // Caso true
         grar.etiqueta(etiBlqThen);
         ses.getBloqueSiEntonces().accept(this);
-        imprimirCodSaltoInc(etiFin);
+        grar.salto(etiFin);
 
         // Caso false
         grar.etiqueta(etiBlqElse);
         ses.getBloqueSino().accept(this);
-        imprimirCodSaltoInc(etiFin);
+        grar.salto(etiFin);
 
         // Fin if
         grar.etiqueta(etiFin);
@@ -751,9 +756,9 @@ public class GeneradorDeCodigo extends Visitor {
         Pair<String, String> parEtiquetas = new Pair<>(etiBucleWhile, etiFinWhile);
         etiquetasMientras.push(parEtiquetas);
 
-        imprimirComent("visit(While)");
+        grar.coment("visit(While)");
 
-        imprimirCodSaltoInc(etiInicioWhile);
+        grar.salto(etiInicioWhile);
         grar.etiqueta(etiInicioWhile);
 
         Expresion condicion = m.getCondicion();
@@ -767,9 +772,9 @@ public class GeneradorDeCodigo extends Visitor {
         // Se evalúa la condición, si es verdadera se salta al bucle y si es falsa al fin
         if (condicion instanceof NegacionLogica) {
             // Invertir etiquetas de salto
-            imprimirCodSaltoCond(condicion.getRefIR(), etiFinWhile, etiBucleWhile);
+            grar.salto(condicion.getRefIR(), etiFinWhile, etiBucleWhile);
         } else {
-            imprimirCodSaltoCond(condicion.getRefIR(), etiBucleWhile, etiFinWhile);
+            grar.salto(condicion.getRefIR(), etiBucleWhile, etiFinWhile);
         }
         grar.etiqueta(etiBucleWhile);
 
@@ -777,7 +782,7 @@ public class GeneradorDeCodigo extends Visitor {
         m.getBloqueSentencias().accept(this);
 
         // Ejecutado el cuerpo, se evalúa de nuevo la condición inicial
-        imprimirCodSaltoInc(etiInicioWhile);
+        grar.salto(etiInicioWhile);
 
         grar.etiqueta(etiFinWhile);
 
@@ -806,28 +811,28 @@ public class GeneradorDeCodigo extends Visitor {
         String ptroRet = simboloFun.getPtroRet();
 
         // Guardo el valor de la expr. del return en la variable que se va a retornar al final de la función
-        imprimirCodigo(String.format("store %1$s %2$s, %1$s* %3$s", tipoIR, refExpr, ptroRet));
+        grar.store(ptroRet, tipoIR, refExpr);
 
         // Salto al final de la función
-        imprimirCodSaltoInc(r.getFun().getEtiquetaFin());
+        grar.salto(r.getFun().getEtiquetaFin());
 
         if (aplicarCortocircuito) etiquetasOpBinLog.pop();
     }
 
     @Override
     public void visit(Continuar c) {
-        imprimirComent("visit(Continuar)");
+        grar.coment("visit(Continuar)");
         Pair<String, String> etiquetas = etiquetasMientras.peek();
         // Saltar al principio del while
-        imprimirCodSaltoInc(etiquetas.fst);
+        grar.salto(etiquetas.fst);
     }
 
     @Override
     public void visit(Salir s) {
-        imprimirComent("visit(Salir)");
+        grar.coment("visit(Salir)");
         Pair<String, String> etiquetas = etiquetasMientras.peek();
         // Saltar al final del while
-        imprimirCodSaltoInc(etiquetas.snd);
+        grar.salto(etiquetas.snd);
     }
 
 
@@ -845,7 +850,7 @@ public class GeneradorDeCodigo extends Visitor {
         String refIR = Normalizador.crearNomRef("ob");
         ob.setRefIR(refIR);
 
-        imprimirComent(String.format("visit(OperacionBinaria): %s %s %s",
+        grar.coment(String.format("visit(OperacionBinaria): %s %s %s",
                 ob.getIzquierda().toString(), ob.getNombre(), ob.getDerecha().toString()));
 
         // El padre visita a las exprs. izq. y der. para generar la declaración de referencias
@@ -853,20 +858,18 @@ public class GeneradorDeCodigo extends Visitor {
 
         String refIzqIR = ob.getIzquierda().getRefIR();
         String refDerIR = ob.getDerecha().getRefIR();
-        String instIR = ob.getInstruccionIR();
+        String instCmpIR = ob.getInstruccionIR();
         String tipoIR = ob.getIzquierda().getTipo().getIR();
         String operadorParser = ob.getNombre();
 
         if (ob instanceof OperacionBinariaAritmetica) {
             // Por ej.: %aux.ob.11 = add i32 %aux.sv.9, %aux.ref.10 ; %aux.ob.11 = %aux.sv.9 + %aux.ref.10
-            imprimirCodigo(String.format("%s = %s %s %s, %s", refIR, instIR, tipoIR, refIzqIR, refDerIR),
-                           String.format("%s = %s %s %s", refIR, refIzqIR, operadorParser, refDerIR));
+            grar.setComentLinea(String.format("%s = %s %s %s", refIR, refIzqIR, operadorParser, refDerIR));
+            grar.asig(refIR, instCmpIR, tipoIR, refIzqIR, refDerIR);
         } else if (ob instanceof Relacion) {
-            String tipoCmp = ((Relacion) ob).getTipoCmp();
             // Por ej.: %aux.ob.15 = icmp sgt i32 %aux.sv.13, %aux.sv.14 ; %aux.sv.13 > %aux.sv.14
-            imprimirCodigo(String.format("%s = %s %s %s %s, %s",
-                                         refIR, tipoCmp, instIR, tipoIR, refIzqIR, refDerIR),
-                           String.format("%s %s %s", refIzqIR, operadorParser, refDerIR));
+            grar.setComentLinea(String.format("%s %s %s", refIzqIR, operadorParser, refDerIR));
+            grar.cmp(instCmpIR, refIR, tipoIR, refIzqIR, refDerIR);
         } else {
             throw new ExcepcionVisitor("Tipo de operación binaria inesperado.");
         }
@@ -895,17 +898,14 @@ public class GeneradorDeCodigo extends Visitor {
          * pero de esta manera queda más uniforme con la forma en la que hacemos lo otro.
          */
 
-        imprimirComent(String.format("visit(Literal): %s", lit.getValor()));
+        grar.coment(String.format("visit(Literal): %s", lit.getValor()));
 
         String refIR = Normalizador.crearNomRef("lit");
         lit.setRefIR(refIR);
 
         Tipo tipoParser = lit.getTipo();
-        String instSuma = lit.getTipo().equals(Tipo.FLOAT) ? "fadd" : "add";
-
         // Hack para generar referencias a valores en una línea (le sumo 0 al valor que quiero guardar)
-        imprimirCodigo(String.format("%s = %s %s %s, %s",
-                refIR, instSuma, tipoParser.getIR(), lit.getValorIR(), tipoParser.getValorDefIR()));
+        grar.suma(refIR, tipoParser.getIR(), lit.getValorIR(), tipoParser.getValorDefIR());
     }
 
     @Override
@@ -926,14 +926,13 @@ public class GeneradorDeCodigo extends Visitor {
         String refIR = Normalizador.crearNomRef(nombreVar);
         sv.setRefIR(refIR);
 
-        imprimirComent(String.format("visit(Identificador): %s", sv.getNombre()));
-
-        imprimirCodigo(String.format("%1$s = load %2$s, %2$s* %3$s", refIR, tipoIR, nombreIR));
+        grar.coment(String.format("visit(Identificador): %s", sv.getNombre()));
+        grar.load(refIR, tipoIR, nombreIR);
     }
 
     @Override
     public void visit(InvocacionFuncion i) throws ExcepcionVisitor {
-        imprimirComent(String.format("visitInvocacionFuncion: %s()", i.getNombre()));
+        grar.coment(String.format("visitInvocacionFuncion: %s()", i.getNombre()));
 
         // El refIR que va a contener el valor de la invocación a la función
         String refIR = Normalizador.crearNomRef("invo");
@@ -955,6 +954,6 @@ public class GeneradorDeCodigo extends Visitor {
         // Generar la lista de argumentos, además de visitarlos para generar las refs.
         String args = grarStrArgs(i.getArgs());
 
-        imprimirCodigo(String.format("%s = call %s %s(%s)", refIR, tipoFun, nombreFun, args));
+        grar.invocacion(nombreFun, tipoFun, refIR, args);
     }
 }
