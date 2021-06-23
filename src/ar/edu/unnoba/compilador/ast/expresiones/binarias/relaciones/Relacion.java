@@ -61,6 +61,6 @@ public abstract class Relacion extends OperacionBinaria {
 
     /* Retorna el tipo de relación usado en el IR */
     public String getTipoCmp() {
-        return getIzquierda().getTipo() == Tipo.FLOAT ? "fcmp" : "icmp";
+        return getIzquierda().getTipo().equals(Tipo.FLOAT) ? "fcmp" : "icmp";
     }
 }

@@ -9,7 +9,7 @@ public class Mayor extends Relacion {
     }
 
     public String getInstruccionIR() {
-        return getIzquierda().getTipo() == Tipo.FLOAT ? "ogt" : "sgt";
+        return getIzquierda().getTipo().equals(Tipo.FLOAT) ? "ogt" : "sgt";
     }
 
     @Override

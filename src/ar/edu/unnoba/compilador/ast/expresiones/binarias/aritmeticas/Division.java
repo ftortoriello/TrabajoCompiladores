@@ -11,7 +11,7 @@ public class Division extends OperacionBinariaAritmetica {
 
     @Override
     public String getInstruccionIR() {
-        return getTipo() == Tipo.INTEGER ? "sdiv" : "fdiv";
+        return getTipo().equals(Tipo.FLOAT) ? "fdiv" : "sdiv";
     }
 
     @Override

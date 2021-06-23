@@ -9,7 +9,7 @@ public class Desigualdad extends Relacion {
     }
 
     public String getInstruccionIR() {
-        return getIzquierda().getTipo() == Tipo.FLOAT ? "one" : "ne";
+        return getIzquierda().getTipo().equals(Tipo.FLOAT) ? "one" : "ne";
     }
 
     @Override

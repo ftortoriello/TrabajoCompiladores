@@ -19,10 +19,10 @@ public class NegacionAritmetica extends OperacionUnaria {
         }
 
         Number valor = ((Literal) expresion).getValorNumerico();
-        if (expresion.getTipo() == Tipo.INTEGER) {
-            return new Literal(-valor.intValue(), Tipo.INTEGER);
-        } else {
+        if (expresion.getTipo().equals(Tipo.FLOAT)) {
             return new Literal(-valor.floatValue(), Tipo.FLOAT);
+        } else {
+            return new Literal(-valor.intValue(), Tipo.INTEGER);
         }
     }
 }

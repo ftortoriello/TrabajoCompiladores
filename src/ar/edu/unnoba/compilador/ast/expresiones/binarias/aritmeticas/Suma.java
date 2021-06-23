@@ -10,7 +10,7 @@ public class Suma extends OperacionBinariaAritmetica {
 
     @Override
     public String getInstruccionIR() {
-        return getTipo() == Tipo.INTEGER ? "add" : "fadd";
+        return getTipo().equals(Tipo.FLOAT) ? "fadd" : "add";
     }
 
     @Override

@@ -9,7 +9,7 @@ public class Igualdad extends Relacion {
     }
 
     public String getInstruccionIR() {
-        return getIzquierda().getTipo() == Tipo.FLOAT ? "oeq" : "eq";
+        return getIzquierda().getTipo().equals(Tipo.FLOAT) ? "oeq" : "eq";
     }
 
     @Override

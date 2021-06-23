@@ -11,6 +11,8 @@ import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.Conjuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.Disyuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.OperacionBinariaLogica;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
+import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
+import ar.edu.unnoba.compilador.ast.expresiones.unarias.aritmeticas.NegacionAritmetica;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.logicas.NegacionLogica;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.*;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
@@ -131,6 +133,26 @@ public class GeneradorDeCodigo extends Visitor {
         }
     }
 
+    /* Negación de enteros y flotantes */
+    private void imprimirNegAritmetica(NegacionAritmetica neg) throws ExcepcionVisitor {
+        String refIR = Normalizador.crearNomRef("neg");
+        neg.setRefIR(refIR);
+
+        Expresion expr = neg.getExpresion();
+        Tipo tipo = expr.getTipo();
+        switch (tipo) {
+            case INTEGER:
+                // hacer 0 - expresion
+                imprimirCodigo(String.format("%s = sub %s 0, %s",
+                        refIR, tipo.getIR(), expr.getRefIR()));
+                break;
+            case FLOAT:
+                imprimirCodigo(String.format("%s = fneg %s %s",
+                        refIR, tipo.getIR(), expr.getRefIR()));
+                break;
+            default: throw new ExcepcionVisitor("Tipo de operación unaria inesperado: " + tipo);
+        }
+    }
 
     /* Para tratar los casos de invocaciones a write */
     private void imprimirWrite(InvocacionFuncion i) throws ExcepcionVisitor {
@@ -872,6 +894,15 @@ public class GeneradorDeCodigo extends Visitor {
         }
     }
 
+    @Override
+    public void visit(OperacionUnaria ou) throws ExcepcionVisitor {
+        super.visit(ou);
+
+        if (ou instanceof NegacionAritmetica) {
+            imprimirNegAritmetica((NegacionAritmetica) ou);
+        }
+    }
+
 
     /* Valores */
 
@@ -882,33 +913,17 @@ public class GeneradorDeCodigo extends Visitor {
          * pero de esta manera queda más uniforme con la forma en la que hacemos lo otro.
          */
 
+        imprimirComent(String.format("visit(Literal): %s", lit.getValor()));
+
         String refIR = Normalizador.crearNomRef("lit");
         lit.setRefIR(refIR);
 
         Tipo tipoParser = lit.getTipo();
-        String tipoIR = tipoParser.getIR();
-        String valorParser = lit.getValor();
-        String valorIR;
+        String instSuma = lit.getTipo().equals(Tipo.FLOAT) ? "fadd" : "add";
 
-        if (tipoParser == Tipo.INTEGER) {
-            valorIR = valorParser;
-        } else if (tipoParser == Tipo.FLOAT) {
-            // ??? De verdad que no se puede hacer más simple esto, cuando imprimo tengo que volver a convertirlo
-            // FIXME: Se puede mejorar? Agregando un 0 a mano si empieza con .?
-            double temp = Float.parseFloat(valorParser);
-            valorIR = Double.toString(temp);
-        } else if (tipoParser == Tipo.BOOLEAN) {
-            valorIR = valorParser.equals("false") ? "0" : "1";
-        } else {
-            throw new ExcepcionVisitor("Valor de tipo inesperado: " + lit.getTipo());
-        }
-
-        imprimirComent(String.format("visit(Literal): %s", valorParser));
-
-        String valorNeutro = lit.getTipo() == Tipo.FLOAT ? "0.0" : "0";
-        String instSuma = lit.getTipo() == Tipo.FLOAT ? "fadd" : "add";
         // Hack para generar referencias a valores en una línea (le sumo 0 al valor que quiero guardar)
-        imprimirCodigo(String.format("%s = %s %s %s, %s", refIR, instSuma, tipoIR, valorIR, valorNeutro));
+        imprimirCodigo(String.format("%s = %s %s %s, %s",
+                refIR, instSuma, tipoParser.getIR(), lit.getValorIR(), tipoParser.getValorDefIR()));
     }
 
     @Override

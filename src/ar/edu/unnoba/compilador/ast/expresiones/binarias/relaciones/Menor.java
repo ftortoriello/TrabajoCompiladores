@@ -9,7 +9,7 @@ public class Menor extends Relacion {
     }
 
     public String getInstruccionIR() {
-        return getIzquierda().getTipo() == Tipo.FLOAT ? "olt" : "slt";
+        return getIzquierda().getTipo().equals(Tipo.FLOAT) ? "olt" : "slt";
     }
 
     @Override

@@ -9,7 +9,7 @@ public class MayorIgual extends Relacion {
     }
 
     public String getInstruccionIR() {
-        return getIzquierda().getTipo() == Tipo.FLOAT ? "oge" : "sge";
+        return getIzquierda().getTipo().equals(Tipo.FLOAT) ? "oge" : "sge";
     }
 
     @Override

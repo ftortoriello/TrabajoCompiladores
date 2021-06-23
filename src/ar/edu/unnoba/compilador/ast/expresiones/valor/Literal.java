@@ -69,6 +69,24 @@ public class Literal extends Valor {
             throw new IllegalStateException(String.format("%s no es de tipo booleano.", this));
     }
 
+    public String getValorIR() {
+        switch (getTipo()) {
+            case BOOLEAN: return getValorBooleano() ? "1" : "0";
+
+            case FLOAT:
+                // Agregar ceros si faltan
+                String v = valor;
+                if (v.startsWith(".")) v = "0" + v;
+                if (v.endsWith(".")) v = v + "0";
+                return v;
+
+            case INTEGER: return valor;
+
+            default: throw new IllegalStateException(
+                    String.format("%s no es de tipo numérico.", this));
+        }
+    }
+
     @Override
     public String getEtiqueta() {
         return String.format("%s\n<%s>", getValor(), getTipo());
