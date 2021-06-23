@@ -1,9 +1,15 @@
-function inc(a is integer) return integer
+function def() return float
+    writeln("Esta devuelve implícitamente 0.0");
+
+function inc(a is integer = 1) return integer
     return a * 2 + 1;
 
 main is
     # def(1); # Me permite invocar esto, debería?
+    variable j is float = inc();
+    writeln(j);
 
+{
     variable c is integer = 0;
     variable d is float = 2.0;
     while c < 10 do
@@ -16,6 +22,7 @@ main is
         write(" a ");
         writeln(c);
     end;
+    }
 end.
 
 {

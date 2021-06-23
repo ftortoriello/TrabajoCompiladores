@@ -648,7 +648,7 @@ public class GeneradorDeCodigo extends Visitor {
          * en algun visit(Retorno), se devuelve el valor por defecto que fue asignado al
          * inicio de la declaración para evitar comportamientos indefinidos.
          */
-        grar.salto(etiquetaFin);
+        if (!df.getTieneRetorno()) grar.salto(etiquetaFin);
         grar.etiqueta(etiquetaFin);
 
         grar.load(refRet, tipoRet, ptroRet);

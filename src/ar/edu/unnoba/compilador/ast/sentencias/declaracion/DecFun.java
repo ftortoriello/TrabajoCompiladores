@@ -17,7 +17,10 @@ public class DecFun extends Declaracion {
     private ArrayList<Param> params;
     private Bloque bloque;
     private Alcance alcance;
-    // Si la función no tiene un retorno, se le generará uno por defecto
+
+    // Para generar un salto a la etiqueta de retorno si no tiene al menos uno definido
+    private Boolean tieneRetorno = false;
+
     // Después de esta etiqueta encuentro el return de la función
     private String etiquetaFin;
 
@@ -59,6 +62,14 @@ public class DecFun extends Declaracion {
 
     public void setAlcance(Alcance alcance) {
         this.alcance = alcance;
+    }
+
+    public Boolean getTieneRetorno() {
+        return tieneRetorno;
+    }
+
+    public void setTieneRetorno(Boolean tieneRetorno) {
+        this.tieneRetorno = tieneRetorno;
     }
 
     public String getEtiquetaFin() {
