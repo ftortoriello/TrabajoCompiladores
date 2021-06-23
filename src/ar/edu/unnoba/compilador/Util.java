@@ -1,6 +1,7 @@
 package ar.edu.unnoba.compilador;
 
-import java.io.IOException;
+import java.io.*;
+import java.util.Scanner;
 
 public class Util {
 

@@ -52,15 +52,18 @@ public class GeneradorDeAlcanceGlobal extends Visitor {
                             nombre, id.getTipo(), tablaFunciones.get(nombre).getTipo()));
         }
 
-        String nombreIR = Normalizador.crearNomFun(nombre);
-        SimboloFuncion simbolo = new SimboloFuncion(d, nombreIR);
+        String nombreFun = Normalizador.crearNomFun(nombre);
+        String ptroRet = Normalizador.crearNomPtroLcl("ret");
+        SimboloFuncion simbolo = new SimboloFuncion(d, nombreFun, ptroRet);
+        simbolo.setRefIR(Normalizador.crearNomRef("ret"));
         tablaFunciones.put(nombre, simbolo);
     }
 
     private void agregarFuncionPredefinida(String nombre, Tipo tipo) {
         Identificador id = new Identificador(nombre, tipo);
         DecFun d = new DecFun(id, new ArrayList<>(), new Bloque(nombre, false));
-        SimboloFuncion simbolo = new SimboloFuncion(d, "@" + nombre);
+        SimboloFuncion simbolo = new SimboloFuncion(d, "@" + nombre,
+                Normalizador.crearNomPtroLcl("ret"));
         tablaFunciones.put(nombre, simbolo);
     }
 
@@ -93,6 +96,7 @@ public class GeneradorDeAlcanceGlobal extends Visitor {
     public void visit(DecFun df) throws ExcepcionVisitor {
         // Agregar a la tabla la declaración de la función
         agregarSimboloFuncion(df);
+        df.setEtiquetaFin(Normalizador.crearNomEtiqueta("ret"));
         // No visitar los parámetros ni el cuerpo
     }
 
