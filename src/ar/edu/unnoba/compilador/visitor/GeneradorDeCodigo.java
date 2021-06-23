@@ -706,7 +706,7 @@ public class GeneradorDeCodigo extends Visitor {
          * en algun visit(Retorno), se devuelve el valor por defecto que fue asignado al
          * inicio de la declaración para evitar comportamientos indefinidos.
          */
-        imprimirCodSaltoInc(etiquetaFin);
+        if (!df.getTieneRetorno()) imprimirCodSaltoInc(etiquetaFin);
         imprimirEtiqueta(etiquetaFin);
 
         imprimirCodigo(String.format("%1$s = load %2$s, %2$s* %3$s", refRet, tipoRet, ptroRet));
