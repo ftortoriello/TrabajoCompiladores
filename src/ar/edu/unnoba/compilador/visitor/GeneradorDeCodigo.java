@@ -1,6 +1,7 @@
 package ar.edu.unnoba.compilador.visitor;
 
-import ar.edu.unnoba.compilador.Normalizador;
+import ar.edu.unnoba.compilador.util.GenerarIR;
+import ar.edu.unnoba.compilador.util.Normalizador;
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;

@@ -63,6 +63,9 @@ class Parser;
 
 parser code
 {:
+    // Constante que indica si se muestra el proceso de creación de nodos.
+    private final boolean mostrarCreacionNodos = false;
+
     public void syntax_error(Symbol s) {
     }
 
@@ -73,7 +76,9 @@ parser code
 
     // Depurar creación de nodos
     private void imprimirEtiqueta(Nodo nodo) {
-        //System.out.println("Se creó el nodo " + nodo.getClass().getSimpleName());
+        if (mostrarCreacionNodos) {
+            System.out.println("Se creó el nodo " + nodo.getClass().getSimpleName());
+        }
     }
 :};
 

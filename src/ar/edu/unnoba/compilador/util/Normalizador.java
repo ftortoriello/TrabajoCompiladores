@@ -1,4 +1,4 @@
-package ar.edu.unnoba.compilador;
+package ar.edu.unnoba.compilador.util;
 
 import java.text.Normalizer;
 import java.util.HashMap;

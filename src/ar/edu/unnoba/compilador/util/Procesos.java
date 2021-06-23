@@ -1,8 +1,8 @@
-package ar.edu.unnoba.compilador;
+package ar.edu.unnoba.compilador.util;
 
 import java.io.*;
 
-public class Util {
+public class Procesos {
 
     /* Ejecutar un comando, gestionar su entrada/salida, esperar que finalice y cuando lo haga
      * retornar su código de salida. */

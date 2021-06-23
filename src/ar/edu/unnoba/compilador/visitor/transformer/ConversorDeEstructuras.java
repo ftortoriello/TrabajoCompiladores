@@ -1,6 +1,6 @@
 package ar.edu.unnoba.compilador.visitor.transformer;
 
-import ar.edu.unnoba.compilador.Normalizador;
+import ar.edu.unnoba.compilador.util.Normalizador;
 import ar.edu.unnoba.compilador.ast.base.Alcance;
 import ar.edu.unnoba.compilador.ast.base.Bloque;
 import ar.edu.unnoba.compilador.ast.base.Nodo;

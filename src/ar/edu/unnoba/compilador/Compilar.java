@@ -4,6 +4,7 @@ import ar.edu.unnoba.compilador.ast.base.Programa;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.lexico.Lexer;
 import ar.edu.unnoba.compilador.sintaxis.Parser;
+import ar.edu.unnoba.compilador.util.Procesos;
 import ar.edu.unnoba.compilador.visitor.*;
 import ar.edu.unnoba.compilador.visitor.transformer.ConversorDeEstructuras;
 import ar.edu.unnoba.compilador.visitor.transformer.Optimizador;
@@ -26,7 +27,7 @@ public class Compilar {
         pw.println(new ASTGraphviz(etiqueta).generarCodigo(programa));
         pw.close();
 
-        int exitCode = Util.ejecutar("dot", "-T" + formatoImg,
+        int exitCode = Procesos.ejecutar("dot", "-T" + formatoImg,
                 nombreArchivo + ".dot",
                 "-o", nombreArchivo + "." + formatoImg);
         if (exitCode == 0) {
@@ -53,15 +54,15 @@ public class Compilar {
             nombreExe = nombre + ".exe";
 
             // generar objeto con la salida de nuestro compilador
-            exitCode = Util.ejecutar("clang", "-c", "-o", nombre + ".o", nombre + ".ll");
+            exitCode = Procesos.ejecutar("clang", "-c", "-o", nombre + ".o", nombre + ".ll");
             if (exitCode == 0) {
                 // En Windows no se puede usar la función scanf directamente; generar .exe enlazado a scanf.o
-                exitCode = Util.ejecutar("clang", "-o", nombreExe, nombre + ".o", "lib/scanf.o");
+                exitCode = Procesos.ejecutar("clang", "-o", nombreExe, nombre + ".o", "lib/scanf.o");
             }
         } else {
             // asumimos Unix
             nombreExe = nombre;
-            exitCode = Util.ejecutar("clang", "-o", nombreExe, nombre + ".ll");
+            exitCode = Procesos.ejecutar("clang", "-o", nombreExe, nombre + ".ll");
         }
 
         if (exitCode == 0) {
@@ -157,7 +158,7 @@ public class Compilar {
 
             // Para probar, pero desde los IDE primero espera las entradas y después muestra las salidas.
             System.out.println("\nEjecutando el programa compilado...");
-            Util.ejecutar("./" + carpetaSalida + nombreArchivo);
+            Procesos.ejecutar("./" + carpetaSalida + nombreArchivo);
 
         } catch (ClassCastException e) {
             // Error sintáctico probablemente
