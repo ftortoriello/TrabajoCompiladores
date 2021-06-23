@@ -13,6 +13,7 @@ import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.OperacionBinari
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.aritmeticas.NegacionAritmetica;
+import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.OperacionConversion;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.logicas.NegacionLogica;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.*;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
@@ -152,6 +153,24 @@ public class GeneradorDeCodigo extends Visitor {
                 break;
             default: throw new ExcepcionVisitor("Tipo de operación unaria inesperado: " + tipo);
         }
+
+        // Ponerle esta referencia a la expresión
+        //expr.setRefIR(refIR);
+    }
+
+    /* not (al que no se le pudo aplicar constant folding ni cortocircuito booleano) */
+    private void imprimirNegLogica(NegacionLogica neg) {
+        // Si el NOT es parte de una condición while por ejemplo, se invierten las etiquetas.
+        // En ese caso no hay que generar una instrucción para negarla.
+        // TODO: Terminar de revisar, seguro que me olvido algún caso
+        if (neg.isEnCortocircuito()) return;
+
+        String refIR = Normalizador.crearNomRef("neg");
+        neg.setRefIR(refIR);
+
+        Expresion expr = neg.getExpresion();
+        imprimirCodigo(String.format("%s = xor i1 1, %s", refIR, expr.getRefIR()));
+        expr.setRefIR(refIR);
     }
 
     /* Para tratar los casos de invocaciones a write */
@@ -349,6 +368,8 @@ public class GeneradorDeCodigo extends Visitor {
         imprimirComent(String.format("Cortocircuito booleano: %s", ob));
 
         Expresion expIzquierda = ob.getIzquierda();
+        if (expIzquierda instanceof NegacionLogica) ((NegacionLogica) expIzquierda).setEnCortocircuito(true);
+
         expIzquierda.accept(this);
 
         final String refIR = expIzquierda.getRefIR();
@@ -800,6 +821,7 @@ public class GeneradorDeCodigo extends Visitor {
         Expresion condicion = m.getCondicion();
         boolean aplicarCortocircuito = (condicion instanceof OperacionBinariaLogica);
         if (aplicarCortocircuito) etiquetasOpBinLog.push(parEtiquetas);
+        if (condicion instanceof NegacionLogica) ((NegacionLogica) condicion).setEnCortocircuito(true);
 
         // Generar ref. al resultado de la condición
         condicion.accept(this);
@@ -828,7 +850,6 @@ public class GeneradorDeCodigo extends Visitor {
 
     /* Sentencias de control */
 
-    // FIXME: Se rompe si no hay un return al final
     @Override
     public void visit(Retorno r) throws ExcepcionVisitor {
         SimboloFuncion simboloFun = tablaFunciones.get(r.getFun().getNombre());
@@ -919,6 +940,10 @@ public class GeneradorDeCodigo extends Visitor {
 
         if (ou instanceof NegacionAritmetica) {
             imprimirNegAritmetica((NegacionAritmetica) ou);
+        } else if (ou instanceof NegacionLogica) {
+            imprimirNegLogica((NegacionLogica) ou);
+        } else if (ou instanceof OperacionConversion) { // EnteroAFlotante, FlotanteAEntero
+            // TODO
         }
     }
 

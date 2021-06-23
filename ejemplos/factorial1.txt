@@ -8,13 +8,14 @@ main is
 	variable n is integer;
 	variable valido is boolean = false;
 
+	write("Ingrese a qué número calcularle el factorial: ");
 	while not valido do
 	begin
 		n = read_integer();	# Leer entero
 		# Fijarse que se pueda calcular
-		valido = n >= 0 and n <= 11;
+		valido = n >= 0 and n <= 12;
 		if not valido then
-			writeln("El número debe ser entre 0 y 11");
+			writeln("El número debe ser entre 0 y 12");
 	end;
 
 	write("Resultado: ");

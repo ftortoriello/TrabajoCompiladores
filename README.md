@@ -65,7 +65,7 @@ Más que opcional:
 * Reemplazo de constantes por su valor.
 * Eliminación de asignaciones redundantes (ej: x = x).
 * Eliminación de las declaraciones de variables sin uso.
-* Código inaccesible.
+* Eliminación de código inaccesible.
 
 ### Revisar
 
@@ -82,26 +82,26 @@ Requisitos:
   * Parámetros opcionales: :white_check_mark:
   * Valor de retorno por defecto (si no hay return): :white_check_mark:
 * Funciones predefinidas o externas:
-  * Read: :x:
-  * Write: :x:
+  * Read: :white_check_mark:
+  * Write: :white_check_mark:
   * Truncamiento o conversiones: :x:
 * Declaración de variables (locales y globales, inicializadas y no inicializadas): :white_check_mark:
   * Valores por defecto para las no inicializadas: :white_check_mark:
 * Bloques de código:
   * Asignaciones: :white_check_mark:
-  * Operaciones lógicas: :x:
-    * Cortocircuito: :x:
+  * Operaciones lógicas: :white_check_mark:
+    * Cortocircuito: :white_check_mark:
   * Operaciones relacionales: :white_check_mark:
   * Operaciones aritméticas: :white_check_mark:
   * Invocación de funciones definidas en el lenguaje: :white_check_mark:
   * Literales: :white_check_mark:
   * If: :white_check_mark:
   * While: :white_check_mark:
-    * Sentencias de control (continue y break): :x:
+    * Sentencias de control (continue y break): :white_check_mark:
 
 Cosas secundarias:
-* Estaría bueno ver si podemos indentar el código IR producido. Pero tiene que ser una forma genérica sino es una locura, por ej. cuando hacemos el return del visit del bloque. Estuve viendo y hay una función `indent` que lo hace prácticamente solo (hasta tiene en cuenta los saltos de línea), el tema es que la estructura de bloques que tenemos no es muy consistente y a veces indenta y a veces no. Pero por lo menos indentar 1 nivel (porque no sé si habría más) todo lo que está dentro de las funciones.
-  Ahora estoy poniendo tabulaciones "a mano" en todo lo que no es global, una etiqueta o una declaración o cierre de función. Pensé y empecé a hacer indentar por niveles de bloque del código de entrada (con un contador de nivel, también es manual), pero no creo que quede bien, porque en el IR no van a existir esos niveles.
 * Eliminar clase "Para" y "Cuando". Generar la transformación de esas estructuras en el propio parser (posiblemente creando un constructor nuevo en las clases Mientras y SiEntonces, cosa de tirarlo ahí y resolverlo en la propia clase).
 * Ver de crear métodos para instrucciones comunes del IR (store, load, etc.), cosa de que queden todas centralizadas en un lugar y no andar creando los strings por todos lados. Por ej. podríamos tener imprimirAlloca(nombre, tipo), y que se encargue esa función del string cosa de que el resto sea más fácil de leer.
-* Para reducir un poco el uso de instanceOf e ifs, podríamos generar más métodos en el visitor. Por ej. si creamos uno para OperacionBinariaAritmetica, en el visitor abstracto llamaría al de OperacionBinaria para que siga funcionando como hasta ahora, pero en el de GeneradorDeCodigo hacemos un overwrite.  
+* Para reducir un poco el uso de instanceOf e ifs, podríamos generar más métodos en el visitor. Por ej. si creamos uno para OperacionBinariaAritmetica, en el visitor abstracto llamaría al de OperacionBinaria para que siga funcionando como hasta ahora, pero en el de GeneradorDeCodigo hacemos un overwrite.
+* Podríamos dejar en el IR como comentario de cada línea la línea del programa original?
+

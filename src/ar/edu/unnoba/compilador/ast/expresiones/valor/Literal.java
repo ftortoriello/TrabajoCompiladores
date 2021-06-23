@@ -1,6 +1,5 @@
 package ar.edu.unnoba.compilador.ast.expresiones.valor;
 
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
@@ -71,7 +70,8 @@ public class Literal extends Valor {
 
     public String getValorIR() {
         switch (getTipo()) {
-            case BOOLEAN: return getValorBooleano() ? "1" : "0";
+            //case BOOLEAN: return getValorBooleano() ? "1" : "0";
+            case BOOLEAN: return getValor(); // usar las constantes de IR "true" y "false"
 
             case FLOAT:
                 // Agregar ceros si faltan

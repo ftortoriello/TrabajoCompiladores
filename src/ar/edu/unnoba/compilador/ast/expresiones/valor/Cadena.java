@@ -46,9 +46,10 @@ public class Cadena extends Expresion {
                 // Convertirlo a código
                 int code = Byte.toUnsignedInt(b);
                 String hex = Integer.toHexString(code).toUpperCase();
+                sb.append("\\");
                 // Tiene que tener dos dígitos
                 if (code < 16) sb.append("0");
-                sb.append("\\").append(hex);
+                sb.append(hex);
             }
         }
         // Agregar fin nulo

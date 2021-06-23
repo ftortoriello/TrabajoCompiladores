@@ -36,7 +36,8 @@ public enum Tipo {
     /* Retorna el String del valor predeterminado usado en IR */
     public String getValorDefIR() {
         switch (this) {
-            case BOOLEAN, INTEGER: return "0";
+            case BOOLEAN: return "false";
+            case INTEGER: return "0";
             case FLOAT: return "0.0";
             default: throw new IllegalStateException(
                     String.format("getTipoIR(): Tipo %s inesperado", this));

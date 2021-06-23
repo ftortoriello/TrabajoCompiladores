@@ -1,6 +1,5 @@
 package ar.edu.unnoba.compilador.ast.expresiones.unarias.logicas;
 
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
@@ -10,6 +9,10 @@ public class NegacionLogica extends OperacionUnaria {
     public NegacionLogica(Expresion expresion) {
         super("NOT", expresion);
     }
+
+    // Propiedad para detectar si se debe generar código IR para los NOT, o no porque se invierten
+    // las etiquetas de una condición.
+    private boolean enCortocircuito = false;
 
     @Override
     public String getRefIR() {
@@ -32,5 +35,13 @@ public class NegacionLogica extends OperacionUnaria {
 
         boolean valorNegado = !((Literal) getExpresion()).getValorBooleano();
         return new Literal(String.valueOf(valorNegado), Tipo.BOOLEAN);
+    }
+
+    public boolean isEnCortocircuito() {
+        return enCortocircuito;
+    }
+
+    public void setEnCortocircuito(boolean enCortocircuito) {
+        this.enCortocircuito = enCortocircuito;
     }
 }

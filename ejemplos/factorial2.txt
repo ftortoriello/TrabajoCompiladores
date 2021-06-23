@@ -10,10 +10,10 @@ main is
 	writeln("Tabla de factoriales\n--------------------");
 	writeln("n\tn!");
 	writeln("~~\t~~~~~~~~");
-	for n from 0 to 11 by 1 do
+	for n from 0 to 12 by 1 do
 	begin
 		if n < 10 then write(" ");
-		write(n); write("\t"); write(factorial(n));
+		write(n); write("\t"); write(factorial(n)); write("\n");
 	end;
 end.
 

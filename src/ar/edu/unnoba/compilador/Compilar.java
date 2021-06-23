@@ -7,7 +7,6 @@ import ar.edu.unnoba.compilador.sintaxis.Parser;
 import ar.edu.unnoba.compilador.visitor.*;
 import ar.edu.unnoba.compilador.visitor.transformer.ConversorDeEstructuras;
 import ar.edu.unnoba.compilador.visitor.transformer.Optimizador;
-import ar.edu.unnoba.compilador.visitor.ReconocedorCadenas;
 import ar.edu.unnoba.compilador.visitor.transformer.TransformerTipos;
 import java_cup.runtime.Symbol;
 
