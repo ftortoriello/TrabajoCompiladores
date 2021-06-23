@@ -8,15 +8,17 @@ import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFun;
 public class SimboloFuncion extends InvocacionFuncion {
     private DecFun declaracion;
 
-    private final String nombreIR;
+    private final String nombreFuncionIR;
+    private final String ptroRet;
 
-    public String getNombreIR() {
-        return nombreIR;
+    public String getNombreFuncionIR() {
+        return nombreFuncionIR;
     }
 
-    public SimboloFuncion(DecFun d, String nombreIR) {
+    public SimboloFuncion(DecFun d, String nombreFuncionIR, String ptroRet) {
         super(d.getIdent().getNombre(), d.getIdent().getTipo());
-        this.nombreIR = nombreIR;
+        this.nombreFuncionIR = nombreFuncionIR;
+        this.ptroRet = ptroRet;
         this.declaracion = d;
     }
 
@@ -26,5 +28,9 @@ public class SimboloFuncion extends InvocacionFuncion {
 
     public void setDeclaracion(DecFun declaracion) {
         this.declaracion = declaracion;
+    }
+
+    public String getPtroRet() {
+        return ptroRet;
     }
 }

@@ -655,29 +655,40 @@ public class GeneradorDeCodigo extends Visitor {
     public void visit(DecFun df) throws ExcepcionVisitor {
         SimboloFuncion simboloFun = tablaFunciones.get(df.getNombre());
 
-        // Elementos que necesito para definir la función: tipo de retorno, nombre, parámetros y el cuerpo
-        String funTipoRetIR = simboloFun.getTipo().getIR();
-        String funNombreIR = simboloFun.getNombreIR();
+        // Elementos que necesito para definir la función: tipo de retorno, nombre,
+        // la etiqueta de retorno, parámetros y el cuerpo
+        String tipoRet = simboloFun.getTipo().getIR();
+        String nombreFun = simboloFun.getNombreFuncionIR();
+        String ptroRet = simboloFun.getPtroRet();
+        String refRet = simboloFun.getRefIR();
+        String etiquetaFin = df.getEtiquetaFin();
+        String valorPorDef = df.getTipo().getValorDefIR();
 
         // Formatear la lista de parámetros de acuerdo a lo requerido por IR
         String params = grarStrParams(df.getParams());
-        codigo.append(String.format("\ndefine %s %s(%s) {\n", funTipoRetIR, funNombreIR, params));
+        codigo.append(String.format("\ndefine %s %s(%s) {\n", tipoRet, nombreFun, params));
 
-        // Anexar referencias de los parámetros al principio de la función
+        // Inicializo el retorno de la función con el valor por defecto
+        imprimirCodigo(String.format("%s = alloca %s", ptroRet, tipoRet));
+        imprimirCodigo(String.format("store %1$s %2$s, %1$s* %3$s", tipoRet, valorPorDef, ptroRet));
+
+        // Generar referencias a los parámetros
         for (Param param : df.getParams()) {
             param.accept(this);
         }
 
-        // Anexar cuerpo de la función y cerrar
+        // Generar cuerpo de la función
         df.getBloque().accept(this);
 
-        if (!(df.getTieneRetorno())) {
-            // Para evitar comportamientos indefinidos, si la función no tiene retorno,
-            // le genero uno en base al valor por defecto asociado a su tipo.
-            String valorDef = df.getTipo().getValorDefIR();
-            imprimirCodigo(String.format("ret %s %s", funTipoRetIR, valorDef));
-        }
+        /* Tengo un único retorno para toda la función. Si no se pisó el valor de retorno
+         * en algun visit(Retorno), se devuelve el valor por defecto que fue asignado al
+         * inicio de la declaración para evitar comportamientos indefinidos.
+         */
+        imprimirCodSaltoInc(etiquetaFin);
+        imprimirEtiqueta(etiquetaFin);
 
+        imprimirCodigo(String.format("%1$s = load %2$s, %2$s* %3$s", refRet, tipoRet, ptroRet));
+        imprimirCodigo(String.format("ret %s %s", tipoRet, refRet));
         codigo.append("}\n");
     }
 
@@ -820,6 +831,7 @@ public class GeneradorDeCodigo extends Visitor {
     // FIXME: Se rompe si no hay un return al final
     @Override
     public void visit(Retorno r) throws ExcepcionVisitor {
+        SimboloFuncion simboloFun = tablaFunciones.get(r.getFun().getNombre());
         Expresion expr = r.getExpresion();
 
         boolean aplicarCortocircuito = (expr instanceof OperacionBinariaLogica);
@@ -828,10 +840,17 @@ public class GeneradorDeCodigo extends Visitor {
         // Generar refIR para la expresión de retorno
         expr.accept(this);
 
-        String tipoRetorno = expr.getTipo().getIR();
-        String refRetorno = expr.getRefIR();
+        String tipoIR = simboloFun.getTipo().getIR();
+        // La variable con el valor de la expresión resuelto
+        String refExpr = expr.getRefIR();
+        // El puntero del cual se toma el valor al hacer el return al final de la fun.
+        String ptroRet = simboloFun.getPtroRet();
 
-        imprimirCodigo(String.format("ret %s %s", tipoRetorno, refRetorno));
+        // Guardo el valor de la expr. del return en la variable que se va a retornar al final de la función
+        imprimirCodigo(String.format("store %1$s %2$s, %1$s* %3$s", tipoIR, refExpr, ptroRet));
+
+        // Salto al final de la función
+        imprimirCodSaltoInc(r.getFun().getEtiquetaFin());
 
         if (aplicarCortocircuito) etiquetasOpBinLog.pop();
     }
@@ -967,7 +986,7 @@ public class GeneradorDeCodigo extends Visitor {
         // Buscar la función en la tabla
         SimboloFuncion sf = tablaFunciones.get(i.getNombre());
 
-        String nombreFun = sf.getNombreIR();
+        String nombreFun = sf.getNombreFuncionIR();
         String tipoFun = sf.getTipo().getIR();
 
         // Generar la lista de argumentos, además de visitarlos para generar las refs.

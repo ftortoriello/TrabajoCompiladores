@@ -17,7 +17,9 @@ public class DecFun extends Declaracion {
     private ArrayList<Param> params;
     private Bloque bloque;
     private Alcance alcance;
-    private Boolean tieneRetorno = false;
+    // Si la función no tiene un retorno, se le generará uno por defecto
+    // Después de esta etiqueta encuentro el return de la función
+    private String etiquetaFin;
 
     public DecFun(Identificador ident, ArrayList<Param> params, Bloque bloque) {
         super(ident.getNombre(), ident);
@@ -59,12 +61,12 @@ public class DecFun extends Declaracion {
         this.alcance = alcance;
     }
 
-    public Boolean getTieneRetorno() {
-        return tieneRetorno;
+    public String getEtiquetaFin() {
+        return etiquetaFin;
     }
 
-    public void setTieneRetorno(Boolean tieneRetorno) {
-        this.tieneRetorno = tieneRetorno;
+    public void setEtiquetaFin(String etiquetaFin) {
+        this.etiquetaFin = etiquetaFin;
     }
 
     /* Retorna la cantidad de argumentos no opcionales de la declaración.
