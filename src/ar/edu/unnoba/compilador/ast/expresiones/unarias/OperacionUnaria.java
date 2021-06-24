@@ -3,9 +3,7 @@ package ar.edu.unnoba.compilador.ast.expresiones.unarias;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
-import ar.edu.unnoba.compilador.visitor.Visitor;
 
 public abstract class OperacionUnaria extends Expresion {
     private Expresion expresion;
@@ -31,11 +29,6 @@ public abstract class OperacionUnaria extends Expresion {
     @Override
     public String toString() {
         return String.format("%s %s", getNombre(), getExpresion());
-    }
-
-    @Override
-    public void accept(Visitor v) throws ExcepcionVisitor {
-        v.visit(this);
     }
 
     @Override

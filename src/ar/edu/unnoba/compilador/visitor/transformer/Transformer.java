@@ -12,8 +12,6 @@ import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
-import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.EnteroAFlotante;
-import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.FlotanteAEntero;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Continuar;
@@ -96,17 +94,6 @@ public abstract class Transformer {
 
 
     // Transforms de operaciones
-
-    // TODO: Esto no se está usando parece
-    public FlotanteAEntero transform(FlotanteAEntero fae) throws ExcepcionTransformer {
-        fae.setExpresion(fae.getExpresion().accept(this));
-        return fae;
-    }
-
-    public EnteroAFlotante transform(EnteroAFlotante eaf) throws ExcepcionTransformer {
-        eaf.setExpresion(eaf.getExpresion().accept(this));
-        return eaf;
-    }
 
     public Expresion transform(OperacionBinaria ob) throws ExcepcionTransformer {
         ob.setIzquierda(ob.getIzquierda().accept(this));

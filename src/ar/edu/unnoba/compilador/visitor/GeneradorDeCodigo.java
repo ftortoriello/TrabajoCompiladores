@@ -12,7 +12,6 @@ import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.Conjuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.Disyuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.OperacionBinariaLogica;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
-import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.aritmeticas.NegacionAritmetica;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.OperacionConversion;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.logicas.NegacionLogica;
@@ -56,11 +55,11 @@ public class GeneradorDeCodigo extends Visitor {
     /* Pila de pares de etiquetas usada para el cortocircuito booleano */
     private final Deque<Pair<String, String>> etiquetasOpBinLog = new ArrayDeque<>();
 
+    /*** Funciones auxiliares ***/
+
     public static boolean targetEsWindows() {
         return System.getProperty("os.name").startsWith("Windows");
     }
-
-    /*** Funciones auxiliares ***/
 
     /* Función para no tener fija la arquitectura y SO destino.
      * El triple se puede sacar de  "llvm-config --host-target"
@@ -93,53 +92,6 @@ public class GeneradorDeCodigo extends Visitor {
             throw new IOException("No se pudieron obtener los datos del host");
         }
         return datalayout + "\n" + triple;
-    }
-
-    /* Negación de enteros y flotantes */
-    private void imprimirNegAritmetica(NegacionAritmetica neg) throws ExcepcionVisitor {
-        String refIR = Normalizador.crearNomRef("neg");
-        neg.setRefIR(refIR);
-
-        Expresion expr = neg.getExpresion();
-        Tipo tipo = expr.getTipo();
-        switch (tipo) {
-            case INTEGER:
-                // hacer 0 - expresion
-                grar.asig(refIR, "sub", tipo.getIR(), "0", expr.getRefIR());
-                break;
-            case FLOAT:
-                grar.asig(refIR, "fneg", tipo.getIR(), expr.getRefIR());
-                break;
-            default: throw new ExcepcionVisitor("Tipo de operación unaria inesperado: " + tipo);
-        }
-
-        // Ponerle esta referencia a la expresión
-        //expr.setRefIR(refIR);
-    }
-
-    /* not (al que no se le pudo aplicar constant folding ni cortocircuito booleano) */
-    private void imprimirNegLogica(NegacionLogica neg) {
-        // Si el NOT es parte de una condición while por ejemplo, se invierten las etiquetas.
-        // En ese caso no hay que generar una instrucción para negarla.
-        // TODO: Terminar de revisar, seguro que me olvido algún caso
-        if (neg.isEnCortocircuito()) return;
-
-        String refIR = Normalizador.crearNomRef("neg");
-        neg.setRefIR(refIR);
-
-        Expresion expr = neg.getExpresion();
-        grar.asig(refIR, "xor", "i1", "1", expr.getRefIR());
-        expr.setRefIR(refIR);
-    }
-
-    private void imprimirConversion(OperacionConversion oc) {
-        String refIR = Normalizador.crearNomRef("conv");
-        oc.setRefIR(refIR);
-
-        Expresion expr = oc.getExpresion();
-        grar.ext(refIR, oc.getInstruccionIR(), expr.getRefIR(),
-                expr.getTipo().getIR(), oc.getTipo().getIR());
-        expr.setRefIR(refIR);
     }
 
     /* Para tratar los casos de invocaciones a write */
@@ -228,6 +180,7 @@ public class GeneradorDeCodigo extends Visitor {
 
             // Extender a i32 para compararlo
             final String refExt = "%ref.char_ext";
+            // FIXME: Lo rompí
             grar.sext(refExt, tipoLeido, ptroValor);
 
             grar.setComentLinea("comparar con 't'");
@@ -878,18 +831,59 @@ public class GeneradorDeCodigo extends Visitor {
         }
     }
 
-    // TODO: Este visit se podría dividir. Los demás me parece que no vale la pena, haría que se duplique código innecesariamente...
     @Override
-    public void visit(OperacionUnaria ou) throws ExcepcionVisitor {
-        super.visit(ou);
+    public void visit(NegacionAritmetica neg) throws ExcepcionVisitor {
+        super.visit(neg);
 
-        if (ou instanceof NegacionAritmetica) {
-            imprimirNegAritmetica((NegacionAritmetica) ou);
-        } else if (ou instanceof NegacionLogica) {
-            imprimirNegLogica((NegacionLogica) ou);
-        } else if (ou instanceof OperacionConversion) {
-            imprimirConversion((OperacionConversion) ou);
+        String refIR = Normalizador.crearNomRef("neg");
+        neg.setRefIR(refIR);
+
+        Expresion expr = neg.getExpresion();
+        Tipo tipo = expr.getTipo();
+        switch (tipo) {
+            case INTEGER:
+                // hacer 0 - expresion
+                grar.asig(refIR, "sub", tipo.getIR(), "0", expr.getRefIR());
+                break;
+            case FLOAT:
+                grar.asig(refIR, "fneg", tipo.getIR(), expr.getRefIR());
+                break;
+            default: throw new ExcepcionVisitor("Tipo de operación unaria inesperado: " + tipo);
         }
+
+        // Ponerle esta referencia a la expresión
+        // TODO: Por qué funciona sin esto?
+        //expr.setRefIR(refIR);
+    }
+
+    @Override
+    public void visit(NegacionLogica neg) throws ExcepcionVisitor {
+        super.visit(neg);
+
+        // Si el NOT es parte de una condición while por ejemplo, se invierten las etiquetas.
+        // En ese caso no hay que generar una instrucción para negarla.
+        // TODO: Terminar de revisar, seguro que me olvido algún caso
+        if (neg.isEnCortocircuito()) return;
+
+        String refIR = Normalizador.crearNomRef("neg");
+        neg.setRefIR(refIR);
+
+        Expresion expr = neg.getExpresion();
+        grar.asig(refIR, "xor", "i1", "1", expr.getRefIR());
+        expr.setRefIR(refIR);
+    }
+
+    @Override
+    public void visit(OperacionConversion conv) throws ExcepcionVisitor {
+        super.visit(conv);
+
+        String refIR = Normalizador.crearNomRef("conv");
+        conv.setRefIR(refIR);
+
+        Expresion expr = conv.getExpresion();
+        grar.ext(refIR, conv.getInstruccionIR(), expr.getRefIR(),
+                expr.getTipo().getIR(), conv.getTipo().getIR());
+        expr.setRefIR(refIR);
     }
 
 

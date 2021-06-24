@@ -3,6 +3,9 @@ package ar.edu.unnoba.compilador.visitor;
 import ar.edu.unnoba.compilador.ast.base.*;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
+import ar.edu.unnoba.compilador.ast.expresiones.unarias.aritmeticas.NegacionAritmetica;
+import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.OperacionConversion;
+import ar.edu.unnoba.compilador.ast.expresiones.unarias.logicas.NegacionLogica;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.*;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.*;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.*;
@@ -178,8 +181,16 @@ public abstract class Visitor {
         ob.getDerecha().accept(this);
     }
 
-    public void visit(OperacionUnaria ou) throws ExcepcionVisitor {
-        ou.getExpresion().accept(this);
+    public void visit(NegacionAritmetica neg) throws ExcepcionVisitor {
+        neg.getExpresion().accept(this);
+    }
+
+    public void visit(NegacionLogica neg) throws ExcepcionVisitor {
+        neg.getExpresion().accept(this);
+    }
+
+    public void visit(OperacionConversion conv) throws ExcepcionVisitor {
+        conv.getExpresion().accept(this);
     }
 
 

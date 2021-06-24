@@ -8,6 +8,8 @@ import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.OperacionBinariaLogica;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
+import ar.edu.unnoba.compilador.ast.expresiones.unarias.aritmeticas.NegacionAritmetica;
+import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.OperacionConversion;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.logicas.NegacionLogica;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.*;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
@@ -282,14 +284,26 @@ public class ASTGraphviz extends Visitor {
     }
 
     @Override
-    public void visit(OperacionUnaria ou) throws ExcepcionVisitor {
-        if (ou instanceof NegacionLogica) {
-            armarStrOpLogica(ou.getEtiqueta());
-        } else {
-            armarStrOperacion(ou.getEtiqueta());
-        }
+    public void visit(NegacionAritmetica neg) throws ExcepcionVisitor {
+        armarStrOperacion(neg.getEtiqueta());
         padres.push(idNodoActual);
-        super.visit(ou);
+        super.visit(neg);
+        padres.pop();
+    }
+
+    @Override
+    public void visit(NegacionLogica neg) throws ExcepcionVisitor {
+        armarStrOpLogica(neg.getEtiqueta());
+        padres.push(idNodoActual);
+        super.visit(neg);
+        padres.pop();
+    }
+
+    @Override
+    public void visit(OperacionConversion conv) throws ExcepcionVisitor {
+        armarStrOperacion(conv.getEtiqueta());
+        padres.push(idNodoActual);
+        super.visit(conv);
         padres.pop();
     }
 

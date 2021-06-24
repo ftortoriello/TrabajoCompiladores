@@ -58,7 +58,7 @@ Requisitos:
 
 Opcional: 
 * Conversiones implícitas de tipo: :white_check_mark:
-* Transformación de estruras when y for:  :white_check_mark: 
+* Transformación de estruras when y for: :white_check_mark:
 * Constant folding: :white_check_mark:
 
 Más que opcional:
@@ -84,7 +84,7 @@ Requisitos:
 * Funciones predefinidas o externas:
   * Read: :white_check_mark:
   * Write: :white_check_mark:
-  * Truncamiento o conversiones: :x:
+  * Truncamiento o conversiones: :white_check_mark:
 * Declaración de variables (locales y globales, inicializadas y no inicializadas): :white_check_mark:
   * Valores por defecto para las no inicializadas: :white_check_mark:
 * Bloques de código:
@@ -101,6 +101,5 @@ Requisitos:
 
 Cosas secundarias:
 * Eliminar clase "Para" y "Cuando". Generar la transformación de esas estructuras en el propio parser (posiblemente creando un constructor nuevo en las clases Mientras y SiEntonces, cosa de tirarlo ahí y resolverlo en la propia clase).
-* Para reducir un poco el uso de instanceOf e ifs, podríamos generar más métodos en el visitor. Por ej. si creamos uno para OperacionBinariaAritmetica, en el visitor abstracto llamaría al de OperacionBinaria para que siga funcionando como hasta ahora, pero en el de GeneradorDeCodigo hacemos un overwrite.
 * Podríamos dejar en el IR como comentario de cada línea la línea del programa original?
 
