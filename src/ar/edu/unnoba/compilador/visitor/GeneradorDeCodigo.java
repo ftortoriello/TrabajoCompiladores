@@ -268,29 +268,27 @@ public class GeneradorDeCodigo extends Visitor {
         return strParams.toString();
     }
 
-    private String grarStrArgs(List<Expresion> arrArgs) throws ExcepcionVisitor {
+    private String grarStrArgs(List<Expresion> arrArgs, List<Param> paramsFormales) throws ExcepcionVisitor {
         // Similar a grarStrParams, pero esta lista es utilizada por las invocaciones, o sea el
         // argumento puede ser una variable, un literal o una expresión más compleja, mientras
         // que en la declaración de la función eso va a ser siempre un objeto de tipo Param.
 
-        // FIXME: Parámetros por defecto
-
         StringBuilder strArgs = new StringBuilder();
 
-        int cantArgs = arrArgs.size();
+        for (int i = 0; i < paramsFormales.size(); i++) {
+            // Si el argumento no existe, tomo el parámetro formal para crear una ref. con el valor definido
+            Expresion expr = i >= arrArgs.size() ?
+                    ((ParamDef) paramsFormales.get(i)).getExpresion() :
+                    arrArgs.get(i);
 
-        for (int i = 0; i < cantArgs; i++) {
-            Expresion exprArg = arrArgs.get(i);
-            String tipoRetornoArg = exprArg.getTipo().getIR();
             // Evaluar la expr. y generar el refIR
-            exprArg.accept(this);
-            String argRefIR = exprArg.getRefIR();
+            expr.accept(this);
 
             // Para separar los argumentos mediante comas, excepto el final
-            String sep = i != cantArgs - 1 ? ", " : "";
+            String sep = i != paramsFormales.size() - 1 ? ", " : "";
 
             // Añado el argumento a la lista
-            strArgs.append(String.format("%s %s%s", tipoRetornoArg, argRefIR, sep));
+            strArgs.append(String.format("%s %s%s", expr.getTipo().getIR(), expr.getRefIR(), sep));
         }
 
         return strArgs.toString();
@@ -945,7 +943,8 @@ public class GeneradorDeCodigo extends Visitor {
         String tipoFun = sf.getTipo().getIR();
 
         // Generar la lista de argumentos, además de visitarlos para generar las refs.
-        String args = grarStrArgs(i.getArgs());
+        // También se genera referencias para argumentos por defecto si son necesarios.
+        String args = grarStrArgs(i.getArgs(), sf.getDeclaracion().getParams());
 
         grar.invocacion(nombreFun, tipoFun, refIR, args);
     }
