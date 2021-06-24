@@ -1,14 +1,49 @@
-{
-function def() return float
-    writeln("Esta devuelve implícitamente 0.0");
-}
+function f(n is integer) return integer
+    if n > 1 then
+        return 1
+    else
+        return 0;
+
 function inc(a is integer, b is integer = 2, c is integer = 3) return integer
     return a + b + c;
+
+function h(tope is integer = 100) return boolean
+begin
+    variable i is integer;
+    variable llego is boolean = true;
+    for i from 0 to 100 do begin
+        if i > tope then begin
+            write("Entramos al break porque i > tope (i = ");
+            write(i);
+            write(" y tope = ");
+            write(tope);
+            writeln(")");
+            llego = false;
+            break;
+        end;
+        write("i: ");
+        write(i);
+        write(". Se acaba en ");
+        writeln(100 - i);
+    end;
+    return llego;
+end;
+
+function g(n is integer) return integer
+begin
+    if n > 1 then
+        n = 10
+    else
+        return 0;
+    return n;
+end;
 
 main is
     # def(1); # Me permite invocar esto, debería?
     variable j is integer = inc(3);
     writeln(j);
+    variable llego is boolean = h(10);
+    writeln(llego);
 
 {
     variable c is integer = 0;

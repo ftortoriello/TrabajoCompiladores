@@ -650,10 +650,11 @@ public class GeneradorDeCodigo extends Visitor {
          * en algun visit(Retorno), se devuelve el valor por defecto que fue asignado al
          * inicio de la declaración para evitar comportamientos indefinidos.
          */
-        if (!df.getTieneRetorno()) grar.salto(etiquetaFin);
-        // FIXME: Se rompe acá: "function f(n is integer) return integer if n > 1 then return 1 else return 0;"
+
+        grar.salto(etiquetaFin);
         grar.etiqueta(etiquetaFin);
 
+        // Cargo el valor de retorno de la función
         grar.load(refRet, tipoRet, ptroRet);
         grar.ret(tipoRet, refRet);
         grar.cierreBloque();
