@@ -1,6 +1,9 @@
 function f(n is integer) return integer
-    if n > 1 then
-        return 1
+    if n > 1 then begin
+        return 1;
+        writeln("Esto es código inaccesible");
+        return 0;
+    end
     else
         return 0;
 

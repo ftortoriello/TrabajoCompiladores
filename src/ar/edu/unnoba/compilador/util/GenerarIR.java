@@ -45,6 +45,13 @@ public class GenerarIR {
 
     /* Agrega una línea de código */
     public void codigo(String cod, boolean indentado) {
+        // Parche para no generar código inaccesible. No imprimo si en la linea anterior
+        // tengo un branch, excepto que lo que esté imprimiendo sea una etiqueta.
+        String ultimaLinea = getCodigo().split("\n")[getCodigo().split("\n").length - 1];
+        if (ultimaLinea.startsWith(String.format("\tbr label")) && !cod.endsWith(":")) {
+            return;
+        }
+
         if (indentado) sbCodigo.append("\t");
         sbCodigo.append(cod);
 
@@ -68,7 +75,7 @@ public class GenerarIR {
         codigo(codigo, true);
     }
 
-    /* Etiqueta; antes se agrega un salto de línea */
+    /* Etiqueta, antes se agrega un salto de línea */
     public void etiqueta(String nombreEtiqueta) {
         codigo(String.format("\n%s:", nombreEtiqueta), false);
     }
@@ -82,11 +89,7 @@ public class GenerarIR {
 
     /* Salto incondicional */
     public void salto(String etiquetaDestino) {
-        // Parche bien feo para no imprimir saltos si en la linea anterior tengo otro
-        String ultimaLinea = getCodigo().split("\n")[getCodigo().split("\n").length - 1];
-        if (!(ultimaLinea.startsWith(String.format("\tbr label")))) {
-            codigo(String.format("br label %%%s", etiquetaDestino));
-        }
+        codigo(String.format("br label %%%s", etiquetaDestino));
     }
 
     /* Salto condicional */

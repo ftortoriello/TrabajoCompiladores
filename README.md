@@ -100,5 +100,4 @@ Requisitos:
     * Sentencias de control (continue y break): :white_check_mark:
 
 Cosas secundarias:
-* Eliminar código IR inaccesible (entre un salto y el final del bloque).
 * Eliminar clase "Para" y "Cuando". Generar la transformación de esas estructuras en el propio parser (posiblemente creando un constructor nuevo en las clases Mientras y SiEntonces, cosa de tirarlo ahí y resolverlo en la propia clase).

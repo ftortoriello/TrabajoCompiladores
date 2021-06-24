@@ -246,15 +246,15 @@ public class GeneradorDeCodigo extends Visitor {
         return strParams.toString();
     }
 
+    /* Similar a grarStrParams, pero esta lista es utilizada por las invocaciones, o sea el
+     * argumento puede ser una variable, un literal o una expresión más compleja, mientras
+     * que en la declaración de la función eso va a ser siempre un objeto de tipo Param.
+     */
     private String grarStrArgs(List<Expresion> arrArgs, List<Param> paramsFormales) throws ExcepcionVisitor {
-        // Similar a grarStrParams, pero esta lista es utilizada por las invocaciones, o sea el
-        // argumento puede ser una variable, un literal o una expresión más compleja, mientras
-        // que en la declaración de la función eso va a ser siempre un objeto de tipo Param.
-
         StringBuilder strArgs = new StringBuilder();
 
         for (int i = 0; i < paramsFormales.size(); i++) {
-            // Si el argumento no existe, tomo el parámetro formal para crear una ref. con el valor definido
+            // Si el argumento no existe, tomo el parámetro formal para crear una ref. con el valor por defecto
             Expresion expr = i >= arrArgs.size() ?
                     ((ParamDef) paramsFormales.get(i)).getExpresion() :
                     arrArgs.get(i);
