@@ -14,11 +14,16 @@ public class FlotanteAEntero extends OperacionConversion {
     public Expresion evaluar() throws ExcepcionTransformer {
         Expresion expr = getExpresion().evaluar();
         if (!(expr instanceof Literal)) {
-            return expr;
+            return this;
         }
 
         float nroOriginal = ((Literal) expr).getValorNumerico().floatValue();
         Number nroConvertido = Math.round(nroOriginal);
         return new Literal(nroConvertido, Tipo.INTEGER);
+    }
+
+    @Override
+    public String getInstruccionIR() {
+        return "fptosi";
     }
 }

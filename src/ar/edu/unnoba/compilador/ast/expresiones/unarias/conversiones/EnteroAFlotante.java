@@ -14,9 +14,14 @@ public class EnteroAFlotante extends OperacionConversion {
     public Expresion evaluar() throws ExcepcionTransformer {
         Expresion expr = getExpresion().evaluar();
         if (!(expr instanceof Literal)) {
-            return expr;
+            return this;
         }
 
         return new Literal(((Literal) expr).getValorNumerico().floatValue(), Tipo.FLOAT);
+    }
+
+    @Override
+    public String getInstruccionIR() {
+        return "sitofp";
     }
 }

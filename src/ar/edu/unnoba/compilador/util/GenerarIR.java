@@ -43,13 +43,6 @@ public class GenerarIR {
                 Normalizador.crearNomRef("ret_scanf"), parametros);
     }
 
-    /* Extender de un tipo a otro */
-    private String ext(String resultado, String instruccion, String valor,
-                       String tipoOrigen, String tipoDestino) {
-        return String.format("%s = %s %s %s to %s",
-                resultado, instruccion, valor, tipoOrigen, tipoDestino);
-    }
-
     /*** Funciones públicas ***/
 
     /* Agrega una línea de código */
@@ -135,14 +128,21 @@ public class GenerarIR {
         asig(resultado, instruccion, tipo, op1, op2);
     }
 
+    /* Convertir de un tipo a otro */
+    public void ext(String resultado, String instruccion, String valor,
+                       String tipoOrigen, String tipoDestino) {
+        codigo(String.format("%s = %s %s %s to %s",
+                resultado, instruccion, tipoOrigen, valor, tipoDestino));
+    }
+
     /* Extender a i32, manteniendo el signo */
     public void sext(String resultado, String tipoOrigen, String valor) {
-        codigo(ext(resultado, "sext", valor, tipoOrigen, "i32"));
+        ext(resultado, "sext", valor, tipoOrigen, "i32");
     }
 
     /* Extender a i32, sin mantener el signo */
     public void zext(String resultado, String tipoOrigen, String valor) {
-        codigo(ext(resultado, "zext", valor, tipoOrigen, "i32"));
+        ext(resultado, "zext", valor, tipoOrigen, "i32");
     }
 
     public void cmp(String tipoCmp, String resultado, String tipoOp, String op1, String op2) {

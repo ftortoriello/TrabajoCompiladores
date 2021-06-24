@@ -132,6 +132,16 @@ public class GeneradorDeCodigo extends Visitor {
         expr.setRefIR(refIR);
     }
 
+    private void imprimirConversion(OperacionConversion oc) {
+        String refIR = Normalizador.crearNomRef("conv");
+        oc.setRefIR(refIR);
+
+        Expresion expr = oc.getExpresion();
+        grar.ext(refIR, oc.getInstruccionIR(), expr.getRefIR(),
+                expr.getTipo().getIR(), oc.getTipo().getIR());
+        expr.setRefIR(refIR);
+    }
+
     /* Para tratar los casos de invocaciones a write */
     private void imprimirWrite(InvocacionFuncion i) throws ExcepcionVisitor {
         Expresion arg = i.getArgs().get(0);
@@ -868,6 +878,7 @@ public class GeneradorDeCodigo extends Visitor {
         }
     }
 
+    // TODO: Este visit se podría dividir. Los demás me parece que no vale la pena, haría que se duplique código innecesariamente...
     @Override
     public void visit(OperacionUnaria ou) throws ExcepcionVisitor {
         super.visit(ou);
@@ -876,8 +887,8 @@ public class GeneradorDeCodigo extends Visitor {
             imprimirNegAritmetica((NegacionAritmetica) ou);
         } else if (ou instanceof NegacionLogica) {
             imprimirNegLogica((NegacionLogica) ou);
-        } else if (ou instanceof OperacionConversion) { // EnteroAFlotante, FlotanteAEntero
-            // TODO
+        } else if (ou instanceof OperacionConversion) {
+            imprimirConversion((OperacionConversion) ou);
         }
     }
 

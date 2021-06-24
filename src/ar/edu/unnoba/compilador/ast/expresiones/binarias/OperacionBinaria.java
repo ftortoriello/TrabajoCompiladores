@@ -11,8 +11,6 @@ public abstract class OperacionBinaria extends Expresion {
     private Expresion izquierda;
     private Expresion derecha;
 
-    public abstract String getInstruccionIR();
-
     public OperacionBinaria(Expresion izquierda, Expresion derecha) {
         super(Tipo.UNKNOWN);
         this.izquierda = izquierda;
@@ -67,4 +65,6 @@ public abstract class OperacionBinaria extends Expresion {
     public Expresion accept(Transformer t) throws ExcepcionTransformer {
         return t.transform(this);
     }
+
+    public abstract String getInstruccionIR();
 }
