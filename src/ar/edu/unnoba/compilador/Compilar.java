@@ -160,12 +160,9 @@ public class Compilar {
             System.out.println("\nEjecutando el programa compilado...");
             Procesos.ejecutar("./" + carpetaSalida + nombreArchivo);
 
-        } catch (ClassCastException e) {
-            // Error sintáctico probablemente
-            e.printStackTrace(System.out);
-            //System.out.printf("%s: %s%n", e.getClass().getSimpleName(), e.getLocalizedMessage());
         } catch (Exception e) {
-            e.printStackTrace(System.out);
+            //e.printStackTrace(System.out);
+            System.out.printf("%s: %s%n", e.getClass().getSimpleName(), e.getLocalizedMessage());
         }
     }
 }

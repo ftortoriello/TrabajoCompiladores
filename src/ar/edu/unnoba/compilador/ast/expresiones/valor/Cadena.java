@@ -1,6 +1,5 @@
 package ar.edu.unnoba.compilador.ast.expresiones.valor;
 
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
@@ -63,7 +62,7 @@ public class Cadena extends Expresion {
     }
 
     @Override
-    public void accept(Visitor v) throws ExcepcionVisitor {
+    public void accept(Visitor v) {
         v.visit(this);
     }
 

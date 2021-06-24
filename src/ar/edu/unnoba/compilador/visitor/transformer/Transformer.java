@@ -97,6 +97,7 @@ public abstract class Transformer {
 
     // Transforms de operaciones
 
+    // TODO: Esto no se está usando parece
     public FlotanteAEntero transform(FlotanteAEntero fae) throws ExcepcionTransformer {
         fae.setExpresion(fae.getExpresion().accept(this));
         return fae;

@@ -185,7 +185,7 @@ public abstract class Visitor {
 
     /* Valores */
 
-    public void visit(Literal l) throws ExcepcionVisitor {
+    public void visit(Literal l) {
     }
 
     public void visit(Identificador i) throws ExcepcionVisitor {

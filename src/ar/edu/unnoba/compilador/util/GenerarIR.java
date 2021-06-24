@@ -3,8 +3,6 @@ package ar.edu.unnoba.compilador.util;
 /* Clase auxiliar usada por GeneradorDeCodigo que se encarga de anexar instrucciones IR al código,
  * para abstraernos del formato y la sintaxis de las instrucciones. */
 
-import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
-
 public class GenerarIR {
     // Constante que indica si imprimir o no los comentarios del recorrido del visitor.
     private final boolean conComentariosVisitor = false;
@@ -14,7 +12,7 @@ public class GenerarIR {
     private final int columnaComent = 70;
 
     // Sobre esta variable vamos anexando lo que va a ser el resultado final en IR
-    private StringBuilder sbCodigo = new StringBuilder();
+    private final StringBuilder sbCodigo = new StringBuilder();
 
     private String comentLinea = null;
 
@@ -65,7 +63,7 @@ public class GenerarIR {
             // alinear
             sbCodigo.append(" ".repeat(cantEspacios));
             // agregar comentario
-            sbCodigo.append("; " + comentLinea);
+            sbCodigo.append("; ").append(comentLinea);
 
             // no generar el mismo comentario en la próxima línea
             comentLinea = null;

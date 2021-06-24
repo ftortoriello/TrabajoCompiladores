@@ -10,18 +10,8 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 public abstract class OperacionUnaria extends Expresion {
     private Expresion expresion;
 
-    public OperacionUnaria(Expresion expresion) {
-        super(Tipo.UNKNOWN);
-        this.expresion = expresion;
-    }
-
     public OperacionUnaria(String nombre, Expresion expresion) {
         super(Tipo.UNKNOWN, nombre);
-        this.expresion = expresion;
-    }
-
-    public OperacionUnaria(Expresion expresion, Tipo tipo) {
-        super(tipo);
         this.expresion = expresion;
     }
 

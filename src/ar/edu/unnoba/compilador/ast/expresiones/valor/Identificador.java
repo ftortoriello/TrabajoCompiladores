@@ -21,7 +21,7 @@ public class Identificador extends Valor {
 
     @Override
     public String getEtiqueta() {
-        return String.format("%s\n<%s>", getNombre(), getTipo());
+        return String.format("%s\\n<%s>", getNombre(), getTipo());
     }
 
     @Override

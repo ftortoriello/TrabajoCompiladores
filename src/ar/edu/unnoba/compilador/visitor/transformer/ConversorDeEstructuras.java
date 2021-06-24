@@ -37,7 +37,7 @@ public class ConversorDeEstructuras extends Transformer {
         p = (Para) super.transform(p);
 
         // bloqueNuevo va a contener el while equivalente al for
-        Bloque bloqueNuevo = new Bloque("Conversión\nFOR a WHILE", false);
+        Bloque bloqueNuevo = new Bloque("Conversión\\nFOR a WHILE", false);
 
         // Genero y defino el alcance padre para que no se rompa la cadena
         bloqueNuevo.setAlcance(new Alcance("Alcance conversión FOR -> WHEN"));
@@ -76,7 +76,7 @@ public class ConversorDeEstructuras extends Transformer {
         c = (Cuando) super.transform(c);
 
         // El bloque que va a contener la estructura equivalente al when
-        Bloque bloqueNuevo = new Bloque("Conversión\nCASE a IF", false);
+        Bloque bloqueNuevo = new Bloque("Conversión\\nCASE a IF", false);
         bloqueNuevo.setAlcance(new Alcance("Alcance conversión WHEN -> IF"));
 
         // La expresión del case pasa a estar en una nueva variable temporal, para la cual tengo que crear su símbolo

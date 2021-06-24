@@ -1,7 +1,6 @@
 package ar.edu.unnoba.compilador.ast.sentencias.control;
 
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 
@@ -16,7 +15,7 @@ public class Salir extends Control {
     }
 
     @Override
-    public Salir accept(Transformer t) throws ExcepcionTransformer {
+    public Salir accept(Transformer t) {
         return t.transform(this);
     }
 }

@@ -2,7 +2,6 @@ package ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas;
 
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
-import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
 
@@ -14,7 +13,6 @@ public abstract class OperacionBinariaLogica extends OperacionBinaria {
 
     @Override
     public Expresion evaluar() throws ExcepcionTransformer {
-        final Tipo tipo = Tipo.BOOLEAN;
         Expresion izquierda = getIzquierda().evaluar();
         Expresion derecha = getDerecha().evaluar();
 

@@ -50,7 +50,7 @@ public class InvocacionFuncion extends Valor {
                 .replace("]", "");
 
         if (!(nombre.equals("write") || nombre.equals("writeln"))) {
-            return String.format("%s(%s)\n<%s>", nombre, args, getTipo());
+            return String.format("%s(%s)\\n<%s>", nombre, args, getTipo());
         }
 
         /* Es una invocación a write o writeln.

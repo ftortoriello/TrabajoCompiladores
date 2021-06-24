@@ -28,14 +28,14 @@ public class DecFun extends Declaracion {
         super(ident.getNombre(), ident);
         // Invierto el orden de los parámetros porque debido a la forma de las reglas los lee al revés
         Collections.reverse(params);
-        bloque.setNombre("Cuerpo\nFUNCIÓN");
+        bloque.setNombre("Cuerpo\\nFUNCIÓN");
         this.params = params;
         this.bloque = bloque;
     }
 
     public DecFun(Identificador ident, Bloque bloque) {
         super(ident.getNombre(), ident);
-        bloque.setNombre("Cuerpo\nFUNCIÓN");
+        bloque.setNombre("Cuerpo\\nFUNCIÓN");
         this.params = new ArrayList<>();
         this.bloque = bloque;
     }
@@ -107,7 +107,7 @@ public class DecFun extends Declaracion {
 
     @Override
     public String getEtiqueta() {
-        return String.format("%s %s()\n<%s>", getClass().getSimpleName(),
+        return String.format("%s %s()\\n<%s>", getClass().getSimpleName(),
                 getIdent().getNombre(), getTipo());
     }
 }

@@ -33,7 +33,7 @@ public class Para extends Sentencia {
             this.salto = -Math.abs(salto);
         }
 
-        bloqueSentencias.setNombre("Cuerpo\nFOR");
+        bloqueSentencias.setNombre("Cuerpo\\nFOR");
         this.bloqueSentencias = bloqueSentencias;
     }
 
@@ -67,7 +67,7 @@ public class Para extends Sentencia {
 
     @Override
     public String getEtiqueta() {
-        return String.format("Bloque FOR\n(%s: %s => %s, salto: %s)",
+        return String.format("Bloque FOR\\n(%s: %s => %s, salto: %s)",
                 this.getIdent().getNombre(), this.getValorInicial(), this.getValorFinal(), this.getSalto());
     }
 

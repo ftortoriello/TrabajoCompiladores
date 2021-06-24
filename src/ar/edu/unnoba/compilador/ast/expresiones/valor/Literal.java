@@ -89,7 +89,7 @@ public class Literal extends Valor {
 
     @Override
     public String getEtiqueta() {
-        return String.format("%s\n<%s>", getValor(), getTipo());
+        return String.format("%s\\n<%s>", getValor(), getTipo());
     }
 
     @Override

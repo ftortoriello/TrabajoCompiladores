@@ -35,15 +35,15 @@ import ar.edu.unnoba.compilador.token.Token;
     *  del analizador léxico.
     *************************************************************************/
 
-    int cadena_yyline = 0;
-    int cadena_yycolumn = 0;
+    private int cadena_yyline = 0;
+    private int cadena_yycolumn = 0;
 
-    final StringBuffer stringBuffer = new StringBuffer();
+    private final StringBuffer stringBuffer = new StringBuffer();
 
-    enum TipoComentario { LLAVES, PASCAL }
-    final Stack<TipoComentario> comentariosAbiertos = new Stack<>();
+    private enum TipoComentario { LLAVES, PASCAL }
+    private final Stack<TipoComentario> comentariosAbiertos = new Stack<>();
 
-    final public List<Token> tablaDeSimbolos = new ArrayList<>();
+    public final List<Token> tablaDeSimbolos = new ArrayList<>();
 
     private Token token(String nombre, Object valor) {
         return new Token(nombre, this.yyline, this.yycolumn, valor);

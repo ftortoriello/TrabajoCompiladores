@@ -185,7 +185,7 @@ public class GeneradorDeCodigo extends Visitor {
 
     private void imprimirDefinicionLeer(Tipo tipo) throws ExcepcionVisitor {
         final String tipoRet = tipo.getIR();
-        grar.defFuncion("@read_" + tipo.toString(), tipoRet, "");
+        grar.defFuncion("@read_" + tipo, tipoRet, "");
 
         // No hace falta generarles un id a los registros y etiquetas;
         // son únicas dentro de la función IR
@@ -300,7 +300,6 @@ public class GeneradorDeCodigo extends Visitor {
 
     private void imprimirCortocircuito(OperacionBinariaLogica ob) throws ExcepcionVisitor {
         Pair<String, String> etiquetas = etiquetasOpBinLog.peek();
-        assert etiquetas != null;
         String etiVerdadero = etiquetas.fst;
         String etiFalso = etiquetas.snd;
 
@@ -515,13 +514,7 @@ public class GeneradorDeCodigo extends Visitor {
         if (aplicarCortocircuito) {
             finalizarCortocircuitoAsig(origen, destino);
         } else {
-            String tipoOrigen = expr.getTipo().getIR();
-            String tipoDestino = svDestino.getTipo().getIR();
-            // TipoOrigen y tipoDestino deberían ser iguales, pero lo dejo así para detectar algún error
-            // y de paso usar los nombres de las variables para que quede un poco más claro lo que se hace
-            // TODO funca esto?
-            assert origen == destino;
-            grar.store(destino, tipoDestino, origen);
+            grar.store(destino, svDestino.getTipo().getIR(), origen);
         }
     }
 
@@ -685,7 +678,7 @@ public class GeneradorDeCodigo extends Visitor {
     }
 
     @Override
-    public void visit(ParamDef pi) throws ExcepcionVisitor {
+    public void visit(ParamDef pi) {
         // El valor del parámetro ya debería venir resuelto desde la invocación,
         // por lo que puedo llamar a visit(Param) directamente.
         visit((Param) pi);
@@ -892,7 +885,7 @@ public class GeneradorDeCodigo extends Visitor {
     /* Valores */
 
     @Override
-    public void visit(Literal lit) throws ExcepcionVisitor {
+    public void visit(Literal lit) {
         /* Este visitor genera una variable auxiliar para utilizar los valores literales.
          * Como alternativa a generar la variable podríamos utilizar directamente el valor,
          * pero de esta manera queda más uniforme con la forma en la que hacemos lo otro.
