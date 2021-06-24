@@ -4,12 +4,10 @@ package ar.edu.unnoba.compilador.util;
  * para abstraernos del formato y la sintaxis de las instrucciones. */
 
 public class GenerarIR {
-    // Constante que indica si imprimir o no los comentarios del recorrido del visitor.
-    private final boolean conComentariosVisitor = false;
-    // Similar, para indicar si se agregan comentarios a la derecha de las líneas.
-    private final boolean conComentariosLinea = false;
+    // Constante que indica si imprimir o no los comentarios
+    private final boolean conComentarios = true;
     // A partir de que columna intentar colocar los comentarios en las líneas
-    private final int columnaComent = 70;
+    private final int columnaComent = 60;
 
     // Sobre esta variable vamos anexando lo que va a ser el resultado final en IR
     private final StringBuilder sbCodigo = new StringBuilder();
@@ -50,9 +48,9 @@ public class GenerarIR {
         if (indentado) sbCodigo.append("\t");
         sbCodigo.append(cod);
 
-        if (conComentariosLinea && comentLinea != null) {
+        if (conComentarios && comentLinea != null) {
             int cantEspacios = columnaComent - cod.length();
-            if (cantEspacios < 1) cantEspacios = 1;
+            if (cantEspacios < 2) cantEspacios = 2;
             // alinear
             sbCodigo.append(" ".repeat(cantEspacios));
             // agregar comentario
@@ -77,8 +75,8 @@ public class GenerarIR {
 
     /* Si se pidió mostrar comentarios para depurar la generación de código, agregar un comentario */
     public void coment(String comentario) {
-        if (conComentariosVisitor) {
-            codigo(String.format("\n; %s", comentario), false);
+        if (conComentarios) {
+            codigo(String.format("; %s", comentario));
         }
     }
 
