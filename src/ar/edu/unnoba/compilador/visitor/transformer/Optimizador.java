@@ -8,6 +8,8 @@ import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
 
 /* Transformer que aplica Constant Folding. */
 
+// FIXME: Me parece que acá elimina conversores que no tendría que eliminar...
+
 public class Optimizador extends Transformer {
 
     @Override

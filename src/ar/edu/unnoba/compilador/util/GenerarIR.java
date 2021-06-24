@@ -112,7 +112,7 @@ public class GenerarIR {
 
     /* Crear una variable global */
     public void global(String nombre, String tipo, String valor) {
-        asig(nombre, "global", tipo, valor);
+        codigo(String.format("%s = global %s %s", nombre, tipo, valor), false);
     }
 
     /* Reservar memoria para un registro */
@@ -177,12 +177,12 @@ public class GenerarIR {
 
     /* Abrir bloque con la definición de una función. El @ ya tiene que estar en el nombre. */
     public void defFuncion(String nombre, String tipoRet, String params) {
-        codigo(String.format("define %s %s(%s) {", tipoRet, nombre, params), false);
+        codigo(String.format("\ndefine %s %s(%s) {", tipoRet, nombre, params), false);
     }
 
     /* Cerrar bloque de definición de función */
     public void cierreBloque() {
-        codigo("}\n\n", false);
+        codigo("}\n", false);
     }
 
     /* Retorno de una función void */
@@ -207,6 +207,7 @@ public class GenerarIR {
 
     /* Definición de una variable global conteniendo un string */
     public void cadena(String nombre, String cadena, int longitud) {
-        codigo(String.format("%s = private constant [%d x i8] c\"%s\"\n", nombre, longitud, cadena));
+        codigo(String.format("%s = private constant [%d x i8] c\"%s\"",
+                nombre, longitud, cadena), false);
     }
 }

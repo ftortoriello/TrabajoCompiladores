@@ -460,7 +460,7 @@ public class GeneradorDeCodigo extends Visitor {
                     .append("@.bln_false_format = private constant [6 x i8] c\"false\\00\"\n");
         }
         if (usaWriteln) {
-            sb.append("@.salto_linea = private constant [2 x i8] c\"\\0A\\00\"\n");
+            sb.append("@.salto_linea = private constant [2 x i8] c\"\\0A\\00\"");
         }
         sb.append("\n");
 
@@ -471,6 +471,7 @@ public class GeneradorDeCodigo extends Visitor {
         if (usaReadFloat) imprimirDefinicionLeer(Tipo.FLOAT);
 
         declararVarsStrs();
+
         super.visit(p);
     }
 
@@ -642,6 +643,7 @@ public class GeneradorDeCodigo extends Visitor {
          * inicio de la declaración para evitar comportamientos indefinidos.
          */
         if (!df.getTieneRetorno()) grar.salto(etiquetaFin);
+        // FIXME: Se rompe acá: "function f(n is integer) return integer if n > 1 then return 1 else return 0;"
         grar.etiqueta(etiquetaFin);
 
         grar.load(refRet, tipoRet, ptroRet);
