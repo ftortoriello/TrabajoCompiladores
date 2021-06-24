@@ -84,7 +84,11 @@ public class GenerarIR {
 
     /* Salto incondicional */
     public void salto(String etiquetaDestino) {
-        codigo(String.format("br label %%%s", etiquetaDestino));
+        // Parche bien feo para no imprimir saltos si en la linea anterior tengo otro
+        String ultimaLinea = getCodigo().split("\n")[getCodigo().split("\n").length - 1];
+        if (!(ultimaLinea.startsWith(String.format("\tbr label")))) {
+            codigo(String.format("br label %%%s", etiquetaDestino));
+        }
     }
 
     /* Salto condicional */
