@@ -1,12 +1,13 @@
+{
 function def() return float
     writeln("Esta devuelve implícitamente 0.0");
-
-function inc(a is integer = 1) return integer
-    return a * 2 + 1;
+}
+function inc(a is integer, b is integer = 2, c is integer = 3) return integer
+    return a + b + c;
 
 main is
     # def(1); # Me permite invocar esto, debería?
-    variable j is float = inc();
+    variable j is integer = inc(3);
     writeln(j);
 
 {
@@ -22,7 +23,7 @@ main is
         write(" a ");
         writeln(c);
     end;
-    }
+}
 end.
 
 {
