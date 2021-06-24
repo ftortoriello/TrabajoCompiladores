@@ -63,9 +63,8 @@ Opcional:
 
 Más que opcional:
 * Reemplazo de constantes por su valor.
-* Eliminación de asignaciones redundantes (ej: x = x).
 * Eliminación de las declaraciones de variables sin uso.
-* Eliminación de código inaccesible.
+* Eliminación de asignaciones redundantes (ej: x = x).
 
 ### Revisar
 

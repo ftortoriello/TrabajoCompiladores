@@ -99,7 +99,8 @@ public class GeneradorDeCodigo extends Visitor {
         Expresion arg = i.getArgs().get(0);
         arg.accept(this);
         String refIR = arg.getRefIR();
-        grar.setComentLinea(i.getEtiqueta());
+
+        grar.coment(i.getEtiqueta());
 
         if (arg instanceof Cadena) {
             Cadena cad = (Cadena) arg;
@@ -439,7 +440,7 @@ public class GeneradorDeCodigo extends Visitor {
         }
         sb.append("\n");
 
-        grar.codigo(sb.toString(), false);
+        grar.encabezado(sb.toString());
 
         if (usaReadBoolean) imprimirDefLeerBoolean();
         if (usaReadInteger) imprimirDefLeer(Tipo.INTEGER);
@@ -768,6 +769,8 @@ public class GeneradorDeCodigo extends Visitor {
         // Generar refIR para la expresión de retorno
         expr.accept(this);
 
+        grar.setComentLinea("return");
+
         String tipoIR = simboloFun.getTipo().getIR();
         // La variable con el valor de la expresión resuelto
         String refExpr = expr.getRefIR();
@@ -939,8 +942,6 @@ public class GeneradorDeCodigo extends Visitor {
         String refIR = Normalizador.crearNomRef("invo");
         i.setRefIR(refIR);
 
-        grar.setComentLinea(String.format("Invocación a %s()", i.getNombre()));
-
         // A las invocaciones a write las manejamos aparte
         if (i.getNombre().equals("write") || i.getNombre().equals("writeln")) {
             imprimirWrite(i);
@@ -953,6 +954,8 @@ public class GeneradorDeCodigo extends Visitor {
 
         String nombreFun = sf.getNombreFuncionIR();
         String tipoFun = sf.getTipo().getIR();
+
+        grar.setComentLinea(String.format("Invocación a %s()", i.getNombre()));
 
         // Generar la lista de argumentos, además de visitarlos para generar las refs.
         // También se genera referencias para argumentos por defecto si son necesarios.

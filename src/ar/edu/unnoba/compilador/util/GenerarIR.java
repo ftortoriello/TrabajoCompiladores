@@ -8,11 +8,15 @@ public class GenerarIR {
     private final boolean conComentarios = true;
     // A partir de que columna intentar colocar los comentarios en las líneas
     private final int columnaComent = 60;
+    // Cuanto espacio dejar como mínimo entre el código y el comentario
+    private final int espacioMinComent = 1;
 
     // Sobre esta variable vamos anexando lo que va a ser el resultado final en IR
     private final StringBuilder sbCodigo = new StringBuilder();
 
     private String comentLinea = null;
+
+    private boolean omitirLinea = false;    // Parche para no generar código inaccesible
 
     public String getCodigo() {
         return sbCodigo.toString();
@@ -23,6 +27,38 @@ public class GenerarIR {
     }
 
     /*** Funciones auxiliares ***/
+
+    /* Agrega una línea de código */
+    private void codigo(String cod, boolean indentado) {
+        // Parche para no generar código inaccesible. No imprimo si en la línea anterior
+        // tengo un branch, excepto que lo que esté imprimiendo sea una etiqueta.
+        if (omitirLinea) {
+            comentLinea = null;
+            return;
+        }
+
+        if (indentado) sbCodigo.append("\t");
+        sbCodigo.append(cod);
+
+        if (conComentarios && comentLinea != null) {
+            int cantEspacios = columnaComent - cod.length();
+            if (cantEspacios < espacioMinComent) cantEspacios = espacioMinComent;
+            // alinear
+            sbCodigo.append(" ".repeat(cantEspacios));
+            // agregar comentario
+            sbCodigo.append("; ").append(comentLinea);
+
+            // no generar el mismo comentario en la próxima línea
+            comentLinea = null;
+        }
+
+        sbCodigo.append("\n");
+    }
+
+    /* Agregar una línea de código indentado */
+    private void codigo(String codigo) {
+        codigo(codigo, true);
+    }
 
     /* Retorna como pasar un string por parámetro. Usado por printf y scanf */
     private String getParamString(String cadena, int longitud) {
@@ -43,40 +79,14 @@ public class GenerarIR {
 
     /*** Funciones públicas ***/
 
-    /* Agrega una línea de código */
-    public void codigo(String cod, boolean indentado) {
-        // Parche para no generar código inaccesible. No imprimo si en la linea anterior
-        // tengo un branch, excepto que lo que esté imprimiendo sea una etiqueta.
-        String ultimaLinea = getCodigo().split("\n")[getCodigo().split("\n").length - 1];
-        if (ultimaLinea.startsWith(String.format("\tbr label")) && !cod.endsWith(":")) {
-            return;
-        }
-
-        if (indentado) sbCodigo.append("\t");
-        sbCodigo.append(cod);
-
-        if (conComentarios && comentLinea != null) {
-            int cantEspacios = columnaComent - cod.length();
-            if (cantEspacios < 2) cantEspacios = 2;
-            // alinear
-            sbCodigo.append(" ".repeat(cantEspacios));
-            // agregar comentario
-            sbCodigo.append("; ").append(comentLinea);
-
-            // no generar el mismo comentario en la próxima línea
-            comentLinea = null;
-        }
-
-        sbCodigo.append("\n");
-    }
-
-    /* Agregar una línea de código general indentado */
-    public void codigo(String codigo) {
-        codigo(codigo, true);
+    /* Imprime el código inicial */
+    public void encabezado(String codEncabezado) {
+        codigo(codEncabezado, false);
     }
 
     /* Etiqueta, antes se agrega un salto de línea */
     public void etiqueta(String nombreEtiqueta) {
+        omitirLinea = false;    // siempre imprimir etiquetas
         codigo(String.format("\n%s:", nombreEtiqueta), false);
     }
 
@@ -85,17 +95,6 @@ public class GenerarIR {
         if (conComentarios) {
             codigo(String.format("; %s", comentario));
         }
-    }
-
-    /* Salto incondicional */
-    public void salto(String etiquetaDestino) {
-        codigo(String.format("br label %%%s", etiquetaDestino));
-    }
-
-    /* Salto condicional */
-    public void salto(String cond, String etiVerdadero, String etiFalso) {
-        codigo(String.format("br i1 %s, label %%%s, label %%%s",
-                cond, etiVerdadero, etiFalso));
     }
 
     /* Asignar resultado de una operación unaria */
@@ -187,17 +186,33 @@ public class GenerarIR {
 
     /* Cerrar bloque de definición de función */
     public void cierreBloque() {
+        omitirLinea = false;
         codigo("}\n", false);
+    }
+
+    /* Salto incondicional */
+    public void salto(String etiquetaDestino) {
+        codigo(String.format("br label %%%s", etiquetaDestino));
+        omitirLinea = true;  // omitir lo que sigue hasta que se encuentre una etiqueta
+    }
+
+    /* Salto condicional */
+    public void salto(String cond, String etiVerdadero, String etiFalso) {
+        codigo(String.format("br i1 %s, label %%%s, label %%%s",
+                cond, etiVerdadero, etiFalso));
+        omitirLinea = true;
     }
 
     /* Retorno de una función void */
     public void ret() {
         codigo("ret void");
+        omitirLinea = true;
     }
 
     /* Retorno de una función */
     public void ret(String tipo, String valor) {
         codigo(String.format("ret %s %s", tipo, valor));
+        omitirLinea = true;
     }
 
     /* Invocación a una función de tipo void */
