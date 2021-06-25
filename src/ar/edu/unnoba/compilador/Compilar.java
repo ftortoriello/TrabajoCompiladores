@@ -21,7 +21,7 @@ import java.nio.file.Paths;
 
 /** Clase principal que realiza todos los pasos para convertir código fuente en un ejecutable. */
 public class Compilar {
-    private static boolean graficarArbol(Programa programa, String nombreArchivo, String etiqueta) throws IOException, ExcepcionVisitor {
+    private static void graficarArbol(Programa programa, String nombreArchivo, String etiqueta) throws IOException, ExcepcionVisitor {
         PrintWriter pw = new PrintWriter(
                 new FileWriter(String.format("%s.dot", nombreArchivo)));
         pw.println(new ASTGraphviz(etiqueta).generarCodigo(programa));
@@ -32,10 +32,8 @@ public class Compilar {
                 "-o", nombreArchivo + "." + Constantes.formatoImgAst);
         if (exitCode == 0) {
             System.out.println("Se graficó el AST «" + nombreArchivo + "».");
-            return true;
         } else {
             System.err.println("Ha ocurrido un error al graficar el AST «" + nombreArchivo + "».");
-            return false;
         }
     }
 
@@ -132,17 +130,17 @@ public class Compilar {
             new VisitorControl().procesar(programa);
 
             System.out.println("\nIniciando validación y conversión de tipos...");
-            new TransformerTipos().procesar(programa);
+            programa = new TransformerTipos().procesar(programa);
 
             System.out.println("\nReescribiendo estructuras when y for...");
-            new ConversorDeEstructuras().procesar(programa);
+            programa = new ConversorDeEstructuras().procesar(programa);
 
             // Mostrar el árbol transformado
             graficarArbol(programa, carpetaSalida + "2_ast-transformado",
                     "AST con conversión de tipos (Conti - Tortoriello)");
 
             System.out.println("\nIniciando proceso de optimización...");
-            new Optimizador().procesar(programa);
+            programa = new Optimizador().procesar(programa);
 
             // Mostrar el árbol optimizado
             graficarArbol(programa, carpetaSalida + "3_ast-optimizado",
@@ -163,8 +161,10 @@ public class Compilar {
 
             // Para probar, pero desde los IDE primero espera las entradas y después muestra las salidas.
             System.out.println("\nEjecutando el programa compilado...");
-            Procesos.ejecutar("./" + carpetaSalida + nombreArchivo);
-
+            int exitCode = Procesos.ejecutar("./" + carpetaSalida + nombreArchivo);
+            if (exitCode != 0) {
+                System.err.printf("Código de salida %d al ejecutar el programa.%n", exitCode);
+            }
         } catch (Exception e) {
             GestorExcepciones.mostrar(e);
         }

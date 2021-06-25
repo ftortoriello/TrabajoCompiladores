@@ -34,7 +34,6 @@ import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntonces;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
 import java_cup.runtime.ComplexSymbolFactory;
-import java_cup.runtime.ComplexSymbolFactory.Location;
 import java_cup.runtime.Symbol;
 
 import java.util.ArrayList;
@@ -47,8 +46,11 @@ parser code
     @Override
     public void syntax_error(Symbol s) {
         ComplexSymbolFactory.ComplexSymbol cs = (ComplexSymbolFactory.ComplexSymbol) s;
-        System.err.print(Util.getPosicion(cs.getLeft(), cs.getRight()));
-        System.err.printf(" - Error sintáctico en el símbolo %s\n", cs.getName());
+        String pos = Util.getPosicion(cs.getLeft(), cs.getRight());
+        String msg = "";
+        if (!pos.equals("")) msg = pos + " - ";
+        msg = msg + "Error sintáctico en el símbolo " + cs.getName();
+        System.err.println(msg);
     }
 
     @Override

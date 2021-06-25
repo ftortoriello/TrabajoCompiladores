@@ -826,7 +826,6 @@ public class GeneradorDeCodigo extends Visitor {
         String refDerIR = ob.getDerecha().getRefIR();
         String instCmpIR = ob.getInstruccionIR();
         String tipoIR = ob.getIzquierda().getTipo().getIR();
-        String operadorParser = ob.getNombre();
 
         grar.setComentLinea(String.format("%s %s %s",
                 ob.getIzquierda().toString(), ob.getNombre(), ob.getDerecha().toString()));
@@ -861,10 +860,6 @@ public class GeneradorDeCodigo extends Visitor {
                 break;
             default: throw new ExcepcionVisitor(neg, "Tipo inesperado: " + tipo);
         }
-
-        // Ponerle esta referencia a la expresión
-        // TODO: Por qué funciona sin esto?
-        //expr.setRefIR(refIR);
     }
 
     @Override
@@ -873,10 +868,9 @@ public class GeneradorDeCodigo extends Visitor {
 
         // Si el NOT es parte de una condición while por ejemplo, se invierten las etiquetas.
         // En ese caso no hay que generar una instrucción para negarla.
-        // TODO: Terminar de revisar, seguro que me olvido algún caso
         if (neg.isEnCortocircuito()) return;
 
-        String refIR = Normalizador.crearNomRef("neg");
+        String refIR = Normalizador.crearNomRef("not");
         neg.setRefIR(refIR);
 
         Expresion expr = neg.getExpresion();
