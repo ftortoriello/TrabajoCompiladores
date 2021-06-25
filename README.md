@@ -2,6 +2,11 @@
 Trabajo para la asignatura "Compiladores" - UNNOBA - 2021
 [https://github.com/ftortoriello/TrabajoCompiladores](https://github.com/ftortoriello/TrabajoCompiladores)
 
+## Ejemplo del lenguaje
+
+![codigo](https://user-images.githubusercontent.com/82975077/123492931-508a2f00-d5f1-11eb-82f7-41897bdb654e.png)
+![ast](https://user-images.githubusercontent.com/82975077/123492687-97c3f000-d5f0-11eb-8473-957206aaa1de.png)
+
 # Progreso
 
 ## 1.ª Etapa: Analizador léxico y sintáctico
@@ -44,8 +49,6 @@ Estado: :white_check_mark:
 ## 2.ª Etapa: Analizador semántico con generación del AST
 
 Fecha de entrega: 04/06/2021
-
-![AST](https://user-images.githubusercontent.com/82975077/120876361-ae919c80-c586-11eb-88c6-0c91690013c7.png)
 
 Requisitos:
 * AST, con su visualización mediante graphviz: :white_check_mark:
