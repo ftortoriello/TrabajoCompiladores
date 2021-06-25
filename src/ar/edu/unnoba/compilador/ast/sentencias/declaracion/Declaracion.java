@@ -4,10 +4,11 @@ import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
 
+/**
+ * Clase que engloba a la declaración de variables, a los parámetros de funciones y la declaración
+ * de funciones.
+ */
 public abstract class Declaracion extends Sentencia {
-    // Clase que engloba a la declaración de variables, a los
-    // parámetros de funciones y la declaración de funciones.
-
     private Identificador ident;
 
     public Declaracion(String nombre, Identificador ident) {

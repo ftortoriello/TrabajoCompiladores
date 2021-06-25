@@ -3,7 +3,7 @@ package ar.edu.unnoba.compilador.visitor;
 import ar.edu.unnoba.compilador.ast.base.Alcance;
 import ar.edu.unnoba.compilador.ast.base.Bloque;
 import ar.edu.unnoba.compilador.ast.base.Programa;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
@@ -19,23 +19,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-/* Visitor para generar el alcance global y construir la tabla de símbolos
- * globales.
- */
+/** Visitor para generar el alcance global y construir la tabla de símbolos globales. */
 public class GeneradorDeAlcanceGlobal extends Visitor {
     private Alcance alcanceGlobal;
     private Map<String, SimboloFuncion> tablaFunciones;
 
-    // Agregar el símbolo de la variable al ámbito global
+    /** Agregar el símbolo de la variable al ámbito global. */
     private void agregarSimboloVarGlobal(Declaracion d) throws ExcepcionVisitor {
         Identificador id = d.getIdent();
         String nombre = id.getNombre();
 
         if (alcanceGlobal.containsKey(nombre)) {
-            throw new ExcepcionVisitor(
-                    String.format("La variable global «%s» de tipo %s ya fue declarada previamente con tipo %s.",
-                            nombre, id.getTipo(),
-                            alcanceGlobal.get(nombre).getTipo()));
+            throw new ExcepcionVisitor(d, String.format(
+                    "La variable global de tipo %s ya fue declarada previamente con tipo %s.",
+                    id.getTipo(), alcanceGlobal.get(nombre).getTipo()));
         }
 
         // Defino de antemano los nombres que necesitamos para el IR
@@ -52,9 +49,9 @@ public class GeneradorDeAlcanceGlobal extends Visitor {
         String nombre = id.getNombre();
 
         if (tablaFunciones.containsKey(nombre)) {
-            throw new ExcepcionVisitor(
-                    String.format("La función «%s» de tipo %s ya fue declarada previamente con tipo %s.",
-                            nombre, id.getTipo(), tablaFunciones.get(nombre).getTipo()));
+            throw new ExcepcionVisitor(d, String.format(
+                    "La función de tipo %s ya fue declarada previamente con tipo %s.",
+                    id.getTipo(), tablaFunciones.get(nombre).getTipo()));
         }
 
         String nombreFun = Normalizador.crearNomFun(nombre);
@@ -115,9 +112,8 @@ public class GeneradorDeAlcanceGlobal extends Visitor {
     @Override
     public void visit(DecVarIni dvi) throws ExcepcionVisitor {
         if (dvi.getExpresion() instanceof InvocacionFuncion) {
-            throw new ExcepcionVisitor(String.format(
-                    "«%s»: No se puede invocar a una función desde la inicialización de una variable global.",
-                    dvi.getIdent()));
+            throw new ExcepcionVisitor(dvi,
+                    "No se puede invocar a una función desde la inicialización de una variable global.");
         }
         agregarSimboloVarGlobal(dvi);
         super.visit(dvi);

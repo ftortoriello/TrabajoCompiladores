@@ -1,6 +1,6 @@
 package ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones;
 
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.OperadorCmp;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
@@ -46,8 +46,10 @@ public abstract class Relacion extends OperacionBinaria {
 
     protected abstract boolean calcularResultado(boolean izq, boolean der);
 
-    // Crea una clase según sea el operador utilizado
-    // Si se utiliza el operador de IGUALDAD, devuelvo una clase Igualdad, etc.
+    /**
+     * Crear una clase según sea el operador utilizado.
+     * Si se utiliza el operador de IGUALDAD, devuelvo una clase Igualdad, etc.
+     */
     public static Relacion getClaseRel(OperadorCmp op, Expresion expr1, Expresion expr2) {
         switch (op) {
             case IGUALDAD:    return new Igualdad(expr1, expr2);

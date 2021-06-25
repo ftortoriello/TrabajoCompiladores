@@ -1,6 +1,6 @@
 package ar.edu.unnoba.compilador.ast.expresiones.unarias.logicas;
 
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
@@ -12,8 +12,10 @@ public class NegacionLogica extends OperacionUnaria {
         super("NOT", expresion);
     }
 
-    // Propiedad para detectar si se debe generar código IR para los NOT, o no porque se invierten
-    // las etiquetas de una condición.
+    /**
+     * Propiedad para detectar si se debe generar código IR para los NOT.
+     * No hay que hacerlo si se invierten las etiquetas de una condición.
+     */
     private boolean enCortocircuito = false;
 
     @Override

@@ -2,29 +2,29 @@ package ar.edu.unnoba.compilador.ast.sentencias.declaracion;
 
 import ar.edu.unnoba.compilador.ast.base.Alcance;
 import ar.edu.unnoba.compilador.ast.base.Bloque;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionTransformer;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
+/** Declaración de una función. */
 public class DecFun extends Declaracion {
-    // Clase para la declaración de funciones
-
-    private ArrayList<Param> params;
+    private List<Param> params;
     private Bloque bloque;
     private Alcance alcance;
 
-    // Para generar un salto a la etiqueta de retorno si no tiene al menos uno definido
+    /** Usado para generar un salto a la etiqueta de retorno si no tiene al menos uno definido. */
     private Boolean tieneRetorno = false;
 
-    // Después de esta etiqueta encuentro el return de la función
+    /** Después de esta etiqueta encuentro el return de la función. */
     private String etiquetaFin;
 
-    public DecFun(Identificador ident, ArrayList<Param> params, Bloque bloque) {
+    public DecFun(Identificador ident, List<Param> params, Bloque bloque) {
         super(ident.getNombre(), ident);
         // Invierto el orden de los parámetros porque debido a la forma de las reglas los lee al revés
         Collections.reverse(params);
@@ -40,11 +40,11 @@ public class DecFun extends Declaracion {
         this.bloque = bloque;
     }
 
-    public ArrayList<Param> getParams() {
+    public List<Param> getParams() {
         return params;
     }
 
-    public void setParams(ArrayList<Param> params) {
+    public void setParams(List<Param> params) {
         this.params = params;
     }
 
@@ -80,7 +80,8 @@ public class DecFun extends Declaracion {
         this.etiquetaFin = etiquetaFin;
     }
 
-    /* Retorna la cantidad de argumentos no opcionales de la declaración.
+    /**
+     * Obtener la cantidad de argumentos no opcionales de la declaración.
      * Usado para validar el pasaje de parámetros.
      */
     public int getCantArgsObligatorios() {

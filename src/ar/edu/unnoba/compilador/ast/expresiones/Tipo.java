@@ -11,7 +11,7 @@ public enum Tipo {
         return name().toLowerCase();
     }
 
-    // Recibe el lexema TIPO (en forma de cadena) y devuelve el enum Tipo correspondiente
+    /** Recibe el lexema TIPO (en forma de cadena) y devuelve el enum Tipo correspondiente. */
     public static Tipo getTipoDato(String tipoStr) {
         switch (tipoStr.toUpperCase()) {
             case "BOOLEAN": return Tipo.BOOLEAN;
@@ -21,19 +21,19 @@ public enum Tipo {
         }
     }
 
-    /* Retorna el tipo usado en el lenguaje IR */
+    /** Retorna el tipo usado en el lenguaje IR. */
     public String getIR() {
         switch (this) {
             case BOOLEAN: return "i1";
             case INTEGER: return "i32";
-            // Usamos double para representar nros. con punto flotante, para no perder tanta precisión
+            // Usamos double para representar nros. con punto flotante, para perder menos precisión
             case FLOAT: return "double";
             default: throw new IllegalStateException(
                     String.format("getTipoIR(): Tipo %s inesperado", this));
         }
     }
 
-    /* Retorna el String del valor predeterminado usado en IR */
+    /** Retorna el String del valor predeterminado usado en IR. */
     public String getValorDefIR() {
         switch (this) {
             case BOOLEAN: return "false";

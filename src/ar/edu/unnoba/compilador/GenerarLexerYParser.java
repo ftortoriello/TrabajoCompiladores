@@ -1,36 +1,37 @@
 package ar.edu.unnoba.compilador;
 
-import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import ar.edu.unnoba.compilador.excepciones.GestorExcepciones;
 
+import java.io.File;
+
+/**
+ * Clase para generar las clases Java del analizador léxico y sintáctico.
+ * Se debe ejecutar antes de generar el compilador.
+ */
 public class GenerarLexerYParser {
     public static void main(String[] args) {
-        String path = "src/ar/edu/unnoba/compilador/lexico/lexico.flex";
-        generarLexer(path);
+        generarLexer("src/ar/edu/unnoba/compilador/lexico/lexer.jflex");
 
-        String[] param = new String[5];
-        param[0] = "-destdir";
-        param[1] = "src/ar/edu/unnoba/compilador/sintaxis";
-        param[2] = "-parser";
-        param[3] = "Parser";
-        param[4] = "src/ar/edu/unnoba/compilador/sintaxis/parser.cup";
-        generarParser(param);
+        generarParser("-destdir", "src/ar/edu/unnoba/compilador/sintaxis",
+                "-parser", "Parser",
+                "-locations",     // permitir guardar la posición en la entrada de cada símbolo
+                "-dump_grammar",  // mostrar la gramática creada
+                "src/ar/edu/unnoba/compilador/sintaxis/parser.cup");
     }
 
-    public static void generarLexer(String path) {
-        File file = new File(path);
+    public static void generarLexer(String ruta) {
+        File file = new File(ruta);
 
-        // La siguiente línea requiere como mínimo JFlex 1.8
+        // Esto requiere como mínimo JFlex 1.8
         jflex.generator.LexGenerator generator = new jflex.generator.LexGenerator(file);
         generator.generate();
     }
 
-    public static void generarParser(String[] param) {
+    public static void generarParser(String... params) {
         try {
-            java_cup.Main.main(param);
-        } catch (Exception ex) {
-            Logger.getLogger(GenerarLexerYParser.class.getName()).log(Level.SEVERE, null, ex);
+            java_cup.Main.main(params);
+        } catch (Exception e) {
+            GestorExcepciones.mostrar(e);
         }
     }
 }

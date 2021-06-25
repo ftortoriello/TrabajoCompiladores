@@ -4,7 +4,7 @@ import ar.edu.unnoba.compilador.ast.base.Alcance;
 import ar.edu.unnoba.compilador.ast.base.Bloque;
 import ar.edu.unnoba.compilador.ast.base.Nodo;
 import ar.edu.unnoba.compilador.ast.base.Programa;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
@@ -27,18 +27,22 @@ import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 
 import java.util.Map;
 
-/* Transformer que asigna tipos a los identificadores y valida la
- * compatibilidad de tipos, haciendo conversiones implícitas si es necesario.
- * También reemplaza los identificadores que encuentra por los símbolos que se
- * encuentran en la tabla de símbolos.
+/**
+ * Transformer que asigna tipos a los identificadores y valida la compatibilidad de tipos, haciendo
+ * conversiones implícitas si es necesario.
+ * También reemplaza los identificadores que encuentra por los símbolos que se encuentran en la
+ * tabla de símbolos.
  */
 public class TransformerTipos extends Transformer {
     private Alcance alcanceActual;
     private Map<String, SimboloFuncion> tablaFunciones;
 
-    // Métodos auxiliares
+    // *** Métodos auxiliares ***
 
-    private static Tipo getTipoEnComun(Tipo tipo1, Tipo tipo2) throws ExcepcionTransformer {
+    private static Tipo getTipoEnComun(OperacionBinaria ob) throws ExcepcionTransformer {
+        Tipo tipo1 = ob.getIzquierda().getTipo();
+        Tipo tipo2 = ob.getDerecha().getTipo();
+
         if (tipo1 == tipo2) {
             return tipo1;
         }
@@ -48,7 +52,7 @@ public class TransformerTipos extends Transformer {
         if (tipo1 == Tipo.FLOAT && tipo2 == Tipo.INTEGER) {
             return tipo1;
         }
-        throw new ExcepcionTransformer(
+        throw new ExcepcionTransformer(ob,
                 String.format("No existe un tipo común entre %s y %s", tipo1, tipo2));
     }
 
@@ -65,11 +69,11 @@ public class TransformerTipos extends Transformer {
             System.out.printf("Advertencia: convirtiendo «%s» de float a integer%n", expresion);
             return new FlotanteAEntero(expresion);
         }
-        throw new ExcepcionTransformer(
+        throw new ExcepcionTransformer(expresion,
                 String.format("No existe un tipo común entre %s y %s", tipoOrigen, tipoDestino));
     }
 
-    // Retorna el símbolo si está en el alcance actual y se pudo cambiar el tipo
+    /** Retorna el símbolo si está en el alcance actual y se pudo cambiar el tipo. */
     private SimboloVariable cambiarTipoVariable(Valor v) {
         SimboloVariable s = alcanceActual.resolver(v.getNombre());
         if (s == null) {
@@ -98,12 +102,12 @@ public class TransformerTipos extends Transformer {
         return s;
     }
 
-    // Retorna el tipo en común
+    /** Retorna el tipo en común. */
     private static Tipo transformOperacionBinaria(OperacionBinaria ob) throws ExcepcionTransformer {
         Expresion expIzquierda = ob.getIzquierda();
         Expresion expDerecha = ob.getDerecha();
 
-        Tipo tipoEnComun = getTipoEnComun(expIzquierda.getTipo(), expDerecha.getTipo());
+        Tipo tipoEnComun = getTipoEnComun(ob);
         expIzquierda = convertirATipo(expIzquierda, tipoEnComun);
         expDerecha = convertirATipo(expDerecha, tipoEnComun);
 
@@ -113,7 +117,7 @@ public class TransformerTipos extends Transformer {
         return tipoEnComun;
     }
 
-    // Transforms
+    // *** Transforms ***
 
     @Override
     public Programa transform(Programa p) throws ExcepcionTransformer {
@@ -152,7 +156,7 @@ public class TransformerTipos extends Transformer {
         i = super.transform(i);
         SimboloVariable s = cambiarTipoVariable(i);
         if (s == null) {
-            throw new ExcepcionTransformer(String.format("No se pudo asignar un tipo a la variable «%s»", i.getNombre()));
+            throw new ExcepcionTransformer(i, "No se pudo asignar un tipo.");
         }
         // Reemplazar cada Identificador por el SimboloVariable correspondiente
         return s;
@@ -169,7 +173,7 @@ public class TransformerTipos extends Transformer {
 
         SimboloFuncion s = cambiarTipoFuncion(i);
         if (s == null) {
-            throw new ExcepcionTransformer(String.format("No se pudo asignar un tipo a la función «%s»", i.getNombre()));
+            throw new ExcepcionTransformer(i, "No se pudo asignar un tipo.");
         }
 
         DecFun decFun = s.getDeclaracion();
@@ -210,7 +214,8 @@ public class TransformerTipos extends Transformer {
         // Sólo las relaciones de igualdad y desigualdad aceptan operandos booleanos
         if ((tipoEnComun == Tipo.BOOLEAN) && !(
                 r instanceof Igualdad || r instanceof Desigualdad)) {
-            throw new ExcepcionTransformer(String.format("No se puede realizar una comparación \"%s\" entre tipos boolean", r.getNombre()));
+            throw new ExcepcionTransformer(r,
+                    "No se puede realizar esta comparación entre tipos boolean");
         }
         r.setTipo(Tipo.BOOLEAN);
         return r;
@@ -248,7 +253,7 @@ public class TransformerTipos extends Transformer {
     public Mientras transform(Mientras m) throws ExcepcionTransformer {
         m = super.transform(m);
         if (m.getCondicion().getTipo() != Tipo.BOOLEAN) {
-            throw new ExcepcionTransformer("El tipo de la condición de «while» no es boolean");
+            throw new ExcepcionTransformer(m, "El tipo de la condición de «while» no es boolean");
         }
         return m;
     }
@@ -273,7 +278,7 @@ public class TransformerTipos extends Transformer {
         // Para que soporte conversiones implícitas de flotante a entero
         // tendríamos que reemplazar en Para el Identificador por Expresion.
         if (p.getIdent().getTipo() != Tipo.INTEGER) {
-            throw new ExcepcionTransformer("El tipo de la variable a iterar en «for» no es integer");
+            throw new ExcepcionTransformer(p, "El tipo de la variable a iterar no es integer");
         }
         return p;
     }

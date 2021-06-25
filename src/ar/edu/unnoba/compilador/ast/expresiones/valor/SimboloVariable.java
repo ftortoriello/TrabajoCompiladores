@@ -2,12 +2,13 @@ package ar.edu.unnoba.compilador.ast.expresiones.valor;
 
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.Declaracion;
 
-/* Clase para representar las variables en la tabla de símbolos.
+/**
+ * Clase para representar las variables en la tabla de símbolos.
  * Luego, mediante un Transformer, este nodo reemplaza a Identificador.
  */
 
 public class SimboloVariable extends Identificador {
-    // El nombre original, pero único y normalizado para usarse en IR.
+    /** El nombre original, pero único y normalizado para usarse en IR. */
     private String nombreIR;
 
     private final Boolean esGlobal;

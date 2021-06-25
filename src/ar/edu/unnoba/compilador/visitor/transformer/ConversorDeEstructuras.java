@@ -3,7 +3,7 @@ package ar.edu.unnoba.compilador.visitor.transformer;
 import ar.edu.unnoba.compilador.ast.base.Alcance;
 import ar.edu.unnoba.compilador.ast.base.Bloque;
 import ar.edu.unnoba.compilador.ast.base.Nodo;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Suma;
@@ -22,12 +22,13 @@ import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
 import ar.edu.unnoba.compilador.util.Normalizador;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ConversorDeEstructuras extends Transformer {
 
     // Estos dos métodos quedaron más complicados de lo que deberían porque para los nodos
     // nuevos que tienen que crearse en las transformaciones hacemos muchas cosas* a mano,
-    // para evitar tener que pasar los generadores de alcance una segunda vez..
+    // para evitar tener que pasar los generadores de alcance una segunda vez...
 
     // *: generar alcances, generar simboloVariable, agregar los Simbolos en los Alcances,
     // setear el padre de los alcances, setear los tipos y creo que nada más.
@@ -113,7 +114,7 @@ public class ConversorDeEstructuras extends Transformer {
             } else {
                 // Los subsiguientes ifs se encadenan al else del if anterior
                 SiEntoncesSino seInterno = new SiEntoncesSino(cond, cc.getBloque());
-                ArrayList<Nodo> ls = new ArrayList<>();
+                List<Nodo> ls = new ArrayList<>();
                 ls.add(seInterno);
                 Bloque bloqueElse = new Bloque("ELSE", ls, false);
                 bloqueElse.setAlcance(cc.getBloque().getAlcance());

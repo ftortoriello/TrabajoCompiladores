@@ -2,7 +2,7 @@ package ar.edu.unnoba.compilador.visitor;
 
 import ar.edu.unnoba.compilador.ast.base.Bloque;
 import ar.edu.unnoba.compilador.ast.base.Programa;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
@@ -30,42 +30,48 @@ import jflex.base.Pair;
 import java.io.*;
 import java.util.*;
 
-/* Clase para genera código de LLVM IR a partir del AST */
-
+/** Clase para generar código de LLVM IR a partir del AST. */
 public class GeneradorDeCodigo extends Visitor {
     private String nombreArchivoFuente;
 
     private GenerarIR grar;
 
-    // Tabla con las funciones definidas por el usuario. Se extrae del objeto Programa al entrar en esta clase
+    /**
+     * Tabla con las funciones definidas por el usuario.
+     * Se extrae del objeto Programa al entrar en esta clase.
+     */
     private Map<String, SimboloFuncion> tablaFunciones;
 
-    // Lista para guardar los nombres de las funciones que inicializan a las variables globales
-    // Se añaden en el visit(DecVarIni), y se procesa una vez que se alcanza el main
+    /**
+     * Lista para guardar los nombres de las funciones que inicializan a las variables globales.
+     * Se añaden en el visit(DecVarIni), y se procesa una vez que se alcanza el main.
+     */
     private final List<String> varGblInit = new ArrayList<>();
 
     private List<Cadena> arrCadenas;
 
-    /* Pila de pares de etiquetas para saber a donde saltar cuando se encuentra break o continue
+    /**
+     * Pila de pares de etiquetas para saber a donde saltar cuando se encuentra break o continue
      * dentro de un while.
      * La primer etiqueta del par representa el comienzo del bloque si la condición es verdadera,
      * y la segunda si es falsa (o el fin del bloque).
      */
     private final Deque<Pair<String, String>> etiquetasMientras = new ArrayDeque<>();
 
-    /* Pila de pares de etiquetas usada para el cortocircuito booleano */
+    /** Pila de pares de etiquetas usada para el cortocircuito booleano */
     private final Deque<Pair<String, String>> etiquetasOpBinLog = new ArrayDeque<>();
 
-    /*** Funciones auxiliares ***/
+    // *** Funciones auxiliares ***
 
     public static boolean targetEsWindows() {
         return System.getProperty("os.name").startsWith("Windows");
     }
 
-    /* Función para no tener fija la arquitectura y SO destino.
-     * El triple se puede sacar de  "llvm-config --host-target"
-     * o "clang -print-target-triple", pero el datalayout no se.
-     * Compilar un programa básico en C a IR y fijarse.
+    /**
+     * Función para no tener fija la arquitectura y SO destino.
+     * El triple se puede sacar de  "llvm-config --host-target" o "clang -print-target-triple",
+     * pero el datalayout no.
+     * Compilar un programa básico en C a IR y obtenerlos.
      */
     private static String getHostTarget() throws IOException, InterruptedException {
         String datalayout = null;
@@ -85,17 +91,17 @@ public class GeneradorDeCodigo extends Visitor {
             }
         }
         clang.waitFor();
-        // borrar archivo C temporal
+        // Borrar archivo C temporal
         File file = new File("void.c");
         file.delete();
         if (datalayout == null || triple == null) {
-            // falló algo... tirar excepción para usar datos predeterminados
+            // Falló algo... tirar excepción para usar datos predeterminados
             throw new IOException("No se pudieron obtener los datos del host");
         }
         return datalayout + "\n" + triple;
     }
 
-    /* Para tratar los casos de invocaciones a write */
+    /** Generar invocación a write() o writeln(). */
     private void imprimirWrite(InvocacionFuncion i) throws ExcepcionVisitor {
         Expresion arg = i.getArgs().get(0);
         arg.accept(this);
@@ -148,8 +154,8 @@ public class GeneradorDeCodigo extends Visitor {
         }
     }
 
-    // Generar implementación de read_integer o read_float
-    private void imprimirDefLeer(Tipo tipo) throws ExcepcionVisitor {
+    /** Generar implementación de read_integer() o read_float(), dependiendo del tipo. */
+    private void imprimirDefLeer(Tipo tipo) {
         // No hace falta generarles un id a los registros y etiquetas;
         // son únicas dentro de la función IR
         final String ptroValor = "%ptro.valor_leido";
@@ -170,8 +176,8 @@ public class GeneradorDeCodigo extends Visitor {
         grar.cierreBloque();
     }
 
-    /* En read_boolean(), leemos caracteres. Si el primero es 't' o 'T' asumimos que es true.
-     * Era más fácil con 0 y 1... */
+    /** Generar implementación de read_boolean().
+     * Leemos caracteres. Si el primero es 't' o 'T' asumimos que es true. */
     private void imprimirDefLeerBoolean() {
         final String tipoRet = "i1";
         final String tipoLeido = "i8";
@@ -226,7 +232,8 @@ public class GeneradorDeCodigo extends Visitor {
         grar.cierreBloque();
     }
 
-    /* Devuelve una lista de parámetros de acuerdo a lo requerido por IR.
+    /**
+     * Devuelve una lista de parámetros de acuerdo a lo requerido por IR.
      * Utilizado para la declaración de funciones.
      */
     private String grarStrParams(List<Param> arrParams) {
@@ -248,7 +255,8 @@ public class GeneradorDeCodigo extends Visitor {
         return strParams.toString();
     }
 
-    /* Similar a grarStrParams, pero esta lista es utilizada por las invocaciones, o sea el
+    /**
+     * Similar a grarStrParams, pero esta lista es utilizada por las invocaciones, o sea el
      * argumento puede ser una variable, un literal o una expresión más compleja, mientras
      * que en la declaración de la función eso va a ser siempre un objeto de tipo Param.
      */
@@ -274,7 +282,7 @@ public class GeneradorDeCodigo extends Visitor {
         return strArgs.toString();
     }
 
-    /*** Funciones auxiliares para generar el cortocircuito booleano ***/
+    // *** Funciones auxiliares para generar el cortocircuito booleano ***
 
     private void imprimirCortocircuito(OperacionBinariaLogica ob) throws ExcepcionVisitor {
         Pair<String, String> etiquetas = etiquetasOpBinLog.peek();
@@ -308,18 +316,18 @@ public class GeneradorDeCodigo extends Visitor {
                 grar.salto(refIR, etiVerdadero, etiTmp);
             }
         } else {
-            throw new ExcepcionVisitor("Tipo de operación binaria lógica inesperado.");
+            throw new ExcepcionVisitor(ob, "Tipo de operación binaria lógica inesperado.");
         }
 
         grar.etiqueta(etiTmp);
 
         Expresion expDerecha = ob.getDerecha();
         expDerecha.accept(this);
-        // asignar el nombre de la variable de la expresión derecha al resultado de la operación
+        // Asignar el nombre de la variable de la expresión derecha al resultado de la operación
         ob.setRefIR(expDerecha.getRefIR());
     }
 
-    /* Generar y apilar etiquetas para asignaciones de expresiones binarias lógicas. */
+    /** Generar y apilar etiquetas para asignaciones de expresiones binarias lógicas. */
     private void grarEtiCortocircuitoAsig(String etiqueta) {
         String etiVerdadero = Normalizador.crearNomEtiqueta(etiqueta + "_verdadero");
         String etiFalso = Normalizador.crearNomEtiqueta(etiqueta + "_falso");
@@ -349,14 +357,15 @@ public class GeneradorDeCodigo extends Visitor {
         grar.etiqueta(etiFin);
     }
 
-    /* Invoca a las funciones que asignan a las variables
-     * globales el valor con el que fueron declaradas */
+    /**
+     * Invocar a las funciones que asignan a las variables
+     * globales el valor con el que fueron declaradas.
+     */
     private void inicializarVarsGbls() {
         varGblInit.forEach(fun -> grar.invocacion(fun, ""));
     }
 
-    /* Inicializa las cadenas que van a usarse en el programa
-     */
+    /** Inicializar las cadenas que van a usarse en el programa. */
     private void declararVarsStrs() {
         // Por ej.: @ptro.str.2 = private constant [5 x i8] c"Hola\00"
         arrCadenas.forEach(cad ->
@@ -364,8 +373,7 @@ public class GeneradorDeCodigo extends Visitor {
     }
 
 
-    /*** Función principal ***/
-
+    /** Función principal. */
     public String generarCodigo(Programa p, String nombreArchivoFuente) throws ExcepcionVisitor {
         this.nombreArchivoFuente = nombreArchivoFuente;
         this.tablaFunciones = p.getTablaFunciones();
@@ -376,9 +384,9 @@ public class GeneradorDeCodigo extends Visitor {
         return grar.getCodigo();
     }
 
-    /**** Visitors ***/
+    // *** Visitors ***
 
-    /* Base */
+    // Base
     @Override
     public void visit(Programa p) throws ExcepcionVisitor {
         StringBuilder sb = new StringBuilder();
@@ -400,13 +408,11 @@ public class GeneradorDeCodigo extends Visitor {
         }
 
         // Generar encabezado
-
         sb.append(String.format("; Programa: %s\n", p.getNombre()))
                 .append(String.format("source_filename = \"%s\"\n", nombreArchivoFuente))
                 .append(target);
 
         // Definir globalmente sólo lo necesario
-
         Set<String> funPredefUsadas = p.getFunPredefUsadas();
         final boolean usaWriteln = funPredefUsadas.contains("writeln");
         final boolean usaWrite = funPredefUsadas.contains("write") || usaWriteln;
@@ -465,9 +471,7 @@ public class GeneradorDeCodigo extends Visitor {
         }
     }
 
-
-    /* Sentencia de asignación */
-
+    // *** Sentencia de asignación ***
     @Override
     public void visit(Asignacion asig) throws ExcepcionVisitor {
         Expresion expr = asig.getExpresion();
@@ -496,12 +500,11 @@ public class GeneradorDeCodigo extends Visitor {
     }
 
 
-    /* Sentencias de declaración */
+    // *** Sentencias de declaración ***
 
+    // Genera la declaración de una variable que no fue inicializada
     @Override
     public void visit(DecVar dv) {
-        // Genera la declaración de una variable que no fue inicializada
-
         SimboloVariable sv = (SimboloVariable) dv.getIdent();
 
         // Parámetros que necesito para declarar la variable
@@ -520,10 +523,9 @@ public class GeneradorDeCodigo extends Visitor {
         }
     }
 
+    // Genera la declaración de una variable que fue inicializada
     @Override
     public void visit(DecVarIni dvi) throws ExcepcionVisitor {
-        // Genera la declaración de una variable que sí fue inicializada
-
         Expresion expr = dvi.getExpresion();
         SimboloVariable sv = (SimboloVariable) dvi.getIdent();
 
@@ -610,11 +612,9 @@ public class GeneradorDeCodigo extends Visitor {
         // Generar cuerpo de la función
         df.getBloque().accept(this);
 
-        /* Tengo un único retorno para toda la función. Si no se pisó el valor de retorno
-         * en algun visit(Retorno), se devuelve el valor por defecto que fue asignado al
-         * inicio de la declaración para evitar comportamientos indefinidos.
-         */
-
+        // Tengo un único retorno para toda la función. Si no se pisó el valor de retorno
+        // en algun visit(Retorno), se devuelve el valor por defecto que fue asignado al
+        // inicio de la declaración para evitar comportamientos indefinidos.
         grar.salto(etiquetaFin);
         grar.etiqueta(etiquetaFin);
 
@@ -626,14 +626,13 @@ public class GeneradorDeCodigo extends Visitor {
 
     @Override
     public void visit(Param p) {
-        /* Para poder utilizar el parámetro creo una variable auxiliar,
-         * para la cual genero un nombreIR y un refIR, que pisan al que
-         * viene en el objeto SimboloVariable del parámetro. Después
-         * guardo el valor que viene en el parámetro en esta "nueva" var.
+        /*
+         * Para poder utilizar el parámetro creo una variable auxiliar, para la cual genero un
+         * nombreIR y un refIR, que pisan al que viene en el objeto SimboloVariable del parámetro.
+         * Después guardo el valor que viene en el parámetro en esta "nueva" var.
          * Esto supone que el pasaje es por valor y no por referencia.
          * Si el parámetro fue inicializado por defecto o no es indistinto.
          */
-
         SimboloVariable sv = (SimboloVariable) p.getIdent();
 
         // Guardo el nombre original del parámetro para poder extraer el valor, después lo piso
@@ -658,7 +657,7 @@ public class GeneradorDeCodigo extends Visitor {
     }
 
 
-    /* Sentencias de selección */
+    // *** Sentencias de selección ***
 
     @Override
     public void visit(SiEntonces se) throws ExcepcionVisitor {
@@ -714,7 +713,7 @@ public class GeneradorDeCodigo extends Visitor {
     }
 
 
-    /* Sentencias de iteración */
+    // *** Sentencias de iteración ***
 
     @Override
     public void visit(Mientras m) throws ExcepcionVisitor {
@@ -759,7 +758,7 @@ public class GeneradorDeCodigo extends Visitor {
     }
 
 
-    /* Sentencias de control */
+    // *** Sentencias de control ***
 
     @Override
     public void visit(Retorno r) throws ExcepcionVisitor {
@@ -806,7 +805,7 @@ public class GeneradorDeCodigo extends Visitor {
     }
 
 
-    /* Operaciones */
+    // *** Operaciones ***
 
     @Override
     public void visit(OperacionBinaria ob) throws ExcepcionVisitor {
@@ -839,7 +838,7 @@ public class GeneradorDeCodigo extends Visitor {
             // Por ej.: %aux.ob.15 = icmp sgt i32 %aux.sv.13, %aux.sv.14 ; %aux.sv.13 > %aux.sv.14
             grar.cmp(instCmpIR, refIR, tipoIR, refIzqIR, refDerIR);
         } else {
-            throw new ExcepcionVisitor("Tipo de operación binaria inesperado.");
+            throw new ExcepcionVisitor(ob, "Tipo de operación binaria inesperado.");
         }
     }
 
@@ -860,7 +859,7 @@ public class GeneradorDeCodigo extends Visitor {
             case FLOAT:
                 grar.asig(refIR, "fneg", tipo.getIR(), expr.getRefIR());
                 break;
-            default: throw new ExcepcionVisitor("Tipo de operación unaria inesperado: " + tipo);
+            default: throw new ExcepcionVisitor(neg, "Tipo inesperado: " + tipo);
         }
 
         // Ponerle esta referencia a la expresión
@@ -899,15 +898,13 @@ public class GeneradorDeCodigo extends Visitor {
     }
 
 
-    /* Valores */
+    // *** Valores ***
 
     @Override
     public void visit(Literal lit) {
-        /* Este visitor genera una variable auxiliar para utilizar los valores literales.
-         * Como alternativa a generar la variable podríamos utilizar directamente el valor,
-         * pero de esta manera queda más uniforme con la forma en la que hacemos lo otro.
-         */
-
+        // Este visitor genera una variable auxiliar para utilizar los valores literales.
+        // Como alternativa a generar la variable podríamos utilizar directamente el valor,
+        // pero de esta manera queda más uniforme con la forma en la que hacemos lo otro.
         String refIR = Normalizador.crearNomRef("lit");
         lit.setRefIR(refIR);
 
@@ -921,8 +918,9 @@ public class GeneradorDeCodigo extends Visitor {
     public void visit(Identificador ident) {
         // Genera el store sobre un refIR para poder acceder a una variable
 
-        // En esta etapa este Identificador va a ser siempre un SimboloVariable. Tengo que utilizarlo así porque
-        // si creo visit(SimboloVariable) da muchos problemas (por ej. se rompe el graficado del AST)
+        // En esta etapa este Identificador va a ser siempre un SimboloVariable.
+        // Tengo que utilizarlo así porque si creo visit(SimboloVariable) da muchos problemas
+        // (por ej. se rompe el graficado del AST)
         SimboloVariable sv = (SimboloVariable) ident;
 
         String nombreIR = sv.getNombreIR();

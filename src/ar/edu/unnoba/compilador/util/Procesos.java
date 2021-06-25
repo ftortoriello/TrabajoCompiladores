@@ -3,12 +3,13 @@ package ar.edu.unnoba.compilador.util;
 import java.io.IOException;
 
 public class Procesos {
-
-    /* Ejecutar un comando, gestionar su entrada/salida, esperar que finalice y cuando lo haga
-     * retornar su código de salida. */
+    /**
+     * Ejecutar un comando, gestionar su entrada/salida, esperar que finalice, y cuando lo haga
+     * retornar su código de salida.
+     */
     public static int ejecutar(String... cmd) {
         if (cmd.length <= 0) {
-            System.out.println("ejecutar(): No se pasó un comando.");
+            System.err.println("ejecutar(): No se pasó un comando.");
             return -1;
         }
 
@@ -24,7 +25,7 @@ public class Procesos {
         try {
             proc = pb.start();
         } catch (IOException e) {
-            System.out.println("No se pudo ejecutar el comando: " + cmd[0]);
+            System.err.println("No se pudo ejecutar el comando: " + cmd[0]);
             return -1;
         }
 
@@ -32,9 +33,8 @@ public class Procesos {
         try {
             proc.waitFor();
         } catch (InterruptedException e) {
-            System.out.println("Se interrumpió la ejecución del programa.");
+            System.err.println("Se interrumpió la ejecución del programa.");
         }
         return proc.exitValue();
     }
-
 }

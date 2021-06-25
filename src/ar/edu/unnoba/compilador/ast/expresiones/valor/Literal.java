@@ -1,6 +1,6 @@
 package ar.edu.unnoba.compilador.ast.expresiones.valor;
 
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.visitor.Visitor;
@@ -98,7 +98,7 @@ public class Literal extends Valor {
     }
 
     @Override
-    public void accept(Visitor v) throws ExcepcionVisitor {
+    public void accept(Visitor v) {
         v.visit(this);
     }
 

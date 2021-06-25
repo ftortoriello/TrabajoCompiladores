@@ -1,7 +1,7 @@
 package ar.edu.unnoba.compilador.ast.expresiones.valor;
 
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionTransformer;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.visitor.Visitor;
@@ -53,11 +53,10 @@ public class InvocacionFuncion extends Valor {
             return String.format("%s(%s)\\n<%s>", nombre, args, getTipo());
         }
 
-        /* Es una invocación a write o writeln.
-         * Fijarse si su argumento es una cadena literal (podría ser una expresión).
-         * En ese caso, acomodar las cadenas para que el gráfico las muestre idénticas al código de
-         * entrada y no quede el DOT con errores de sintaxis.
-         */
+        // Es una invocación a write o writeln.
+        // Fijarse si su argumento es una cadena literal (podría ser una expresión).
+        // En ese caso, acomodar las cadenas para que el gráfico las muestre idénticas al código de
+        // entrada y no quede el DOT con errores de sintaxis.
         if (args.startsWith("\\\"")) {
             args = "\\\"" + args
                     // Sacar comillas externas escapadas
@@ -71,7 +70,7 @@ public class InvocacionFuncion extends Valor {
                     + "\\\"";
         }
 
-        // write y writeln no son funciones que devuelven un valor; no poner el tipo
+        // No poner el tipo a las funciones write() y writeln(), porque no que devuelven un valor
         return String.format("%s(%s)", nombre, args);
     }
 

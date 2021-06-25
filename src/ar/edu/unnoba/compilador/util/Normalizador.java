@@ -4,11 +4,11 @@ import java.text.Normalizer;
 import java.util.HashMap;
 import java.util.Map;
 
-/* Clase utilizada por los generadores de alcances para generar
- * nombres normalizados y únicos para variables y funciones de IR.
+/**
+ * Clase utilizada por los generadores de alcances para crear nombres normalizados y únicos para
+ * variables y funciones de IR.
  */
 public class Normalizador {
-
     private static final Map<String, Long> etiquetas = new HashMap<>();
     private static final Map<String, Long> funciones = new HashMap<>();
     private static final Map<String, Long> varGbls = new HashMap<>();
@@ -49,40 +49,47 @@ public class Normalizador {
         return getIdMapa(varRefs, nombre);
     }
 
-    // Devuelve una cadena normalizada
+    /** Devuelve una cadena normalizada. */
     public static String normalizar(String cadena) {
         return Normalizer.normalize(cadena, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
     }
 
-    /* Funciones para generar nombres nuevos normalizados únicos */
+    // *** Funciones para generar nombres nuevos normalizados únicos para LLVM IR ***
 
-    // Etiqueta de LLVM IR
+    /** Generar una etiqueta. */
     public static String crearNomEtiqueta(String nombreOrig) {
         return String.format("%s.%s", nombreOrig, getIdEtiqueta(nombreOrig));
     }
 
-    // Función
+    /** Generar un nombre de función. */
     public static String crearNomFun(String nombreOrig) {
         String nombreNormalizado = normalizar(nombreOrig);
         return String.format("@%s.%s", nombreNormalizado, getIdFuncion(nombreNormalizado));
     }
 
-    // Variable global tipo puntero de IR (gralmente. usado para el atrib. nombreIR)
+    /**
+     * Generar un nombre de variable global tipo puntero de IR.
+     * Usado para el atributo nombreIR.
+     */
     public static String crearNomPtroGbl(String nombreOrig) {
         String nombreNormalizado = normalizar(nombreOrig);
         return String.format("@ptro.%s.%s", nombreNormalizado, getIdVarGbl(nombreNormalizado));
     }
 
-    // Variable local tipo puntero de IR (gralmente. usado para el atrib. nombreIR)
+    /**
+     * Generar un nombre de variable local tipo puntero de IR.
+     * Usado generalmente para el atributo nombreIR.
+     */
     public static String crearNomPtroLcl(String nombreOrig) {
         String nombreNormalizado = normalizar(nombreOrig);
         return String.format("%%ptro.%s.%s", nombreNormalizado, getIdVarLcl(nombreNormalizado));
     }
 
-    // Variable que contenga el valor referenciado por un puntero
-    // (gralmente. usado para el atrib refIR)
+    /**
+     * Generar un nombre de variable que contenga el valor referenciado por un puntero.
+     * Usado generalmente para el atributo refIR.
+     */
     public static String crearNomRef(String nombreOrig) {
         return String.format("%%ref.%s.%s", nombreOrig, getIdVarRef(nombreOrig));
     }
-
 }

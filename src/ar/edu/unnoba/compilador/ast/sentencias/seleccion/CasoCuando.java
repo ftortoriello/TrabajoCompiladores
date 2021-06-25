@@ -1,8 +1,8 @@
 package ar.edu.unnoba.compilador.ast.sentencias.seleccion;
 
 import ar.edu.unnoba.compilador.ast.base.Bloque;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionTransformer;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.OperadorCmp;
 import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;

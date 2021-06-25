@@ -20,7 +20,10 @@ public enum OperadorCmp {
         }
     }
 
-    // Recibe el lexema OP_COMPARACION (en forma de cadena) y devuelve el enum OperadorCmp correspondiente
+    /**
+     * Recibe el lexema OP_COMPARACION (en forma de cadena) y devuelve el enum OperadorCmp
+     * correspondiente.
+     */
     public static OperadorCmp getTipoOpCmp(String opStr) {
         switch (opStr) {
             case "==": return OperadorCmp.IGUALDAD;

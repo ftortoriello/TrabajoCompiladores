@@ -3,7 +3,7 @@ package ar.edu.unnoba.compilador.visitor;
 import ar.edu.unnoba.compilador.ast.base.Bloque;
 import ar.edu.unnoba.compilador.ast.base.Encabezado;
 import ar.edu.unnoba.compilador.ast.base.Programa;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.OperacionBinariaLogica;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
@@ -37,13 +37,13 @@ public class ASTGraphviz extends Visitor {
         this.etiqueta = etiqueta;
     }
 
-    /*** Función principal ***/
+    /** Función principal. */
     public String generarCodigo(Programa p) throws ExcepcionVisitor {
         super.procesar(p);
         return codigo.toString();
     }
 
-    // Genera un ID nuevo, agrega al código dot un nodo, y lo conecta a su padre si lo tiene.
+    /** Generar un ID nuevo, agregar al código dot un nodo, y conectarlo a su padre si lo tiene. */
     private void armarStrNodo(String etiqueta, Integer tamanhoFuente, Integer color) {
         idNodoActual = getID();
         Integer idNodoPadre = padres.peek();  // el que está en el tope ahora
@@ -93,7 +93,7 @@ public class ASTGraphviz extends Visitor {
     }
 
 
-    /* Base */
+    // *** Base ***
 
     @Override
     public void visit(Programa p) throws ExcepcionVisitor {
@@ -141,7 +141,7 @@ public class ASTGraphviz extends Visitor {
     }
 
 
-    /* Sentencia de asignación */
+    // *** Sentencia de asignación ***
 
     @Override
     public void visit(Asignacion a) throws ExcepcionVisitor {
@@ -152,7 +152,7 @@ public class ASTGraphviz extends Visitor {
     }
 
 
-    /* Sentencias de declaración */
+    // *** Sentencias de declaración ***
 
     @Override
     public void visit(DecVar dv) throws ExcepcionVisitor {
@@ -195,7 +195,7 @@ public class ASTGraphviz extends Visitor {
     }
 
 
-    /* Sentencias de selección */
+    // *** Sentencias de selección ***
 
     @Override
     public void visit(SiEntonces se) throws ExcepcionVisitor {
@@ -230,7 +230,7 @@ public class ASTGraphviz extends Visitor {
     }
 
 
-    /* Sentencias de iteración */
+    // *** Sentencias de iteración ***
 
     @Override
     public void visit(Mientras m) throws ExcepcionVisitor {
@@ -249,7 +249,7 @@ public class ASTGraphviz extends Visitor {
     }
 
 
-    /* Sentencias de control */
+    // *** Sentencias de control ***
 
     @Override
     public void visit(Retorno r) throws ExcepcionVisitor {
@@ -270,7 +270,7 @@ public class ASTGraphviz extends Visitor {
     }
 
 
-    /* Operaciones */
+    // *** Operaciones ***
 
     @Override
     public void visit(OperacionBinaria ob) throws ExcepcionVisitor {
@@ -312,7 +312,7 @@ public class ASTGraphviz extends Visitor {
     }
 
 
-    /* Valores */
+    // *** Valores ***
 
     @Override
     public void visit(Literal l) {

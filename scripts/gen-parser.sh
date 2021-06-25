@@ -1,4 +1,3 @@
 #!/bin/sh
-"$(dirname "$0")"/run.sh GenerarLexerYParser && \
-"$(dirname "$0")"/run.sh sintaxis/PruebaParser
+"$(dirname "$0")"/run.sh GenerarLexerYParser
 exit $?

@@ -1,14 +1,13 @@
 package ar.edu.unnoba.compilador.ast.sentencias.declaracion;
 
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionTransformer;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 
+/** Parámetro de una función sin valor por defecto. */
 public class Param extends Declaracion {
-    // Clase para los parámetros de las funciones que no tengan valor por defecto.
-
     public Param(String nombre, Identificador ident) {
         super(nombre, ident);
     }

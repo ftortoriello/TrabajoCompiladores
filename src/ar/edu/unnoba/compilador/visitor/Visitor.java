@@ -4,7 +4,7 @@ import ar.edu.unnoba.compilador.ast.base.Bloque;
 import ar.edu.unnoba.compilador.ast.base.Encabezado;
 import ar.edu.unnoba.compilador.ast.base.Nodo;
 import ar.edu.unnoba.compilador.ast.base.Programa;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.aritmeticas.NegacionAritmetica;
@@ -29,9 +29,7 @@ import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
 public abstract class Visitor {
     private int id = 0;
 
-    /* Flags para comprobar si el Visitor se encuentra en una función o
-     * estructura de control
-     */
+    /** Flags para comprobar si el Visitor se encuentra en una función o estructura de control */
     private boolean enFuncion;
     private boolean enBucle;
 
@@ -58,13 +56,13 @@ public abstract class Visitor {
     }
 
 
-    /*** Inicio del Visitor ***/
+    /** Inicio del Visitor */
     public void procesar(Programa p) throws ExcepcionVisitor {
         p.accept(this);
     }
 
 
-    /* Base */
+    // *** Base ***
 
     public void visit(Programa p) throws ExcepcionVisitor {
         p.getEncabezado().accept(this);
@@ -84,7 +82,7 @@ public abstract class Visitor {
     }
 
 
-    /* Sentencia de asignación */
+    // *** Sentencia de asignación ***
 
     public void visit(Asignacion a) throws ExcepcionVisitor {
         a.getIdent().accept(this);
@@ -92,7 +90,7 @@ public abstract class Visitor {
     }
 
 
-    /* Sentencias de declaración */
+    // *** Sentencias de declaración ***
 
     public void visit(DecVar dv) throws ExcepcionVisitor {
         dv.getIdent().accept(this);
@@ -122,7 +120,7 @@ public abstract class Visitor {
     }
 
 
-    /* Sentencias de selección */
+    // *** Sentencias de selección ***
 
     public void visit(SiEntonces se) throws ExcepcionVisitor {
         se.getCondicion().accept(this);
@@ -149,7 +147,7 @@ public abstract class Visitor {
     }
 
 
-    /* Sentencias de iteración */
+    // *** Sentencias de iteración ***
 
     public void visit(Mientras m) throws ExcepcionVisitor {
         setEnBucle(true);
@@ -166,7 +164,7 @@ public abstract class Visitor {
     }
 
 
-    /* Sentencias de control */
+    // *** Sentencias de control ***
 
     public void visit(Retorno r) throws ExcepcionVisitor {
         r.getExpresion().accept(this);
@@ -179,7 +177,7 @@ public abstract class Visitor {
     }
 
 
-    /* Operaciones */
+    // *** Operaciones ***
 
     public void visit(OperacionBinaria ob) throws ExcepcionVisitor {
         ob.getIzquierda().accept(this);
@@ -199,7 +197,7 @@ public abstract class Visitor {
     }
 
 
-    /* Valores */
+    // *** Valores ***
 
     public void visit(Literal l) {
     }
@@ -214,6 +212,5 @@ public abstract class Visitor {
     }
 
     public void visit(Cadena c) {
-
     }
 }

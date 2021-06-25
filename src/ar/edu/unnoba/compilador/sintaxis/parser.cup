@@ -1,120 +1,95 @@
 package ar.edu.unnoba.compilador.sintaxis;
 
-import java_cup.runtime.*;
-import java.util.ArrayList;
-import java.util.ArrayList;
-
+import ar.edu.unnoba.compilador.ast.base.Bloque;
+import ar.edu.unnoba.compilador.ast.base.Encabezado;
 import ar.edu.unnoba.compilador.ast.base.Nodo;
 import ar.edu.unnoba.compilador.ast.base.Programa;
-import ar.edu.unnoba.compilador.ast.base.Encabezado;
-import ar.edu.unnoba.compilador.ast.base.Bloque;
-
-import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
-
-import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.Declaracion;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFun;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarIni;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.Param;
-import ar.edu.unnoba.compilador.ast.sentencias.declaracion.ParamDef;
-
-import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
-import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
-import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntonces;
-import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
-
-import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
-import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
-
-import ar.edu.unnoba.compilador.ast.sentencias.control.Salir;
-import ar.edu.unnoba.compilador.ast.sentencias.control.Continuar;
-import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
-
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
-
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.Disyuncion;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.Conjuncion;
-import ar.edu.unnoba.compilador.ast.expresiones.unarias.logicas.NegacionLogica;
-
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Desigualdad;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Igualdad;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Mayor;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.MayorIgual;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Menor;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.MenorIgual;
-
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Suma;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Resta;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Multiplicacion;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Division;
-import ar.edu.unnoba.compilador.ast.expresiones.unarias.aritmeticas.NegacionAritmetica;
-
-import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.OperadorCmp;
+import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Division;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Multiplicacion;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Resta;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Suma;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.Conjuncion;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.Disyuncion;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
+import ar.edu.unnoba.compilador.ast.expresiones.unarias.aritmeticas.NegacionAritmetica;
+import ar.edu.unnoba.compilador.ast.expresiones.unarias.logicas.NegacionLogica;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Cadena;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
+import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
+import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
+import ar.edu.unnoba.compilador.ast.sentencias.control.Continuar;
+import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
+import ar.edu.unnoba.compilador.ast.sentencias.control.Salir;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
+import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
+import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
+import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
+import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
+import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntonces;
+import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
+import java_cup.runtime.ComplexSymbolFactory;
+import java_cup.runtime.ComplexSymbolFactory.Location;
+import java_cup.runtime.Symbol;
+
+import java.util.ArrayList;
+import java.util.List;
 
 class Parser;
 
 parser code
 {:
-    // Constante que indica si se muestra el proceso de creación de nodos.
-    private final boolean mostrarCreacionNodos = false;
-
+    @Override
     public void syntax_error(Symbol s) {
+        ComplexSymbolFactory.ComplexSymbol cs = (ComplexSymbolFactory.ComplexSymbol) s;
+        System.err.print(Util.getPosicion(cs.getLeft(), cs.getRight()));
+        System.err.printf(" - Error sintáctico en el símbolo %s\n", cs.getName());
     }
 
-    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception {
-        System.out.println("Error en la línea "+ (s.left+1) + " Columna " + s.right + ". Símbolo '"
-        + s.value + "'. Símbolo n° " + s.sym + " no reconocido." );
-    }
-
-    // Depurar creación de nodos
-    private void imprimirEtiqueta(Nodo nodo) {
-        if (mostrarCreacionNodos) {
-            System.out.println("Se creó el nodo " + nodo.getClass().getSimpleName());
-        }
+    @Override
+    public void unrecovered_syntax_error(Symbol s) {
     }
 :};
 
-terminal String PR_MAIN_IS, PR_END_PUNTO,
+terminal PR_MAIN_IS, PR_END_PUNTO,
     PR_VARIABLE, PR_IS, PR_FUNCTION, PR_RETURN,
     PR_BEGIN, PR_END,
     PR_IF, PR_THEN, PR_ELSE, PR_WHEN, PR_WHILE,
     PR_FOR, PR_FROM, PR_TO, PR_BY, PR_DO, PR_BREAK, PR_CONTINUE,
-    PR_WRITELN, PR_WRITE, PR_READ_INTEGER, PR_READ_FLOAT, PR_READ_BOOLEAN,
     OP_LOG_BIN_OR, OP_LOG_BIN_AND, OP_LOG_UNA_NOT,
-    OP_COMPARACION,
     OP_ARIT_SUMA, OP_ARIT_RESTA, OP_ARIT_PROD, OP_ARIT_DIV,
-    PAR_ABRE, PAR_CIERRA, COMA, PUNTO_Y_COMA, IGUAL,
-    IDENTIFICADOR, TIPO_DE_DATO,
-    LIT_BOOLEANO, LIT_FLOTANTE, LIT_ENTERO, CADENA;
+    PAR_ABRE, PAR_CIERRA, COMA, PUNTO_Y_COMA, IGUAL;
+
+terminal String IDENTIFICADOR, TIPO_DE_DATO,
+    LIT_BOOLEANO, LIT_FLOTANTE, LIT_ENTERO, CADENA,
+    OP_COMPARACION,
+    PR_WRITELN, PR_WRITE, PR_READ_INTEGER, PR_READ_FLOAT, PR_READ_BOOLEAN;
 
 nonterminal Programa programa;
 
-nonterminal ArrayList<Declaracion> encabezado;
+nonterminal List<Declaracion> encabezado;
 nonterminal DecVar dec_var;
 nonterminal DecFun dec_fun;
-nonterminal ArrayList<Param> lst_params, lst_params_def;
+nonterminal List<Param> lst_params, lst_params_def;
 nonterminal Param param, param_def;
 
 nonterminal Bloque cuerpo_programa, bloque;
-nonterminal ArrayList<Nodo> lst_sentencias;
+nonterminal List<Nodo> lst_sentencias;
 nonterminal Nodo sentencia;
 
 nonterminal Sentencia asignacion, si_entonces, cuando, para, mientras, control;
-nonterminal ArrayList<CasoCuando> bloque_cuando;
+nonterminal List<CasoCuando> bloque_cuando;
 
 nonterminal Expresion expresion, disyuncion, conjuncion, negacion_logica,
     relacion, adicion, termino, negacion_aritmetica,
     factor, literal, invocacion_funcion;
 
-nonterminal ArrayList<Expresion> lst_args;
+nonterminal List<Expresion> lst_args;
 
 precedence left PR_ELSE, PR_IS;
 
@@ -123,93 +98,92 @@ start with programa;
 programa ::=
         encabezado:decs cuerpo_programa:cpoProg {:
             Encabezado enc = new Encabezado(decs);
+            enc.setPosicion(decsxleft, decsxright);
             Programa prog = new Programa("Programa", enc, cpoProg);
-            imprimirEtiqueta(prog);
+            prog.setPosicion(decsxleft, cpoProgxright);
             RESULT = prog;
         :} |
         cuerpo_programa:cpoProg {:
-            Encabezado enc = new Encabezado(new ArrayList<Declaracion>());
+            Encabezado enc = new Encabezado(new ArrayList<>());
             Programa prog = new Programa("Programa", enc, cpoProg);
-            imprimirEtiqueta(prog);
+            prog.setPosicion(cpoProgxleft, cpoProgxright);
             RESULT = prog;
         :};
 
 cuerpo_programa ::=
-        PR_MAIN_IS lst_sentencias:sentencias PR_END_PUNTO {:
+        PR_MAIN_IS:main lst_sentencias:sentencias PR_END_PUNTO:end {:
             final boolean esBloquePrincipal = true;
             Bloque cuerpoPrograma = new Bloque("Bloque principal", sentencias, esBloquePrincipal);
-            imprimirEtiqueta(cuerpoPrograma);
+            cuerpoPrograma.setPosicion(mainxleft, endxright);
             RESULT = cuerpoPrograma;
         :} |
-        PR_MAIN_IS PR_END_PUNTO {:
+        PR_MAIN_IS:main PR_END_PUNTO:end {:
             final boolean esBloquePrincipal = true;
             Bloque cuerpoPrograma = new Bloque("Bloque principal (vacío)", esBloquePrincipal);
-            imprimirEtiqueta(cuerpoPrograma);
+            cuerpoPrograma.setPosicion(mainxleft, endxright);
             RESULT = cuerpoPrograma;
         :};
 
 encabezado ::=
         encabezado:decs dec_var:decVar PUNTO_Y_COMA {:
             decs.add(decVar);
-            imprimirEtiqueta(decVar);
             RESULT = decs;
         :} |
         encabezado:decs dec_fun:decFun {:
             decs.add(decFun);
-            imprimirEtiqueta(decFun);
             RESULT = decs;
         :} |
         dec_var:decVar PUNTO_Y_COMA {:
-            ArrayList<Declaracion> decs = new ArrayList<>();
+            List<Declaracion> decs = new ArrayList<>();
             decs.add(decVar);
-            imprimirEtiqueta(decVar);
             RESULT = decs;
         :} |
         dec_fun:decFun {:
-            ArrayList<Declaracion> decs = new ArrayList<>();
+            List<Declaracion> decs = new ArrayList<>();
             decs.add(decFun);
-            imprimirEtiqueta(decFun);
             RESULT = decs;
         :};
 
 dec_var ::=
-        PR_VARIABLE IDENTIFICADOR:id PR_IS TIPO_DE_DATO:td {:
+        PR_VARIABLE:var IDENTIFICADOR:id PR_IS TIPO_DE_DATO:td {:
             Identificador ident = new Identificador(id, Tipo.getTipoDato(td));
+            ident.setPosicion(idxleft, idxright);
             DecVar decVar = new DecVar("Variable sin inicializar", ident);
-            imprimirEtiqueta(decVar);
+            decVar.setPosicion(varxleft, tdxright);
             RESULT = decVar;
         :} |
-        PR_VARIABLE IDENTIFICADOR:id PR_IS TIPO_DE_DATO:td IGUAL expresion:expr {:
+        PR_VARIABLE:var IDENTIFICADOR:id PR_IS TIPO_DE_DATO:td IGUAL expresion:expr {:
             Identificador ident = new Identificador(id, Tipo.getTipoDato(td));
+            ident.setPosicion(idxleft, idxright);
             DecVarIni decVarIni = new DecVarIni("Variable inicializada", ident, expr);
-            imprimirEtiqueta(decVarIni);
+            decVarIni.setPosicion(varxleft, exprxright);
             RESULT = decVarIni;
         :};
 
 dec_fun ::=
-        PR_FUNCTION IDENTIFICADOR:id PAR_ABRE PAR_CIERRA PR_RETURN TIPO_DE_DATO:td bloque:bloque PUNTO_Y_COMA {:
+        PR_FUNCTION:fun IDENTIFICADOR:id PAR_ABRE PAR_CIERRA PR_RETURN TIPO_DE_DATO:td bloque:bloque PUNTO_Y_COMA:pyc {:
             Identificador ident = new Identificador(id, Tipo.getTipoDato(td));
+            ident.setPosicion(idxleft, idxright);
             DecFun decFun = new DecFun(ident, bloque);
-            imprimirEtiqueta(decFun);
+            decFun.setPosicion(funxleft, pycxright);
             RESULT = decFun;
         :} |
-        PR_FUNCTION IDENTIFICADOR:id PAR_ABRE lst_params:params PAR_CIERRA PR_RETURN TIPO_DE_DATO:td bloque:bloque PUNTO_Y_COMA {:
+        PR_FUNCTION:fun IDENTIFICADOR:id PAR_ABRE lst_params:params PAR_CIERRA PR_RETURN TIPO_DE_DATO:td bloque:bloque PUNTO_Y_COMA:pyc {:
             Identificador ident = new Identificador(id, Tipo.getTipoDato(td));
+            ident.setPosicion(idxleft, idxright);
             DecFun decFun = new DecFun(ident, params, bloque);
-            imprimirEtiqueta(decFun);
+            decFun.setPosicion(funxleft, pycxright);
             RESULT = decFun;
         :};
 
 lst_params ::=
         param:param {:
-            ArrayList<Param> params = new ArrayList<>();
+            List<Param> params = new ArrayList<>();
             params.add(param);
-            imprimirEtiqueta(param);
             RESULT = params;
         :} |
         param:param COMA lst_params:params {:
             params.add(param);
-            imprimirEtiqueta(param);
             RESULT = params;
         :} |
         lst_params_def:params {:
@@ -219,41 +193,43 @@ lst_params ::=
 lst_params_def ::=
         param_def:param COMA lst_params_def:params {:
             params.add(param);
-            imprimirEtiqueta(param);
             RESULT = params;
         :} |
         param_def:param {:
-            ArrayList<Param> params = new ArrayList<>();
+            List<Param> params = new ArrayList<>();
             params.add(param);
-            imprimirEtiqueta(param);
             RESULT = params;
         :};
 
 param ::= IDENTIFICADOR:id PR_IS TIPO_DE_DATO:td {:
             Identificador ident = new Identificador(id, Tipo.getTipoDato(td));
+            ident.setPosicion(idxleft, idxright);
             Param param = new Param("Parámetro sin valor por defecto", ident);
-            imprimirEtiqueta(param);
+            param.setPosicion(idxleft, tdxright);
             RESULT = param;
         :};
 
 param_def ::= IDENTIFICADOR:id PR_IS TIPO_DE_DATO:td IGUAL expresion:expr {:
             Identificador ident = new Identificador(id, Tipo.getTipoDato(td));
+            ident.setPosicion(idxleft, idxright);
             ParamDef paramDef = new ParamDef("Parámetro con valor por defecto", ident, expr);
-            imprimirEtiqueta(paramDef);
+            ident.setPosicion(idxleft, exprxright);
             RESULT = paramDef;
         :};
 
 bloque ::=
         sentencia:sent {:
-            ArrayList<Nodo> sentencias = new ArrayList<>();
+            List<Nodo> sentencias = new ArrayList<>();
             sentencias.add(sent);
             final boolean esBloquePrincipal = false;
             Bloque bloque = new Bloque("Bloque simple\n(una sentencia)", sentencias, esBloquePrincipal);
+            bloque.setPosicion(sentxleft, sentxright);
             RESULT = bloque;
         :} |
-        PR_BEGIN lst_sentencias:sentencias PR_END {:
+        PR_BEGIN:begin lst_sentencias:sentencias PR_END:end {:
             final boolean esBloquePrincipal = false;
             Bloque bloque = new Bloque("Bloque compuesto\n(múltiples sentencias)", sentencias, esBloquePrincipal);
+            bloque.setPosicion(beginxleft, endxright);
             RESULT = bloque;
         :};
 
@@ -263,7 +239,7 @@ lst_sentencias ::=
             RESULT = sentencias;
         :} |
         sentencia:sent PUNTO_Y_COMA {:
-            ArrayList<Nodo> sentencias = new ArrayList<>();
+            List<Nodo> sentencias = new ArrayList<>();
             sentencias.add(sent);
             RESULT = sentencias;
         :};
@@ -297,103 +273,106 @@ sentencia ::=
 asignacion ::=
         IDENTIFICADOR:id IGUAL expresion:expr {:
             Identificador ident = new Identificador(id);
+            ident.setPosicion(idxleft, idxright);
             Asignacion asig = new Asignacion(ident, expr);
-            imprimirEtiqueta(asig);
+            ident.setPosicion(idxleft, exprxright);
             RESULT = asig;
        :};
 
 si_entonces ::=
-        PR_IF expresion:cond PR_THEN bloque:bloque {:
+        PR_IF:i expresion:cond PR_THEN bloque:bloque {:
             SiEntonces se = new SiEntonces(cond, bloque);
-            imprimirEtiqueta(se);
+            se.setPosicion(ixleft, bloquexright);
             RESULT = se;
         :} |
-        PR_IF expresion:cond PR_THEN bloque:bloqueSi PR_ELSE bloque:bloqueSino {:
-            SiEntoncesSino se = new SiEntoncesSino(cond, bloqueSi, bloqueSino);
-            imprimirEtiqueta(se);
-            RESULT = se;
+        PR_IF:i expresion:cond PR_THEN bloque:bloqueSi PR_ELSE bloque:bloqueSino {:
+            SiEntoncesSino ses = new SiEntoncesSino(cond, bloqueSi, bloqueSino);
+            ses.setPosicion(ixleft, bloqueSinoxright);
+            RESULT = ses;
         :};
 
 cuando ::=
-        PR_WHEN expresion:cond bloque_cuando:bloqueCuando {:
+        PR_WHEN:w expresion:cond bloque_cuando:bloqueCuando {:
             Cuando cuando = new Cuando(cond, bloqueCuando);
-            imprimirEtiqueta(cuando);
+            cuando.setPosicion(wxleft, bloqueCuandoxright);
             RESULT = cuando;
         :} |
-        PR_WHEN expresion:cond bloque_cuando:bloqueCuando PR_ELSE bloque:bloqueSino {:
+        PR_WHEN:w expresion:cond bloque_cuando:bloqueCuando PR_ELSE bloque:bloqueSino {:
             Cuando cuando = new Cuando(cond, bloqueCuando, bloqueSino);
-            imprimirEtiqueta(cuando);
+            cuando.setPosicion(wxleft, bloqueSinoxright);
             RESULT = cuando;
         :};
 
 bloque_cuando ::=
-        PR_IS OP_COMPARACION:op expresion:cond PR_THEN bloque:bloque {:
-            ArrayList<CasoCuando> bloqueCuando = new ArrayList<>();
+        PR_IS:is OP_COMPARACION:op expresion:cond PR_THEN bloque:bloque {:
+            List<CasoCuando> bloqueCuando = new ArrayList<>();
             CasoCuando caso = new CasoCuando(OperadorCmp.getTipoOpCmp(op), cond, bloque);
-            imprimirEtiqueta(caso);
+            caso.setPosicion(isxleft, bloquexright);
             bloqueCuando.add(caso);
             RESULT = bloqueCuando;
         :} |
-        PR_IS OP_COMPARACION:op expresion:cond PR_THEN bloque:bloque bloque_cuando:bloqueCuando {:
+        PR_IS:is OP_COMPARACION:op expresion:cond PR_THEN bloque:bloque bloque_cuando:bloqueCuando {:
             CasoCuando caso = new CasoCuando(OperadorCmp.getTipoOpCmp(op), cond, bloque);
-            imprimirEtiqueta(caso);
+            caso.setPosicion(isxleft, bloquexright);
             bloqueCuando.add(caso);
             RESULT = bloqueCuando;
         :};
 
 para ::=
-        PR_FOR IDENTIFICADOR:id PR_FROM LIT_ENTERO:numIni PR_TO LIT_ENTERO:numFin PR_DO bloque:bloque {:
-            int saltoPorDefecto = 1;
+        PR_FOR:f IDENTIFICADOR:id PR_FROM LIT_ENTERO:numIni PR_TO LIT_ENTERO:numFin PR_DO bloque:bloque {:
+            final int saltoPorDefecto = 1;
             Identificador ident = new Identificador(id);
+            ident.setPosicion(idxleft, idxright);
             Para para = new Para(ident, Integer.parseInt(numIni),
                                 Integer.parseInt(numFin), saltoPorDefecto, bloque);
-            imprimirEtiqueta(para);
+            para.setPosicion(fxleft, bloquexright);
             RESULT = para;
         :} |
-        PR_FOR IDENTIFICADOR:id PR_FROM LIT_ENTERO:numIni PR_TO LIT_ENTERO:numFin PR_BY LIT_ENTERO:salto PR_DO bloque:bloque {:
+        PR_FOR:f IDENTIFICADOR:id PR_FROM LIT_ENTERO:numIni PR_TO LIT_ENTERO:numFin PR_BY LIT_ENTERO:salto PR_DO bloque:bloque {:
             Identificador ident = new Identificador(id);
+            ident.setPosicion(idxleft, idxright);
             Para para = new Para(ident, Integer.parseInt(numIni),
                                 Integer.parseInt(numFin), Integer.parseInt(salto), bloque);
-            imprimirEtiqueta(para);
+            para.setPosicion(fxleft, bloquexright);
             RESULT = para;
         :};
 
 mientras ::=
-        PR_WHILE expresion:cond PR_DO bloque:bloque {:
+        PR_WHILE:w expresion:cond PR_DO bloque:bloque {:
             Mientras mientras = new Mientras(cond, bloque);
-            imprimirEtiqueta(mientras);
+            mientras.setPosicion(wxleft, bloquexright);
             RESULT = mientras;
         :};
 
 control ::=
-        PR_RETURN expresion:expr {:
+        PR_RETURN:r expresion:expr {:
             Retorno ret = new Retorno(expr);
-            imprimirEtiqueta(ret);
+            ret.setPosicion(rxleft, exprxright);
             RESULT = ret;
         :} |
-        PR_BREAK {:
-            Salir brk = new Salir();
-            imprimirEtiqueta(brk);
-            RESULT = brk;
+        PR_BREAK:b {:
+            Salir salir = new Salir();
+            salir.setPosicion(bxleft, bxright);
+            RESULT = salir;
         :} |
-        PR_CONTINUE {:
+        PR_CONTINUE:c {:
             Continuar ctn = new Continuar();
-            imprimirEtiqueta(ctn);
+            ctn.setPosicion(cxleft, cxright);
             RESULT = ctn;
         :};
 
 // Pongo este "alias" porque queda raro llamar a la expresión disyunción en
 // las otras reglas, pero tampoco quiero renombrar a la disyunción expresión.
 expresion ::=
-        disyuncion:disy {:
-            RESULT = disy;
+        disyuncion:d {:
+            RESULT = d;
         :};
 
 disyuncion ::=
-        disyuncion:disy OP_LOG_BIN_OR conjuncion:con {:
-            Disyuncion dis = new Disyuncion(disy, con);
-            imprimirEtiqueta(dis);
-            RESULT = dis;
+        disyuncion:d OP_LOG_BIN_OR conjuncion:con {:
+            Disyuncion disy = new Disyuncion(d, con);
+            disy.setPosicion(dxleft, conxright);
+            RESULT = disy;
         :} |
         conjuncion:con {:
             RESULT = con;
@@ -402,7 +381,7 @@ disyuncion ::=
 conjuncion ::=
        conjuncion:con OP_LOG_BIN_AND negacion_logica:neg {:
             Conjuncion conjun = new Conjuncion(con, neg);
-            imprimirEtiqueta(conjun);
+            conjun.setPosicion(conxleft, negxright);
             RESULT = conjun;
        :} |
        negacion_logica:neg {:
@@ -410,9 +389,9 @@ conjuncion ::=
        :};
 
 negacion_logica ::=
-        OP_LOG_UNA_NOT negacion_logica:neg {:
+        OP_LOG_UNA_NOT:n negacion_logica:neg {:
             NegacionLogica negLog = new NegacionLogica(neg);
-            imprimirEtiqueta(negLog);
+            negLog.setPosicion(nxleft, negxright);
             RESULT = negLog;
         :} |
         relacion:relacion {:
@@ -422,7 +401,7 @@ negacion_logica ::=
 relacion ::=
         adicion:adicionIzq OP_COMPARACION:op adicion:adicionDer {:
             OperacionBinaria rel = Relacion.getClaseRel(OperadorCmp.getTipoOpCmp(op), adicionIzq, adicionDer);
-            imprimirEtiqueta(rel);
+            rel.setPosicion(adicionIzqxleft, adicionDerxright);
             RESULT = rel;
         :} |
         adicion:adicion {:
@@ -432,12 +411,12 @@ relacion ::=
 adicion ::=
         adicion:adicion OP_ARIT_SUMA termino:termino {:
             Suma suma = new Suma(adicion, termino);
-            imprimirEtiqueta(suma);
+            suma.setPosicion(adicionxleft, terminoxright);
             RESULT = suma;
         :} |
         adicion:adicion OP_ARIT_RESTA termino:termino {:
             Resta resta = new Resta(adicion, termino);
-            imprimirEtiqueta(resta);
+            resta.setPosicion(adicionxleft, terminoxright);
             RESULT = resta;
         :} |
         termino:termino {:
@@ -447,12 +426,12 @@ adicion ::=
 termino ::=
         termino:termino OP_ARIT_PROD negacion_aritmetica:neg {:
             Multiplicacion multi = new Multiplicacion(termino, neg);
-            imprimirEtiqueta(multi);
+            multi.setPosicion(terminoxleft, negxright);
             RESULT = multi;
         :} |
         termino:termino OP_ARIT_DIV negacion_aritmetica:neg {:
             Division divi = new Division(termino, neg);
-            imprimirEtiqueta(divi);
+            divi.setPosicion(terminoxleft, negxright);
             RESULT = divi;
         :} |
         negacion_aritmetica:negacion_aritmetica {:
@@ -460,9 +439,9 @@ termino ::=
         :};
 
 negacion_aritmetica ::=
-        OP_ARIT_RESTA negacion_aritmetica:neg {:
+        OP_ARIT_RESTA:r negacion_aritmetica:neg {:
             NegacionAritmetica negArit = new NegacionAritmetica(neg);
-            imprimirEtiqueta(negArit);
+            negArit.setPosicion(rxleft, negxright);
             RESULT = negArit;
         :} |
         factor:factor {:
@@ -475,7 +454,7 @@ factor ::=
         :} |
         IDENTIFICADOR:id {:
             Identificador ident = new Identificador(id);
-            imprimirEtiqueta(ident);
+            ident.setPosicion(idxleft, idxright);
             RESULT = ident;
         :} |
         invocacion_funcion:invo {:
@@ -488,60 +467,68 @@ factor ::=
 literal ::=
         LIT_ENTERO:litInt {:
             Literal lit = new Literal(litInt, Tipo.INTEGER);
-            imprimirEtiqueta(lit);
+            lit.setPosicion(litIntxleft, litIntxright);
             RESULT = lit;
         :} |
         LIT_FLOTANTE:litFloat {:
             Literal lit = new Literal(litFloat, Tipo.FLOAT);
-            imprimirEtiqueta(lit);
+            lit.setPosicion(litFloatxleft, litFloatxright);
             RESULT = lit;
         :} |
         LIT_BOOLEANO:litBoolean {:
             Literal lit = new Literal(litBoolean, Tipo.BOOLEAN);
-            imprimirEtiqueta(lit);
+            lit.setPosicion(litBooleanxleft, litBooleanxright);
             RESULT = lit;
         :};
 
 invocacion_funcion ::=
-        PR_WRITELN:nombreFun PAR_ABRE expresion:expr PAR_CIERRA {:
-            ArrayList<Expresion> params = new ArrayList<>();
+        PR_WRITELN:idfun PAR_ABRE expresion:expr PAR_CIERRA:cierre {:
+            List<Expresion> params = new ArrayList<>();
             params.add(expr);
-            RESULT = new InvocacionFuncion(nombreFun, params, Tipo.UNKNOWN);
+            InvocacionFuncion invo = new InvocacionFuncion(idfun, params, Tipo.UNKNOWN);
+            invo.setPosicion(idfunxleft, cierrexright);
+            RESULT = invo;
         :} |
-        PR_WRITELN:nombreFun PAR_ABRE CADENA:c PAR_CIERRA {:
-            ArrayList<Expresion> params = new ArrayList<>();
+        PR_WRITELN:idfun PAR_ABRE CADENA:c PAR_CIERRA:cierre {:
+            List<Expresion> params = new ArrayList<>();
             params.add(new Cadena("\\\"" + c + "\\\""));
-            RESULT = new InvocacionFuncion(nombreFun, params, Tipo.UNKNOWN);
+            InvocacionFuncion invo = new InvocacionFuncion(idfun, params, Tipo.UNKNOWN);
+            invo.setPosicion(idfunxleft, cierrexright);
+            RESULT = invo;
         :} |
-        PR_WRITE:nombreFun PAR_ABRE expresion:expr PAR_CIERRA {:
-            ArrayList<Expresion> params = new ArrayList<>();
+        PR_WRITE:idfun PAR_ABRE expresion:expr PAR_CIERRA:cierre {:
+            List<Expresion> params = new ArrayList<>();
             params.add(expr);
-            RESULT = new InvocacionFuncion(nombreFun, params, Tipo.UNKNOWN);
+            InvocacionFuncion invo = new InvocacionFuncion(idfun, params, Tipo.UNKNOWN);
+            invo.setPosicion(idfunxleft, cierrexright);
+            RESULT = invo;
         :} |
-        PR_WRITE:nombreFun PAR_ABRE CADENA:c PAR_CIERRA {:
-            ArrayList<Expresion> params = new ArrayList<>();
+        PR_WRITE:idfun PAR_ABRE CADENA:c PAR_CIERRA:cierre {:
+            List<Expresion> params = new ArrayList<>();
             params.add(new Cadena("\\\"" + c + "\\\""));
-            RESULT = new InvocacionFuncion(nombreFun, params, Tipo.UNKNOWN);
-        :} |
-        PR_READ_INTEGER:nombreFun PAR_ABRE PAR_CIERRA {:
-            InvocacionFuncion invo = new InvocacionFuncion(nombreFun, Tipo.INTEGER);
-            imprimirEtiqueta(invo);
+            InvocacionFuncion invo = new InvocacionFuncion(idfun, params, Tipo.UNKNOWN);
+            invo.setPosicion(idfunxleft, cierrexright);
             RESULT = invo;
         :} |
-        PR_READ_FLOAT:nombreFun PAR_ABRE PAR_CIERRA {:
-            InvocacionFuncion invo = new InvocacionFuncion(nombreFun, Tipo.FLOAT);
-            imprimirEtiqueta(invo);
+        PR_READ_INTEGER:idfun PAR_ABRE PAR_CIERRA:cierre {:
+            InvocacionFuncion invo = new InvocacionFuncion(idfun, Tipo.INTEGER);
+            invo.setPosicion(idfunxleft, cierrexright);
             RESULT = invo;
         :} |
-        PR_READ_BOOLEAN:nombreFun PAR_ABRE PAR_CIERRA {:
-            InvocacionFuncion invo = new InvocacionFuncion(nombreFun, Tipo.BOOLEAN);
-            imprimirEtiqueta(invo);
+        PR_READ_FLOAT:idfun PAR_ABRE PAR_CIERRA:cierre {:
+            InvocacionFuncion invo = new InvocacionFuncion(idfun, Tipo.FLOAT);
+            invo.setPosicion(idfunxleft, cierrexright);
             RESULT = invo;
         :} |
-        IDENTIFICADOR:nombreFun PAR_ABRE lst_args:args PAR_CIERRA {:
+        PR_READ_BOOLEAN:idfun PAR_ABRE PAR_CIERRA:cierre {:
+            InvocacionFuncion invo = new InvocacionFuncion(idfun, Tipo.BOOLEAN);
+            invo.setPosicion(idfunxleft, cierrexright);
+            RESULT = invo;
+        :} |
+        IDENTIFICADOR:idfun PAR_ABRE lst_args:args PAR_CIERRA:cierre {:
             final boolean esPredefinida = false;
-            InvocacionFuncion invo = new InvocacionFuncion(nombreFun, args, Tipo.UNKNOWN, esPredefinida);
-            imprimirEtiqueta(invo);
+            InvocacionFuncion invo = new InvocacionFuncion(idfun, args, Tipo.UNKNOWN, esPredefinida);
+            invo.setPosicion(idfunxleft, cierrexright);
             RESULT = invo;
         :};
 
@@ -552,13 +539,13 @@ lst_args ::=
             RESULT = args;
         :} |
         expresion:arg {:
-            ArrayList<Expresion> args = new ArrayList<>();
+            List<Expresion> args = new ArrayList<>();
             args.add(arg);
             RESULT = args;
         :} |
         {:
             // Para que acepte la producción cuando no se pasa ningún argumento,
             // y a la vez genere una lista vacía para pasarle al constructor.
-            ArrayList<Expresion> args = new ArrayList<>();
+            List<Expresion> args = new ArrayList<>();
             RESULT = args;
         :};

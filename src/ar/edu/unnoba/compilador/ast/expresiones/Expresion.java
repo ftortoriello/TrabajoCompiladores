@@ -1,8 +1,8 @@
 package ar.edu.unnoba.compilador.ast.expresiones;
 
 import ar.edu.unnoba.compilador.ast.base.Nodo;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionTransformer;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 
@@ -37,8 +37,9 @@ public abstract class Expresion extends Nodo {
 
     public String getRefIR() {
         if (refIR == null) {
-            throw new IllegalStateException(String.format("Se hizo getRefIR sobre un objeto de tipo %s, " +
-                            "pero el refIR es nulo.", getClass().getSimpleName()));
+            throw new IllegalStateException(String.format(
+                    "Se hizo getRefIR sobre un objeto de tipo %s, pero el refIR es nulo.",
+                    getClass().getSimpleName()));
         }
         return refIR;
     }

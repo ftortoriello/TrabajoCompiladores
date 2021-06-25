@@ -1,7 +1,7 @@
 package ar.edu.unnoba.compilador.ast.sentencias.control;
 
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionTransformer;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFun;
 import ar.edu.unnoba.compilador.visitor.Visitor;
@@ -10,8 +10,10 @@ import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 public class Retorno extends Control {
     private Expresion expr;
 
-    // La función a la que pertenece el return, la necesitamos para sacar el nombre
-    // del ptro. en el que se devuelve el valor y la etiqueta de retorno.
+    /**
+     * La función a la que pertenece el return, la necesitamos para sacar el nombre del puntero
+     * en el que se devuelve el valor y la etiqueta de retorno.
+     */
     private DecFun fun;
 
     public Retorno(Expresion expr) {

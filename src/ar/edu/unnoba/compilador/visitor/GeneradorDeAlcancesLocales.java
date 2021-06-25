@@ -3,7 +3,7 @@ package ar.edu.unnoba.compilador.visitor;
 import ar.edu.unnoba.compilador.ast.base.Alcance;
 import ar.edu.unnoba.compilador.ast.base.Bloque;
 import ar.edu.unnoba.compilador.ast.base.Programa;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.SimboloFuncion;
@@ -15,8 +15,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-/* Visitor para generar los alcances de los bloques, construir la tabla de
- * símbolos locales y verificar los alcances.
+/**
+ * Visitor para generar los alcances de los bloques, construir la tabla de símbolos locales y
+ * verificar los alcances.
  */
 public class GeneradorDeAlcancesLocales extends Visitor {
     private Alcance alcanceGlobal;
@@ -24,7 +25,7 @@ public class GeneradorDeAlcancesLocales extends Visitor {
     private Map<String, SimboloFuncion> tablaFunciones;
     private Set<String> funPredefUsadas;
 
-    // Agregar la declaración al ámbito en el que se encuentra
+    /** Agregar la declaración al ámbito en el que se encuentra. */
     private void agregarSimbolo(Declaracion d) throws ExcepcionVisitor {
         if (alcanceGlobal == alcanceActual) {
             // Este Visitor sólo agrega símbolos locales, los globales ya los agregó el visitor
@@ -39,10 +40,9 @@ public class GeneradorDeAlcancesLocales extends Visitor {
         // Dar error si ya existía un símbolo con este nombre en este ámbito o
         // en los ámbitos superiores.
         if (alcanceActual.containsKey(nombre)) {
-            throw new ExcepcionVisitor(
-                    String.format("La variable local «%s» de tipo %s ya fue declarada previamente con tipo %s.",
-                            nombre, id.getTipo(),
-                            alcanceActual.get(nombre).getTipo()));
+            throw new ExcepcionVisitor(d,
+                    String.format("La variable local de tipo %s ya fue declarada previamente con tipo %s.",
+                            id.getTipo(), alcanceActual.get(nombre).getTipo()));
         }
 
         String nombreIR = Normalizador.crearNomPtroLcl(nombre);
@@ -124,7 +124,8 @@ public class GeneradorDeAlcancesLocales extends Visitor {
     @Override
     public void visit(Identificador i) throws ExcepcionVisitor {
         if (!estaEnElAlcance(i)) {
-            throw new ExcepcionVisitor(String.format("No se declaró la variable «%s»", i.getNombre()));
+            throw new ExcepcionVisitor(i, String.format(
+                    "No se declaró la variable «%s»", i.getNombre()));
         }
         super.visit(i);
     }
@@ -135,13 +136,14 @@ public class GeneradorDeAlcancesLocales extends Visitor {
             funPredefUsadas.add(i.getNombre());
             super.visit(i);
 
-            // Si es predefinida ya están limitados los parámetros por el parser, no es necesario validarlos acá
+            // Si es predefinida ya están limitados los parámetros por el parser, no es necesario
+            // validarlos acá
             return;
         }
 
         // Validar definición contra la tabla de funciones
         if (!estaEnElAlcance(i)) {
-            throw new ExcepcionVisitor(String.format("La función «%s» no está definida", i.getNombre()));
+            throw new ExcepcionVisitor(i, "La función no está definida");
         }
 
         // Validar que la cantidad de argumentos pasados sea por lo menos la cantidad obligaria,
@@ -152,10 +154,11 @@ public class GeneradorDeAlcancesLocales extends Visitor {
         int cantMinArgs = decFun.getCantArgsObligatorios();
         int cantMaxArgs = decFun.getParams().size();
         if (cantArgsInvo < cantMinArgs || cantArgsInvo > cantMaxArgs) {
-            throw new ExcepcionVisitor(String.format(
-                    "La función «%s» fue invocada con %d " + (cantArgsInvo == 1 ? "parámetro" : "parámetros") +
-                            ", cuando requiere " + (cantMinArgs == cantMaxArgs ? "%d" : "entre %d y %d") + ".",
-                    decFun.getNombre(), cantArgsInvo, cantMinArgs, cantMaxArgs));
+            throw new ExcepcionVisitor(decFun, String.format(
+                    "La función fue invocada con %d parámetro" + (cantArgsInvo == 1 ? "" : "s") +
+                            ", pero requiere " +
+                            (cantMinArgs == cantMaxArgs ? "%d" : "entre %d y %d") + ".",
+                    cantArgsInvo, cantMinArgs, cantMaxArgs));
         }
 
         super.visit(i);

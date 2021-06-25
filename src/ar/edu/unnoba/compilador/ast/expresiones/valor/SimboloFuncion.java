@@ -2,7 +2,8 @@ package ar.edu.unnoba.compilador.ast.expresiones.valor;
 
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFun;
 
-/* Clase para asociar las invocaciones a funciones a sus declaraciones.
+/**
+ * Clase para asociar las invocaciones a funciones a sus declaraciones.
  * Luego mediante un Transformer este nodo reemplaza a InvocacionFuncion.
  */
 public class SimboloFuncion extends InvocacionFuncion {

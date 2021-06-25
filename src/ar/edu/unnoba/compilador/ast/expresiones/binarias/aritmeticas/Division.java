@@ -1,6 +1,6 @@
 package ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas;
 
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 
@@ -16,7 +16,7 @@ public class Division extends OperacionBinariaAritmetica {
 
     @Override
     protected Number calcularResultado(Number izq, Number der) throws ExcepcionTransformer {
-        if (der.equals(0)) throw new ExcepcionTransformer("División por cero");
+        if (der.equals(0)) throw new ExcepcionTransformer(this, "División por cero");
         return izq.doubleValue() / der.doubleValue();
     }
 

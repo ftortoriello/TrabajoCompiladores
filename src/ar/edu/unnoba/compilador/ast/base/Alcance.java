@@ -9,19 +9,19 @@ public class Alcance extends TreeMap<String, SimboloVariable> {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    // El "nombre" del alcance puede ser "global", el nombre de la función en la que está incluido, etc...
+    /** El "nombre" del alcance puede ser "global", el nombre de la función en la que está incluido, etc. */
     private String nombre;
-    // Necesitamos el padre porque si una variable no está definida en este ámbito le preguntamos a él
+    /** Necesitamos el padre porque si una variable no está definida en este ámbito le preguntamos a él */
     private Alcance padre;
 
+    /** Alcance global (no tiene padre). */
     public Alcance(String nombre) {
-        // Alcance global (no tiene padre)
         this.nombre = nombre;
         this.padre = null;
     }
 
+    /** Todos los demás alcances (de función, bloque, ...) */
     public Alcance(String nombre, Alcance padre) {
-        // Todos los demás alcances (de función, bloque, ...)
         this.nombre = nombre;
         this.padre = padre;
     }

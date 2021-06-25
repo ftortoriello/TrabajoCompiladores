@@ -4,7 +4,7 @@ import ar.edu.unnoba.compilador.ast.base.Bloque;
 import ar.edu.unnoba.compilador.ast.base.Encabezado;
 import ar.edu.unnoba.compilador.ast.base.Nodo;
 import ar.edu.unnoba.compilador.ast.base.Programa;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
@@ -29,8 +29,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Transformer {
-    // Guardamos la última función visitada para validar el tipo de retorno,
-    // y convertir el tipo de la expresión return en caso de ser necesario
+    /**
+     * Última función visitada. La guardamos para validar el tipo de retorno, y convertir el tipo
+     * de la expresión return en caso de ser necesario.
+     */
     private DecFun ultFunVisitada;
 
     protected DecFun getUltFunVisitada() {
@@ -95,8 +97,7 @@ public abstract class Transformer {
         return invo;
     }
 
-
-    // Transforms de operaciones
+    // *** Transforms de operaciones ***
 
     public Expresion transform(OperacionBinaria ob) throws ExcepcionTransformer {
         ob.setIzquierda(ob.getIzquierda().accept(this));
@@ -115,7 +116,7 @@ public abstract class Transformer {
         return ou;
     }
 
-    // Transforms de sentencias
+    // *** Transforms de sentencias ***
 
     public Asignacion transform(Asignacion a) throws ExcepcionTransformer {
         a.setIdent(a.getIdent().accept(this));
@@ -148,7 +149,7 @@ public abstract class Transformer {
     public DecFun transform(DecFun df) throws ExcepcionTransformer {
         setUltFunVisitada(df);
 
-        ArrayList<Param> params = new ArrayList<>();
+        List<Param> params = new ArrayList<>();
         for (Param p : df.getParams()) {
             params.add(p.accept(this));
         }

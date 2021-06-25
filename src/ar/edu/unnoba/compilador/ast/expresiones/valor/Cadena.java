@@ -31,8 +31,10 @@ public class Cadena extends Expresion {
         this.nombreIR = nombreIR;
     }
 
-    /* Obtener cadena con sus caracteres no ASCII reemplazados por el código UTF-8
-     * (por ej: á --> \C3\A1), y con el carácter final nulo. */
+    /**
+     * Obtener cadena con sus caracteres no ASCII reemplazados por el código UTF-8
+     * (por ej: á --> \C3\A1), y con el carácter final nulo.
+     */
     public String getValorIR() {
         byte[] utf8bytes = valor.getBytes(StandardCharsets.UTF_8);
         StringBuilder sb = new StringBuilder();
@@ -56,7 +58,7 @@ public class Cadena extends Expresion {
         return sb.toString();
     }
 
-    /* Retorna la cantidad de bytes, incluyendo el nulo. */
+    /** Obtener la cantidad de bytes, incluyendo el nulo. */
     public int getLongitudIR() {
         return valor.getBytes(StandardCharsets.UTF_8).length + 1;
     }
