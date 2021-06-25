@@ -710,6 +710,7 @@ public class GeneradorDeCodigo extends Visitor {
 
         // Fin if
         grar.etiqueta(etiFin);
+        etiquetasOpBinLog.pop();
     }
 
 
