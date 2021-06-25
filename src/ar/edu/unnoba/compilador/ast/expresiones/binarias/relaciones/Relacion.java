@@ -5,6 +5,7 @@ import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.OperadorCmp;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.OperacionBinariaLogica;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
 import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 
@@ -28,7 +29,8 @@ public abstract class Relacion extends OperacionBinaria {
         }
 
         boolean resultado;
-        if (getTipo().equals(Tipo.BOOLEAN)) {
+
+        if (izquierda.getTipo().equals(Tipo.BOOLEAN) && derecha.getTipo().equals(Tipo.BOOLEAN)) {
             boolean valorIzq = ((Literal) izquierda).getValorBooleano();
             boolean valorDer = ((Literal) derecha).getValorBooleano();
             resultado = calcularResultado(valorIzq, valorDer);
