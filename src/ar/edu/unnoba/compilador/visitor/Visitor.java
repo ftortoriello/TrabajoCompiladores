@@ -1,14 +1,19 @@
 package ar.edu.unnoba.compilador.visitor;
 
-import ar.edu.unnoba.compilador.ast.base.*;
+import ar.edu.unnoba.compilador.ast.base.Bloque;
+import ar.edu.unnoba.compilador.ast.base.Encabezado;
+import ar.edu.unnoba.compilador.ast.base.Nodo;
+import ar.edu.unnoba.compilador.ast.base.Programa;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.aritmeticas.NegacionAritmetica;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.OperacionConversion;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.logicas.NegacionLogica;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.*;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.*;
-import ar.edu.unnoba.compilador.ast.expresiones.unarias.*;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Cadena;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Continuar;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;

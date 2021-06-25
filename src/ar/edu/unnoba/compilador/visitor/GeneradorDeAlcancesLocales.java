@@ -1,10 +1,15 @@
 package ar.edu.unnoba.compilador.visitor;
 
-import ar.edu.unnoba.compilador.util.Normalizador;
-import ar.edu.unnoba.compilador.ast.base.*;
+import ar.edu.unnoba.compilador.ast.base.Alcance;
+import ar.edu.unnoba.compilador.ast.base.Bloque;
+import ar.edu.unnoba.compilador.ast.base.Programa;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.*;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.SimboloFuncion;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.SimboloVariable;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
+import ar.edu.unnoba.compilador.util.Normalizador;
 
 import java.util.HashSet;
 import java.util.Map;

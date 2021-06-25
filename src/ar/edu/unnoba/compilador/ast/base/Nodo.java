@@ -1,8 +1,8 @@
 package ar.edu.unnoba.compilador.ast.base;
 
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
-import ar.edu.unnoba.compilador.visitor.*;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
+import ar.edu.unnoba.compilador.visitor.Visitor;
 import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 
 public abstract class Nodo {

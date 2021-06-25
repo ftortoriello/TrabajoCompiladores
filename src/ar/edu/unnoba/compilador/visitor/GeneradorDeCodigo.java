@@ -1,8 +1,7 @@
 package ar.edu.unnoba.compilador.visitor;
 
-import ar.edu.unnoba.compilador.util.GenerarIR;
-import ar.edu.unnoba.compilador.util.Normalizador;
-import ar.edu.unnoba.compilador.ast.base.*;
+import ar.edu.unnoba.compilador.ast.base.Bloque;
+import ar.edu.unnoba.compilador.ast.base.Programa;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
@@ -24,6 +23,8 @@ import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntonces;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
+import ar.edu.unnoba.compilador.util.GenerarIR;
+import ar.edu.unnoba.compilador.util.Normalizador;
 import jflex.base.Pair;
 
 import java.io.*;
@@ -100,7 +101,7 @@ public class GeneradorDeCodigo extends Visitor {
         arg.accept(this);
         String refIR = arg.getRefIR();
 
-        grar.coment(i.getEtiqueta());
+        grar.coment((i.getEtiqueta()));
 
         if (arg instanceof Cadena) {
             Cadena cad = (Cadena) arg;

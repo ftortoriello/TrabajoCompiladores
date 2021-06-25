@@ -93,6 +93,9 @@ public class GenerarIR {
     /* Si se pidió mostrar comentarios para depurar la generación de código, agregar un comentario */
     public void coment(String comentario) {
         if (conComentarios) {
+            // Reemplazar saltos de línea, algunas entradas (por ej. de write) pueden romper el programa
+            comentario = comentario.replace("\n", "\\n")
+                                   .replace("\r", "\\r");
             codigo(String.format("; %s", comentario));
         }
     }

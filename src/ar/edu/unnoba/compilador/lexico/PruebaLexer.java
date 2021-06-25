@@ -1,9 +1,9 @@
 package ar.edu.unnoba.compilador.lexico;
 
+import java_cup.runtime.Symbol;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
-
-import java_cup.runtime.Symbol;
 
 public class PruebaLexer {
     public static void main(String[] args) throws IOException {

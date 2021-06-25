@@ -1,10 +1,10 @@
 package ar.edu.unnoba.compilador.sintaxis;
 
+import ar.edu.unnoba.compilador.lexico.Lexer;
+
 import java.io.FileReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import ar.edu.unnoba.compilador.lexico.Lexer;
 
 public class PruebaParser {
     public static void main(String[] args) {

@@ -1,17 +1,17 @@
 package ar.edu.unnoba.compilador.visitor.transformer;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import ar.edu.unnoba.compilador.ast.base.*;
+import ar.edu.unnoba.compilador.ast.base.Bloque;
+import ar.edu.unnoba.compilador.ast.base.Encabezado;
+import ar.edu.unnoba.compilador.ast.base.Nodo;
+import ar.edu.unnoba.compilador.ast.base.Programa;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Continuar;
@@ -24,6 +24,9 @@ import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntonces;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class Transformer {
     // Guardamos la última función visitada para validar el tipo de retorno,

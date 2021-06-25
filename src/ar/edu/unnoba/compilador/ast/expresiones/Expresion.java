@@ -1,10 +1,10 @@
 package ar.edu.unnoba.compilador.ast.expresiones;
 
 import ar.edu.unnoba.compilador.ast.base.Nodo;
-import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
-import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
+import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.visitor.Visitor;
+import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 
 public abstract class Expresion extends Nodo {
     private Tipo tipo;

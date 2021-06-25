@@ -1,6 +1,5 @@
 package ar.edu.unnoba.compilador.visitor.transformer;
 
-import ar.edu.unnoba.compilador.util.Normalizador;
 import ar.edu.unnoba.compilador.ast.base.Alcance;
 import ar.edu.unnoba.compilador.ast.base.Bloque;
 import ar.edu.unnoba.compilador.ast.base.Nodo;
@@ -20,6 +19,7 @@ import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
+import ar.edu.unnoba.compilador.util.Normalizador;
 
 import java.util.ArrayList;
 
