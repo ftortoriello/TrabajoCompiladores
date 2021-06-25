@@ -8,7 +8,7 @@ main is
 	variable n is integer;
 	variable valido is boolean = false;
 
-	write("Ingrese a qué número calcularle el factorial: ");
+	write("Ingrese un número: ");
 	while not valido do
 	begin
 		n = read_integer();	# Leer entero
