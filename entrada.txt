@@ -1,14 +1,41 @@
-function f(n is integer) return integer
-    if n > 1 then begin
-        return 1;
-        writeln("Esto es código inaccesible");
-        return 0;
+(* Ejemplo de un programa completo dado en la consigna de la etapa 1 *)
+
+(* Se definen algunas variables globales *)
+
+variable radio is float;
+variable superficie₁ is float = radio * 1.5;
+
+{ Una función }
+function superficie_círculo(x is float, y is float) return float
+begin
+    writeln("Dentro de función superficie_círculo()");
+    # Definición de una variable local.
+    if radio < 0 then begin
+        variable z is integer;
+        return radio + x;
     end
+    else begin
+        variable radio² is float = cuadrado(y);
+        return cuadrado(radio) * radio²;
+    end;
+end;
+
+
+(* Otra función pero con una única sentencia *)
+function cuadrado(valor is float) return float
+    return valor * valor;
+
+{ Otra variable global (esta vez, sin inicialización explícita) }
+variable superficie₂ is float;
+
+function g(n is integer) return integer
+begin
+    if n > 1 then
+        n = 10
     else
         return 0;
-
-function inc(a is integer, b is integer = 2, c is integer = 3) return integer
-    return a + b + c;
+    return n;
+end;
 
 function h(tope is integer = 100) return boolean
 begin
@@ -32,23 +59,31 @@ begin
     return llego;
 end;
 
-function g(n is integer) return integer
-begin
-    if n > 1 then
-        n = 10
+function f(n is integer) return integer
+    if n > 1 then begin
+        return 1;
+        writeln("Esto es código inaccesible");
+        return 0;
+    end
     else
         return 0;
-    return n;
-end;
 
+function inc(a is integer, b is integer = 2, c is integer = 3) return integer
+    return a + b + c;
+
+
+# probar variables globales declaradas desp
+
+# Procedimiento principal
 main is
+    when 1 is < 1.0 then writeln("...");
+
     # def(1); # Me permite invocar esto, debería?
     variable j is integer = inc(3);
     writeln(j);
     variable llego is boolean = h(10);
     writeln(llego);
 
-{
     variable c is integer = 0;
     variable d is float = 2.0;
     while c < 10 do
@@ -61,41 +96,7 @@ main is
         write(" a ");
         writeln(c);
     end;
-}
-end.
 
-{
-(* Ejemplo de un programa completo dado en la consigna de la etapa 1 *)
-
-(* Se definen algunas variables globales *)
-
-variable radio is float;
-variable superficie₁ is float = radio * 1.5;
-
-{ Una función }
-function superficie_círculo(x is float, y is float) return float
-begin
-    writeln("Dentro de función superficie_círculo()");
-    # Definición de una variable local.
-    if radio < 0 then begin
-        variable z is integer;
-        return radio + x;
-    end
-    else begin
-        variable radio² is float = cuadrado(y);
-        return cuadrado(radio) * radio²;
-    end;
-end;
-
-(* Otra función pero con una única sentencia *)
-function cuadrado(valor is float) return float
-    return valor * valor;
-
-{ Otra variable global (esta vez, sin inicialización explícita) }
-variable superficie₂ is float;
-
-# Procedimiento principal
-main is
 
     variable justo is boolean = false;
     when superficie_círculo(radio, 1.0)
@@ -117,6 +118,7 @@ main is
             writeln("Este juego no me gusta");
         end;
 
+
     write("Acertó: "); writeln(justo);
 
     variable i is integer;
@@ -127,8 +129,9 @@ main is
     end;
 
     writeln("Se acabó\n\nFin!");
+
 end.
-}
+
 {
 (* Ejemplo de ámbitos dado en la consigna de la etapa 2 *)
 

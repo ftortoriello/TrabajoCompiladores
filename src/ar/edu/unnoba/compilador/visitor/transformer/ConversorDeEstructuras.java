@@ -79,19 +79,19 @@ public class ConversorDeEstructuras extends Transformer {
         Bloque bloqueNuevo = new Bloque("Conversión\\nCASE a IF", false);
         bloqueNuevo.setAlcance(new Alcance("Alcance conversión WHEN -> IF"));
 
-        // La expresión del case pasa a estar en una nueva variable temporal, para la cual tengo que crear su símbolo
-        String nombreVarAux = Normalizador.crearNomRef("when");
-        Identificador identTemp = new Identificador(nombreVarAux, c.getCondicion().getTipo());
-        DecVarIni decVarTemp  = new DecVarIni(nombreVarAux, identTemp, c.getCondicion());
-        final boolean esGlobal = false;
-        SimboloVariable simbolo = new SimboloVariable(decVarTemp, nombreVarAux, esGlobal);
-        decVarTemp.setIdent(simbolo);
+        // La expresión del case pasa a estar en una nueva variable temporal, para la
+        // cual tengo que crear su símbolo y añadirlo al alcance.
+        String nombreVarAux = Normalizador.crearNomRef("aux");
+        Identificador identAux = new Identificador(nombreVarAux, c.getCondicion().getTipo());
+        DecVarIni decVarAux  = new DecVarIni(identAux.getNombre(), identAux, c.getCondicion());
+        SimboloVariable simboloAux = new SimboloVariable(decVarAux, nombreVarAux, false);
+        decVarAux.setIdent(simboloAux);
 
         // Agrego la declaración en la lista de sentencias
-        bloqueNuevo.getSentencias().add(decVarTemp);
+        bloqueNuevo.getSentencias().add(decVarAux);
 
         // Agrego el nuevo símbolo en el alcance
-        bloqueNuevo.getAlcance().put(identTemp.getNombre(), simbolo);
+        bloqueNuevo.getAlcance().put(identAux.getNombre(), simboloAux);
 
         // Tengo que hacer esta chanchada para rescatar el alcance en el que está el when y no perder el padre
         Alcance alcancePadre = c.getCasos().get(0).getBloque().getAlcance().getPadre();
@@ -103,7 +103,7 @@ public class ConversorDeEstructuras extends Transformer {
 
         for (CasoCuando cc : c.getCasos()) {
             // Crear la condición del if en base a la del when y el case
-            Relacion cond = Relacion.getClaseRel(cc.getOp(), c.getCondicion(), cc.getExpresion());
+            Relacion cond = Relacion.getClaseRel(cc.getOp(), simboloAux, cc.getExpresion());
             cond.setTipo(Tipo.BOOLEAN);
             if (seActual == null) {
                 // Primera vez que entro al for, creo el if principal

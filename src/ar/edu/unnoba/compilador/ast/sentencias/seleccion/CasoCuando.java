@@ -33,7 +33,7 @@ public class CasoCuando extends Sentencia {
         return expr;
     }
 
-    public void setExpr(Expresion expr) {
+    public void setExpresion(Expresion expr) {
         this.expr = expr;
     }
 

@@ -2,6 +2,7 @@ package ar.edu.unnoba.compilador.visitor.transformer;
 
 import ar.edu.unnoba.compilador.ast.base.Alcance;
 import ar.edu.unnoba.compilador.ast.base.Bloque;
+import ar.edu.unnoba.compilador.ast.base.Nodo;
 import ar.edu.unnoba.compilador.ast.base.Programa;
 import ar.edu.unnoba.compilador.ast.base.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
@@ -19,6 +20,8 @@ import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFun;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarIni;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
+import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
+import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 
 import java.util.Map;
 
@@ -246,6 +249,19 @@ public class TransformerTipos extends Transformer {
             throw new ExcepcionTransformer("El tipo de la condición de «while» no es boolean");
         }
         return m;
+    }
+
+    @Override
+    public Nodo transform(Cuando c) throws ExcepcionTransformer {
+        super.transform(c);
+
+        // Convierto el tipo de la expresión de los casos al tipo de la expresión principal.
+        Tipo tipoCuando = c.getCondicion().getTipo();
+        for (CasoCuando caso : c.getCasos()) {
+            caso.setExpresion(convertirATipo(caso.getExpresion(), tipoCuando));
+        }
+
+        return c;
     }
 
     @Override

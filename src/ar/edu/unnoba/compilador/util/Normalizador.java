@@ -10,10 +10,10 @@ import java.util.Map;
 public class Normalizador {
 
     private static final Map<String, Long> etiquetas = new HashMap<>();
+    private static final Map<String, Long> funciones = new HashMap<>();
     private static final Map<String, Long> varGbls = new HashMap<>();
     private static final Map<String, Long> varLcls = new HashMap<>();
     private static final Map<String, Long> varRefs = new HashMap<>();
-    private static final Map<String, Long> funciones = new HashMap<>();
 
     private Normalizador() {
     }
@@ -29,6 +29,14 @@ public class Normalizador {
         return id;
     }
 
+    public static long getIdEtiqueta(String nombre) {
+        return getIdMapa(etiquetas, nombre);
+    }
+
+    public static long getIdFuncion(String nombre) {
+        return getIdMapa(funciones, nombre);
+    }
+
     public static long getIdVarGbl(String nombre) {
         return getIdMapa(varGbls, nombre);
     }
@@ -41,20 +49,17 @@ public class Normalizador {
         return getIdMapa(varRefs, nombre);
     }
 
-    public static long getIdFuncion(String nombre) {
-        return getIdMapa(funciones, nombre);
-    }
-
-    public static long getIdEtiqueta(String nombre) {
-        return getIdMapa(etiquetas, nombre);
-    }
-
     // Devuelve una cadena normalizada
     public static String normalizar(String cadena) {
         return Normalizer.normalize(cadena, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
     }
 
     /* Funciones para generar nombres nuevos normalizados únicos */
+
+    // Etiqueta de LLVM IR
+    public static String crearNomEtiqueta(String nombreOrig) {
+        return String.format("%s.%s", nombreOrig, getIdEtiqueta(nombreOrig));
+    }
 
     // Función
     public static String crearNomFun(String nombreOrig) {
@@ -78,11 +83,6 @@ public class Normalizador {
     // (gralmente. usado para el atrib refIR)
     public static String crearNomRef(String nombreOrig) {
         return String.format("%%ref.%s.%s", nombreOrig, getIdVarRef(nombreOrig));
-    }
-
-    // Etiqueta de LLVM IR
-    public static String crearNomEtiqueta(String nombreOrig) {
-        return String.format("%s.%s", nombreOrig, getIdEtiqueta(nombreOrig));
     }
 
 }
