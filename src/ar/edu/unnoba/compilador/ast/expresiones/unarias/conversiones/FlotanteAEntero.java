@@ -17,7 +17,7 @@ public class FlotanteAEntero extends OperacionConversion {
             return this;
         }
 
-        float nroOriginal = ((Literal) expr).getValorNumerico().floatValue();
+        double nroOriginal = ((Literal) expr).getValorNumerico().doubleValue();
         Number nroConvertido = Math.round(nroOriginal);
         return new Literal(nroConvertido, Tipo.INTEGER);
     }

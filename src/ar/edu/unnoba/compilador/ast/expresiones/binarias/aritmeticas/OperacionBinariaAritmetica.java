@@ -68,7 +68,7 @@ public abstract class OperacionBinariaAritmetica extends OperacionBinaria {
         // Hacer lo mismo con el hijo derecho
         if (subexprDer instanceof Literal) {
             valorIzq = ((Literal) subexprDer).getValorNumerico();
-            if (izquierda instanceof Resta) valorIzq = -valorIzq.floatValue();
+            if (izquierda instanceof Resta) valorIzq = -valorIzq.doubleValue();
             setIzquierda(subexprIzq);
             setDerecha(new Literal(calcularResultado(valorIzq, valorDer), tipo));
             return this;

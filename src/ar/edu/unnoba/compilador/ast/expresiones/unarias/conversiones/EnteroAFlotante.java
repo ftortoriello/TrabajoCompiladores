@@ -17,7 +17,7 @@ public class EnteroAFlotante extends OperacionConversion {
             return this;
         }
 
-        return new Literal(((Literal) expr).getValorNumerico().floatValue(), Tipo.FLOAT);
+        return new Literal(((Literal) expr).getValorNumerico().doubleValue(), Tipo.FLOAT);
     }
 
     @Override

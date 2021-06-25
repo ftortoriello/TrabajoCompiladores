@@ -34,15 +34,15 @@ public abstract class Relacion extends OperacionBinaria {
             boolean valorDer = ((Literal) derecha).getValorBooleano();
             resultado = calcularResultado(valorIzq, valorDer);
         } else {
-            float valorIzq = ((Literal) izquierda).getValorNumerico().floatValue();
-            float valorDer = ((Literal) derecha).getValorNumerico().floatValue();
+            double valorIzq = ((Literal) izquierda).getValorNumerico().doubleValue();
+            double valorDer = ((Literal) derecha).getValorNumerico().doubleValue();
             resultado = calcularResultado(valorIzq, valorDer);
         }
 
         return new Literal(String.valueOf(resultado), Tipo.BOOLEAN);
     }
 
-    protected abstract boolean calcularResultado(float izq, float der);
+    protected abstract boolean calcularResultado(double izq, double der);
 
     protected abstract boolean calcularResultado(boolean izq, boolean der);
 

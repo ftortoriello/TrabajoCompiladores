@@ -13,7 +13,7 @@ public class Mayor extends Relacion {
     }
 
     @Override
-    protected boolean calcularResultado(float izq, float der) {
+    protected boolean calcularResultado(double izq, double der) {
         return izq > der;
     }
 

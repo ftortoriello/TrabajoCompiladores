@@ -13,7 +13,7 @@ public class Desigualdad extends Relacion {
     }
 
     @Override
-    protected boolean calcularResultado(float litIzq, float litDer) {
+    protected boolean calcularResultado(double litIzq, double litDer) {
         return litIzq != litDer;
     }
 

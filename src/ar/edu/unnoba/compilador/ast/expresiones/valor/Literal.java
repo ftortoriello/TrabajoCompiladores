@@ -25,7 +25,7 @@ public class Literal extends Valor {
                 this.valor = Integer.toString(numero.intValue());
                 break;
             case FLOAT:
-                this.valor = Float.toString(numero.floatValue());
+                this.valor = Double.toString(numero.doubleValue());
                 break;
             default: throw new IllegalStateException(
                     String.format("Tipo inesperado: %s. Se esperaba un tipo numérico.", tipo));
@@ -53,7 +53,7 @@ public class Literal extends Valor {
 
     public Number getValorNumerico() {
         switch (getTipo()) {
-            case FLOAT:   return Float.parseFloat(valor);
+            case FLOAT:   return Double.parseDouble(valor);
             case INTEGER: return Integer.parseInt(valor);
             default: throw new IllegalStateException(
                     String.format("%s no es de tipo numérico.", this));

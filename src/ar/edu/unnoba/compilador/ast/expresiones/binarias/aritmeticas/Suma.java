@@ -15,7 +15,7 @@ public class Suma extends OperacionBinariaAritmetica {
 
     @Override
     protected Number calcularResultado(Number izq, Number der) {
-        return izq.floatValue() + der.floatValue();
+        return izq.doubleValue() + der.doubleValue();
     }
 
     @Override

@@ -53,7 +53,7 @@ import java.util.Stack;
 
     private Symbol symbol(String nombre, int linea, int columna, Object valor) {
         return symbolFactory.newSymbol(nombre, getSymbolId(nombre),
-                new Location(linea, columna), new Location(linea, columna + yylength()),
+                new Location(linea, columna), new Location(linea, columna + yylength() - 1),
                  valor);
     }
 
