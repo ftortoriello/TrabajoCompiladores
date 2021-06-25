@@ -689,6 +689,7 @@ public class GeneradorDeCodigo extends Visitor {
         String etiBlqThen = Normalizador.crearNomEtiqueta("blq_then");
         String etiBlqElse = Normalizador.crearNomEtiqueta("blq_else");
         String etiFin = Normalizador.crearNomEtiqueta("fin_if");
+        etiquetasOpBinLog.push(new Pair<>(etiBlqThen, etiBlqElse));
 
         grar.coment("if / then / else");
 
