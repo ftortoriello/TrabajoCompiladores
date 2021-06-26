@@ -167,7 +167,7 @@ public class GeneradorDeCodigo extends Visitor {
 
         if (tipo.equals(Tipo.FLOAT)) {
             grar.scan("@.double_format", 4, tipoIR, ptroValor);
-        } else{
+        } else {
             grar.scan("@.int_format", 3, tipoIR, ptroValor);
         }
 
@@ -308,8 +308,8 @@ public class GeneradorDeCodigo extends Visitor {
 
         // Esto es para que queden bien las etiquetas si tenemos a AND b OR c.
         // Sin esto, si "a" es falso se hace falsa toda la operación.
-        // El problema es que tenemos que llamar temprano a expIzquierda.accept() para obtener la
-        // referencia.
+        // El problema es que tenemos que llamar temprano a expIzquierda.accept() para generar el
+        // código del AND.
         boolean esAndOr = (ob instanceof Disyuncion && expIzquierda instanceof Conjuncion);
         if (esAndOr) {
             etiquetasOpBinLog.push(new Pair<>(etiVerdadero, etiTmp));
