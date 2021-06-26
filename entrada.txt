@@ -1,4 +1,4 @@
-(* Ejemplo de un programa completo dado en la consigna de la etapa 1 *)
+(* Programa de prueba *)
 
 (* Se definen algunas variables globales *)
 
@@ -78,7 +78,6 @@ function inc(a is integer, b is integer = 2, c is integer = 3) return integer
 main is
     when 1 is < 1.0 then writeln("...");
 
-    # def(1); # Me permite invocar esto, debería?
     variable j is integer = inc(3);
     writeln(j);
     variable llego is boolean = h(10);
@@ -100,7 +99,7 @@ main is
 
     variable justo is boolean = false;
     when superficie_círculo(radio, 1.0)
-        is < 75 then begin # se rompe, sup_circ() es float y 75 int, no convierte
+        is < 75 then begin
             variable primerCond is float;
             writeln("Re mal...");
         end
@@ -131,39 +130,4 @@ main is
     writeln("Se acabó\n\nFin!");
 
 end.
-
-{
-(* Ejemplo de ámbitos dado en la consigna de la etapa 2 *)
-
-function ejemplo() return boolean
-begin
-    variable local_a_ejemplo is boolean = true;
-    if global > 10 then
-    begin
-        variable local_al_then is float = global;
-        while local_al_then > 5 do
-        begin
-            local_al_then = local_al_then - 1;
-            variable local_al_while is float = local_al_then * 1.5;
-            writeln(local_al_while);
-        end;
-        writeln(local_al_then);
-        #local_al_main = false;  # error, está fuera del alcance
-    end else
-        global = global + 5;
-    #writeln(local_al_main);     # error, está fuera del alcance
-    return local_a_ejemplo;
-end;
-
-variable global is integer = 42;
-
-main is
-    variable local_al_main is boolean = true;
-
-    if not local_al_main then
-        variable local_al_then is integer = 1
-    else
-        ejemplo();
-end.
-}
 

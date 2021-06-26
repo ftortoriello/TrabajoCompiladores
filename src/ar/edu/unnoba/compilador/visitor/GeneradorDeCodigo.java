@@ -292,16 +292,40 @@ public class GeneradorDeCodigo extends Visitor {
         grar.coment(String.format("Cortocircuito booleano: %s", ob));
 
         Expresion expIzquierda = ob.getIzquierda();
-        if (expIzquierda instanceof NegacionLogica) ((NegacionLogica) expIzquierda).setEnCortocircuito(true);
+        if (expIzquierda instanceof NegacionLogica) {
+            ((NegacionLogica) expIzquierda).setEnCortocircuito(true);
+        }
 
+        // Creamos esta etiqueta acá por el problema de más abajo.
+        final String etiTmp;
+        if (ob instanceof Conjuncion) {
+            etiTmp = Normalizador.crearNomEtiqueta("and_verdadero");
+        } else if (ob instanceof Disyuncion) { // OR
+            etiTmp = Normalizador.crearNomEtiqueta("or_falso");
+        } else {
+            throw new ExcepcionVisitor(ob, "Tipo de operación binaria lógica inesperado.");
+        }
+
+        // Esto es para que queden bien las etiquetas si tenemos a AND b OR c.
+        // Sin esto, si "a" es falso se hace falsa toda la operación.
+        // El problema es que tenemos que llamar temprano a expIzquierda.accept() para obtener la
+        // referencia.
+        boolean esAndOr = (ob instanceof Disyuncion && expIzquierda instanceof Conjuncion);
+        if (esAndOr) {
+            etiquetasOpBinLog.push(new Pair<>(etiVerdadero, etiTmp));
+        }
+
+        // Visitar el operando de la izquierda para poder obtener su refIR
         expIzquierda.accept(this);
 
+        if (esAndOr) {
+            etiquetasOpBinLog.pop();
+        }
+
         final String refIR = expIzquierda.getRefIR();
-        final String etiTmp;
 
         if (ob instanceof Conjuncion) { // AND
             // Si el operador izquierdo es falso, esta operación es falsa
-            etiTmp = Normalizador.crearNomEtiqueta("and_verdadero");
             if (expIzquierda instanceof NegacionLogica) {
                 grar.salto(refIR, etiFalso, etiTmp);
             } else {
@@ -309,7 +333,6 @@ public class GeneradorDeCodigo extends Visitor {
             }
         } else if (ob instanceof Disyuncion) { // OR
             // Si el operador izquierdo es verdadero, esta operación es verdadera
-            etiTmp = Normalizador.crearNomEtiqueta("or_falso");
             if (expIzquierda instanceof NegacionLogica) {
                 grar.salto(refIR, etiTmp, etiVerdadero);
             } else {
