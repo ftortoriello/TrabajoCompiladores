@@ -29,21 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Transformer {
-    /**
-     * Última función visitada. La guardamos para validar el tipo de retorno, y convertir el tipo
-     * de la expresión return en caso de ser necesario.
-     */
-    private DecFun ultFunVisitada;
-
-    protected DecFun getUltFunVisitada() {
-        return ultFunVisitada;
-    }
-
-    protected void setUltFunVisitada(DecFun ultFunVisitada) {
-        this.ultFunVisitada = ultFunVisitada;
-    }
-
-
     public Programa procesar(Programa p) throws ExcepcionTransformer {
         return p.accept(this);
     }
@@ -147,15 +132,13 @@ public abstract class Transformer {
     }
 
     public DecFun transform(DecFun df) throws ExcepcionTransformer {
-        setUltFunVisitada(df);
-
         List<Param> params = new ArrayList<>();
         for (Param p : df.getParams()) {
             params.add(p.accept(this));
         }
         df.setParams(params);
+
         df.setBloque(df.getBloque().accept(this));
-        setUltFunVisitada(null);
         return df;
     }
 
@@ -201,6 +184,7 @@ public abstract class Transformer {
         r.setExpr(r.getExpresion().accept(this));
         return r;
     }
+
 
     public Salir transform(Salir s) {
         return s;

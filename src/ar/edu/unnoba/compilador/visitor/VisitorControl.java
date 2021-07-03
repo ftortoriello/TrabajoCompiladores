@@ -20,7 +20,7 @@ public class VisitorControl extends Visitor {
     /**
      * Flags para comprobar si el Visitor se encuentra en una función o estructura de control.
      * Para enBucle antes utilizábamos un booleano, pero necesitamos contar la cantidad de
-     * anidamientos porque si al salir del más interno nos setea enBucle en falso, y
+     * anidamientos porque al salir del más interno nos seteaba enBucle en falso, y
      * el resto de continue/break que haya los detecta como que no están en un bucle.
      */
     private boolean enFuncion;

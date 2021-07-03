@@ -37,6 +37,36 @@ public class TransformerTipos extends Transformer {
     private Alcance alcanceActual;
     private Map<String, SimboloFuncion> tablaFunciones;
 
+    /**
+     * Última función visitada. La guardamos para validar el tipo de retorno, y convertir el tipo
+     * de la expresión return en caso de ser necesario.
+     */
+    private DecFun ultFunVisitada;
+
+    public Alcance getAlcanceActual() {
+        return alcanceActual;
+    }
+
+    public void setAlcanceActual(Alcance alcanceActual) {
+        this.alcanceActual = alcanceActual;
+    }
+
+    public Map<String, SimboloFuncion> getTablaFunciones() {
+        return tablaFunciones;
+    }
+
+    public void setTablaFunciones(Map<String, SimboloFuncion> tablaFunciones) {
+        this.tablaFunciones = tablaFunciones;
+    }
+
+    protected DecFun getUltFunVisitada() {
+        return ultFunVisitada;
+    }
+
+    protected void setUltFunVisitada(DecFun ultFunVisitada) {
+        this.ultFunVisitada = ultFunVisitada;
+    }
+
     // *** Métodos auxiliares ***
 
     private static Tipo getTipoEnComun(OperacionBinaria ob) throws ExcepcionTransformer {
@@ -73,35 +103,6 @@ public class TransformerTipos extends Transformer {
                 String.format("No existe un tipo común entre %s y %s", tipoOrigen, tipoDestino));
     }
 
-    /** Retorna el símbolo si está en el alcance actual y se pudo cambiar el tipo. */
-    private SimboloVariable cambiarTipoVariable(Valor v) {
-        SimboloVariable s = alcanceActual.resolver(v.getNombre());
-        if (s == null) {
-            return null;
-        }
-        Tipo tipo = s.getTipo();
-        if (tipo == Tipo.UNKNOWN) {
-            // No se pudo cambiar el tipo
-            return null;
-        }
-        v.setTipo(tipo);
-        return s;
-    }
-
-    private SimboloFuncion cambiarTipoFuncion(Valor v) {
-        SimboloFuncion s = tablaFunciones.get(v.getNombre());
-        if (s == null) {
-            return null;
-        }
-        Tipo tipo = s.getTipo();
-        if (tipo == Tipo.UNKNOWN) {
-            // No se pudo cambiar el tipo
-            return null;
-        }
-        v.setTipo(tipo);
-        return s;
-    }
-
     /** Retorna el tipo en común. */
     private static Tipo transformOperacionBinaria(OperacionBinaria ob) throws ExcepcionTransformer {
         Expresion expIzquierda = ob.getIzquierda();
@@ -121,10 +122,13 @@ public class TransformerTipos extends Transformer {
 
     @Override
     public Programa transform(Programa p) throws ExcepcionTransformer {
-        alcanceActual = p.getAlcance();
-        tablaFunciones = p.getTablaFunciones();
+        setAlcanceActual(p.getAlcance());
+        setTablaFunciones(p.getTablaFunciones());
+
         p = super.transform(p);
-        alcanceActual = null;
+
+        setAlcanceActual(null);
+        setTablaFunciones(null);
         return p;
     }
 
@@ -137,58 +141,60 @@ public class TransformerTipos extends Transformer {
 
     @Override
     public DecFun transform(DecFun df) throws ExcepcionTransformer {
-        alcanceActual = df.getAlcance();
+        setUltFunVisitada(df);
+        setAlcanceActual(df.getAlcance());
+
         df = super.transform(df);
-        alcanceActual = alcanceActual.getPadre();
+
+        setUltFunVisitada(null);
+        setAlcanceActual(getAlcanceActual().getPadre());
+
         return df;
     }
 
     @Override
     public Bloque transform(Bloque b) throws ExcepcionTransformer {
-        alcanceActual = b.getAlcance();
+        setAlcanceActual(b.getAlcance());
         b = super.transform(b);
-        alcanceActual = alcanceActual.getPadre();
+        setAlcanceActual(getAlcanceActual().getPadre());
         return b;
     }
 
     @Override
-    public Identificador transform(Identificador i) throws ExcepcionTransformer {
-        i = super.transform(i);
-        SimboloVariable s = cambiarTipoVariable(i);
-        if (s == null) {
-            throw new ExcepcionTransformer(i, "No se pudo asignar un tipo.");
-        }
+    public SimboloVariable transform(Identificador i) throws ExcepcionTransformer {
         // Reemplazar cada Identificador por el SimboloVariable correspondiente
-        return s;
+        SimboloVariable sv = getAlcanceActual().resolver(i.getNombre());
+        return sv;
     }
 
     @Override
-    public InvocacionFuncion transform(InvocacionFuncion i) throws ExcepcionTransformer {
-        i = super.transform(i);
+    public InvocacionFuncion transform(InvocacionFuncion invo) throws ExcepcionTransformer {
+        invo = super.transform(invo);
 
-        // No es necesario buscar en el alcance las funciones predefinidas
-        if (i.getEsPredefinida()) {
-            return i;
+        // No es necesario buscar en el alcance a las funciones predefinidas
+        if (invo.getEsPredefinida()) {
+            return invo;
         }
 
-        SimboloFuncion s = cambiarTipoFuncion(i);
-        if (s == null) {
-            throw new ExcepcionTransformer(i, "No se pudo asignar un tipo.");
+        SimboloFuncion sf = getTablaFunciones().get(invo.getNombre());
+        DecFun decFun = sf.getDeclaracion();
+        int cantArgs = invo.getArgs().size();
+
+        // La invocación va a tener el mismo tipo que la función
+        invo.setTipo(sf.getTipo());
+
+        // Validar el tipo de cada argumento, y convertir cuando sea necesario/posible
+        for (int i = 0; i < cantArgs; i++) {
+            // El argumento pasado en la invocación
+            Expresion argInvo = invo.getArgs().get(i);
+
+            // El tipo del parámetro, según se definió en la declaración
+            Tipo tipoFormal = decFun.getParams().get(i).getTipo();
+
+            // Guardar el argumento convertido en la invocación
+            invo.getArgs().set(i, convertirATipo(argInvo, tipoFormal));
         }
-
-        DecFun decFun = s.getDeclaracion();
-        int cantArgs = i.getArgs().size();
-
-        // Validar el tipo de cada argumento, y convertir cuando sea necesario
-        for (int iArg = 0; iArg < cantArgs; iArg++) {
-            Expresion arg = i.getArgs().get(iArg);
-            Tipo tipoOriginal = decFun.getParams().get(iArg).getTipo();
-
-            // TODO acá tendría que modificar el SimboloFuncion
-            //s.getDeclaracion().getArgs().set(iArg, convertirATipo(arg, tipoOriginal));
-            i.getArgs().set(iArg, convertirATipo(arg, tipoOriginal));
-        }
-        return i;
+        return invo;
     }
 
     @Override
@@ -236,15 +242,12 @@ public class TransformerTipos extends Transformer {
     public Retorno transform(Retorno r) throws ExcepcionTransformer {
         // Transformar la expresión interna del return
         r = super.transform(r);
-        // Y compararla con el de la función a la que pertenece
-        DecFun ultFunVisitada = getUltFunVisitada();
-        if (ultFunVisitada == null) {
-            // No tendría que suceder si se ejecutó el Visitor de sentencias de
-            // control
-            return null;
-        }
-        r.setFun(ultFunVisitada);
+
+        // Y convertirla según el tipo de la función a la que pertenece
         r.setExpr(convertirATipo(r.getExpresion(), ultFunVisitada.getTipo()));
+
+        // Además, guardar una referencia a la función en el return (la necesitamos para el IR)
+        r.setFun(getUltFunVisitada());
         return r;
     }
 
