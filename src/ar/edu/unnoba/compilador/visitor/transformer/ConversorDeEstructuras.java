@@ -84,7 +84,7 @@ public class ConversorDeEstructuras extends Transformer {
         // cual tengo que crear su símbolo y añadirlo al alcance.
         String nombreVarAux = Normalizador.crearNomRef("aux");
         Identificador identAux = new Identificador(nombreVarAux, c.getCondicion().getTipo());
-        DecVarIni decVarAux  = new DecVarIni(identAux.getNombre(), identAux, c.getCondicion());
+        DecVarIni decVarAux  = new DecVarIni(identAux, c.getCondicion());
         SimboloVariable simboloAux = new SimboloVariable(decVarAux, nombreVarAux, false);
         decVarAux.setIdent(simboloAux);
 

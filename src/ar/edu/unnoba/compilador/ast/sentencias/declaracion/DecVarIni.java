@@ -11,8 +11,8 @@ import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 public class DecVarIni extends DecVar {
     private Expresion expresion;
 
-    public DecVarIni(String nombre, Identificador ident, Expresion expr) {
-        super(nombre, ident);
+    public DecVarIni(Identificador ident, Expresion expr) {
+        super(ident);
         this.expresion = expr;
     }
 

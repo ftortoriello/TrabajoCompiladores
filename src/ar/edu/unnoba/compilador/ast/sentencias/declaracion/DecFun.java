@@ -22,7 +22,7 @@ public class DecFun extends Declaracion {
     private String etiquetaFin;
 
     public DecFun(Identificador ident, List<Param> params, Bloque bloque) {
-        super(ident.getNombre(), ident);
+        super(ident);
         // Invierto el orden de los parámetros porque debido a la forma de las reglas los lee al revés
         Collections.reverse(params);
         bloque.setNombre("Cuerpo\\nFUNCIÓN");
@@ -31,7 +31,7 @@ public class DecFun extends Declaracion {
     }
 
     public DecFun(Identificador ident, Bloque bloque) {
-        super(ident.getNombre(), ident);
+        super(ident);
         bloque.setNombre("Cuerpo\\nFUNCIÓN");
         this.params = new ArrayList<>();
         this.bloque = bloque;

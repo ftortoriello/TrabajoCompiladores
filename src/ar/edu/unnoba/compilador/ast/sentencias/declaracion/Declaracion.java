@@ -11,8 +11,7 @@ import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
 public abstract class Declaracion extends Sentencia {
     private Identificador ident;
 
-    public Declaracion(String nombre, Identificador ident) {
-        super(nombre);
+    public Declaracion(Identificador ident) {
         this.ident = ident;
     }
 
@@ -39,7 +38,7 @@ public abstract class Declaracion extends Sentencia {
 
     @Override
     public String getNombre() {
-        return this.toString();
+        return ident.toString();
     }
 
     @Override

@@ -11,8 +11,8 @@ import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 public class ParamDef extends Param {
     private Expresion expresion;
 
-    public ParamDef(String nombre, Identificador ident, Expresion expr) {
-        super(nombre, ident);
+    public ParamDef(Identificador ident, Expresion expr) {
+        super(ident);
         this.expresion = expr;
     }
 

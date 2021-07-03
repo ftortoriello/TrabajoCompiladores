@@ -150,14 +150,14 @@ dec_var ::=
         PR_VARIABLE:var IDENTIFICADOR:id PR_IS TIPO_DE_DATO:td {:
             Identificador ident = new Identificador(id, Tipo.getTipoDato(td));
             ident.setPosicion(idxleft, idxright);
-            DecVar decVar = new DecVar("Variable sin inicializar", ident);
+            DecVar decVar = new DecVar(ident);
             decVar.setPosicion(varxleft, tdxright);
             RESULT = decVar;
         :} |
         PR_VARIABLE:var IDENTIFICADOR:id PR_IS TIPO_DE_DATO:td IGUAL expresion:expr {:
             Identificador ident = new Identificador(id, Tipo.getTipoDato(td));
             ident.setPosicion(idxleft, idxright);
-            DecVarIni decVarIni = new DecVarIni("Variable inicializada", ident, expr);
+            DecVarIni decVarIni = new DecVarIni(ident, expr);
             decVarIni.setPosicion(varxleft, exprxright);
             RESULT = decVarIni;
         :};
@@ -206,7 +206,7 @@ lst_params_def ::=
 param ::= IDENTIFICADOR:id PR_IS TIPO_DE_DATO:td {:
             Identificador ident = new Identificador(id, Tipo.getTipoDato(td));
             ident.setPosicion(idxleft, idxright);
-            Param param = new Param("Parámetro sin valor por defecto", ident);
+            Param param = new Param(ident);
             param.setPosicion(idxleft, tdxright);
             RESULT = param;
         :};
@@ -214,7 +214,7 @@ param ::= IDENTIFICADOR:id PR_IS TIPO_DE_DATO:td {:
 param_def ::= IDENTIFICADOR:id PR_IS TIPO_DE_DATO:td IGUAL expresion:expr {:
             Identificador ident = new Identificador(id, Tipo.getTipoDato(td));
             ident.setPosicion(idxleft, idxright);
-            ParamDef paramDef = new ParamDef("Parámetro con valor por defecto", ident, expr);
+            ParamDef paramDef = new ParamDef(ident, expr);
             paramDef.setPosicion(idxleft, exprxright);
             RESULT = paramDef;
         :};

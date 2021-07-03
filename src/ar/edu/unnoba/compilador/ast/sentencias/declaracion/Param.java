@@ -8,8 +8,8 @@ import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 
 /** Parámetro de una función sin valor por defecto. */
 public class Param extends Declaracion {
-    public Param(String nombre, Identificador ident) {
-        super(nombre, ident);
+    public Param(Identificador ident) {
+        super(ident);
     }
 
     @Override

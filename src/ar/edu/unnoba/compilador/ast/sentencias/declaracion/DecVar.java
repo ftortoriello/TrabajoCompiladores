@@ -8,8 +8,8 @@ import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 
 /** Declaración de variable o parámetro sin inicializar al declararse. */
 public class DecVar extends Declaracion {
-    public DecVar(String nombre, Identificador ident) {
-        super(nombre, ident);
+    public DecVar(Identificador ident) {
+        super(ident);
     }
 
     @Override
