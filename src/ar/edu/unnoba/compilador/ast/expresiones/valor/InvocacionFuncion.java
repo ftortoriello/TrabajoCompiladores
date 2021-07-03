@@ -45,33 +45,16 @@ public class InvocacionFuncion extends Valor {
     @Override
     public String getEtiqueta() {
         String nombre = getNombre();
-        String args = argumentos.toString()
-                .replace("[", "")
-                .replace("]", "");
+        String args = argumentos.toString();
+        args = args.substring(1, args.length() - 1);    // sacar corchetes al principio y final
+        String eti = String.format("%s(%s)", nombre, args);
 
-        if (!(nombre.equals("write") || nombre.equals("writeln"))) {
-            return String.format("%s(%s)\\n<%s>", nombre, args, getTipo());
+        if (nombre.equals("write") || nombre.equals("writeln")) {
+            // No poner el tipo a las funciones write() y writeln(), porque no que devuelven un valor
+            return eti;
+        } else {
+            return String.format("%s\\n<%s>", eti, getTipo());
         }
-
-        // Es una invocación a write o writeln.
-        // Fijarse si su argumento es una cadena literal (podría ser una expresión).
-        // En ese caso, acomodar las cadenas para que el gráfico las muestre idénticas al código de
-        // entrada y no quede el DOT con errores de sintaxis.
-        if (args.startsWith("\\\"")) {
-            args = "\\\"" + args
-                    // Sacar comillas externas escapadas
-                    .substring(2, args.length() - 2)
-                    // Mostrar escape en los caracteres de escape
-                    .replace("\\", "\\\\\\\\")
-                    .replace("\t", "\\\\t")
-                    .replace("\n", "\\\\n")
-                    .replace("\r", "\\\\r")
-                    .replace("\"", "\\\\\\\"")
-                    + "\\\"";
-        }
-
-        // No poner el tipo a las funciones write() y writeln(), porque no que devuelven un valor
-        return String.format("%s(%s)", nombre, args);
     }
 
     @Override

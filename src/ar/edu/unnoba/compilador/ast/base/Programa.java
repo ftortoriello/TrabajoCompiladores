@@ -76,11 +76,6 @@ public class Programa extends Nodo {
     }
 
     @Override
-    public String toString() {
-        return this.getEtiqueta();
-    }
-
-    @Override
     public void accept(Visitor v) throws ExcepcionVisitor {
         v.visit(this);
     }

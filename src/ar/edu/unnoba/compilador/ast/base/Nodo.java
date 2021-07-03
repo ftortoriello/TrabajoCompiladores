@@ -46,17 +46,6 @@ public abstract class Nodo {
         this.posDer = der;
     }
 
-    public String getEtiqueta() {
-        if (this.nombre != null) {
-            return this.getNombre();
-        }
-        return this.getClass().getSimpleName();
-    }
-
-    public abstract void accept(Visitor v) throws ExcepcionVisitor;
-
-    public abstract Nodo accept(Transformer t) throws ExcepcionTransformer;
-
     @Override
     public String toString() {
         if (nombre == null) {
@@ -65,4 +54,16 @@ public abstract class Nodo {
             return nombre;
         }
     }
+
+    public String getEtiqueta() {
+        if (nombre == null) {
+            return this.getClass().getSimpleName();
+        } else {
+            return nombre;
+        }
+    }
+
+    public abstract void accept(Visitor v) throws ExcepcionVisitor;
+
+    public abstract Nodo accept(Transformer t) throws ExcepcionTransformer;
 }

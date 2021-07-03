@@ -7,7 +7,6 @@ import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 import java.nio.charset.StandardCharsets;
 
 public class Cadena extends Expresion {
-
     private String valor;
     private String nombreIR;
 
@@ -29,6 +28,29 @@ public class Cadena extends Expresion {
 
     public void setNombreIR(String nombreIR) {
         this.nombreIR = nombreIR;
+    }
+
+    /**
+     * Obtener representación con los caracteres de escape escapados.
+     * Usado en los archivos DOT para que el gráfico las muestre idénticas al código de entrada
+     * y no quede con errores de sintaxis.
+     */
+    @Override
+    public String toString() {
+        String str = valor;
+
+        // Sacar comillas externas escapadas para que no se reemplacen las barras
+        if (str.startsWith("\\\"")) str = str.substring(2, str.length() - 2);
+
+        // Agregar escape en los caracteres de escape
+        str = "\\\"" + str
+                .replace("\\", "\\\\\\\\")
+                .replace("\t", "\\\\t")
+                .replace("\n", "\\\\n")
+                .replace("\r", "\\\\r")
+                .replace("\"", "\\\\\\\"")
+                + "\\\"";
+        return str;
     }
 
     /**
@@ -75,10 +97,5 @@ public class Cadena extends Expresion {
 
     public Expresion evaluar() {
         return this;
-    }
-
-    @Override
-    public String toString() {
-        return getValor();
     }
 }
