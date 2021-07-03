@@ -86,6 +86,9 @@ public class TransformerTipos extends Transformer {
                 String.format("No existe un tipo común entre %s y %s", tipo1, tipo2));
     }
 
+    /** Si es necesario, reemplaza el nodo Expresion original por uno de OperacionConversion
+     *  Por ej., si se quiere convertir de entero a flotante, el nodo Expresion va a quedar
+     *  debajo de un nodo EnteroAFlotante. */
     private static Expresion convertirATipo(Expresion expresion, Tipo tipoDestino) throws ExcepcionTransformer {
         Tipo tipoOrigen = expresion.getTipo();
         if (tipoOrigen == tipoDestino) {
@@ -103,7 +106,7 @@ public class TransformerTipos extends Transformer {
                 String.format("No existe un tipo común entre %s y %s", tipoOrigen, tipoDestino));
     }
 
-    /** Retorna el tipo en común. */
+    /** Transforma el término izquierdo y derecho de la op. bin. al tipo común, y lo retorna. */
     private static Tipo transformOperacionBinaria(OperacionBinaria ob) throws ExcepcionTransformer {
         Expresion expIzquierda = ob.getIzquierda();
         Expresion expDerecha = ob.getDerecha();
