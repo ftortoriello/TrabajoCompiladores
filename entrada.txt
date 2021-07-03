@@ -2,6 +2,10 @@
 
 (* Se definen algunas variables globales *)
 
+variable aa is float = 2.0;
+variable bb is integer = 1;
+variable cc is boolean = aa == bb or bb < aa or aa > bb;
+
 variable radio is float;
 variable superficie₁ is float = radio * 1.5;
 
@@ -92,8 +96,13 @@ begin
     return true;
 end;
 
+
 # Procedimiento principal
 main is
+    writeln(aa);
+    writeln(bb);
+    writeln(cc);
+
     probarControl();
 
     when 1 is < 1.0 then writeln("...");

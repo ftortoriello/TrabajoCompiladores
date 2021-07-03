@@ -581,12 +581,11 @@ public class GeneradorDeCodigo extends Visitor {
                 finalizarCortocircuitoAsig(refIR, sv.getNombreIR());
             } else {
                 grar.store(nombreIR, tipoIR, refIR);
-                grar.ret();
-                grar.cierreBloque();
-
-                // Guardo el nombre de la función para invocarla en el main
-                varGblInit.add(nomFunAux);
             }
+            // Guardo el nombre de la función para invocarla en el main
+            varGblInit.add(nomFunAux);
+            grar.ret();
+            grar.cierreBloque();
         } else {
             // Variable local
 
