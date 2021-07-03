@@ -31,8 +31,8 @@ public class GeneradorDeAlcanceGlobal extends Visitor {
 
         if (alcanceGlobal.containsKey(nombre)) {
             throw new ExcepcionVisitor(d, String.format(
-                    "La variable global de tipo %s ya fue declarada previamente con tipo %s.",
-                    id.getTipo(), alcanceGlobal.get(nombre).getTipo()));
+                    "La variable global %s de tipo %s ya fue declarada previamente con tipo %s.",
+                    id.getNombre(), id.getTipo(), alcanceGlobal.get(nombre).getTipo()));
         }
 
         // Defino de antemano los nombres que necesitamos para el IR
@@ -106,7 +106,6 @@ public class GeneradorDeAlcanceGlobal extends Visitor {
     @Override
     public void visit(DecVar dv) throws ExcepcionVisitor {
         agregarSimboloVarGlobal(dv);
-        super.visit(dv);
     }
 
     @Override
@@ -116,6 +115,5 @@ public class GeneradorDeAlcanceGlobal extends Visitor {
                     "No se puede invocar a una función desde la inicialización de una variable global.");
         }
         agregarSimboloVarGlobal(dvi);
-        super.visit(dvi);
     }
 }

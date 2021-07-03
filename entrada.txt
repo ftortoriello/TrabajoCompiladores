@@ -123,9 +123,9 @@ main is
 
     variable i is integer;
     for i from 5 to 1 do begin
-        variable j is integer = 2;
+        variable h is integer = 2;
         write("Se acaba en ");
-        writeln(i + j);
+        writeln(i + h);
     end;
 
     writeln("Se acabó\n\nFin!");

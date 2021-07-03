@@ -76,7 +76,7 @@ Id                  = [\p{L}_][\p{L}\p{N}_]*\??
 // Podría solucionarse agregando \b a las regex, pero no funciona en JFlex :(
 // Igualmente en esos casos tiene que fallar el análisis sintáctico.
 Entero              = \d+
-Flotante            = \d*\.\d*
+Flotante            = \d+\.|\.\d+|\d+\.\d+
 
 OpComparacion       = ==|\!=|\>|\>=|\<|\<=
 TiposDeDato         = boolean|integer|float

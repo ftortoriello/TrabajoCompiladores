@@ -39,10 +39,10 @@ public class GeneradorDeAlcancesLocales extends Visitor {
         // En este lenguaje no se pueden sobreescribir símbolos.
         // Dar error si ya existía un símbolo con este nombre en este ámbito o
         // en los ámbitos superiores.
-        if (alcanceActual.containsKey(nombre)) {
+        if (estaEnElAlcance(id)) {
             throw new ExcepcionVisitor(d,
-                    String.format("La variable local de tipo %s ya fue declarada previamente con tipo %s.",
-                            id.getTipo(), alcanceActual.get(nombre).getTipo()));
+                    String.format("La variable local %s de tipo %s ya fue declarada previamente con tipo %s.",
+                            id.getNombre(), id.getTipo(), alcanceActual.resolver(nombre).getTipo()));
         }
 
         String nombreIR = Normalizador.crearNomPtroLcl(nombre);
@@ -98,27 +98,24 @@ public class GeneradorDeAlcancesLocales extends Visitor {
         alcanceActual = alcanceActual.getPadre();
     }
 
+    @Override
     public void visit(Param p) throws ExcepcionVisitor {
         agregarSimbolo(p);
-        super.visit(p);
     }
 
     @Override
     public void visit(ParamDef pd) throws ExcepcionVisitor {
         agregarSimbolo(pd);
-        super.visit(pd);
     }
 
     @Override
     public void visit(DecVar dv) throws ExcepcionVisitor {
         agregarSimbolo(dv);
-        super.visit(dv);
     }
 
     @Override
     public void visit(DecVarIni dvi) throws ExcepcionVisitor {
         agregarSimbolo(dvi);
-        super.visit(dvi);
     }
 
     @Override
@@ -160,7 +157,5 @@ public class GeneradorDeAlcancesLocales extends Visitor {
                             (cantMinArgs == cantMaxArgs ? "%d" : "entre %d y %d") + ".",
                     cantArgsInvo, cantMinArgs, cantMaxArgs));
         }
-
-        super.visit(i);
     }
 }
