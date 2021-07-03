@@ -87,6 +87,7 @@ begin
         end;
         if i == 5 then break;
     end;
+    # break; # esto tendría que romper
 
     return true;
 end;
