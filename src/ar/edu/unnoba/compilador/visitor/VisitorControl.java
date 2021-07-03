@@ -19,12 +19,12 @@ public class VisitorControl extends Visitor {
 
     /**
      * Flags para comprobar si el Visitor se encuentra en una función o estructura de control.
-     * Para enBucle antes utilizábamos un booleano, pero necesitamos una pila porque si hay
-     * estructuras de iteración anidadas al salir de la primera nos setea enBucle en falso, y
+     * Para enBucle antes utilizábamos un booleano, pero necesitamos contar la cantidad de
+     * anidamientos porque si al salir del más interno nos setea enBucle en falso, y
      * el resto de continue/break que haya los detecta como que no están en un bucle.
      */
     private boolean enFuncion;
-    private Deque<Boolean> enBucle = new ArrayDeque<>();
+    private Integer contBucle = 0;
 
     protected boolean isEnFuncion() {
         return enFuncion;
@@ -34,8 +34,16 @@ public class VisitorControl extends Visitor {
         this.enFuncion = enFuncion;
     }
 
+    protected void incContBucles() {
+        this.contBucle += 1;
+    }
+
+    protected void decContBucles() {
+        this.contBucle -= 1;
+    }
+
     protected boolean enBucle() {
-        return enBucle.peek();
+        return contBucle > 0;
     }
 
     public void visit(DecFun df) throws ExcepcionVisitor {
@@ -45,15 +53,15 @@ public class VisitorControl extends Visitor {
     }
 
     public void visit(Mientras m) throws ExcepcionVisitor {
-        enBucle.push(true);
+        incContBucles();
         super.visit(m);
-        enBucle.pop();
+        decContBucles();
     }
 
     public void visit(Para p) throws ExcepcionVisitor {
-        enBucle.push(true);
+        incContBucles();
         super.visit(p);
-        enBucle.pop();
+        decContBucles();
     }
 
     @Override
