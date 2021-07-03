@@ -13,11 +13,6 @@ public class DecVar extends Declaracion {
     }
 
     @Override
-    public String toString() {
-        return getIdent().getNombre();
-    }
-
-    @Override
     public void accept(Visitor v) throws ExcepcionVisitor {
         v.visit(this);
     }

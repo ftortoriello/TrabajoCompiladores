@@ -38,6 +38,11 @@ public abstract class Declaracion extends Sentencia {
     }
 
     @Override
+    public String getNombre() {
+        return this.toString();
+    }
+
+    @Override
     public String getEtiqueta() {
         return getClass().getSimpleName();
     }

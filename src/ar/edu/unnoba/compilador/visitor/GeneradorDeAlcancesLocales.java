@@ -41,8 +41,8 @@ public class GeneradorDeAlcancesLocales extends Visitor {
         // en los ámbitos superiores.
         if (estaEnElAlcance(id)) {
             throw new ExcepcionVisitor(d,
-                    String.format("La variable local %s de tipo %s ya fue declarada previamente con tipo %s.",
-                            id.getNombre(), id.getTipo(), alcanceActual.resolver(nombre).getTipo()));
+                    String.format("La variable local de tipo %s ya fue declarada previamente con tipo %s.",
+                            id.getTipo(), alcanceActual.resolver(nombre).getTipo()));
         }
 
         String nombreIR = Normalizador.crearNomPtroLcl(nombre);
