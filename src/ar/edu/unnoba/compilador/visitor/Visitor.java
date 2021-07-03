@@ -29,34 +29,11 @@ import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
 public abstract class Visitor {
     private int id = 0;
 
-    /**
-     * Flags para comprobar si el Visitor se encuentra en una función o estructura de control
-     */
-    private boolean enFuncion;
-    private boolean enBucle;
-
     /* Funciones auxiliares */
     protected int getID() {
         id += 1;
         return id;
     }
-
-    protected boolean isEnFuncion() {
-        return enFuncion;
-    }
-
-    protected void setEnFuncion(boolean enFuncion) {
-        this.enFuncion = enFuncion;
-    }
-
-    protected boolean isEnBucle() {
-        return enBucle;
-    }
-
-    protected void setEnBucle(boolean enBucle) {
-        this.enBucle = enBucle;
-    }
-
 
     /**
      * Inicio del Visitor
@@ -106,12 +83,10 @@ public abstract class Visitor {
     }
 
     public void visit(DecFun df) throws ExcepcionVisitor {
-        setEnFuncion(true);
         for (Param p : df.getParams()) {
             p.accept(this);
         }
         df.getBloque().accept(this);
-        setEnFuncion(false);
     }
 
     public void visit(Param p) throws ExcepcionVisitor {
@@ -154,17 +129,13 @@ public abstract class Visitor {
     // *** Sentencias de iteración ***
 
     public void visit(Mientras m) throws ExcepcionVisitor {
-        setEnBucle(true);
         m.getCondicion().accept(this);
         m.getBloqueSentencias().accept(this);
-        setEnBucle(false);
     }
 
     public void visit(Para p) throws ExcepcionVisitor {
-        setEnBucle(true);
         p.getIdent().accept(this);
         p.getBloqueSentencias().accept(this);
-        setEnBucle(false);
     }
 
 

@@ -72,10 +72,29 @@ function inc(a is integer, b is integer = 2, c is integer = 3) return integer
     return a + b + c;
 
 
-# probar variables globales declaradas desp
+function probarControl() return boolean
+begin
+    variable i is integer = 0;
+
+    while true do begin
+        i = i + 1;
+        while true do begin
+            if i == 1 or i == 3 or i == 5 then begin
+                write(i);
+                writeln(". Esto tendría que aparecer tres veces");
+            end;
+            break;
+        end;
+        if i == 5 then break;
+    end;
+
+    return true;
+end;
 
 # Procedimiento principal
 main is
+    probarControl();
+
     when 1 is < 1.0 then writeln("...");
 
     variable j is integer = inc(3);
