@@ -215,7 +215,7 @@ param_def ::= IDENTIFICADOR:id PR_IS TIPO_DE_DATO:td IGUAL expresion:expr {:
             Identificador ident = new Identificador(id, Tipo.getTipoDato(td));
             ident.setPosicion(idxleft, idxright);
             ParamDef paramDef = new ParamDef("Parámetro con valor por defecto", ident, expr);
-            ident.setPosicion(idxleft, exprxright);
+            paramDef.setPosicion(idxleft, exprxright);
             RESULT = paramDef;
         :};
 
@@ -277,7 +277,7 @@ asignacion ::=
             Identificador ident = new Identificador(id);
             ident.setPosicion(idxleft, idxright);
             Asignacion asig = new Asignacion(ident, expr);
-            ident.setPosicion(idxleft, exprxright);
+            asig.setPosicion(idxleft, exprxright);
             RESULT = asig;
        :};
 
