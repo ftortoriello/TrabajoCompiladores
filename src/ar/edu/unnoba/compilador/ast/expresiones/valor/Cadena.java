@@ -7,7 +7,7 @@ import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 import java.nio.charset.StandardCharsets;
 
 public class Cadena extends Expresion {
-    private String valor;
+    private String valor;   // siempre tiene comillas escapadas (\")
     private String ptroIR;
 
     public Cadena(String valor) {
@@ -30,6 +30,11 @@ public class Cadena extends Expresion {
         this.ptroIR = ptroIR;
     }
 
+    /** Obtener cadena sin las comillas externas */
+    private String getValorSinComillas() {
+        return valor.substring(2, valor.length() - 2);
+    }
+
     /**
      * Obtener representación con los caracteres de escape escapados.
      * Usado en los archivos DOT para que el gráfico las muestre idénticas al código de entrada
@@ -37,20 +42,15 @@ public class Cadena extends Expresion {
      */
     @Override
     public String toString() {
-        String str = valor;
-
-        // Sacar comillas externas escapadas para que no se reemplacen las barras
-        if (str.startsWith("\\\"")) str = str.substring(2, str.length() - 2);
-
-        // Agregar escape en los caracteres de escape
-        str = "\\\"" + str
+        // Agregar escape en los caracteres de escape.
+        // Tomar la cadena sin comillas externas para que no se reemplacen las barras.
+        return "\\\"" + getValorSinComillas()
                 .replace("\\", "\\\\\\\\")
                 .replace("\t", "\\\\t")
                 .replace("\n", "\\\\n")
                 .replace("\r", "\\\\r")
                 .replace("\"", "\\\\\\\"")
                 + "\\\"";
-        return str;
     }
 
     /**
@@ -58,7 +58,7 @@ public class Cadena extends Expresion {
      * (por ej: á --> \C3\A1), y con el carácter final nulo.
      */
     public String getValorIR() {
-        byte[] utf8bytes = valor.getBytes(StandardCharsets.UTF_8);
+        byte[] utf8bytes = getValorSinComillas().getBytes(StandardCharsets.UTF_8);
         StringBuilder sb = new StringBuilder();
         for (byte b : utf8bytes) {
             if (b >= 0x20 && b <= 0x7E && b != 0x22) {
@@ -82,7 +82,8 @@ public class Cadena extends Expresion {
 
     /** Obtener la cantidad de bytes, incluyendo el nulo. */
     public int getLongitudIR() {
-        return valor.getBytes(StandardCharsets.UTF_8).length + 1;
+        // Longitud sin las comillas (-2*2) y con el fin nulo (+1)
+        return valor.getBytes(StandardCharsets.UTF_8).length - 3;
     }
 
     @Override

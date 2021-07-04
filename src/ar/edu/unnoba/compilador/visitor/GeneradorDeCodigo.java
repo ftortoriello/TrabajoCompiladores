@@ -101,6 +101,37 @@ public class GeneradorDeCodigo extends Visitor {
         return datalayout + "\n" + triple;
     }
 
+    /**
+     * Generar invocación a write() o writeln() de un valor booleano.
+     * Usado por imprimirWrite().
+     */
+    private void imprimiWriteBoolean(String refIR) {
+        // Extender el i1 a i32 para poder compararlo
+        String refExt = Normalizador.crearNomRef("ext");
+        grar.zext(refExt, "i1", refIR);
+        refIR = refExt;
+
+        // Ahora se evalúa el valor del booleano para imprimir "true" o "false".
+        String casoTrue = Normalizador.crearNomEtiqueta("bln_true");
+        String casoFalse = Normalizador.crearNomEtiqueta("bln_false");
+        String fin = Normalizador.crearNomEtiqueta("fin_eval_bln");
+
+        String refAux = Normalizador.crearNomRef("aux");
+
+        // Guardo en refAux el valor de la comparación
+        grar.saltoIgual(refAux, "i32", refIR, "1", casoTrue, casoFalse);
+
+        grar.etiqueta(casoTrue);
+        grar.print("@.bln_true_format", 5);
+        grar.salto(fin);
+
+        grar.etiqueta(casoFalse);
+        grar.print("@.bln_false_format", 6);
+        grar.salto(fin);
+
+        grar.etiqueta(fin);
+    }
+
     /** Generar invocación a write() o writeln(). */
     private void imprimirWrite(InvocacionFuncion i) throws ExcepcionVisitor {
         Expresion arg = i.getArgs().get(0);
@@ -112,40 +143,16 @@ public class GeneradorDeCodigo extends Visitor {
         if (arg instanceof Cadena) {
             Cadena cad = (Cadena) arg;
             grar.print(cad.getPtroIR(), cad.getLongitudIR());
-        } else if (arg.getTipo().equals(Tipo.BOOLEAN)) {
-            // Extender el i1 a i32 para poder compararlo
-            String refExt = Normalizador.crearNomRef("ext");
-            grar.zext(refExt, "i1", refIR);
-            refIR = refExt;
-
-            // Ahora se evalúa el valor del booleano para imprimir "true" o "false".
-            String casoTrue = Normalizador.crearNomEtiqueta("bln_true");
-            String casoFalse = Normalizador.crearNomEtiqueta("bln_false");
-            String fin = Normalizador.crearNomEtiqueta("fin_eval_bln");
-
-            String refAux = Normalizador.crearNomRef("aux");
-
-            // Guardo en refAux el valor de la comparación
-            grar.saltoIgual(refAux, "i32", refIR, "1", casoTrue, casoFalse);
-
-            grar.etiqueta(casoTrue);
-            grar.print("@.bln_true_format", 5);
-            grar.salto(fin);
-
-            grar.etiqueta(casoFalse);
-            grar.print("@.bln_false_format", 6);
-            grar.salto(fin);
-
-            grar.etiqueta(fin);
-        } else {
-            // Es un número entero o flotante
-            String tipoIR = arg.getTipo().equals(Tipo.INTEGER) ? "i32" : "double";
-
-            if (arg.getTipo().equals(Tipo.INTEGER)) {
-                grar.print("@.int_format", 3, tipoIR, refIR);
-            } else {
-                grar.print("@.double_print_format", 6, tipoIR, refIR);
-            }
+        } else switch (arg.getTipo()) {
+            case BOOLEAN:
+                imprimiWriteBoolean(refIR);
+                break;
+            case INTEGER:
+                grar.print("@.int_format", 3, "i32", refIR);
+                break;
+            case FLOAT:
+                grar.print("@.double_print_format", 6, "double", refIR);
+                break;
         }
 
         if (i.getNombre().equals("writeln")) {

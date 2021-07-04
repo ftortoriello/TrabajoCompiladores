@@ -23,7 +23,6 @@ public class ReconocedorCadenas extends Visitor {
 
     @Override
     public void visit(Cadena c) {
-        c.setValor(c.getValor().replace("\\\"", ""));
         arrCadenas.add(c);
     }
 
