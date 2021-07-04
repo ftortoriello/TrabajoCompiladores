@@ -149,9 +149,9 @@ ComentarioUnaLinea = #.*{FinDeLinea}?
     {EspacioEnBlanco}   { /* ignorar */ }
 
     // Literales
-    {CtesBooleanas}     { return symbol("LIT_BOOLEANO", yytext()); }
-    {Flotante}          { return symbol("LIT_FLOTANTE", yytext()); }
-    {Entero}            { return symbol("LIT_ENTERO", yytext()); }
+    {CtesBooleanas}     { return symbol("LIT_BOOLEANO", Boolean.parseBoolean(yytext())); }
+    {Flotante}          { return symbol("LIT_FLOTANTE", Double.parseDouble(yytext())); }
+    {Entero}            { return symbol("LIT_ENTERO", Integer.parseInt(yytext())); }
 
     {Id}                { return symbol("IDENTIFICADOR", yytext()); }
 }

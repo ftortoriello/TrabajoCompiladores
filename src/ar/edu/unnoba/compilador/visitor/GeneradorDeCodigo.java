@@ -2,6 +2,7 @@ package ar.edu.unnoba.compilador.visitor;
 
 import ar.edu.unnoba.compilador.ast.base.Bloque;
 import ar.edu.unnoba.compilador.ast.base.Programa;
+import ar.edu.unnoba.compilador.ast.expresiones.Cadena;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
@@ -14,6 +15,7 @@ import ar.edu.unnoba.compilador.ast.expresiones.unarias.aritmeticas.NegacionArit
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.OperacionConversion;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.logicas.NegacionLogica;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.*;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.literal.Literal;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Continuar;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
@@ -541,7 +543,7 @@ public class GeneradorDeCodigo extends Visitor {
         String nombreIR = sv.getPtroIR();
         String tipoIR = sv.getTipo().getIR();
         Boolean esGlobal = sv.getEsGlobal();
-        String valorIR = dv.getTipo().getValorDefIR();
+        String valorIR = dv.getTipo().getValorDef();
 
         grar.setComentLinea(String.format("variable %s is %s = %s", sv.getNombre(), sv.getTipo(), valorIR));
 
@@ -575,7 +577,7 @@ public class GeneradorDeCodigo extends Visitor {
         if (sv.getEsGlobal()) {
             // Le asigno temporalmente a la var. el valor por defecto según
             // su tipo, porque no puedo inicializarla en el alcance global.
-            String valorDef = sv.getTipo().getValorDefIR();
+            String valorDef = sv.getTipo().getValorDef();
             grar.global(nombreIR, tipoIR, valorDef);
 
             // Creo una función que se va a llamar en el main para inicializar la var. con el valor correspondiente
@@ -621,7 +623,7 @@ public class GeneradorDeCodigo extends Visitor {
         String ptroRet = df.getPtroRet();
         String refRet = df.getRefIR();
         String etiquetaFin = df.getEtiquetaFin();
-        String valorPorDef = df.getTipo().getValorDefIR();
+        String valorPorDef = df.getTipo().getValorDef();
 
         // Formatear la lista de parámetros de acuerdo a lo requerido por IR
         String params = grarStrParams(df.getParams());
@@ -914,10 +916,10 @@ public class GeneradorDeCodigo extends Visitor {
         // Este visitor utiliza una variable auxiliar para almacenar los valores literales.
         // Como alternativa a generar la variable, podríamos utilizar directamente el valor,
         // pero de esta manera queda más uniforme con el resto del código.
-        grar.setComentLinea(String.format("Literal %s", lit.getValor()));
+        grar.setComentLinea(String.format("Literal %s", lit));
         // Hack para generar referencias a valores en una línea (le sumo 0 al valor que quiero guardar)
         grar.suma(lit.getRefIR(), lit.getTipo().getIR(),
-                lit.getValorIR(), lit.getTipo().getValorDefIR());
+                lit.toString(), lit.getTipo().getValorDef());
     }
 
     @Override

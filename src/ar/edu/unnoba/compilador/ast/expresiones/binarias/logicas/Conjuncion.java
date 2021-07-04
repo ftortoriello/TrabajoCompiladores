@@ -1,8 +1,7 @@
 package ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas;
 
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
-import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.literal.Booleano;
 
 public class Conjuncion extends OperacionBinariaLogica {
     public Conjuncion(Expresion izquierda, Expresion derecha) {
@@ -16,6 +15,6 @@ public class Conjuncion extends OperacionBinariaLogica {
 
     @Override
     protected Expresion transformarResultado(boolean valor, Expresion otroOperando) {
-        return valor ? otroOperando : new Literal(false, Tipo.BOOLEAN);
+        return valor ? otroOperando : new Booleano(false);
     }
 }

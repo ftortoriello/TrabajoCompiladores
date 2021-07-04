@@ -11,7 +11,7 @@ import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.OperacionCo
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.logicas.NegacionLogica;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.literal.Literal;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.SimboloVariable;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Continuar;

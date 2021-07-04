@@ -2,7 +2,8 @@ package ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones;
 
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.literal.Entero;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.literal.Flotante;
 import ar.edu.unnoba.compilador.excepciones.ExcepcionTransformer;
 
 public class EnteroAFlotante extends OperacionConversion {
@@ -13,11 +14,11 @@ public class EnteroAFlotante extends OperacionConversion {
     @Override
     public Expresion evaluar() throws ExcepcionTransformer {
         Expresion expr = getExpresion().evaluar();
-        if (!(expr instanceof Literal)) {
+        if (!(expr instanceof Entero)) {
             return this;
         }
 
-        return new Literal(((Literal) expr).getValorNumerico().doubleValue(), Tipo.FLOAT);
+        return new Flotante(((Entero) expr).getValor().doubleValue());
     }
 
     @Override

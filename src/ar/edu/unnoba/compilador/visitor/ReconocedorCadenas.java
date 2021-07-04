@@ -1,7 +1,7 @@
 package ar.edu.unnoba.compilador.visitor;
 
 import ar.edu.unnoba.compilador.ast.base.Programa;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Cadena;
+import ar.edu.unnoba.compilador.ast.expresiones.Cadena;
 import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;
 
 import java.util.ArrayList;

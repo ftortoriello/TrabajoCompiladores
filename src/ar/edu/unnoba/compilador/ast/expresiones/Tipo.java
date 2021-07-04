@@ -34,7 +34,7 @@ public enum Tipo {
     }
 
     /** Retorna el String del valor predeterminado usado en IR. */
-    public String getValorDefIR() {
+    public String getValorDef() {
         switch (this) {
             case BOOLEAN: return "false";
             case INTEGER: return "0";

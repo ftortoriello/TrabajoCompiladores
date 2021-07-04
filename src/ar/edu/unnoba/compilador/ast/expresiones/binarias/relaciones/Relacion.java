@@ -4,7 +4,8 @@ import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.OperadorCmp;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.literal.Booleano;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.literal.Literal;
 import ar.edu.unnoba.compilador.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 
@@ -23,23 +24,23 @@ public abstract class Relacion extends OperacionBinaria {
     public Expresion evaluar() throws ExcepcionTransformer {
         Expresion izquierda = getIzquierda().evaluar();
         Expresion derecha = getDerecha().evaluar();
-        if (!(izquierda instanceof Literal) || !(derecha instanceof Literal)) {
+        if (!(izquierda instanceof Literal && derecha instanceof Literal)) {
             return this;
         }
 
         boolean resultado;
 
         if (izquierda.getTipo().equals(Tipo.BOOLEAN) && derecha.getTipo().equals(Tipo.BOOLEAN)) {
-            boolean valorIzq = ((Literal) izquierda).getValorBooleano();
-            boolean valorDer = ((Literal) derecha).getValorBooleano();
+            boolean valorIzq = ((Booleano) izquierda).getValor();
+            boolean valorDer = ((Booleano) derecha).getValor();
             resultado = calcularResultado(valorIzq, valorDer);
         } else {
-            double valorIzq = ((Literal) izquierda).getValorNumerico().doubleValue();
-            double valorDer = ((Literal) derecha).getValorNumerico().doubleValue();
+            double valorIzq = Literal.getNumero(izquierda).doubleValue();
+            double valorDer = Literal.getNumero(derecha).doubleValue();
             resultado = calcularResultado(valorIzq, valorDer);
         }
 
-        return new Literal(String.valueOf(resultado), Tipo.BOOLEAN);
+        return new Booleano(resultado);
     }
 
     protected abstract boolean calcularResultado(double izq, double der);

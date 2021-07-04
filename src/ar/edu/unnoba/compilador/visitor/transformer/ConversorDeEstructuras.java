@@ -9,7 +9,8 @@ import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Suma;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.MenorIgual;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.literal.Entero;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.literal.Literal;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.SimboloVariable;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarIni;
@@ -43,8 +44,8 @@ public class ConversorDeEstructuras extends Transformer {
         bloqueNuevo.setAlcance(new Alcance("Alcance conversión FOR -> WHEN"));
         bloqueNuevo.getAlcance().setPadre(p.getBloqueSentencias().getAlcance().getPadre());
 
-        Literal valDesde = new Literal(String.valueOf(p.getValorInicial()), Tipo.INTEGER, "Valor desde");
-        Literal valHasta = new Literal(String.valueOf(p.getValorFinal()), Tipo.INTEGER, "Valor hasta");
+        Literal valDesde = new Entero(p.getValorInicial());
+        Literal valHasta = new Entero(p.getValorFinal());
 
         // Añadir al bloque la asignación con el valor inicial del contador
         Asignacion decDesde = new Asignacion(p.getIdent(), valDesde);
@@ -56,7 +57,7 @@ public class ConversorDeEstructuras extends Transformer {
         condMientras.setTipo(Tipo.BOOLEAN);
 
         // Añadir incremento del contador al final del bloque for
-        Literal salto = new Literal(String.valueOf(p.getSalto()), Tipo.INTEGER, "Salto");
+        Literal salto = new Entero(p.getSalto());
         Expresion inc = new Suma(p.getIdent(), salto);
         inc.setTipo(Tipo.INTEGER);
         Asignacion asigInc = new Asignacion(p.getIdent(), inc);

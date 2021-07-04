@@ -1,6 +1,6 @@
 package ar.edu.unnoba.compilador.ast.base;
 
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Cadena;
+import ar.edu.unnoba.compilador.ast.expresiones.Cadena;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFun;
 import ar.edu.unnoba.compilador.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;

@@ -166,10 +166,9 @@ public class TransformerTipos extends Transformer {
     }
 
     @Override
-    public SimboloVariable transform(Identificador i) throws ExcepcionTransformer {
+    public SimboloVariable transform(Identificador i) {
         // Reemplazar cada Identificador por el SimboloVariable correspondiente
-        SimboloVariable sv = getAlcanceActual().resolver(i.getNombre());
-        return sv;
+        return getAlcanceActual().resolver(i.getNombre());
     }
 
     @Override

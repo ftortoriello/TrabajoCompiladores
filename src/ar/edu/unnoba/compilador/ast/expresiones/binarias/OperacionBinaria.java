@@ -11,26 +11,8 @@ public abstract class OperacionBinaria extends Expresion {
     private Expresion izquierda;
     private Expresion derecha;
 
-    public OperacionBinaria(Expresion izquierda, Expresion derecha) {
-        super(Tipo.UNKNOWN);
-        this.izquierda = izquierda;
-        this.derecha = derecha;
-    }
-
     public OperacionBinaria(Expresion izquierda, Expresion derecha, String nombre) {
         super(Tipo.UNKNOWN, nombre);
-        this.izquierda = izquierda;
-        this.derecha = derecha;
-    }
-
-    public OperacionBinaria(Expresion izquierda, Expresion derecha, Tipo tipo) {
-        super(tipo);
-        this.izquierda = izquierda;
-        this.derecha = derecha;
-    }
-
-    public OperacionBinaria(Expresion izquierda, Expresion derecha, Tipo tipo, String nombre) {
-        super(tipo, nombre);
         this.izquierda = izquierda;
         this.derecha = derecha;
     }

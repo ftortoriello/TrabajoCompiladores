@@ -18,5 +18,5 @@ public class Constantes {
     public static final int espacioMinComent = 1;
 
     /** Si mostrar stack trace de las excepciones o sólo su descripción */
-    public static final boolean mostrarExcepcionesDetalladas = false;
+    public static final boolean mostrarExcepcionesDetalladas = true;
 }

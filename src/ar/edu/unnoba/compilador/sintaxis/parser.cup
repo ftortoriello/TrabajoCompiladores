@@ -17,10 +17,12 @@ import ar.edu.unnoba.compilador.ast.expresiones.binarias.logicas.Disyuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.aritmeticas.NegacionAritmetica;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.logicas.NegacionLogica;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Cadena;
+import ar.edu.unnoba.compilador.ast.expresiones.Cadena;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.literal.Booleano;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.literal.Entero;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.literal.Flotante;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Continuar;
@@ -65,12 +67,13 @@ terminal PR_MAIN_IS, PR_END_PUNTO,
     PR_FOR, PR_FROM, PR_TO, PR_BY, PR_DO, PR_BREAK, PR_CONTINUE,
     OP_LOG_BIN_OR, OP_LOG_BIN_AND, OP_LOG_UNA_NOT,
     OP_ARIT_SUMA, OP_ARIT_RESTA, OP_ARIT_PROD, OP_ARIT_DIV,
-    PAR_ABRE, PAR_CIERRA, COMA, PUNTO_Y_COMA, IGUAL;
-
-terminal String IDENTIFICADOR, TIPO_DE_DATO,
-    LIT_BOOLEANO, LIT_FLOTANTE, LIT_ENTERO, CADENA,
-    OP_COMPARACION,
+    PAR_ABRE, PAR_CIERRA, COMA, PUNTO_Y_COMA, IGUAL,
     PR_WRITELN, PR_WRITE, PR_READ_INTEGER, PR_READ_FLOAT, PR_READ_BOOLEAN;
+
+terminal Boolean LIT_BOOLEANO;
+terminal Integer LIT_ENTERO;
+terminal Double LIT_FLOTANTE;
+terminal String IDENTIFICADOR, TIPO_DE_DATO, OP_COMPARACION, CADENA;
 
 nonterminal Programa programa;
 
@@ -325,16 +328,14 @@ para ::=
             final int saltoPorDefecto = 1;
             Identificador ident = new Identificador(id);
             ident.setPosicion(idxleft, idxright);
-            Para para = new Para(ident, Integer.parseInt(numIni),
-                                Integer.parseInt(numFin), saltoPorDefecto, bloque);
+            Para para = new Para(ident, numIni, numFin, saltoPorDefecto, bloque);
             para.setPosicion(fxleft, bloquexright);
             RESULT = para;
         :} |
         PR_FOR:f IDENTIFICADOR:id PR_FROM LIT_ENTERO:numIni PR_TO LIT_ENTERO:numFin PR_BY LIT_ENTERO:salto PR_DO bloque:bloque {:
             Identificador ident = new Identificador(id);
             ident.setPosicion(idxleft, idxright);
-            Para para = new Para(ident, Integer.parseInt(numIni),
-                                Integer.parseInt(numFin), Integer.parseInt(salto), bloque);
+            Para para = new Para(ident, numIni, numFin, salto, bloque);
             para.setPosicion(fxleft, bloquexright);
             RESULT = para;
         :};
@@ -467,63 +468,63 @@ factor ::=
         :};
 
 literal ::=
-        LIT_ENTERO:litInt {:
-            Literal lit = new Literal(litInt, Tipo.INTEGER);
-            lit.setPosicion(litIntxleft, litIntxright);
-            RESULT = lit;
+        LIT_ENTERO:lit {:
+            Entero ent = new Entero(lit);
+            ent.setPosicion(litxleft, litxright);
+            RESULT = ent;
         :} |
-        LIT_FLOTANTE:litFloat {:
-            Literal lit = new Literal(litFloat, Tipo.FLOAT);
-            lit.setPosicion(litFloatxleft, litFloatxright);
-            RESULT = lit;
+        LIT_FLOTANTE:lit {:
+            Flotante flot = new Flotante(lit);
+            flot.setPosicion(litxleft, litxright);
+            RESULT = flot;
         :} |
-        LIT_BOOLEANO:litBoolean {:
-            Literal lit = new Literal(litBoolean, Tipo.BOOLEAN);
-            lit.setPosicion(litBooleanxleft, litBooleanxright);
-            RESULT = lit;
+        LIT_BOOLEANO:lit {:
+            Booleano bool = new Booleano(lit);
+            bool.setPosicion(litxleft, litxright);
+            RESULT = bool;
         :};
 
 invocacion_funcion ::=
         PR_WRITELN:idfun PAR_ABRE expresion:expr PAR_CIERRA:cierre {:
             List<Expresion> params = new ArrayList<>();
             params.add(expr);
-            InvocacionFuncion invo = new InvocacionFuncion(idfun, params, Tipo.UNKNOWN);
+            InvocacionFuncion invo = new InvocacionFuncion("writeln", params, Tipo.UNKNOWN);
             invo.setPosicion(idfunxleft, cierrexright);
             RESULT = invo;
         :} |
         PR_WRITELN:idfun PAR_ABRE CADENA:c PAR_CIERRA:cierre {:
             List<Expresion> params = new ArrayList<>();
             params.add(new Cadena(c));
-            InvocacionFuncion invo = new InvocacionFuncion(idfun, params, Tipo.UNKNOWN);
+            InvocacionFuncion invo = new InvocacionFuncion("writeln", params, Tipo.UNKNOWN);
             invo.setPosicion(idfunxleft, cierrexright);
             RESULT = invo;
         :} |
         PR_WRITE:idfun PAR_ABRE expresion:expr PAR_CIERRA:cierre {:
             List<Expresion> params = new ArrayList<>();
             params.add(expr);
-            InvocacionFuncion invo = new InvocacionFuncion(idfun, params, Tipo.UNKNOWN);
+            InvocacionFuncion invo = new InvocacionFuncion("write", params, Tipo.UNKNOWN);
             invo.setPosicion(idfunxleft, cierrexright);
             RESULT = invo;
         :} |
         PR_WRITE:idfun PAR_ABRE CADENA:c PAR_CIERRA:cierre {:
             List<Expresion> params = new ArrayList<>();
             params.add(new Cadena(c));
-            InvocacionFuncion invo = new InvocacionFuncion(idfun, params, Tipo.UNKNOWN);
+            InvocacionFuncion invo = new InvocacionFuncion("write", params, Tipo.UNKNOWN);
             invo.setPosicion(idfunxleft, cierrexright);
             RESULT = invo;
         :} |
         PR_READ_INTEGER:idfun PAR_ABRE PAR_CIERRA:cierre {:
-            InvocacionFuncion invo = new InvocacionFuncion(idfun, Tipo.INTEGER);
+            InvocacionFuncion invo = new InvocacionFuncion("read_integer", Tipo.INTEGER);
             invo.setPosicion(idfunxleft, cierrexright);
             RESULT = invo;
         :} |
         PR_READ_FLOAT:idfun PAR_ABRE PAR_CIERRA:cierre {:
-            InvocacionFuncion invo = new InvocacionFuncion(idfun, Tipo.FLOAT);
+            InvocacionFuncion invo = new InvocacionFuncion("read_float", Tipo.FLOAT);
             invo.setPosicion(idfunxleft, cierrexright);
             RESULT = invo;
         :} |
         PR_READ_BOOLEAN:idfun PAR_ABRE PAR_CIERRA:cierre {:
-            InvocacionFuncion invo = new InvocacionFuncion(idfun, Tipo.BOOLEAN);
+            InvocacionFuncion invo = new InvocacionFuncion("read_boolean", Tipo.BOOLEAN);
             invo.setPosicion(idfunxleft, cierrexright);
             RESULT = invo;
         :} |

@@ -1,6 +1,5 @@
-package ar.edu.unnoba.compilador.ast.expresiones.valor;
+package ar.edu.unnoba.compilador.ast.expresiones;
 
-import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 

@@ -10,21 +10,17 @@ public abstract class Expresion extends Nodo {
     private Tipo tipo;
     private String refIR;
 
-    public Expresion(Tipo tipo) {
-        this.tipo = tipo;
+    public Expresion() {
+        this.tipo = Tipo.UNKNOWN;
     }
 
-    public Expresion(String nombre) {
-        super(nombre);
+    public Expresion(Tipo tipo) {
+        this.tipo = tipo;
     }
 
     public Expresion(Tipo tipo, String nombre) {
         super(nombre);
         this.tipo = tipo;
-    }
-
-    public Expresion() {
-        this.tipo = Tipo.UNKNOWN;
     }
 
     public Tipo getTipo() {

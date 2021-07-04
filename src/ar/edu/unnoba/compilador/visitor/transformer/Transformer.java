@@ -10,7 +10,7 @@ import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Literal;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.literal.Literal;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Continuar;
@@ -69,7 +69,7 @@ public abstract class Transformer {
         return c;
     }
 
-    public Identificador transform(Identificador i) throws ExcepcionTransformer {
+    public Identificador transform(Identificador i) {
         return i;
     }
 
