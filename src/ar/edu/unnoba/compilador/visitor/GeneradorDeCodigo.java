@@ -919,7 +919,7 @@ public class GeneradorDeCodigo extends Visitor {
         grar.setComentLinea(String.format("Literal %s", lit));
         // Hack para generar referencias a valores en una línea (le sumo 0 al valor que quiero guardar)
         grar.suma(lit.getRefIR(), lit.getTipo().getIR(),
-                lit.toString(), lit.getTipo().getValorDef());
+                  lit.toString(), lit.getTipo().getValorDef());
     }
 
     @Override

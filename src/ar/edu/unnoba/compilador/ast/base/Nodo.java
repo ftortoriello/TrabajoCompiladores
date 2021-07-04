@@ -6,16 +6,16 @@ import ar.edu.unnoba.compilador.sintaxis.Util;
 import ar.edu.unnoba.compilador.util.Constantes;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
-import java_cup.runtime.ComplexSymbolFactory;
+import java_cup.runtime.ComplexSymbolFactory.Location;
 
 public abstract class Nodo {
     private String nombre;
 
     /** Posición en que comienza el token en el archivo de entrada. */
-    private ComplexSymbolFactory.Location posIzq;
+    private Location posIzq;
 
     /** Posición en que termina el token en el archivo de entrada. */
-    private ComplexSymbolFactory.Location posDer;
+    private Location posDer;
 
     public Nodo() {
         if (Constantes.mostrarCreacionNodos) {
@@ -40,7 +40,7 @@ public abstract class Nodo {
         return Util.getPosicion(posIzq, posDer);
     }
 
-    public void setPosicion(ComplexSymbolFactory.Location izq, ComplexSymbolFactory.Location der) {
+    public void setPosicion(Location izq, Location der) {
         this.posIzq = izq;
         this.posDer = der;
     }

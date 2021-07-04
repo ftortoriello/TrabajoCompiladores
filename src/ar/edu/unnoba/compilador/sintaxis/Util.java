@@ -4,7 +4,7 @@ import java_cup.runtime.ComplexSymbolFactory.Location;
 
 public class Util {
     /** Obtener un String. Si izq y der son iguales, contiene con un valor, sino los dos. */
-    private static String getStringRango(int izq, int der) {
+    private static String getStrRango(int izq, int der) {
         if (izq == der) {
             return String.format("%d", izq);
         } else {
@@ -16,7 +16,7 @@ public class Util {
     public static String getPosicion(Location izq, Location der) {
         if (izq == null || der == null) return "";
 
-        return "Línea:" + getStringRango(izq.getLine(), der.getLine()) +
-               " Columna:" + getStringRango(izq.getColumn(), der.getColumn());
+        return String.format("Línea:%s Columna:%s", getStrRango(izq.getLine(), der.getLine()),
+                                                    getStrRango(izq.getColumn(), der.getColumn()));
     }
 }

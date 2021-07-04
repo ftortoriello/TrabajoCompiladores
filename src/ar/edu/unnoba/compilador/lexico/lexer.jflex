@@ -67,7 +67,7 @@ import java.util.Stack;
 
     /** Mostrar error léxico, incluyendo la posición del scanner */
     private void errorLexico(String msg) {
-        throw new Error("Línea " + this.yyline + ", columna " + this.yycolumn + ": " + msg);
+        throw new Error(String.format("Línea:%d Columna:%d - %s", yyline+1, yycolumn+1, msg));
     }
 %}
 
