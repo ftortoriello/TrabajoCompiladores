@@ -12,6 +12,7 @@ import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVar;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarIni;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.Declaracion;
 import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;
+import ar.edu.unnoba.compilador.util.Normalizador;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,6 +54,10 @@ public class GeneradorDeAlcanceGlobal extends Visitor {
     private void agregarFuncionPredefinida(String nombre, Tipo tipo) {
         Identificador id = new Identificador(nombre, tipo);
         DecFun d = new DecFun(id, new ArrayList<>(), new Bloque(nombre, false));
+        d.setEtiquetaFin(Normalizador.crearNomEtiqueta("ret"));
+        d.setNombreFunIR("@" + nombre);
+        d.setPtroRet(Normalizador.crearNomPtroLcl("ret"));
+        d.setRefIR(Normalizador.crearNomRef(nombre));
         tablaFunciones.put(nombre, d);
     }
 
