@@ -47,6 +47,10 @@ import java.util.Stack;
         symbolFactory = sf;
     }
 
+    private Symbol symbol(String nombre) {
+        return symbol(nombre, yyline + 1, yycolumn + 1, null);
+    }
+
     private Symbol symbol(String nombre, Object valor) {
         return symbol(nombre, yyline + 1, yycolumn + 1, valor);
     }
@@ -99,52 +103,52 @@ ComentarioUnaLinea = #.*{FinDeLinea}?
     {ComentarioUnaLinea} { /* ignorar */ }
 
     // Palabras reservadas
-    "main is"           { return symbol("PR_MAIN_IS", yytext()); }
-    "end."              { return symbol("PR_END_PUNTO", yytext()); }
-    "variable"          { return symbol("PR_VARIABLE", yytext()); }
-    "is"                { return symbol("PR_IS", yytext()); }
-    "function"          { return symbol("PR_FUNCTION", yytext()); }
-    "return"            { return symbol("PR_RETURN", yytext()); }
-    "begin"             { return symbol("PR_BEGIN", yytext()); }
-    "end"               { return symbol("PR_END", yytext()); }
-    "if"                { return symbol("PR_IF", yytext()); }
-    "then"              { return symbol("PR_THEN", yytext()); }
-    "else"              { return symbol("PR_ELSE", yytext()); }
-    "when"              { return symbol("PR_WHEN", yytext()); }
-    "while"             { return symbol("PR_WHILE", yytext()); }
-    "for"               { return symbol("PR_FOR", yytext()); }
-    "from"              { return symbol("PR_FROM", yytext()); }
-    "to"                { return symbol("PR_TO", yytext()); }
-    "by"                { return symbol("PR_BY", yytext()); }
-    "do"                { return symbol("PR_DO", yytext()); }
-    "break"             { return symbol("PR_BREAK", yytext()); }
-    "continue"          { return symbol("PR_CONTINUE", yytext()); }
-    "writeln"           { return symbol("PR_WRITELN", yytext()); }
-    "write"             { return symbol("PR_WRITE", yytext()); }
-    "read_integer"      { return symbol("PR_READ_INTEGER", yytext()); }
-    "read_float"        { return symbol("PR_READ_FLOAT", yytext()); }
-    "read_boolean"      { return symbol("PR_READ_BOOLEAN", yytext()); }
+    "main is"           { return symbol("PR_MAIN_IS"); }
+    "end."              { return symbol("PR_END_PUNTO"); }
+    "variable"          { return symbol("PR_VARIABLE"); }
+    "is"                { return symbol("PR_IS"); }
+    "function"          { return symbol("PR_FUNCTION"); }
+    "return"            { return symbol("PR_RETURN"); }
+    "begin"             { return symbol("PR_BEGIN"); }
+    "end"               { return symbol("PR_END"); }
+    "if"                { return symbol("PR_IF"); }
+    "then"              { return symbol("PR_THEN"); }
+    "else"              { return symbol("PR_ELSE"); }
+    "when"              { return symbol("PR_WHEN"); }
+    "while"             { return symbol("PR_WHILE"); }
+    "for"               { return symbol("PR_FOR"); }
+    "from"              { return symbol("PR_FROM"); }
+    "to"                { return symbol("PR_TO"); }
+    "by"                { return symbol("PR_BY"); }
+    "do"                { return symbol("PR_DO"); }
+    "break"             { return symbol("PR_BREAK"); }
+    "continue"          { return symbol("PR_CONTINUE"); }
+    "writeln"           { return symbol("PR_WRITELN"); }
+    "write"             { return symbol("PR_WRITE"); }
+    "read_integer"      { return symbol("PR_READ_INTEGER"); }
+    "read_float"        { return symbol("PR_READ_FLOAT"); }
+    "read_boolean"      { return symbol("PR_READ_BOOLEAN"); }
     {TiposDeDato}       { return symbol("TIPO_DE_DATO", yytext()); }
 
     // Operadores
-    "+"                 { return symbol("OP_ARIT_SUMA", yytext()); }
-    "-"                 { return symbol("OP_ARIT_RESTA", yytext()); }
-    "*"                 { return symbol("OP_ARIT_PROD", yytext()); }
-    "/"                 { return symbol("OP_ARIT_DIV", yytext()); }
+    "+"                 { return symbol("OP_ARIT_SUMA"); }
+    "-"                 { return symbol("OP_ARIT_RESTA"); }
+    "*"                 { return symbol("OP_ARIT_PROD"); }
+    "/"                 { return symbol("OP_ARIT_DIV"); }
 
     {OpComparacion}     { return symbol("OP_COMPARACION", yytext()); }
 
-    "or"                { return symbol("OP_LOG_BIN_OR", yytext()); }
-    "and"               { return symbol("OP_LOG_BIN_AND", yytext()); }
-    "not"               { return symbol("OP_LOG_UNA_NOT", yytext()); }
+    "or"                { return symbol("OP_LOG_BIN_OR"); }
+    "and"               { return symbol("OP_LOG_BIN_AND"); }
+    "not"               { return symbol("OP_LOG_UNA_NOT"); }
 
     // Otros símbolos del lenguaje
-    "("                 { return symbol("PAR_ABRE", yytext()); }
-    ")"                 { return symbol("PAR_CIERRA", yytext()); }
+    "("                 { return symbol("PAR_ABRE"); }
+    ")"                 { return symbol("PAR_CIERRA"); }
 
-    ","                 { return symbol("COMA", yytext()); }
-    ";"                 { return symbol("PUNTO_Y_COMA", yytext()); }
-    "="                 { return symbol("IGUAL", yytext()); }
+    ","                 { return symbol("COMA"); }
+    ";"                 { return symbol("PUNTO_Y_COMA"); }
+    "="                 { return symbol("IGUAL"); }
 
     {EspacioEnBlanco}   { /* ignorar */ }
 
