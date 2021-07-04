@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 
 public class Cadena extends Expresion {
     private String valor;
-    private String nombreIR;
+    private String ptroIR;
 
     public Cadena(String valor) {
         this.valor = valor;
@@ -22,12 +22,12 @@ public class Cadena extends Expresion {
         this.valor = valor;
     }
 
-    public String getNombreIR() {
-        return nombreIR;
+    public String getPtroIR() {
+        return ptroIR;
     }
 
-    public void setNombreIR(String nombreIR) {
-        this.nombreIR = nombreIR;
+    public void setPtroIR(String ptroIR) {
+        this.ptroIR = ptroIR;
     }
 
     /**

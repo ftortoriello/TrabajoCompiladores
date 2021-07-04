@@ -3,7 +3,6 @@ package ar.edu.unnoba.compilador.visitor.transformer;
 import ar.edu.unnoba.compilador.ast.base.Alcance;
 import ar.edu.unnoba.compilador.ast.base.Bloque;
 import ar.edu.unnoba.compilador.ast.base.Nodo;
-import ar.edu.unnoba.compilador.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Suma;
@@ -19,7 +18,7 @@ import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
-import ar.edu.unnoba.compilador.util.Normalizador;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionTransformer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,10 +81,9 @@ public class ConversorDeEstructuras extends Transformer {
 
         // La expresión del case pasa a estar en una nueva variable temporal, para la
         // cual tengo que crear su símbolo y añadirlo al alcance.
-        String nombreVarAux = Normalizador.crearNomRef("aux");
-        Identificador identAux = new Identificador(nombreVarAux, c.getCondicion().getTipo());
+        Identificador identAux = new Identificador("aux", c.getCondicion().getTipo());
         DecVarIni decVarAux  = new DecVarIni(identAux, c.getCondicion());
-        SimboloVariable simboloAux = new SimboloVariable(decVarAux, nombreVarAux, false);
+        SimboloVariable simboloAux = new SimboloVariable(decVarAux, false);
         decVarAux.setIdent(simboloAux);
 
         // Agrego la declaración en la lista de sentencias

@@ -9,22 +9,21 @@ import ar.edu.unnoba.compilador.ast.sentencias.declaracion.Declaracion;
 
 public class SimboloVariable extends Identificador {
     /** El nombre original, pero único y normalizado para usarse en IR. */
-    private String nombreIR;
+    private String ptroIR;
 
     private final Boolean esGlobal;
 
-    public SimboloVariable(Declaracion d, String nombreIR, Boolean esGlobal) {
+    public SimboloVariable(Declaracion d, Boolean esGlobal) {
         super(d.getIdent().getNombre(), d.getIdent().getTipo());
-        this.nombreIR = nombreIR;
         this.esGlobal = esGlobal;
     }
 
-    public String getNombreIR() {
-        return nombreIR;
+    public String getPtroIR() {
+        return ptroIR;
     }
 
-    public void setNombreIR(String nombreIR) {
-        this.nombreIR = nombreIR;
+    public void setPtroIR(String ptroIR) {
+        this.ptroIR = ptroIR;
     }
 
     public Boolean getEsGlobal() {

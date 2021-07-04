@@ -3,13 +3,11 @@ package ar.edu.unnoba.compilador.visitor;
 import ar.edu.unnoba.compilador.ast.base.Alcance;
 import ar.edu.unnoba.compilador.ast.base.Bloque;
 import ar.edu.unnoba.compilador.ast.base.Programa;
-import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.SimboloFuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.SimboloVariable;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
-import ar.edu.unnoba.compilador.util.Normalizador;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -22,7 +20,7 @@ import java.util.Set;
 public class GeneradorDeAlcancesLocales extends Visitor {
     private Alcance alcanceGlobal;
     private Alcance alcanceActual;
-    private Map<String, SimboloFuncion> tablaFunciones;
+    private Map<String, DecFun> tablaFunciones;
     private Set<String> funPredefUsadas;
 
     /** Agregar la declaración al ámbito en el que se encuentra. */
@@ -45,10 +43,7 @@ public class GeneradorDeAlcancesLocales extends Visitor {
                             id.getTipo(), alcanceActual.resolver(nombre).getTipo()));
         }
 
-        String nombreIR = Normalizador.crearNomPtroLcl(nombre);
-        final boolean esGlobal = false;
-
-        SimboloVariable simbolo = new SimboloVariable(d, nombreIR, esGlobal);
+        SimboloVariable simbolo = new SimboloVariable(d, false);
         alcanceActual.put(nombre, simbolo);
     }
 
@@ -145,7 +140,7 @@ public class GeneradorDeAlcancesLocales extends Visitor {
 
         // Validar que la cantidad de argumentos pasados sea por lo menos la cantidad obligaria,
         // y no supere la cantidad total de parámetros, incluyendo los opcionales
-        DecFun decFun = tablaFunciones.get(i.getNombre()).getDeclaracion();
+        DecFun decFun = tablaFunciones.get(i.getNombre());
 
         int cantArgsInvo = i.getArgs().size();
         int cantMinArgs = decFun.getCantArgsObligatorios();

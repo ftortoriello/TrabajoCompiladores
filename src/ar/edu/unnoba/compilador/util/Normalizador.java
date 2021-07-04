@@ -90,6 +90,7 @@ public class Normalizador {
      * Usado generalmente para el atributo refIR.
      */
     public static String crearNomRef(String nombreOrig) {
-        return String.format("%%ref.%s.%s", nombreOrig, getIdVarRef(nombreOrig));
+        String nombreNormalizado = normalizar(nombreOrig);
+        return String.format("%%ref.%s.%s", nombreNormalizado, getIdVarRef(nombreOrig));
     }
 }

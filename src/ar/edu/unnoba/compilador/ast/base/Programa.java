@@ -1,22 +1,19 @@
 package ar.edu.unnoba.compilador.ast.base;
 
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Cadena;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFun;
 import ar.edu.unnoba.compilador.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Cadena;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.SimboloFuncion;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Programa extends Nodo {
     private Encabezado encabezado;
     private Bloque cuerpo;
     private Alcance alcance;
-    private Map<String, SimboloFuncion> tablaFunciones;
+    private Map<String, DecFun> tablaFunciones;
     // Para generar código IR sólo si se usan las funciones
     private Set<String> funPredefUsadas;
     private List<Cadena> arrCadenas = new ArrayList<>();
@@ -51,11 +48,11 @@ public class Programa extends Nodo {
         this.alcance = alcance;
     }
 
-    public Map<String, SimboloFuncion> getTablaFunciones() {
+    public Map<String, DecFun> getTablaFunciones() {
         return tablaFunciones;
     }
 
-    public void setTablaFunciones(Map<String, SimboloFuncion> tablaFunciones) {
+    public void setTablaFunciones(Map<String, DecFun> tablaFunciones) {
         this.tablaFunciones = tablaFunciones;
     }
 

@@ -2,9 +2,9 @@ package ar.edu.unnoba.compilador.ast.sentencias.declaracion;
 
 import ar.edu.unnoba.compilador.ast.base.Alcance;
 import ar.edu.unnoba.compilador.ast.base.Bloque;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 
@@ -18,6 +18,12 @@ public class DecFun extends Declaracion {
     private Bloque bloque;
     private Alcance alcance;
 
+    /** El nombre de la función, normalizado para usarse en IR. */
+    private String nombreFunIR;
+    /** El puntero en el que se va a guardar el valor de retorno. */
+    private String ptroRet;
+    /** Referencia utilizada en conjunto con el ptro. para cargar el valor. */
+    private String refIR;
     /** Después de esta etiqueta encuentro el return de la función. */
     private String etiquetaFin;
 
@@ -59,6 +65,30 @@ public class DecFun extends Declaracion {
 
     public void setAlcance(Alcance alcance) {
         this.alcance = alcance;
+    }
+
+    public String getNombreFunIR() {
+        return nombreFunIR;
+    }
+
+    public void setNombreFunIR(String nombreFunIR) {
+        this.nombreFunIR = nombreFunIR;
+    }
+
+    public String getPtroRet() {
+        return ptroRet;
+    }
+
+    public void setPtroRet(String ptroRet) {
+        this.ptroRet = ptroRet;
+    }
+
+    public String getRefIR() {
+        return refIR;
+    }
+
+    public void setRefIR(String refIR) {
+        this.refIR = refIR;
     }
 
     public String getEtiquetaFin() {

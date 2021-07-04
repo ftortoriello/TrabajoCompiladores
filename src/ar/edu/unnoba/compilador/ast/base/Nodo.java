@@ -2,11 +2,10 @@ package ar.edu.unnoba.compilador.ast.base;
 
 import ar.edu.unnoba.compilador.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;
-import ar.edu.unnoba.compilador.util.Constantes;
 import ar.edu.unnoba.compilador.sintaxis.Util;
+import ar.edu.unnoba.compilador.util.Constantes;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
-
 import java_cup.runtime.ComplexSymbolFactory;
 
 public abstract class Nodo {

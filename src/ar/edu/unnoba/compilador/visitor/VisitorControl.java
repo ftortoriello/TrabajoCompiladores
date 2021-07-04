@@ -1,15 +1,12 @@
 package ar.edu.unnoba.compilador.visitor;
 
+import ar.edu.unnoba.compilador.ast.sentencias.control.Continuar;
+import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
+import ar.edu.unnoba.compilador.ast.sentencias.control.Salir;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFun;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
 import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;
-import ar.edu.unnoba.compilador.ast.sentencias.control.Continuar;
-import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
-import ar.edu.unnoba.compilador.ast.sentencias.control.Salir;
-
-import java.util.ArrayDeque;
-import java.util.Deque;
 
 /**
  * Visitor para verificar que las sentencias return, break y continue se encuentren en donde

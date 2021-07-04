@@ -1,8 +1,8 @@
 package ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas;
 
-import ar.edu.unnoba.compilador.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionTransformer;
 
 public class Division extends OperacionBinariaAritmetica {
     public Division(Expresion izquierda, Expresion derecha) {

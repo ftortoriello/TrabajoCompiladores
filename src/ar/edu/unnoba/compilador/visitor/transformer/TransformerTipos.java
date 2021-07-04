@@ -4,7 +4,6 @@ import ar.edu.unnoba.compilador.ast.base.Alcance;
 import ar.edu.unnoba.compilador.ast.base.Bloque;
 import ar.edu.unnoba.compilador.ast.base.Nodo;
 import ar.edu.unnoba.compilador.ast.base.Programa;
-import ar.edu.unnoba.compilador.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
@@ -14,7 +13,9 @@ import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.EnteroAFlotante;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.conversiones.FlotanteAEntero;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.*;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.SimboloVariable;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
@@ -24,6 +25,7 @@ import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionTransformer;
 
 import java.util.Map;
 
@@ -35,7 +37,7 @@ import java.util.Map;
  */
 public class TransformerTipos extends Transformer {
     private Alcance alcanceActual;
-    private Map<String, SimboloFuncion> tablaFunciones;
+    private Map<String, DecFun> tablaFunciones;
 
     /**
      * Última función visitada. La guardamos para validar el tipo de retorno, y convertir el tipo
@@ -51,11 +53,11 @@ public class TransformerTipos extends Transformer {
         this.alcanceActual = alcanceActual;
     }
 
-    public Map<String, SimboloFuncion> getTablaFunciones() {
+    public Map<String, DecFun> getTablaFunciones() {
         return tablaFunciones;
     }
 
-    public void setTablaFunciones(Map<String, SimboloFuncion> tablaFunciones) {
+    public void setTablaFunciones(Map<String, DecFun> tablaFunciones) {
         this.tablaFunciones = tablaFunciones;
     }
 
@@ -179,12 +181,11 @@ public class TransformerTipos extends Transformer {
             return invo;
         }
 
-        SimboloFuncion sf = getTablaFunciones().get(invo.getNombre());
-        DecFun decFun = sf.getDeclaracion();
+        DecFun df = getTablaFunciones().get(invo.getNombre());
         int cantArgs = invo.getArgs().size();
 
         // La invocación va a tener el mismo tipo que la función
-        invo.setTipo(sf.getTipo());
+        invo.setTipo(df.getTipo());
 
         // Validar el tipo de cada argumento, y convertir cuando sea necesario/posible
         for (int i = 0; i < cantArgs; i++) {
@@ -192,7 +193,7 @@ public class TransformerTipos extends Transformer {
             Expresion argInvo = invo.getArgs().get(i);
 
             // El tipo del parámetro, según se definió en la declaración
-            Tipo tipoFormal = decFun.getParams().get(i).getTipo();
+            Tipo tipoFormal = df.getParams().get(i).getTipo();
 
             // Guardar el argumento convertido en la invocación
             invo.getArgs().set(i, convertirATipo(argInvo, tipoFormal));

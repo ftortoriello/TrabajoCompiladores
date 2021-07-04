@@ -2,7 +2,6 @@ package ar.edu.unnoba.compilador.visitor;
 
 import ar.edu.unnoba.compilador.ast.base.Bloque;
 import ar.edu.unnoba.compilador.ast.base.Programa;
-import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
@@ -23,6 +22,7 @@ import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntonces;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
+import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.util.GenerarIR;
 import ar.edu.unnoba.compilador.util.Normalizador;
 import jflex.base.Pair;
@@ -40,7 +40,7 @@ public class GeneradorDeCodigo extends Visitor {
      * Tabla con las funciones definidas por el usuario.
      * Se extrae del objeto Programa al entrar en esta clase.
      */
-    private Map<String, SimboloFuncion> tablaFunciones;
+    private Map<String, DecFun> tablaFunciones;
 
     /**
      * Lista para guardar los nombres de las funciones que inicializan a las variables globales.
@@ -111,7 +111,7 @@ public class GeneradorDeCodigo extends Visitor {
 
         if (arg instanceof Cadena) {
             Cadena cad = (Cadena) arg;
-            grar.print(cad.getNombreIR(), cad.getLongitudIR());
+            grar.print(cad.getPtroIR(), cad.getLongitudIR());
         } else if (arg.getTipo().equals(Tipo.BOOLEAN)) {
             // Extender el i1 a i32 para poder compararlo
             String refExt = Normalizador.crearNomRef("ext");
@@ -243,13 +243,13 @@ public class GeneradorDeCodigo extends Visitor {
         for (int i = 0; i < cantParams; i++) {
             SimboloVariable simboloParam = (SimboloVariable) arrParams.get(i).getIdent();
             String tipoParam = simboloParam.getTipo().getIR();
-            String paramNombreIR = simboloParam.getNombreIR();
+            String paramPtroIR = simboloParam.getPtroIR();
 
             // Para separar los parámetros mediante comas, excepto el final
             String sep = i != cantParams - 1 ? ", " : "";
 
             // Añado el argumento a la lista
-            strParams.append(String.format("%s %s%s", tipoParam, paramNombreIR, sep));
+            strParams.append(String.format("%s %s%s", tipoParam, paramPtroIR, sep));
         }
 
         return strParams.toString();
@@ -392,7 +392,7 @@ public class GeneradorDeCodigo extends Visitor {
     private void declararVarsStrs() {
         // Por ej.: @ptro.str.2 = private constant [5 x i8] c"Hola\00"
         arrCadenas.forEach(cad ->
-                grar.cadena(cad.getNombreIR(), cad.getValorIR(), cad.getLongitudIR()));
+                grar.cadena(cad.getPtroIR(), cad.getValorIR(), cad.getLongitudIR()));
     }
 
 
@@ -510,7 +510,7 @@ public class GeneradorDeCodigo extends Visitor {
 
         // Origen va a contener la referencia al valor de la expresión
         String origen = expr.getRefIR();
-        String destino = svDestino.getNombreIR();
+        String destino = svDestino.getPtroIR();
 
         grar.setComentLinea(String.format("%s %s %s%s",
                 svDestino.getNombre(), asig.getEtiqueta(), expr,
@@ -531,7 +531,7 @@ public class GeneradorDeCodigo extends Visitor {
         SimboloVariable sv = (SimboloVariable) dv.getIdent();
 
         // Parámetros que necesito para declarar la variable
-        String nombreIR = sv.getNombreIR();
+        String nombreIR = sv.getPtroIR();
         String tipoIR = sv.getTipo().getIR();
         Boolean esGlobal = sv.getEsGlobal();
         String valorIR = dv.getTipo().getValorDefIR();
@@ -554,11 +554,11 @@ public class GeneradorDeCodigo extends Visitor {
 
         boolean aplicarCortocircuito = (expr instanceof OperacionBinariaLogica);
         if (aplicarCortocircuito) {
-            grarEtiCortocircuitoAsig("decvarini");
+            grarEtiCortocircuitoAsig("dec.var.ini");
         }
 
         // Parámetros que necesito para declarar la variable
-        String nombreIR = sv.getNombreIR();
+        String nombreIR = sv.getPtroIR();
         String tipoIR = sv.getTipo().getIR();
 
         grar.setComentLinea(String.format("variable %s is %s = %s%s",
@@ -578,7 +578,7 @@ public class GeneradorDeCodigo extends Visitor {
             String refIR = expr.getRefIR();
 
             if (aplicarCortocircuito) {
-                finalizarCortocircuitoAsig(refIR, sv.getNombreIR());
+                finalizarCortocircuitoAsig(refIR, sv.getPtroIR());
             } else {
                 grar.store(nombreIR, tipoIR, refIR);
             }
@@ -597,7 +597,7 @@ public class GeneradorDeCodigo extends Visitor {
             refIR = expr.getRefIR();
 
             if (aplicarCortocircuito) {
-                finalizarCortocircuitoAsig(refIR, sv.getNombreIR());
+                finalizarCortocircuitoAsig(refIR, sv.getPtroIR());
             } else {
                 grar.alloca(nombreIR, tipoIR);
                 grar.store(nombreIR, tipoIR, refIR);
@@ -607,14 +607,12 @@ public class GeneradorDeCodigo extends Visitor {
 
     @Override
     public void visit(DecFun df) throws ExcepcionVisitor {
-        SimboloFuncion simboloFun = tablaFunciones.get(df.getNombre());
-
         // Elementos que necesito para definir la función: tipo de retorno, nombre,
         // la etiqueta de retorno, parámetros y el cuerpo
-        String tipoRet = simboloFun.getTipo().getIR();
-        String nombreFun = simboloFun.getNombreFuncionIR();
-        String ptroRet = simboloFun.getPtroRet();
-        String refRet = simboloFun.getRefIR();
+        String tipoRet = df.getTipo().getIR();
+        String nombreFun = df.getNombreFunIR();
+        String ptroRet = df.getPtroRet();
+        String refRet = df.getRefIR();
         String etiquetaFin = df.getEtiquetaFin();
         String valorPorDef = df.getTipo().getValorDefIR();
 
@@ -658,13 +656,12 @@ public class GeneradorDeCodigo extends Visitor {
         SimboloVariable sv = (SimboloVariable) p.getIdent();
 
         // Guardo el nombre original del parámetro para poder extraer el valor, después lo piso
-        String nombreOriginal = sv.getNombreIR();
-        String refIR = Normalizador.crearNomPtroLcl("ref");
-        String nombreIR = Normalizador.crearNomPtroLcl("param");
+        String nombreOriginal = sv.getPtroIR();
         String tipoIR = p.getTipo().getIR();
 
-        sv.setRefIR(refIR);
-        sv.setNombreIR(nombreIR);
+        // TODO este reemplazo es cualquier cosa me parece, ver de simplificar
+        String nombreIR = Normalizador.crearNomPtroLcl("param");
+        sv.setPtroIR(nombreIR);
 
         grar.alloca(nombreIR, tipoIR);
         grar.setComentLinea(String.format("Param %s", sv.getNombre()));
@@ -784,22 +781,22 @@ public class GeneradorDeCodigo extends Visitor {
 
     @Override
     public void visit(Retorno r) throws ExcepcionVisitor {
-        SimboloFuncion simboloFun = tablaFunciones.get(r.getFun().getNombre());
+        DecFun df = r.getFun();
         Expresion expr = r.getExpresion();
 
         boolean aplicarCortocircuito = (expr instanceof OperacionBinariaLogica);
-        if (aplicarCortocircuito) grarEtiCortocircuitoAsig("decvarini");
+        if (aplicarCortocircuito) grarEtiCortocircuitoAsig("ret");
 
         // Generar refIR para la expresión de retorno
         expr.accept(this);
 
         grar.setComentLinea("return");
 
-        String tipoIR = simboloFun.getTipo().getIR();
+        String tipoIR = df.getTipo().getIR();
         // La variable con el valor de la expresión resuelto
         String refExpr = expr.getRefIR();
         // El puntero del cual se toma el valor al hacer el return al final de la fun.
-        String ptroRet = simboloFun.getPtroRet();
+        String ptroRet = df.getPtroRet();
 
         // Guardo el valor de la expr. del return en la variable que se va a retornar al final de la función
         grar.store(ptroRet, tipoIR, refExpr);
@@ -837,10 +834,6 @@ public class GeneradorDeCodigo extends Visitor {
             return;
         }
 
-        // Defino un nombre auxiliar con el cual puedo referenciar el valor de la expr.
-        String refIR = Normalizador.crearNomRef("ob");
-        ob.setRefIR(refIR);
-
         // El padre visita a las exprs. izq. y der. para generar la declaración de referencias
         super.visit(ob);
 
@@ -854,10 +847,10 @@ public class GeneradorDeCodigo extends Visitor {
 
         if (ob instanceof OperacionBinariaAritmetica) {
             // Por ej.: %aux.ob.11 = add i32 %aux.sv.9, %aux.ref.10 ; %aux.ob.11 = %aux.sv.9 + %aux.ref.10
-            grar.asig(refIR, instCmpIR, tipoIR, refIzqIR, refDerIR);
+            grar.asig(ob.getRefIR(), instCmpIR, tipoIR, refIzqIR, refDerIR);
         } else if (ob instanceof Relacion) {
             // Por ej.: %aux.ob.15 = icmp sgt i32 %aux.sv.13, %aux.sv.14 ; %aux.sv.13 > %aux.sv.14
-            grar.cmp(instCmpIR, refIR, tipoIR, refIzqIR, refDerIR);
+            grar.cmp(instCmpIR, ob.getRefIR(), tipoIR, refIzqIR, refDerIR);
         } else {
             throw new ExcepcionVisitor(ob, "Tipo de operación binaria inesperado.");
         }
@@ -867,18 +860,15 @@ public class GeneradorDeCodigo extends Visitor {
     public void visit(NegacionAritmetica neg) throws ExcepcionVisitor {
         super.visit(neg);
 
-        String refIR = Normalizador.crearNomRef("neg");
-        neg.setRefIR(refIR);
-
         Expresion expr = neg.getExpresion();
         Tipo tipo = expr.getTipo();
         switch (tipo) {
             case INTEGER:
                 // hacer 0 - expresion
-                grar.asig(refIR, "sub", tipo.getIR(), "0", expr.getRefIR());
+                grar.asig(neg.getRefIR(), "sub", tipo.getIR(), "0", expr.getRefIR());
                 break;
             case FLOAT:
-                grar.asig(refIR, "fneg", tipo.getIR(), expr.getRefIR());
+                grar.asig(neg.getRefIR(), "fneg", tipo.getIR(), expr.getRefIR());
                 break;
             default: throw new ExcepcionVisitor(neg, "Tipo inesperado: " + tipo);
         }
@@ -892,25 +882,21 @@ public class GeneradorDeCodigo extends Visitor {
         // En ese caso no hay que generar una instrucción para negarla.
         if (neg.isEnCortocircuito()) return;
 
-        String refIR = Normalizador.crearNomRef("not");
-        neg.setRefIR(refIR);
-
         Expresion expr = neg.getExpresion();
-        grar.asig(refIR, "xor", "i1", "1", expr.getRefIR());
-        expr.setRefIR(refIR);
+        grar.asig(neg.getRefIR(), "xor", "i1", "1", expr.getRefIR());
+        expr.setRefIR(neg.getRefIR());
     }
 
     @Override
     public void visit(OperacionConversion conv) throws ExcepcionVisitor {
         super.visit(conv);
 
-        String refIR = Normalizador.crearNomRef("conv");
-        conv.setRefIR(refIR);
-
         Expresion expr = conv.getExpresion();
-        grar.ext(refIR, conv.getInstruccionIR(), expr.getRefIR(),
+
+        // Convertimos el valor al tipo indicado en OperacionConversion
+        grar.ext(conv.getRefIR(), conv.getInstruccionIR(), expr.getRefIR(),
                 expr.getTipo().getIR(), conv.getTipo().getIR());
-        expr.setRefIR(refIR);
+        expr.setRefIR(conv.getRefIR());
     }
 
 
@@ -918,47 +904,32 @@ public class GeneradorDeCodigo extends Visitor {
 
     @Override
     public void visit(Literal lit) {
-        // Este visitor genera una variable auxiliar para utilizar los valores literales.
-        // Como alternativa a generar la variable podríamos utilizar directamente el valor,
-        // pero de esta manera queda más uniforme con la forma en la que hacemos lo otro.
-        String refIR = Normalizador.crearNomRef("lit");
-        lit.setRefIR(refIR);
-
+        // Este visitor utiliza una variable auxiliar para almacenar los valores literales.
+        // Como alternativa a generar la variable, podríamos utilizar directamente el valor,
+        // pero de esta manera queda más uniforme con el resto del código.
         grar.setComentLinea(String.format("Literal %s", lit.getValor()));
-        Tipo tipoParser = lit.getTipo();
         // Hack para generar referencias a valores en una línea (le sumo 0 al valor que quiero guardar)
-        grar.suma(refIR, tipoParser.getIR(), lit.getValorIR(), tipoParser.getValorDefIR());
+        grar.suma(lit.getRefIR(), lit.getTipo().getIR(),
+                lit.getValorIR(), lit.getTipo().getValorDefIR());
     }
 
     @Override
     public void visit(Identificador ident) {
-        // Genera el store sobre un refIR para poder acceder a una variable
-
-        // En esta etapa este Identificador va a ser siempre un SimboloVariable.
-        // Tengo que utilizarlo así porque si creo visit(SimboloVariable) da muchos problemas
-        // (por ej. se rompe el graficado del AST)
+        // Identificador va a ser siempre un SimboloVariable.
         SimboloVariable sv = (SimboloVariable) ident;
 
-        String nombreIR = sv.getNombreIR();
-        String tipoIR = sv.getTipo().getIR();
-
-        String nombreVar = sv.getTipo().equals(Tipo.INTEGER) ? "int" :
-                sv.getTipo().equals(Tipo.FLOAT) ? "dbl" :
-                sv.getTipo().equals(Tipo.BOOLEAN) ? "bln" : "unknown";
-
-        String refIR = Normalizador.crearNomRef(nombreVar);
-        sv.setRefIR(refIR);
-
         grar.setComentLinea(String.format("Identificador %s", sv.getNombre()));
-        grar.load(refIR, tipoIR, nombreIR);
+
+        // Generar referencias dinámicamente cada vez que se usa la variable
+        // Necesitamos esto por el Static Single Assignment
+        sv.setRefIR(Normalizador.crearNomRef(ident.getNombre()));
+
+        // Genera el store sobre el refIR del SimboloVariable para acceder al valor de la variable
+        grar.load(sv.getRefIR(), sv.getTipo().getIR(), sv.getPtroIR());
     }
 
     @Override
     public void visit(InvocacionFuncion i) throws ExcepcionVisitor {
-        // El refIR que va a contener el valor de la invocación a la función
-        String refIR = Normalizador.crearNomRef("invo");
-        i.setRefIR(refIR);
-
         // A las invocaciones a write las manejamos aparte
         if (i.getNombre().equals("write") || i.getNombre().equals("writeln")) {
             imprimirWrite(i);
@@ -967,16 +938,16 @@ public class GeneradorDeCodigo extends Visitor {
         // A las funciones read las definimos como funciones en IR, y las invocamos normalmente
 
         // Buscar la función en la tabla
-        SimboloFuncion sf = tablaFunciones.get(i.getNombre());
+        DecFun df = tablaFunciones.get(i.getNombre());
 
-        String nombreFun = sf.getNombreFuncionIR();
-        String tipoFun = sf.getTipo().getIR();
+        String nombreFun = df.getNombreFunIR();
+        String tipoFun = df.getTipo().getIR();
 
         grar.setComentLinea(String.format("Invocación a %s()", i.getNombre()));
 
         // Generar la lista de argumentos, además de visitarlos para generar las refs.
         // También se genera referencias para argumentos por defecto si son necesarios.
-        String args = grarStrArgs(i.getArgs(), sf.getDeclaracion().getParams());
-        grar.invocacion(nombreFun, tipoFun, refIR, args);
+        String args = grarStrArgs(i.getArgs(), df.getParams());
+        grar.invocacion(nombreFun, tipoFun, i.getRefIR(), args);
     }
 }

@@ -2,10 +2,10 @@ package ar.edu.unnoba.compilador;
 
 import ar.edu.unnoba.compilador.ast.base.Programa;
 import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;
+import ar.edu.unnoba.compilador.excepciones.GestorExcepciones;
 import ar.edu.unnoba.compilador.lexico.Lexer;
 import ar.edu.unnoba.compilador.sintaxis.Parser;
 import ar.edu.unnoba.compilador.util.Constantes;
-import ar.edu.unnoba.compilador.excepciones.GestorExcepciones;
 import ar.edu.unnoba.compilador.util.Procesos;
 import ar.edu.unnoba.compilador.visitor.*;
 import ar.edu.unnoba.compilador.visitor.transformer.ConversorDeEstructuras;
@@ -147,6 +147,9 @@ public class Compilar {
                     "AST optimizado (Conti - Tortoriello)");
 
             final String nombreArchivo = "4_llvm-ir";
+
+            System.out.println("\nGenerando nombres normalizados para los objetos...");
+            new GeneradorDeNombres().procesar(programa);
 
             System.out.println("\nRecorriendo el programa para detectar cadenas...");
             new ReconocedorCadenas().procesar(programa);
