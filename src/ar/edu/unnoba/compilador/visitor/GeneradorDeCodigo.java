@@ -668,7 +668,6 @@ public class GeneradorDeCodigo extends Visitor {
         String nombreOriginal = sv.getPtroIR();
         String tipoIR = p.getTipo().getIR();
 
-        // TODO este reemplazo es cualquier cosa me parece, ver de simplificar
         String nombreIR = Normalizador.crearNomPtroLcl("param");
         sv.setPtroIR(nombreIR);
 
@@ -892,8 +891,9 @@ public class GeneradorDeCodigo extends Visitor {
         if (neg.isEnCortocircuito()) return;
 
         Expresion expr = neg.getExpresion();
-        grar.asig(neg.getRefIR(), "xor", "i1", "1", expr.getRefIR());
-        expr.setRefIR(neg.getRefIR());
+        String refAux = Normalizador.crearNomRef("not");
+        grar.asig(refAux, "xor", "i1", "1", expr.getRefIR());
+        expr.setRefIR(refAux);
     }
 
     @Override

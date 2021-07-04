@@ -91,6 +91,6 @@ public class Normalizador {
      */
     public static String crearNomRef(String nombreOrig) {
         String nombreNormalizado = normalizar(nombreOrig);
-        return String.format("%%ref.%s.%s", nombreNormalizado, getIdVarRef(nombreOrig));
+        return String.format("%%ref.%s.%s", nombreNormalizado, getIdVarRef(nombreNormalizado));
     }
 }
