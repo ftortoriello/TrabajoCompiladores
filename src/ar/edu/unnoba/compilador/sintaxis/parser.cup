@@ -493,7 +493,7 @@ invocacion_funcion ::=
         :} |
         PR_WRITELN:idfun PAR_ABRE CADENA:c PAR_CIERRA:cierre {:
             List<Expresion> params = new ArrayList<>();
-            params.add(new Cadena("\\\"" + c + "\\\""));
+            params.add(new Cadena(c));
             InvocacionFuncion invo = new InvocacionFuncion(idfun, params, Tipo.UNKNOWN);
             invo.setPosicion(idfunxleft, cierrexright);
             RESULT = invo;
@@ -507,7 +507,7 @@ invocacion_funcion ::=
         :} |
         PR_WRITE:idfun PAR_ABRE CADENA:c PAR_CIERRA:cierre {:
             List<Expresion> params = new ArrayList<>();
-            params.add(new Cadena("\\\"" + c + "\\\""));
+            params.add(new Cadena(c));
             InvocacionFuncion invo = new InvocacionFuncion(idfun, params, Tipo.UNKNOWN);
             invo.setPosicion(idfunxleft, cierrexright);
             RESULT = invo;

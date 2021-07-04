@@ -1,5 +1,7 @@
 package ar.edu.unnoba.compilador.util;
 
+import ar.edu.unnoba.compilador.ast.expresiones.valor.Cadena;
+
 /**
  * Clase auxiliar usada por GeneradorDeCodigo que se encarga de anexar instrucciones IR al código,
  * para abstraernos del formato y la sintaxis de las instrucciones.
@@ -88,9 +90,9 @@ public class GenerarIR {
     /** Agregar un comentario si se configuró para hacerlo. */
     public void coment(String comentario) {
         if (Constantes.conComentarios) {
-            // Reemplazar saltos de línea, algunas entradas (por ej. de write) pueden romper el programa
-            comentario = comentario.replace("\n", "\\n")
-                                   .replace("\r", "\\r");
+            // Reemplazar caracteres especiales (como saltos de línea) porque algunas entradas
+            // (por ej. de write) pueden romper el programa
+            comentario = Cadena.escaparCadena(comentario);
             codigo(String.format("; %s", comentario));
         }
     }

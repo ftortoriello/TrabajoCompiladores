@@ -5,13 +5,16 @@ import ar.edu.unnoba.compilador.visitor.Visitor;
 import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Cadena extends Expresion {
-    private String valor;   // siempre tiene comillas escapadas (\")
+    private String valor;    // siempre tiene comillas escapadas (\")
+    private String valorEsc; // valor con caracteres especiales escapados
     private String ptroIR;
 
     public Cadena(String valor) {
-        this.valor = valor;
+        setValor(valor);
     }
 
     public String getValor() {
@@ -20,6 +23,7 @@ public class Cadena extends Expresion {
 
     public void setValor(String valor) {
         this.valor = valor;
+        valorEsc = escaparCadena(valor);
     }
 
     public String getPtroIR() {
@@ -30,27 +34,31 @@ public class Cadena extends Expresion {
         this.ptroIR = ptroIR;
     }
 
-    /** Obtener cadena sin las comillas externas */
-    private String getValorSinComillas() {
-        return valor.substring(2, valor.length() - 2);
-    }
-
-    /**
-     * Obtener representación con los caracteres de escape escapados.
-     * Usado en los archivos DOT para que el gráfico las muestre idénticas al código de entrada
-     * y no quede con errores de sintaxis.
-     */
     @Override
     public String toString() {
-        // Agregar escape en los caracteres de escape.
-        // Tomar la cadena sin comillas externas para que no se reemplacen las barras.
-        return "\\\"" + getValorSinComillas()
-                .replace("\\", "\\\\\\\\")
-                .replace("\t", "\\\\t")
-                .replace("\n", "\\\\n")
-                .replace("\r", "\\\\r")
-                .replace("\"", "\\\\\\\"")
-                + "\\\"";
+        return valorEsc;
+    }
+
+    /** Obtener una cadena con caracteres especiales escapados. */
+    public static String escaparCadena(String orig) {
+        final String barraInv = "\\";
+        Map<Character, String> reemp = new HashMap<>();
+        StringBuilder sb = new StringBuilder();
+
+        // Reemplazos
+        reemp.put('\t', barraInv.repeat(2) + "t");
+        reemp.put('\n', barraInv.repeat(2) + "n");
+        reemp.put('\r', barraInv.repeat(2) + "r");
+        reemp.put('"', barraInv.repeat(3) + '"');
+        reemp.put('\\', barraInv.repeat(4));
+
+        // Agregar cada carácter, reemplazándolo si es necesario
+        for (char c : orig.toCharArray()) {
+            String s = reemp.get(c);
+            sb.append(s == null ? c : s);
+        }
+
+        return sb.toString();
     }
 
     /**
@@ -58,7 +66,7 @@ public class Cadena extends Expresion {
      * (por ej: á --> \C3\A1), y con el carácter final nulo.
      */
     public String getValorIR() {
-        byte[] utf8bytes = getValorSinComillas().getBytes(StandardCharsets.UTF_8);
+        byte[] utf8bytes = valor.getBytes(StandardCharsets.UTF_8);
         StringBuilder sb = new StringBuilder();
         for (byte b : utf8bytes) {
             if (b >= 0x20 && b <= 0x7E && b != 0x22) {
@@ -82,8 +90,8 @@ public class Cadena extends Expresion {
 
     /** Obtener la cantidad de bytes, incluyendo el nulo. */
     public int getLongitudIR() {
-        // Longitud sin las comillas (-2*2) y con el fin nulo (+1)
-        return valor.getBytes(StandardCharsets.UTF_8).length - 3;
+        // Cantidad de bytes + fin nulo
+        return valor.getBytes(StandardCharsets.UTF_8).length + 1;
     }
 
     @Override

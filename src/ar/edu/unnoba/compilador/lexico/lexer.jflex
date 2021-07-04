@@ -34,7 +34,7 @@ import java.util.Stack;
     ComplexSymbolFactory symbolFactory;
 
     public final List<Symbol> tablaDeSimbolos = new ArrayList<>();
-    private final StringBuffer stringBuffer = new StringBuffer();
+    private final StringBuilder stringBuilder = new StringBuilder();
 
     private int cadena_yyline = 0;
     private int cadena_yycolumn = 0;
@@ -90,7 +90,7 @@ ComentarioUnaLinea = #.*{FinDeLinea}?
 %%
 
 <YYINITIAL> {
-    \"                  { stringBuffer.setLength(0); yybegin(CADENA);
+    \"                  { stringBuilder.setLength(0); yybegin(CADENA);
                           /* guardar posición inicial para dejarla bien en el lexema */
                           cadena_yyline = this.yyline; cadena_yycolumn = this.yycolumn; }
     "{"                 { comentariosAbiertos.push(TipoComentario.LLAVES); yybegin(BLOQUE_COMENT); }
@@ -187,15 +187,15 @@ ComentarioUnaLinea = #.*{FinDeLinea}?
 <CADENA> {
     \"                  {   // Fin de la cadena
                             yybegin(YYINITIAL);
-                            return symbol("CADENA", cadena_yyline, cadena_yycolumn, stringBuffer.toString());
+                            return symbol("CADENA", cadena_yyline, cadena_yycolumn, stringBuilder.toString());
                         }
-    \\\"                { stringBuffer.append('"'); }   // comilla doble escapada: \"
-    \\t                 { stringBuffer.append('\t'); }  // tabulación
-    \\n                 { stringBuffer.append('\n'); }  // salto de línea
-    \\r                 { stringBuffer.append('\r'); }  // retorno de carro
-    \\\\                { stringBuffer.append('\\'); }  // \\ --> \
+    \\\"                { stringBuilder.append('"'); }   // comilla doble escapada: \"
+    \\t                 { stringBuilder.append('\t'); }  // tabulación
+    \\n                 { stringBuilder.append('\n'); }  // salto de línea
+    \\r                 { stringBuilder.append('\r'); }  // retorno de carro
+    \\\\                { stringBuilder.append('\\'); }  // \\ --> \
     /* permitir lo demás, excepto \ que no estén seguidas por lo definido arriba */
-    [^\\]               { stringBuffer.append( yytext() ); }
+    [^\\]               { stringBuilder.append( yytext() ); }
 }
 
 <<EOF>> { return null; }
