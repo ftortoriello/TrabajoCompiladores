@@ -138,7 +138,7 @@ public class GeneradorDeCodigo extends Visitor {
         arg.accept(this);
         String refIR = arg.getRefIR();
 
-        grar.coment((i.getEtiqueta()));
+        grar.coment(i.getEtiqueta());
 
         if (arg instanceof Cadena) {
             Cadena cad = (Cadena) arg;

@@ -9,9 +9,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Cadena extends Expresion {
-    private String valor;    // siempre tiene comillas escapadas (\")
-    private String valorEsc; // valor con caracteres especiales escapados
+    private String valor;
     private String ptroIR;
+
+    /**
+     * Valor de la cadena entre comillas dobles y con caracteres especiales escapados.
+     * Usado en los archivos DOT para que no queden con errores de sintaxis.
+     */
+    private String valorEsc;
 
     public Cadena(String valor) {
         setValor(valor);
@@ -23,7 +28,7 @@ public class Cadena extends Expresion {
 
     public void setValor(String valor) {
         this.valor = valor;
-        valorEsc = escaparCadena(valor);
+        setValorEsc();
     }
 
     public String getPtroIR() {
@@ -39,8 +44,7 @@ public class Cadena extends Expresion {
         return valorEsc;
     }
 
-    /** Obtener una cadena con caracteres especiales escapados. */
-    public static String escaparCadena(String orig) {
+    private void setValorEsc() {
         final String barraInv = "\\";
         Map<Character, String> reemp = new HashMap<>();
         StringBuilder sb = new StringBuilder();
@@ -52,13 +56,18 @@ public class Cadena extends Expresion {
         reemp.put('"', barraInv.repeat(3) + '"');
         reemp.put('\\', barraInv.repeat(4));
 
-        // Agregar cada carácter, reemplazándolo si es necesario
-        for (char c : orig.toCharArray()) {
+        // Agregar comillas
+        sb.append(barraInv).append('"');
+
+        // Agregar cada carácter de la cadena original, reemplazándolo si es necesario
+        for (char c : valor.toCharArray()) {
             String s = reemp.get(c);
             sb.append(s == null ? c : s);
         }
 
-        return sb.toString();
+        sb.append(barraInv).append('"');
+
+        valorEsc = sb.toString();
     }
 
     /**
