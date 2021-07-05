@@ -366,7 +366,7 @@ public class GeneradorDeCodigo extends Visitor {
         etiquetasOpBinLog.push(new Pair<>(etiVerdadero, etiFalso));
     }
 
-    private void finalizarCortocircuitoAsig(String refIR, String nombreIR) {
+    private void finalizarCortocircuitoAsig(String refIR, String ptroIR) {
         // Obtener y desapilar las etiquetas de esta asignación
         Pair<String, String> parEtiquetas = etiquetasOpBinLog.pop();
 
@@ -378,12 +378,12 @@ public class GeneradorDeCodigo extends Visitor {
 
         // Resultado verdadero
         grar.etiqueta(parEtiquetas.fst);
-        grar.store(nombreIR, "i1", "1");
+        grar.store(ptroIR, "i1", "1");
         grar.salto(etiFin);
 
         // Resultado falso
         grar.etiqueta(parEtiquetas.snd);
-        grar.store(nombreIR, "i1", "0");
+        grar.store(ptroIR, "i1", "0");
         grar.salto(etiFin);
 
         grar.etiqueta(etiFin);
@@ -540,7 +540,7 @@ public class GeneradorDeCodigo extends Visitor {
         SimboloVariable sv = (SimboloVariable) dv.getIdent();
 
         // Parámetros que necesito para declarar la variable
-        String nombreIR = sv.getPtroIR();
+        String ptroIR = sv.getPtroIR();
         String tipoIR = sv.getTipo().getIR();
         Boolean esGlobal = sv.getEsGlobal();
         String valorIR = dv.getTipo().getValorDef();
@@ -548,10 +548,10 @@ public class GeneradorDeCodigo extends Visitor {
         grar.setComentLinea(String.format("variable %s is %s = %s", sv.getNombre(), sv.getTipo(), valorIR));
 
         if (esGlobal) {
-            grar.global(nombreIR, tipoIR, valorIR);
+            grar.global(ptroIR, tipoIR, valorIR);
         } else {
-            grar.alloca(nombreIR, tipoIR);
-            grar.store(nombreIR, tipoIR, valorIR);
+            grar.alloca(ptroIR, tipoIR);
+            grar.store(ptroIR, tipoIR, valorIR);
         }
     }
 
@@ -567,7 +567,7 @@ public class GeneradorDeCodigo extends Visitor {
         }
 
         // Parámetros que necesito para declarar la variable
-        String nombreIR = sv.getPtroIR();
+        String ptroIR = sv.getPtroIR();
         String tipoIR = sv.getTipo().getIR();
 
         grar.setComentLinea(String.format("variable %s is %s = %s%s",
@@ -578,7 +578,7 @@ public class GeneradorDeCodigo extends Visitor {
             // Le asigno temporalmente a la var. el valor por defecto según
             // su tipo, porque no puedo inicializarla en el alcance global.
             String valorDef = sv.getTipo().getValorDef();
-            grar.global(nombreIR, tipoIR, valorDef);
+            grar.global(ptroIR, tipoIR, valorDef);
 
             // Creo una función que se va a llamar en el main para inicializar la var. con el valor correspondiente
             String nomFunAux = Normalizador.crearNomFun("init.var.gbl");
@@ -589,7 +589,7 @@ public class GeneradorDeCodigo extends Visitor {
             if (aplicarCortocircuito) {
                 finalizarCortocircuitoAsig(refIR, sv.getPtroIR());
             } else {
-                grar.store(nombreIR, tipoIR, refIR);
+                grar.store(ptroIR, tipoIR, refIR);
             }
             // Guardo el nombre de la función para invocarla en el main
             varGblInit.add(nomFunAux);
@@ -608,8 +608,8 @@ public class GeneradorDeCodigo extends Visitor {
             if (aplicarCortocircuito) {
                 finalizarCortocircuitoAsig(refIR, sv.getPtroIR());
             } else {
-                grar.alloca(nombreIR, tipoIR);
-                grar.store(nombreIR, tipoIR, refIR);
+                grar.alloca(ptroIR, tipoIR);
+                grar.store(ptroIR, tipoIR, refIR);
             }
         }
     }
@@ -657,7 +657,7 @@ public class GeneradorDeCodigo extends Visitor {
     public void visit(Param p) {
         /*
          * Para poder utilizar el parámetro creo una variable auxiliar, para la cual genero un
-         * nombreIR y un refIR, que pisan al que viene en el objeto SimboloVariable del parámetro.
+         * ptroIR y un refIR, que pisan al que viene en el objeto SimboloVariable del parámetro.
          * Después guardo el valor que viene en el parámetro en esta "nueva" var.
          * Esto supone que el pasaje es por valor y no por referencia.
          * Si el parámetro fue inicializado por defecto o no es indistinto.
@@ -668,12 +668,12 @@ public class GeneradorDeCodigo extends Visitor {
         String nombreOriginal = sv.getPtroIR();
         String tipoIR = p.getTipo().getIR();
 
-        String nombreIR = Normalizador.crearNomPtroLcl("param");
-        sv.setPtroIR(nombreIR);
+        sv.setPtroIR(Normalizador.crearNomPtroLcl("aux." + sv.getNombre()));
+        sv.setRefIR(Normalizador.crearNomPtroLcl(sv.getNombre()));
 
-        grar.alloca(nombreIR, tipoIR);
+        grar.alloca(sv.getPtroIR(), tipoIR);
         grar.setComentLinea(String.format("Param %s", sv.getNombre()));
-        grar.store(nombreIR, tipoIR, nombreOriginal);
+        grar.store(sv.getPtroIR(), tipoIR, nombreOriginal);
     }
 
     @Override
@@ -844,6 +844,7 @@ public class GeneradorDeCodigo extends Visitor {
 
         // El padre visita a las exprs. izq. y der. para generar la declaración de referencias
         super.visit(ob);
+        ob.setRefIR(Normalizador.crearNomRef("ob"));
 
         String refIzqIR = ob.getIzquierda().getRefIR();
         String refDerIR = ob.getDerecha().getRefIR();
@@ -867,6 +868,8 @@ public class GeneradorDeCodigo extends Visitor {
     @Override
     public void visit(NegacionAritmetica neg) throws ExcepcionVisitor {
         super.visit(neg);
+
+        neg.setRefIR(Normalizador.crearNomRef("neg"));
 
         Expresion expr = neg.getExpresion();
         Tipo tipo = expr.getTipo();
@@ -900,6 +903,7 @@ public class GeneradorDeCodigo extends Visitor {
     public void visit(OperacionConversion conv) throws ExcepcionVisitor {
         super.visit(conv);
 
+        conv.setRefIR(Normalizador.crearNomRef("conv"));
         Expresion expr = conv.getExpresion();
 
         // Convertimos el valor al tipo indicado en OperacionConversion
@@ -917,6 +921,8 @@ public class GeneradorDeCodigo extends Visitor {
         // Como alternativa a generar la variable, podríamos utilizar directamente el valor,
         // pero de esta manera queda más uniforme con el resto del código.
         grar.setComentLinea(String.format("Literal %s", lit));
+
+        lit.setRefIR(Normalizador.crearNomRef("lit"));
         // Hack para generar referencias a valores en una línea (le sumo 0 al valor que quiero guardar)
         grar.suma(lit.getRefIR(), lit.getTipo().getIR(),
                   lit.toString(), lit.getTipo().getValorDef());
@@ -945,6 +951,8 @@ public class GeneradorDeCodigo extends Visitor {
             return;
         }
         // A las funciones read las definimos como funciones en IR, y las invocamos normalmente
+
+        i.setRefIR(Normalizador.crearNomRef("invo"));
 
         // Buscar la función en la tabla
         DecFun df = tablaFunciones.get(i.getNombre());

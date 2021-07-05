@@ -1,6 +1,7 @@
 package ar.edu.unnoba.compilador.ast.expresiones.valor;
 
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.Declaracion;
+import ar.edu.unnoba.compilador.util.Normalizador;
 
 /**
  * Clase para representar las variables en la tabla de símbolos.
@@ -16,6 +17,9 @@ public class SimboloVariable extends Identificador {
     public SimboloVariable(Declaracion d, Boolean esGlobal) {
         super(d.getIdent().getNombre(), d.getIdent().getTipo());
         this.esGlobal = esGlobal;
+        this.setPtroIR(getEsGlobal() ?
+                Normalizador.crearNomPtroGbl(getNombre()) :
+                Normalizador.crearNomPtroLcl(getNombre()));
     }
 
     public String getPtroIR() {

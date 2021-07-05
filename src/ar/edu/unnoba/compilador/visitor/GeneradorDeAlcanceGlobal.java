@@ -89,6 +89,10 @@ public class GeneradorDeAlcanceGlobal extends Visitor {
     @Override
     public void visit(DecFun df) throws ExcepcionVisitor {
         // Agregar a la tabla la declaración de la función, sin visitar los parámetros ni el cuerpo
+        df.setEtiquetaFin(Normalizador.crearNomEtiqueta("ret"));
+        df.setNombreFunIR(Normalizador.crearNomFun(df.getIdent().getNombre()));
+        df.setPtroRet(Normalizador.crearNomPtroLcl("ret"));
+        df.setRefIR(Normalizador.crearNomRef(df.getIdent().getNombre()));
         agregarSimboloFuncion(df);
     }
 

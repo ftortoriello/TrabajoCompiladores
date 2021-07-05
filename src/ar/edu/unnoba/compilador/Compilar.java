@@ -148,9 +148,6 @@ public class Compilar {
 
             final String nombreArchivo = "4_llvm-ir";
 
-            System.out.println("\nGenerando nombres normalizados para los objetos...");
-            new GeneradorDeNombres().procesar(programa);
-
             System.out.println("\nRecorriendo el programa para detectar cadenas...");
             new ReconocedorCadenas().procesar(programa);
 
