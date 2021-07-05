@@ -50,6 +50,11 @@ public class GeneradorDeCodigo extends Visitor {
      */
     private final List<String> varGblInit = new ArrayList<>();
 
+    /**
+     * Arreglo con las cadenas utilizadas en el programa y que necesitamos declarar.
+     * Se cargan en el visitor ReconocerCadenas sobre el objeto programa, y llegado
+     * este visitor se inicializan en el ámbito global para poder ser usadas.
+     */
     private List<Cadena> arrCadenas;
 
     /**

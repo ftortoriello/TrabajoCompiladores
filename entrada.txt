@@ -99,7 +99,7 @@ end;
 
 # Procedimiento principal
 main is
-    variable hh is integer = inc(5);
+    variable hh is integer = inc(5) + read_integer();
     variable pp is integer = inc(3 + hh) + 1.0 + hh;
     variable notnot is boolean = not(pp > hh);
     writeln(notnot);

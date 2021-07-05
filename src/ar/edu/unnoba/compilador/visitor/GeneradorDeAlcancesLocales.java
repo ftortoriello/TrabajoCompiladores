@@ -111,6 +111,7 @@ public class GeneradorDeAlcancesLocales extends Visitor {
     @Override
     public void visit(DecVarIni dvi) throws ExcepcionVisitor {
         agregarSimbolo(dvi);
+        super.visit(dvi);
     }
 
     @Override
