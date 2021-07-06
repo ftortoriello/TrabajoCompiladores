@@ -199,6 +199,15 @@ public class GenerarIR {
         omitirLinea = true;
     }
 
+    /** Salto condicional usando pares de etiquetas. */
+    public void salto(String cond, ParEtiquetas etiquetas) {
+        if (etiquetas.getInvertidas()) {
+            salto(cond, etiquetas.getFalso(), etiquetas.getVerdadero());
+        } else {
+            salto(cond, etiquetas.getVerdadero(), etiquetas.getFalso());
+        }
+    }
+
     /** Retorno de una función de tipo void. */
     public void ret() {
         codigo("ret void");
