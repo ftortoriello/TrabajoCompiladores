@@ -67,6 +67,7 @@ public class GeneradorDeCodigo extends Visitor {
 
     /** Pila de pares de etiquetas usada para el cortocircuito booleano */
     private final Deque<Pair<String, String>> etiquetasOpBinLog = new ArrayDeque<>();
+    private boolean invertirEtiquetasDerecha = false;
 
     // *** Funciones auxiliares ***
 
@@ -359,6 +360,10 @@ public class GeneradorDeCodigo extends Visitor {
         grar.etiqueta(etiTmp);
 
         Expresion expDerecha = ob.getDerecha();
+        if (expDerecha instanceof NegacionLogica) {
+            ((NegacionLogica) expDerecha).setEnCortocircuito(true);
+            invertirEtiquetasDerecha = true;
+        }
         expDerecha.accept(this);
         // Asignar el nombre de la variable de la expresión derecha al resultado de la operación
         ob.setRefIR(expDerecha.getRefIR());
@@ -379,7 +384,13 @@ public class GeneradorDeCodigo extends Visitor {
 
         // Con el visit de expresión ya se generó el código para el cortocircuito.
         // Hay que agregar el último salto.
-        grar.salto(refIR, parEtiquetas.fst, parEtiquetas.snd);
+        if (invertirEtiquetasDerecha) {
+            // Manejar el caso a and NOT b
+            grar.salto(refIR, parEtiquetas.snd, parEtiquetas.fst);
+            invertirEtiquetasDerecha = false;
+        } else {
+            grar.salto(refIR, parEtiquetas.fst, parEtiquetas.snd);
+        }
 
         // Resultado verdadero
         grar.etiqueta(parEtiquetas.fst);
