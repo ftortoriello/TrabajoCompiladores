@@ -184,7 +184,7 @@ public class TransformerTipos extends Transformer {
         invo = super.transform(invo);
 
         // No es necesario buscar en el alcance a las funciones predefinidas
-        if (invo.getEsPredefinida()) {
+        if (invo.esPredefinida()) {
             return invo;
         }
 

@@ -36,7 +36,7 @@ public class Optimizador extends Transformer {
         for (Declaracion d : e.getDeclaraciones()) {
             boolean agregar = true;
             if (d instanceof DecFun) {
-                agregar = ((DecFun) d).isUsada();
+                agregar = ((DecFun) d).esInvocada();
             }
             if (agregar) declaraciones.add((Declaracion) d.accept(this));
         }

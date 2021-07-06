@@ -123,26 +123,11 @@ public class GeneradorDeAlcancesLocales extends Visitor {
         super.visit(i);
     }
 
-    @Override
-    public void visit(InvocacionFuncion i) throws ExcepcionVisitor {
-        if (i.getEsPredefinida()) {
-            funPredefUsadas.add(i.getNombre());
-            super.visit(i);
-
-            // Si es predefinida ya están limitados los parámetros por el parser, no es necesario
-            // validarlos acá
-            return;
-        }
-
-        // Validar definición contra la tabla de funciones
-        if (!estaEnElAlcance(i)) {
-            throw new ExcepcionVisitor(i, "La función no está definida");
-        }
-
-        // Validar que la cantidad de argumentos pasados sea por lo menos la cantidad obligaria,
-        // y no supere la cantidad total de parámetros, incluyendo los opcionales
-        DecFun decFun = tablaFunciones.get(i.getNombre());
-
+    /**
+     * Validar que la cantidad de argumentos pasados sea por lo menos la cantidad obligaria,
+     * y no supere la cantidad total de parámetros, incluyendo los opcionales.
+     */
+    private void validarParametros(DecFun decFun, InvocacionFuncion i) throws ExcepcionVisitor {
         int cantArgsInvo = i.getArgs().size();
         int cantMinArgs = decFun.getCantArgsObligatorios();
         int cantMaxArgs = decFun.getParams().size();
@@ -153,8 +138,27 @@ public class GeneradorDeAlcancesLocales extends Visitor {
                             (cantMinArgs == cantMaxArgs ? "%d" : "entre %d y %d") + ".",
                     cantArgsInvo, cantMinArgs, cantMaxArgs));
         }
+    }
 
-        // Para eliminar las declaraciones no usadas
-        decFun.setUsada();
+    @Override
+    public void visit(InvocacionFuncion i) throws ExcepcionVisitor {
+        // Validar definición contra la tabla de funciones
+        if (!estaEnElAlcance(i)) {
+            throw new ExcepcionVisitor(i, "La función no está definida");
+        }
+
+        DecFun decFun = tablaFunciones.get(i.getNombre());
+        if (i.esPredefinida()) {
+            funPredefUsadas.add(i.getNombre());
+        } else {
+            // Si es predefinida ya están limitados los parámetros por el parser, no es necesario
+            // validarlos acá
+            validarParametros(decFun, i);
+        }
+
+        // Para poder eliminar las declaraciones no usadas
+        decFun.setInvocada();
+
+        super.visit(i);
     }
 }

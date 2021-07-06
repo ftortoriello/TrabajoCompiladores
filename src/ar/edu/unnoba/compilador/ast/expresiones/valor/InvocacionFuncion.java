@@ -12,12 +12,13 @@ import java.util.List;
 
 public class InvocacionFuncion extends Valor {
     private List<Expresion> argumentos;
-    private Boolean esPredefinida = true;
+    private boolean predefinida = true;
 
-    public InvocacionFuncion(String nombre, List<Expresion> argumentos, Tipo tipo, Boolean esPredefinida) {
+    public InvocacionFuncion(String nombre, List<Expresion> argumentos, Tipo tipo,
+                             boolean predefinida) {
         super(tipo, nombre);
         this.argumentos = argumentos;
-        this.esPredefinida = esPredefinida;
+        this.predefinida = predefinida;
     }
 
     public InvocacionFuncion(String nombre, List<Expresion> argumentos, Tipo tipo) {
@@ -38,8 +39,8 @@ public class InvocacionFuncion extends Valor {
         this.argumentos = argumentos;
     }
 
-    public Boolean getEsPredefinida() {
-        return esPredefinida;
+    public boolean esPredefinida() {
+        return predefinida;
     }
 
     @Override

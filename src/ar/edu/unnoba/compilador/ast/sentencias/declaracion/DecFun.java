@@ -19,7 +19,7 @@ public class DecFun extends Declaracion {
     private Alcance alcance;
 
     /** Si la función se invoca en algún momento. */
-    private boolean usada = false;
+    private boolean invocada = false;
 
     /** El nombre de la función, normalizado para usarse en IR. */
     private String nombreFunIR;
@@ -70,12 +70,12 @@ public class DecFun extends Declaracion {
         this.alcance = alcance;
     }
 
-    public boolean isUsada() {
-        return usada;
+    public boolean esInvocada() {
+        return invocada;
     }
 
-    public void setUsada() {
-        this.usada = true;
+    public void setInvocada() {
+        this.invocada = true;
     }
 
     public String getNombreFunIR() {
