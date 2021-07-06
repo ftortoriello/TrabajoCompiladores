@@ -18,6 +18,9 @@ public class DecFun extends Declaracion {
     private Bloque bloque;
     private Alcance alcance;
 
+    /** Si la función se invoca en algún momento. */
+    private boolean usada = false;
+
     /** El nombre de la función, normalizado para usarse en IR. */
     private String nombreFunIR;
     /** El puntero en el que se va a guardar el valor de retorno. */
@@ -65,6 +68,14 @@ public class DecFun extends Declaracion {
 
     public void setAlcance(Alcance alcance) {
         this.alcance = alcance;
+    }
+
+    public boolean isUsada() {
+        return usada;
+    }
+
+    public void setUsada() {
+        this.usada = true;
     }
 
     public String getNombreFunIR() {

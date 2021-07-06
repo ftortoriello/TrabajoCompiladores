@@ -107,7 +107,8 @@ Mejoras en caso de que tengamos que seguir:
   * Corregir for i = x to y con x > y
   * ¿Por qué acepta operaciones aritméticas con operandos lógicos (true + false)?
   * Cortocircuito booleano:
+    * Simplificar.
     * Esto no anda: writeln(x or not y);
-    * Manejar caso a and NOT b en el cortocircuito booleano.
+    * Manejar caso a and NOT b.
   * Añadir referencia a DecFun en Invocacion para poder eliminar las tablas de funciones.
   * Implementar visit(SimboloVariable) para no tener que convertir constantemente desde Identificador a SimboloVariable en los últimos visitors.

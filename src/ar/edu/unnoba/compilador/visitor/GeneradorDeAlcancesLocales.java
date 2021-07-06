@@ -153,5 +153,8 @@ public class GeneradorDeAlcancesLocales extends Visitor {
                             (cantMinArgs == cantMaxArgs ? "%d" : "entre %d y %d") + ".",
                     cantArgsInvo, cantMinArgs, cantMaxArgs));
         }
+
+        // Para eliminar las declaraciones no usadas
+        decFun.setUsada();
     }
 }
