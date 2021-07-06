@@ -756,7 +756,7 @@ public class GeneradorDeCodigo extends Visitor {
         String etiInicioWhile = Normalizador.crearNomEtiqueta("inicio_while");
         String etiBucleWhile = Normalizador.crearNomEtiqueta("bucle_while");
         String etiFinWhile = Normalizador.crearNomEtiqueta("fin_while");
-        ParEtiquetas parEtiquetas = new ParEtiquetas(etiBucleWhile, etiFinWhile);
+        ParEtiquetas parEtiquetas = new ParEtiquetas(etiInicioWhile, etiFinWhile);
         etiquetasMientras.push(parEtiquetas);
 
         grar.coment("while");
