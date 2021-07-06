@@ -19,7 +19,6 @@ import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Salir;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
-import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntonces;
@@ -131,11 +130,6 @@ public abstract class Visitor {
     public void visit(Mientras m) throws ExcepcionVisitor {
         m.getCondicion().accept(this);
         m.getBloqueSentencias().accept(this);
-    }
-
-    public void visit(Para p) throws ExcepcionVisitor {
-        p.getIdent().accept(this);
-        p.getBloqueSentencias().accept(this);
     }
 
 

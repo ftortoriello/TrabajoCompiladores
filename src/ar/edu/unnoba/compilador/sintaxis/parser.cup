@@ -30,7 +30,6 @@ import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Salir;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
-import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntonces;
@@ -226,14 +225,12 @@ bloque ::=
         sentencia:sent {:
             List<Nodo> sentencias = new ArrayList<>();
             sentencias.add(sent);
-            final boolean esBloquePrincipal = false;
-            Bloque bloque = new Bloque("Bloque simple\n(una sentencia)", sentencias, esBloquePrincipal);
+            Bloque bloque = new Bloque("Bloque simple\n(una sentencia)", sentencias);
             bloque.setPosicion(sentxleft, sentxright);
             RESULT = bloque;
         :} |
         PR_BEGIN:begin lst_sentencias:sentencias PR_END:end {:
-            final boolean esBloquePrincipal = false;
-            Bloque bloque = new Bloque("Bloque compuesto\n(múltiples sentencias)", sentencias, esBloquePrincipal);
+            Bloque bloque = new Bloque("Bloque compuesto\n(múltiples sentencias)", sentencias);
             bloque.setPosicion(beginxleft, endxright);
             RESULT = bloque;
         :};
@@ -325,19 +322,40 @@ bloque_cuando ::=
 
 para ::=
         PR_FOR:f IDENTIFICADOR:id PR_FROM LIT_ENTERO:numIni PR_TO LIT_ENTERO:numFin PR_DO bloque:bloque {:
-            final int saltoPorDefecto = 1;
             Identificador ident = new Identificador(id);
             ident.setPosicion(idxleft, idxright);
-            Para para = new Para(ident, numIni, numFin, saltoPorDefecto, bloque);
-            para.setPosicion(fxleft, bloquexright);
-            RESULT = para;
+
+            // A partir de la estructura FOR crear WHILE directamente
+
+            // Crear un bloque con dos sentencias:
+            List<Nodo> sentencias = new ArrayList<>();
+
+            // La asignación del valor inicial del contador
+            sentencias.add(new Asignacion(ident, new Entero(numIni)));
+
+            // Y el cuerpo del WHILE
+            Mientras mientras = new Mientras(ident, numIni, numFin, bloque);
+            mientras.setPosicion(fxleft, bloquexright);
+            sentencias.add(mientras);
+
+            // Crear bloque
+            Bloque bloqueConv = new Bloque("Conversión\\nFOR a WHILE", sentencias);
+            bloqueConv.setPosicion(fxleft, bloquexright);
+
+            RESULT = bloqueConv;
         :} |
-        PR_FOR:f IDENTIFICADOR:id PR_FROM LIT_ENTERO:numIni PR_TO LIT_ENTERO:numFin PR_BY LIT_ENTERO:salto PR_DO bloque:bloque {:
+        PR_FOR:f IDENTIFICADOR:id PR_FROM LIT_ENTERO:numIni PR_TO LIT_ENTERO:numFin
+                 PR_BY LIT_ENTERO:salto PR_DO bloque:bloque {:
             Identificador ident = new Identificador(id);
             ident.setPosicion(idxleft, idxright);
-            Para para = new Para(ident, numIni, numFin, salto, bloque);
-            para.setPosicion(fxleft, bloquexright);
-            RESULT = para;
+            List<Nodo> sentencias = new ArrayList<>();
+            sentencias.add(new Asignacion(ident, new Entero(numIni)));
+            Mientras mientras = new Mientras(ident, numIni, numFin, salto, bloque);
+            mientras.setPosicion(fxleft, bloquexright);
+            sentencias.add(mientras);
+            Bloque bloqueConv = new Bloque("Conversión\\nFOR a WHILE", sentencias);
+            bloqueConv.setPosicion(fxleft, bloquexright);
+            RESULT = bloqueConv;
         :};
 
 mientras ::=

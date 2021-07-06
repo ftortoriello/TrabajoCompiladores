@@ -1,5 +1,6 @@
 package ar.edu.unnoba.compilador.ast.base;
 
+import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
 import ar.edu.unnoba.compilador.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.visitor.Visitor;
@@ -8,7 +9,7 @@ import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Bloque extends Nodo {
+public class Bloque extends Sentencia {
     private List<Nodo> sentencias;
     private Alcance alcance;
     private final boolean esProgramaPrincipal;
@@ -20,9 +21,11 @@ public class Bloque extends Nodo {
     }
 
     public Bloque(String nombre, boolean esProgramaPrincipal) {
-        super(nombre);
-        this.sentencias = new ArrayList<>();
-        this.esProgramaPrincipal = esProgramaPrincipal;
+        this(nombre, new ArrayList<>(), esProgramaPrincipal);
+    }
+
+    public Bloque(String nombre, List<Nodo> sentencias) {
+        this(nombre, sentencias, false);
     }
 
     public void setSentencias(List<Nodo> sentencias) {

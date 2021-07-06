@@ -18,7 +18,6 @@ import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Salir;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
-import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntonces;
@@ -172,12 +171,6 @@ public abstract class Transformer {
         m.setCondicion(m.getCondicion().accept(this));
         m.setBloqueSentencias(m.getBloqueSentencias().accept(this));
         return m;
-    }
-
-    public Nodo transform(Para p) throws ExcepcionTransformer {
-        p.setIdent(p.getIdent().accept(this));
-        p.setBloqueSentencias(p.getBloqueSentencias().accept(this));
-        return p;
     }
 
     public Retorno transform(Retorno r) throws ExcepcionTransformer {

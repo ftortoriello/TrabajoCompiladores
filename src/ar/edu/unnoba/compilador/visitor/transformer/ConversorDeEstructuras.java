@@ -3,19 +3,11 @@ package ar.edu.unnoba.compilador.visitor.transformer;
 import ar.edu.unnoba.compilador.ast.base.Alcance;
 import ar.edu.unnoba.compilador.ast.base.Bloque;
 import ar.edu.unnoba.compilador.ast.base.Nodo;
-import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Suma;
-import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.MenorIgual;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.literal.Entero;
-import ar.edu.unnoba.compilador.ast.expresiones.valor.literal.Literal;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.SimboloVariable;
-import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarIni;
-import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
-import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
@@ -26,51 +18,12 @@ import java.util.List;
 
 public class ConversorDeEstructuras extends Transformer {
 
-    // Estos dos métodos quedaron más complicados de lo que deberían porque para los nodos
-    // nuevos que tienen que crearse en las transformaciones hacemos muchas cosas* a mano,
-    // para evitar tener que pasar los generadores de alcance una segunda vez...
+    // Este método quedó más complicados de lo que debería porque para los nodos nuevos que tienen
+    // que crearse en las transformaciones hacemos muchas cosas* a mano, para evitar tener que pasar
+    // los generadores de alcance una segunda vez...
 
     // *: generar alcances, generar simboloVariable, agregar los Simbolos en los Alcances,
     // setear el padre de los alcances, setear los tipos y creo que nada más.
-
-    @Override
-    public Bloque transform(Para p) throws ExcepcionTransformer {
-        p = (Para) super.transform(p);
-
-        // bloqueNuevo va a contener el while equivalente al for
-        Bloque bloqueNuevo = new Bloque("Conversión\\nFOR a WHILE", false);
-
-        // Genero y defino el alcance padre para que no se rompa la cadena
-        bloqueNuevo.setAlcance(new Alcance("Alcance conversión FOR -> WHEN"));
-        bloqueNuevo.getAlcance().setPadre(p.getBloqueSentencias().getAlcance().getPadre());
-
-        Literal valDesde = new Entero(p.getValorInicial());
-        Literal valHasta = new Entero(p.getValorFinal());
-
-        // Añadir al bloque la asignación con el valor inicial del contador
-        Asignacion decDesde = new Asignacion(p.getIdent(), valDesde);
-        bloqueNuevo.getSentencias().add(decDesde);
-
-        // Crear condición del while según los valores del for
-        Expresion condMientras = new MenorIgual(p.getIdent(), valHasta);
-        // Las relaciones son siempre boolean, y puedo setearlo directamente porque ya está validado
-        condMientras.setTipo(Tipo.BOOLEAN);
-
-        // Añadir incremento del contador al final del bloque for
-        Literal salto = new Entero(p.getSalto());
-        Expresion inc = new Suma(p.getIdent(), salto);
-        inc.setTipo(Tipo.INTEGER);
-        Asignacion asigInc = new Asignacion(p.getIdent(), inc);
-        p.getBloqueSentencias().getSentencias().add(asigInc);
-
-        // Crear while con la condición y el bloque for adaptado
-        Mientras m = new Mientras(condMientras, p.getBloqueSentencias());
-        m.getBloqueSentencias().getAlcance().setPadre(bloqueNuevo.getAlcance());
-
-        bloqueNuevo.getSentencias().add(m);
-
-        return bloqueNuevo;
-    }
 
     @Override
     public Bloque transform(Cuando c) throws ExcepcionTransformer {

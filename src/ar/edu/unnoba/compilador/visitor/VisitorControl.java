@@ -5,7 +5,6 @@ import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Salir;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFun;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
-import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
 import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;
 
 /**
@@ -52,12 +51,6 @@ public class VisitorControl extends Visitor {
     public void visit(Mientras m) throws ExcepcionVisitor {
         incContBucles();
         super.visit(m);
-        decContBucles();
-    }
-
-    public void visit(Para p) throws ExcepcionVisitor {
-        incContBucles();
-        super.visit(p);
         decContBucles();
     }
 

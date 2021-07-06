@@ -19,7 +19,6 @@ import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Salir;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.*;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
-import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntonces;
@@ -240,14 +239,6 @@ public class ASTGraphviz extends Visitor {
         armarStrEstructura(m.getEtiqueta());
         padres.push(idNodoActual);
         super.visit(m);
-        padres.pop();
-    }
-
-    @Override
-    public void visit(Para p) throws ExcepcionVisitor {
-        armarStrEstructura(p.getEtiqueta());
-        padres.push(idNodoActual);
-        super.visit(p);
         padres.pop();
     }
 

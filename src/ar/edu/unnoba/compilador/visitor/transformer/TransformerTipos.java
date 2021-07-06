@@ -17,13 +17,11 @@ import ar.edu.unnoba.compilador.ast.expresiones.valor.Identificador;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.InvocacionFuncion;
 import ar.edu.unnoba.compilador.ast.expresiones.valor.SimboloVariable;
 import ar.edu.unnoba.compilador.ast.sentencias.Asignacion;
-import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFun;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarIni;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.ParamDef;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
-import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.Cuando;
 import ar.edu.unnoba.compilador.excepciones.ExcepcionTransformer;
@@ -282,17 +280,5 @@ public class TransformerTipos extends Transformer {
         }
 
         return c;
-    }
-
-    @Override
-    public Sentencia transform(Para p) throws ExcepcionTransformer {
-        p = (Para) super.transform(p);
-        // No se puede convertir OperacionConversion a Identificador acá.
-        // Para que soporte conversiones implícitas de flotante a entero
-        // tendríamos que reemplazar en Para el Identificador por Expresion.
-        if (p.getIdent().getTipo() != Tipo.INTEGER) {
-            throw new ExcepcionTransformer(p, "El tipo de la variable a iterar no es integer");
-        }
-        return p;
     }
 }
