@@ -100,3 +100,7 @@ Requisitos:
   * If: :white_check_mark:
   * While: :white_check_mark:
     * Sentencias de control (continue y break): :white_check_mark:
+
+Mejoras en caso de que tengamos que seguir:
+  * Añadir referencia a DecFun en Invocacion para poder eliminar las tablas de funciones.
+  * Implementar visit(SimboloVariable) para no tener que convertir constantemente desde Identificador a SimboloVariable en los últimos visitors.

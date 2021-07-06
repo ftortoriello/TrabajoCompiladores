@@ -251,22 +251,22 @@ public class GeneradorDeCodigo extends Visitor {
      * Utilizado para la declaración de funciones.
      */
     private String grarStrParams(List<Param> arrParams) {
-        StringBuilder strParams = new StringBuilder();
+        StringBuilder sbParams = new StringBuilder();
 
         int cantParams = arrParams.size();
         for (int i = 0; i < cantParams; i++) {
-            SimboloVariable simboloParam = (SimboloVariable) arrParams.get(i).getIdent();
-            String tipoParam = simboloParam.getTipo().getIR();
-            String paramPtroIR = simboloParam.getPtroIR();
+            SimboloVariable sv = (SimboloVariable) arrParams.get(i).getIdent();
+            String tipoParam = sv.getTipo().getIR();
+            String ptroParam = sv.getPtroIR();
 
-            // Para separar los parámetros mediante comas, excepto el final
+            // Para separar los parámetros mediante comas, excepto el último
             String sep = i != cantParams - 1 ? ", " : "";
 
             // Añado el argumento a la lista
-            strParams.append(String.format("%s %s%s", tipoParam, paramPtroIR, sep));
+            sbParams.append(String.format("%s %s%s", tipoParam, ptroParam, sep));
         }
 
-        return strParams.toString();
+        return sbParams.toString();
     }
 
     /**
@@ -275,10 +275,10 @@ public class GeneradorDeCodigo extends Visitor {
      * que en la declaración de la función eso va a ser siempre un objeto de tipo Param.
      */
     private String grarStrArgs(List<Expresion> arrArgs, List<Param> paramsFormales) throws ExcepcionVisitor {
-        StringBuilder strArgs = new StringBuilder();
+        StringBuilder sbArgs = new StringBuilder();
 
         for (int i = 0; i < paramsFormales.size(); i++) {
-            // Si el argumento no existe, tomo el parámetro formal para crear una ref. con el valor por defecto
+            // Si el argumento no existe, busco el parámetro formal para crear una ref. con el valor por defecto
             Expresion expr = i >= arrArgs.size() ?
                     ((ParamDef) paramsFormales.get(i)).getExpresion() :
                     arrArgs.get(i);
@@ -286,14 +286,14 @@ public class GeneradorDeCodigo extends Visitor {
             // Evaluar la expr. y generar el refIR
             expr.accept(this);
 
-            // Para separar los argumentos mediante comas, excepto el final
+            // Para separar los argumentos mediante comas, excepto el último
             String sep = i != paramsFormales.size() - 1 ? ", " : "";
 
             // Añado el argumento a la lista
-            strArgs.append(String.format("%s %s%s", expr.getTipo().getIR(), expr.getRefIR(), sep));
+            sbArgs.append(String.format("%s %s%s", expr.getTipo().getIR(), expr.getRefIR(), sep));
         }
 
-        return strArgs.toString();
+        return sbArgs.toString();
     }
 
     // *** Funciones auxiliares para generar el cortocircuito booleano ***
@@ -580,19 +580,20 @@ public class GeneradorDeCodigo extends Visitor {
                 aplicarCortocircuito ? " - cortocircuito" : ""));
 
         if (sv.getEsGlobal()) {
-            // Le asigno temporalmente a la var. el valor por defecto según
-            // su tipo, porque no puedo inicializarla en el alcance global.
+            // Le asigno temporalmente a la var. el valor por defecto según su tipo, porque
+            // no puedo inicializarla con una ref. en el alcance global.
             String valorDef = sv.getTipo().getValorDef();
             grar.global(ptroIR, tipoIR, valorDef);
 
-            // Creo una función que se va a llamar en el main para inicializar la var. con el valor correspondiente
+            // Creo una función que se va a llamar en el main para asignar en la var. el
+            // valor correspondiente
             String nomFunAux = Normalizador.crearNomFun("init.var.gbl");
             grar.defFuncion(nomFunAux, "void", "");
             expr.accept(this);
             String refIR = expr.getRefIR();
 
             if (aplicarCortocircuito) {
-                finalizarCortocircuitoAsig(refIR, sv.getPtroIR());
+                finalizarCortocircuitoAsig(refIR, ptroIR);
             } else {
                 grar.store(ptroIR, tipoIR, refIR);
             }
@@ -602,18 +603,17 @@ public class GeneradorDeCodigo extends Visitor {
             grar.cierreBloque();
         } else {
             // Variable local
+            grar.alloca(ptroIR, tipoIR);
 
             // Visito a la expresión para generar la declaración de referencias necesarias
             expr.accept(this);
 
             // El refIR con el valor de la expresión viene resuelto gracias a la visita anterior
-            String refIR;
-            refIR = expr.getRefIR();
+            String refIR = expr.getRefIR();
 
             if (aplicarCortocircuito) {
                 finalizarCortocircuitoAsig(refIR, sv.getPtroIR());
             } else {
-                grar.alloca(ptroIR, tipoIR);
                 grar.store(ptroIR, tipoIR, refIR);
             }
         }
@@ -922,9 +922,9 @@ public class GeneradorDeCodigo extends Visitor {
 
     @Override
     public void visit(Literal lit) {
-        // Este visitor utiliza una variable auxiliar para almacenar los valores literales.
-        // Como alternativa a generar la variable, podríamos utilizar directamente el valor,
-        // pero de esta manera queda más uniforme con el resto del código.
+        // Utilizamos una ref. auxiliar para almacenar los valores literales. Como
+        // alternativa podríamos utilizar directamente el valor, pero de esta manera
+        // queda más uniforme con el resto del código.
         grar.setComentLinea(String.format("Literal %s", lit));
 
         lit.setRefIR(Normalizador.crearNomRef("lit"));
@@ -944,7 +944,7 @@ public class GeneradorDeCodigo extends Visitor {
         // Necesitamos esto por el Static Single Assignment
         sv.setRefIR(Normalizador.crearNomRef(ident.getNombre()));
 
-        // Genera el store sobre el refIR del SimboloVariable para acceder al valor de la variable
+        // Genera el store sobre el refIR del SimboloVariable para luego acceder al valor
         grar.load(sv.getRefIR(), sv.getTipo().getIR(), sv.getPtroIR());
     }
 

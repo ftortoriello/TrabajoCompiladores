@@ -1,7 +1,6 @@
 (* Programa de prueba *)
 
 (* Se definen algunas variables globales *)
-
 variable aa is float = 2.0;
 variable bb is integer = 1;
 variable cc is boolean = aa == bb or bb < aa or aa > bb;
@@ -99,6 +98,12 @@ end;
 
 # Procedimiento principal
 main is
+
+    variable ah is boolean = true;
+    variable bh is boolean = false;
+    variable ch is boolean = ah and bh;
+    writeln(ch);
+
     variable hh is integer = inc(5) + read_integer();
     variable pp is integer = inc(3 + hh) + 1.0 + hh;
     variable notnot is boolean = not(pp > hh);
@@ -165,4 +170,3 @@ main is
     writeln("Se acabó\n\nFin!");
 
 end.
-
