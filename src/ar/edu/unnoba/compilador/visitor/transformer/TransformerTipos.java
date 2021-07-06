@@ -21,6 +21,7 @@ import ar.edu.unnoba.compilador.ast.sentencias.Sentencia;
 import ar.edu.unnoba.compilador.ast.sentencias.control.Retorno;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFun;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecVarIni;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.ParamDef;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Mientras;
 import ar.edu.unnoba.compilador.ast.sentencias.iteracion.Para;
 import ar.edu.unnoba.compilador.ast.sentencias.seleccion.CasoCuando;
@@ -155,6 +156,13 @@ public class TransformerTipos extends Transformer {
         setAlcanceActual(getAlcanceActual().getPadre());
 
         return df;
+    }
+
+    @Override
+    public ParamDef transform(ParamDef pd) throws ExcepcionTransformer {
+        pd = super.transform(pd);
+        pd.setExpresion(convertirATipo(pd.getExpresion(), pd.getIdent().getTipo()));
+        return pd;
     }
 
     @Override
