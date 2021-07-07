@@ -321,41 +321,24 @@ bloque_cuando ::=
         :};
 
 para ::=
-        PR_FOR:f IDENTIFICADOR:id PR_FROM LIT_ENTERO:numIni PR_TO LIT_ENTERO:numFin PR_DO bloque:bloque {:
+        PR_FOR:f IDENTIFICADOR:id PR_FROM LIT_ENTERO:valorIni PR_TO LIT_ENTERO:valorFin
+                 PR_DO bloque:bloque {:
             Identificador ident = new Identificador(id);
             ident.setPosicion(idxleft, idxright);
-
             // A partir de la estructura FOR crear WHILE directamente
-
-            // Crear un bloque con dos sentencias:
-            List<Nodo> sentencias = new ArrayList<>();
-
-            // La asignación del valor inicial del contador
-            sentencias.add(new Asignacion(ident, new Entero(numIni)));
-
-            // Y el cuerpo del WHILE
-            Mientras mientras = new Mientras(ident, numIni, numFin, bloque);
-            mientras.setPosicion(fxleft, bloquexright);
-            sentencias.add(mientras);
-
-            // Crear bloque
-            Bloque bloqueConv = new Bloque("Conversión\\nFOR a WHILE", sentencias);
-            bloqueConv.setPosicion(fxleft, bloquexright);
-
-            RESULT = bloqueConv;
+            Bloque bloquePara = Mientras.crearBloquePara(ident, valorIni, valorFin, bloque,
+                                                         fxleft, bloquexright);
+            bloquePara.setPosicion(fxleft, bloquexright);
+            RESULT = bloquePara;
         :} |
-        PR_FOR:f IDENTIFICADOR:id PR_FROM LIT_ENTERO:numIni PR_TO LIT_ENTERO:numFin
+        PR_FOR:f IDENTIFICADOR:id PR_FROM LIT_ENTERO:valorIni PR_TO LIT_ENTERO:valorFin
                  PR_BY LIT_ENTERO:salto PR_DO bloque:bloque {:
             Identificador ident = new Identificador(id);
             ident.setPosicion(idxleft, idxright);
-            List<Nodo> sentencias = new ArrayList<>();
-            sentencias.add(new Asignacion(ident, new Entero(numIni)));
-            Mientras mientras = new Mientras(ident, numIni, numFin, salto, bloque);
-            mientras.setPosicion(fxleft, bloquexright);
-            sentencias.add(mientras);
-            Bloque bloqueConv = new Bloque("Conversión\\nFOR a WHILE", sentencias);
-            bloqueConv.setPosicion(fxleft, bloquexright);
-            RESULT = bloqueConv;
+            Bloque bloquePara = Mientras.crearBloquePara(ident, valorIni, valorFin, salto, bloque,
+                                                         fxleft, bloquexright);
+            bloquePara.setPosicion(fxleft, bloquexright);
+            RESULT = bloquePara;
         :};
 
 mientras ::=

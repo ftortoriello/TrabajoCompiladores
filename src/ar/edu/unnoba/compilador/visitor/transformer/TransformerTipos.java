@@ -263,7 +263,16 @@ public class TransformerTipos extends Transformer {
     @Override
     public Mientras transform(Mientras m) throws ExcepcionTransformer {
         m = super.transform(m);
-        if (m.getCondicion().getTipo() != Tipo.BOOLEAN) {
+        if (m.esForConvertido()) {
+            // Verificar que el iterador de FOR sea entero
+            Relacion r = (Relacion) m.getCondicion();
+            Identificador i = (Identificador) r.getIzquierda();
+            Tipo tipo = i.getTipo();
+            if (!tipo.equals(Tipo.INTEGER)) {
+                throw new ExcepcionTransformer(m, String.format(
+                        "El tipo de la variable a iterar debe ser integer, pero es %s", tipo));
+            }
+        } else if (!m.getCondicion().getTipo().equals(Tipo.BOOLEAN)) {
             throw new ExcepcionTransformer(m, "El tipo de la condición de «while» no es boolean");
         }
         return m;

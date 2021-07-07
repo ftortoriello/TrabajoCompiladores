@@ -1,6 +1,7 @@
 package ar.edu.unnoba.compilador.visitor;
 
 import ar.edu.unnoba.compilador.ast.base.Bloque;
+import ar.edu.unnoba.compilador.ast.base.Nodo;
 import ar.edu.unnoba.compilador.ast.base.Programa;
 import ar.edu.unnoba.compilador.ast.expresiones.Cadena;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
@@ -27,7 +28,7 @@ import ar.edu.unnoba.compilador.ast.sentencias.seleccion.SiEntoncesSino;
 import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.util.GenerarIR;
 import ar.edu.unnoba.compilador.util.Normalizador;
-import ar.edu.unnoba.compilador.util.ParEtiquetas;
+import ar.edu.unnoba.compilador.util.Etiquetas;
 
 import java.io.*;
 import java.util.*;
@@ -61,10 +62,10 @@ public class GeneradorDeCodigo extends Visitor {
      * Pila de pares de etiquetas para saber a donde saltar cuando se encuentra break o continue
      * dentro de un while.
      */
-    private final Deque<ParEtiquetas> etiquetasMientras = new ArrayDeque<>();
+    private final Deque<Etiquetas> etiquetasMientras = new ArrayDeque<>();
 
     /** Pila de pares de etiquetas usada para el cortocircuito booleano */
-    private final Deque<ParEtiquetas> etiquetasOpBinLog = new ArrayDeque<>();
+    private final Deque<Etiquetas> etiquetasOpBinLog = new ArrayDeque<>();
 
     // *** Funciones auxiliares ***
 
@@ -297,7 +298,7 @@ public class GeneradorDeCodigo extends Visitor {
     // *** Funciones auxiliares para generar el cortocircuito booleano ***
 
     private void imprimirCortocircuito(OperacionBinariaLogica ob) throws ExcepcionVisitor {
-        ParEtiquetas etiquetas = etiquetasOpBinLog.peek();
+        Etiquetas etiquetas = etiquetasOpBinLog.peek();
         String etiVerdadero = etiquetas.getVerdadero();
         String etiFalso = etiquetas.getFalso();
 
@@ -324,7 +325,7 @@ public class GeneradorDeCodigo extends Visitor {
         // código del AND.
         boolean esAndOr = (ob instanceof Disyuncion && expIzquierda instanceof Conjuncion);
         if (esAndOr) {
-            etiquetasOpBinLog.push(new ParEtiquetas(etiVerdadero, etiTmp));
+            etiquetasOpBinLog.push(new Etiquetas(etiVerdadero, etiTmp));
         }
 
         // Visitar el operando de la izquierda para poder obtener su refIR
@@ -372,12 +373,12 @@ public class GeneradorDeCodigo extends Visitor {
     private void grarEtiCortocircuitoAsig(String etiqueta) {
         String etiVerdadero = Normalizador.crearNomEtiqueta(etiqueta + "_verdadero");
         String etiFalso = Normalizador.crearNomEtiqueta(etiqueta + "_falso");
-        etiquetasOpBinLog.push(new ParEtiquetas(etiVerdadero, etiFalso));
+        etiquetasOpBinLog.push(new Etiquetas(etiVerdadero, etiFalso));
     }
 
     private void finalizarCortocircuitoAsig(String refIR, String ptroIR) {
         // Obtener y desapilar las etiquetas de esta asignación
-        ParEtiquetas parEtiquetas = etiquetasOpBinLog.pop();
+        Etiquetas parEtiquetas = etiquetasOpBinLog.pop();
 
         String etiFin = Normalizador.crearNomEtiqueta("asig_fin");
 
@@ -699,7 +700,7 @@ public class GeneradorDeCodigo extends Visitor {
     public void visit(SiEntonces se) throws ExcepcionVisitor {
         String etiBlqThen = Normalizador.crearNomEtiqueta("blq_then");
         String etiFin = Normalizador.crearNomEtiqueta("fin_if");
-        etiquetasOpBinLog.push(new ParEtiquetas(etiBlqThen, etiFin));
+        etiquetasOpBinLog.push(new Etiquetas(etiBlqThen, etiFin));
 
         grar.coment("if / then");
 
@@ -724,7 +725,7 @@ public class GeneradorDeCodigo extends Visitor {
         String etiBlqThen = Normalizador.crearNomEtiqueta("blq_then");
         String etiBlqElse = Normalizador.crearNomEtiqueta("blq_else");
         String etiFin = Normalizador.crearNomEtiqueta("fin_if");
-        etiquetasOpBinLog.push(new ParEtiquetas(etiBlqThen, etiBlqElse));
+        etiquetasOpBinLog.push(new Etiquetas(etiBlqThen, etiBlqElse));
 
         grar.coment("if / then / else");
 
@@ -756,7 +757,14 @@ public class GeneradorDeCodigo extends Visitor {
         String etiInicioWhile = Normalizador.crearNomEtiqueta("inicio_while");
         String etiBucleWhile = Normalizador.crearNomEtiqueta("bucle_while");
         String etiFinWhile = Normalizador.crearNomEtiqueta("fin_while");
-        ParEtiquetas parEtiquetas = new ParEtiquetas(etiInicioWhile, etiFinWhile);
+        Etiquetas parEtiquetas = new Etiquetas(etiInicioWhile, etiFinWhile);
+
+        String etiIterador = null;
+        if (m.esForConvertido()) {
+            etiIterador = Normalizador.crearNomEtiqueta("inc_iterador");
+            parEtiquetas.setEtiIterador(etiIterador);
+        }
+
         etiquetasMientras.push(parEtiquetas);
 
         grar.coment("while");
@@ -782,7 +790,20 @@ public class GeneradorDeCodigo extends Visitor {
         grar.etiqueta(etiBucleWhile);
 
         // Generar cuerpo del while
-        m.getBloqueSentencias().accept(this);
+        if (m.esForConvertido()) {
+            // Aceptar todas las sentencias excepto la última,
+            // porque hay que insertarle una etiqueta antes
+            List<Nodo> sentencias = m.getBloqueSentencias().getSentencias();
+            for (Nodo sentencia : sentencias.subList(0, sentencias.size() - 1)) {
+                sentencia.accept(this);
+            }
+            grar.salto(etiIterador);
+            grar.etiqueta(etiIterador);
+            // Aceptar la última
+            sentencias.get(sentencias.size() - 1).accept(this);
+        } else {
+            m.getBloqueSentencias().accept(this);
+        }
 
         // Ejecutado el cuerpo, se evalúa de nuevo la condición inicial
         grar.salto(etiInicioWhile);
@@ -826,15 +847,21 @@ public class GeneradorDeCodigo extends Visitor {
 
     @Override
     public void visit(Continuar c) {
-        ParEtiquetas etiquetas = etiquetasMientras.peek();
+        Etiquetas etiquetas = etiquetasMientras.peek();
         grar.setComentLinea("continue");
-        // Saltar al principio del while
-        grar.salto(etiquetas.getVerdadero());
+        String etiIterador = etiquetas.getEtiIterador();
+        if (etiIterador == null) {
+            // Saltar al principio del while
+            grar.salto(etiquetas.getVerdadero());
+        } else {
+            // Saltar al incremento del iterador
+            grar.salto(etiIterador);
+        }
     }
 
     @Override
     public void visit(Salir s) {
-        ParEtiquetas etiquetas = etiquetasMientras.peek();
+        Etiquetas etiquetas = etiquetasMientras.peek();
         grar.setComentLinea("break");
         // Saltar al final del while
         grar.salto(etiquetas.getFalso());

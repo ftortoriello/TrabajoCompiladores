@@ -3,7 +3,6 @@ package ar.edu.unnoba.compilador.ast.sentencias.iteracion;
 import ar.edu.unnoba.compilador.ast.base.Bloque;
 import ar.edu.unnoba.compilador.ast.base.Nodo;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
-import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Resta;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.Suma;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.MayorIgual;
@@ -16,7 +15,9 @@ import ar.edu.unnoba.compilador.excepciones.ExcepcionTransformer;
 import ar.edu.unnoba.compilador.excepciones.ExcepcionVisitor;
 import ar.edu.unnoba.compilador.visitor.Visitor;
 import ar.edu.unnoba.compilador.visitor.transformer.Transformer;
+import java_cup.runtime.ComplexSymbolFactory.Location;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,19 +28,23 @@ import java.util.List;
 public class Mientras extends Sentencia {
     private Expresion condicion;
     private Bloque bloqueSentencias;
+    /** Si se convirtió de FOR a WHILE */
+    private final boolean forConvertido;
 
     public Mientras(Expresion condicion, Bloque bloqueSentencias) {
-        super("Bloque\\nWHILE");
+        super("Bloque WHILE");
         this.condicion = condicion;
-        bloqueSentencias.setNombre("Cuerpo\\nWHILE");
+        bloqueSentencias.setNombre("Cuerpo WHILE");
         this.bloqueSentencias = bloqueSentencias;
+        this.forConvertido = false;
     }
 
     /** Construir WHILE a partir de FOR */
-    public Mientras(Identificador ident, int valorIni, int valorFin, int salto, Bloque bloque) {
-        super("Bloque\\nWHILE");
-        bloque.setNombre("Cuerpo\\nWHILE");
+    private Mientras(Identificador ident, int valorIni, int valorFin, int salto, Bloque bloque) {
+        super("Bloque WHILE");
+        bloque.setNombre("Cuerpo WHILE");
         this.bloqueSentencias = bloque;
+        this.forConvertido = true;
 
         // Si aceptamos salto == 0 se producen bucles infinitos.
         // Podría verificarse en el lexer esto, pero si distinguimos enteros positivos de los que
@@ -63,8 +68,6 @@ public class Mientras extends Sentencia {
         } else {
             this.condicion = new MayorIgual(ident, litValorFin);
         }
-        // Las relaciones son siempre boolean
-        this.condicion.setTipo(Tipo.BOOLEAN);
 
         // Añadir incremento o decremento del contador al final del bloque for
         Expresion inc;
@@ -73,15 +76,31 @@ public class Mientras extends Sentencia {
         } else {
             inc = new Resta(ident, litSalto);
         }
-        inc.setTipo(Tipo.INTEGER);
 
         Asignacion asigInc = new Asignacion(ident, inc);
         sentencias.add(asigInc);
     }
 
-    /** Construir WHILE a partir de FOR, usando el salto predeterminado 1 */
-    public Mientras(Identificador ident, int valorIni, int valorFin, Bloque bloque) {
-        this(ident, valorIni, valorFin, 1, bloque);
+    /**
+     * Retorna un bloque con dos sentencias: la asignación del valor inicial del contador, y el
+     * cuerpo de la estructura FOR convertido en WHILE.
+     */
+    public static Bloque crearBloquePara(Identificador ident, int valorIni, int valorFin, int salto,
+                                         Bloque bloque, Location posIzq, Location posDer) {
+        List<Nodo> sentencias = new ArrayList<>();
+        sentencias.add(new Asignacion(ident, new Entero(valorIni)));
+
+        Mientras mientras = new Mientras(ident, valorIni, valorFin, salto, bloque);
+        mientras.setPosicion(posIzq, posDer);
+        sentencias.add(mientras);
+
+        return new Bloque("Conversión\\nFOR a WHILE", sentencias);
+    }
+
+    /** crearBloquePara() usando como valor de salto predeterminado 1. */
+    public static Bloque crearBloquePara(Identificador ident, int valorIni, int valorFin,
+                                         Bloque bloque, Location posIzq, Location posDer) {
+        return crearBloquePara(ident, valorIni, valorFin, 1, bloque, posIzq, posDer);
     }
 
     public Expresion getCondicion() {
@@ -98,6 +117,10 @@ public class Mientras extends Sentencia {
 
     public void setBloqueSentencias(Bloque bloqueSentencias) {
         this.bloqueSentencias = bloqueSentencias;
+    }
+
+    public boolean esForConvertido() {
+        return forConvertido;
     }
 
     @Override

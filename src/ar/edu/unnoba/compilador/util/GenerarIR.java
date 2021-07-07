@@ -200,7 +200,7 @@ public class GenerarIR {
     }
 
     /** Salto condicional usando pares de etiquetas. */
-    public void salto(String cond, ParEtiquetas etiquetas) {
+    public void salto(String cond, Etiquetas etiquetas) {
         if (etiquetas.getInvertidas()) {
             salto(cond, etiquetas.getFalso(), etiquetas.getVerdadero());
         } else {
