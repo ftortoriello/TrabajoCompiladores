@@ -146,7 +146,16 @@ public class TransformerTipos extends Transformer {
     @Override
     public DecVarIni transform(DecVarIni dvi) throws ExcepcionTransformer {
         dvi = super.transform(dvi);
-        dvi.setExpresion(convertirATipo(dvi.getExpresion(), dvi.getIdent().getTipo()));
+
+        Expresion expresion = dvi.getExpresion();
+        Tipo tipoDestino = dvi.getIdent().getTipo();
+        if (tipoDestino.equals(Tipo.UNKNOWN)) {
+            // Se da este caso en la conversión de WHEN a IF. Asignarle el tipo de la derecha.
+            tipoDestino = expresion.getTipo();
+            dvi.setTipo(tipoDestino);
+        }
+
+        dvi.setExpresion(convertirATipo(expresion, tipoDestino));
         return dvi;
     }
 

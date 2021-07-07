@@ -359,12 +359,6 @@ public class GeneradorDeCodigo extends Visitor {
 
         Expresion expDerecha = ob.getDerecha();
         expDerecha.accept(this);
-        /* TODO
-        if (expDerecha instanceof NegacionLogica) {
-            ((NegacionLogica) expDerecha).setEnCortocircuito(true);
-            etiquetas.setInvertidas();
-        }
-        */
         // Asignar el nombre de la variable de la expresión derecha al resultado de la operación
         ob.setRefIR(expDerecha.getRefIR());
     }

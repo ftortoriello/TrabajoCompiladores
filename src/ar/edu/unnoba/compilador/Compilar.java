@@ -120,6 +120,10 @@ public class Compilar {
             graficarArbol(programa, carpetaSalida + "1_ast-original",
                     "Árbol de sintaxis abstracta (Conti - Tortoriello)");
 
+            // Llamarlo antes de los generadores de alcances para que se generen automáticamente
+            System.out.println("\nReescribiendo estructuras when y for...");
+            programa = new ConversorDeEstructuras().procesar(programa);
+
             System.out.println("\nIniciando generador de alcances globales...");
             new GeneradorDeAlcanceGlobal().procesar(programa);
 
@@ -131,9 +135,6 @@ public class Compilar {
 
             System.out.println("\nIniciando validación y conversión de tipos...");
             programa = new TransformerTipos().procesar(programa);
-
-            System.out.println("\nReescribiendo estructuras when y for...");
-            programa = new ConversorDeEstructuras().procesar(programa);
 
             // Mostrar el árbol transformado
             graficarArbol(programa, carpetaSalida + "2_ast-transformado",
