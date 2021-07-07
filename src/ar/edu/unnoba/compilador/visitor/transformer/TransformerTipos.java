@@ -7,6 +7,7 @@ import ar.edu.unnoba.compilador.ast.base.Programa;
 import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.Tipo;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
+import ar.edu.unnoba.compilador.ast.expresiones.binarias.aritmeticas.OperacionBinariaAritmetica;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Desigualdad;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Igualdad;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
@@ -74,13 +75,19 @@ public class TransformerTipos extends Transformer {
         Tipo tipo1 = ob.getIzquierda().getTipo();
         Tipo tipo2 = ob.getDerecha().getTipo();
 
-        if (tipo1 == tipo2) {
+        if (ob instanceof OperacionBinariaAritmetica &&
+                (tipo1.equals(Tipo.BOOLEAN) || tipo2.equals(Tipo.BOOLEAN))) {
+            throw new ExcepcionTransformer(ob,
+                    String.format("Tipo inválido para operaciones aritméticas: %s", Tipo.BOOLEAN));
+        }
+
+        if (tipo1.equals(tipo2)) {
             return tipo1;
         }
-        if (tipo1 == Tipo.INTEGER && tipo2 == Tipo.FLOAT) {
+        if (tipo1.equals(Tipo.INTEGER) && tipo2.equals(Tipo.FLOAT)) {
             return tipo2;
         }
-        if (tipo1 == Tipo.FLOAT && tipo2 == Tipo.INTEGER) {
+        if (tipo1.equals(Tipo.FLOAT) && tipo2.equals(Tipo.INTEGER)) {
             return tipo1;
         }
         throw new ExcepcionTransformer(ob,
@@ -92,14 +99,14 @@ public class TransformerTipos extends Transformer {
      *  debajo de un nodo EnteroAFlotante. */
     private static Expresion convertirATipo(Expresion expresion, Tipo tipoDestino) throws ExcepcionTransformer {
         Tipo tipoOrigen = expresion.getTipo();
-        if (tipoOrigen == tipoDestino) {
+        if (tipoOrigen.equals(tipoDestino)) {
             return expresion;
         }
-        if (tipoOrigen == Tipo.INTEGER && tipoDestino == Tipo.FLOAT) {
+        if (tipoOrigen.equals(Tipo.INTEGER) && tipoDestino.equals(Tipo.FLOAT)) {
             System.out.printf("Advertencia: convirtiendo «%s» de integer a float%n", expresion);
             return new EnteroAFlotante(expresion);
         }
-        if (tipoOrigen == Tipo.FLOAT && tipoDestino == Tipo.INTEGER) {
+        if (tipoOrigen.equals(Tipo.FLOAT) && tipoDestino.equals(Tipo.INTEGER)) {
             System.out.printf("Advertencia: convirtiendo «%s» de float a integer%n", expresion);
             return new FlotanteAEntero(expresion);
         }
@@ -227,7 +234,7 @@ public class TransformerTipos extends Transformer {
         r = (Relacion) super.transform(r);
         Tipo tipoEnComun = transformOperacionBinaria(r);
         // Sólo las relaciones de igualdad y desigualdad aceptan operandos booleanos
-        if ((tipoEnComun == Tipo.BOOLEAN) && !(
+        if ((tipoEnComun.equals(Tipo.BOOLEAN)) && !(
                 r instanceof Igualdad || r instanceof Desigualdad)) {
             throw new ExcepcionTransformer(r,
                     "No se puede realizar esta comparación entre tipos boolean");
@@ -239,7 +246,7 @@ public class TransformerTipos extends Transformer {
     @Override
     public Expresion transform(OperacionUnaria ou) throws ExcepcionTransformer {
         ou = (OperacionUnaria) super.transform(ou);
-        if (ou.getTipo() == Tipo.UNKNOWN) {
+        if (ou.getTipo().equals(Tipo.UNKNOWN)) {
             ou.setTipo(ou.getExpresion().getTipo());
         } else {
             ou.setExpresion(convertirATipo(ou.getExpresion(), ou.getTipo()));

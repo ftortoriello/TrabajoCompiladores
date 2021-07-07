@@ -102,7 +102,6 @@ Requisitos:
     * Sentencias de control (continue y break): :white_check_mark:
 
 Mejoras en caso de que tengamos que seguir:
-  * ¿Por qué acepta operaciones aritméticas con operandos lógicos (true + false)?
   * Cortocircuito booleano:
     * Esto no anda: writeln(x or not y);
     * Manejar caso a and NOT b.
