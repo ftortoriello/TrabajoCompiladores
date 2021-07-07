@@ -102,12 +102,5 @@ Requisitos:
     * Sentencias de control (continue y break): :white_check_mark:
 
 Mejoras en caso de que tengamos que seguir:
-  * Cortocircuito booleano:
-    * Esto no anda: writeln(x or not y);
-    * Manejar caso a and NOT b.
-  * Añadir referencia a DecFun en Invocacion para poder eliminar las tablas de funciones.
-    * Me parece que no se gana mucho. Para ver si ya fue declarada una función tenemos que armar una tabla temporal.
-      Y para asociar la declaración a las invocaciones tenemos que, en cada invocación, en el generador de alcances locales (o en otro lado que no sea el generador global) consultar esa tabla.
-      Para compartirla entre esos visitor tenemos que tenerla en el programa o el encabezado...
-      Y se usaría el atributo de la declaración sólo en el transformer de tipos y el generador de código.
+  * Cortocircuito booleano: Manejar caso a and NOT b.
   * Implementar visit(SimboloVariable) para no tener que convertir constantemente desde Identificador a SimboloVariable en los últimos visitors.

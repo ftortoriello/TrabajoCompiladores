@@ -519,9 +519,18 @@ public class GeneradorDeCodigo extends Visitor {
         Expresion expr = asig.getExpresion();
         SimboloVariable svDestino = (SimboloVariable) asig.getIdent();
 
-        boolean aplicarCortocircuito = (expr instanceof OperacionBinariaLogica);
-        if (aplicarCortocircuito) {
+        if (expr instanceof OperacionBinariaLogica) {
             grarEtiCortocircuitoAsig("asig");
+            imprimirCortocircuito((OperacionBinariaLogica) expr);
+
+            // Origen va a contener la referencia al valor de la expresión
+            String origen = expr.getRefIR();
+            String destino = svDestino.getPtroIR();
+
+            grar.setComentLinea(String.format("%s %s %s - cortocircuito\"",
+                    svDestino.getNombre(), asig.getEtiqueta(), expr));
+            finalizarCortocircuitoAsig(origen, destino);
+            return;
         }
 
         // Anexar declaración de referencias necesarias para la parte derecha de la asig.
@@ -531,14 +540,9 @@ public class GeneradorDeCodigo extends Visitor {
         String origen = expr.getRefIR();
         String destino = svDestino.getPtroIR();
 
-        grar.setComentLinea(String.format("%s %s %s%s",
-                svDestino.getNombre(), asig.getEtiqueta(), expr,
-                aplicarCortocircuito ? " - cortocircuito" : ""));
-        if (aplicarCortocircuito) {
-            finalizarCortocircuitoAsig(origen, destino);
-        } else {
-            grar.store(destino, svDestino.getTipo().getIR(), origen);
-        }
+        grar.setComentLinea(String.format("%s %s %s",
+                svDestino.getNombre(), asig.getEtiqueta(), expr));
+        grar.store(destino, svDestino.getTipo().getIR(), origen);
     }
 
 
@@ -571,18 +575,10 @@ public class GeneradorDeCodigo extends Visitor {
         Expresion expr = dvi.getExpresion();
         SimboloVariable sv = (SimboloVariable) dvi.getIdent();
 
-        boolean aplicarCortocircuito = (expr instanceof OperacionBinariaLogica);
-        if (aplicarCortocircuito) {
-            grarEtiCortocircuitoAsig("dec.var.ini");
-        }
-
         // Parámetros que necesito para declarar la variable
         String ptroIR = sv.getPtroIR();
         String tipoIR = sv.getTipo().getIR();
-
-        grar.setComentLinea(String.format("variable %s is %s = %s%s",
-                sv.getNombre(), sv.getTipo(), expr,
-                aplicarCortocircuito ? " - cortocircuito" : ""));
+        String nomFunAux = null;
 
         if (sv.getEsGlobal()) {
             // Le asigno temporalmente a la var. el valor por defecto según su tipo, porque
@@ -592,35 +588,37 @@ public class GeneradorDeCodigo extends Visitor {
 
             // Creo una función que se va a llamar en el main para asignar en la var. el
             // valor correspondiente
-            String nomFunAux = Normalizador.crearNomFun("init.var.gbl");
+            nomFunAux = Normalizador.crearNomFun("init.var.gbl");
             grar.defFuncion(nomFunAux, "void", "");
-            expr.accept(this);
-            String refIR = expr.getRefIR();
+        } else {
+            // Variable local
+            grar.alloca(ptroIR, tipoIR);
+        }
 
-            if (aplicarCortocircuito) {
-                finalizarCortocircuitoAsig(refIR, ptroIR);
-            } else {
-                grar.store(ptroIR, tipoIR, refIR);
-            }
+        String refIR;
+        if (expr instanceof OperacionBinariaLogica) {
+            grar.setComentLinea(String.format("variable %s is %s = %s - cortocircuito",
+                    sv.getNombre(), sv.getTipo(), expr));
+            grarEtiCortocircuitoAsig("dec.var.ini");
+            imprimirCortocircuito((OperacionBinariaLogica) expr);
+
+            refIR = expr.getRefIR();
+            finalizarCortocircuitoAsig(refIR, ptroIR);
+        } else {
+            grar.setComentLinea(String.format("variable %s is %s = %s",
+                    sv.getNombre(), sv.getTipo(), expr));
+            expr.accept(this);
+
+            // El refIR con el valor de la expresión viene resuelto gracias a la visita anterior
+            refIR = expr.getRefIR();
+            grar.store(ptroIR, tipoIR, refIR);
+        }
+
+        if (sv.getEsGlobal()) {
             // Guardo el nombre de la función para invocarla en el main
             varGblInit.add(nomFunAux);
             grar.ret();
             grar.cierreBloque();
-        } else {
-            // Variable local
-            grar.alloca(ptroIR, tipoIR);
-
-            // Visito a la expresión para generar la declaración de referencias necesarias
-            expr.accept(this);
-
-            // El refIR con el valor de la expresión viene resuelto gracias a la visita anterior
-            String refIR = expr.getRefIR();
-
-            if (aplicarCortocircuito) {
-                finalizarCortocircuitoAsig(refIR, sv.getPtroIR());
-            } else {
-                grar.store(ptroIR, tipoIR, refIR);
-            }
         }
     }
 
@@ -774,13 +772,17 @@ public class GeneradorDeCodigo extends Visitor {
 
         Expresion condicion = m.getCondicion();
         boolean aplicarCortocircuito = (condicion instanceof OperacionBinariaLogica);
-        if (aplicarCortocircuito) etiquetasOpBinLog.push(parEtiquetas);
-        if (condicion instanceof NegacionLogica) ((NegacionLogica) condicion).setEnCortocircuito(true);
+        if (aplicarCortocircuito) {
+            etiquetasOpBinLog.push(parEtiquetas);
+            imprimirCortocircuito((OperacionBinariaLogica) condicion);
+        } else {
+            if (condicion instanceof NegacionLogica) {
+                ((NegacionLogica) condicion).setEnCortocircuito(true);
+            }
+            condicion.accept(this);
+        }
 
-        // Generar ref. al resultado de la condición
-        condicion.accept(this);
-
-        // Se evalúa la condición, si es verdadera se salta al bucle y si es falsa al fin
+        // Se evalúa la condición, si es verdadera se salta al bucle, sino al fin
         if (condicion instanceof NegacionLogica) {
             // Invertir etiquetas de salto
             grar.salto(condicion.getRefIR(), etiFinWhile, etiBucleWhile);
@@ -807,7 +809,6 @@ public class GeneradorDeCodigo extends Visitor {
 
         // Ejecutado el cuerpo, se evalúa de nuevo la condición inicial
         grar.salto(etiInicioWhile);
-
         grar.etiqueta(etiFinWhile);
 
         etiquetasMientras.pop();
@@ -823,10 +824,13 @@ public class GeneradorDeCodigo extends Visitor {
         Expresion expr = r.getExpresion();
 
         boolean aplicarCortocircuito = (expr instanceof OperacionBinariaLogica);
-        if (aplicarCortocircuito) grarEtiCortocircuitoAsig("ret");
-
-        // Generar refIR para la expresión de retorno
-        expr.accept(this);
+        if (aplicarCortocircuito) {
+            grarEtiCortocircuitoAsig("ret");
+            imprimirCortocircuito((OperacionBinariaLogica) expr);
+        } else {
+            // Generar refIR para la expresión de retorno
+            expr.accept(this);
+        }
 
         grar.setComentLinea("return");
 
@@ -872,12 +876,6 @@ public class GeneradorDeCodigo extends Visitor {
 
     @Override
     public void visit(OperacionBinaria ob) throws ExcepcionVisitor {
-        if (ob instanceof OperacionBinariaLogica) {
-            // Manejar operaciones lógicas usando cortocircuito booleano.
-            imprimirCortocircuito((OperacionBinariaLogica) ob);
-            return;
-        }
-
         // El padre visita a las exprs. izq. y der. para generar la declaración de referencias
         super.visit(ob);
         ob.setRefIR(Normalizador.crearNomRef("ob"));
@@ -890,7 +888,7 @@ public class GeneradorDeCodigo extends Visitor {
         grar.setComentLinea(String.format("%s %s %s",
                 ob.getIzquierda().toString(), ob.getNombre(), ob.getDerecha().toString()));
 
-        if (ob instanceof OperacionBinariaAritmetica) {
+        if (ob instanceof OperacionBinariaAritmetica || ob instanceof OperacionBinariaLogica) {
             // Por ej.: %aux.ob.11 = add i32 %aux.sv.9, %aux.ref.10 ; %aux.ob.11 = %aux.sv.9 + %aux.ref.10
             grar.asig(ob.getRefIR(), instCmpIR, tipoIR, refIzqIR, refDerIR);
         } else if (ob instanceof Relacion) {
