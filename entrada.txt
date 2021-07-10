@@ -74,6 +74,13 @@ main is
         x = x - 1;
         writeln(x);
     end;
+
+    variable a is boolean = true;
+    if not a then
+        writeln("a es falso")
+    else
+        writeln("a es verdadero");
+
 end.
 
 # ====================

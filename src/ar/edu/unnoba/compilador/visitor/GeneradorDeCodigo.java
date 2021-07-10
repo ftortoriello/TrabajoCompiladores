@@ -301,8 +301,8 @@ public class GeneradorDeCodigo extends Visitor {
     }
 
     /**
-     *
-     *
+     * Genera el código del cortocircuito booleano para una expresión lógica
+     * que es la cond. de una estructura (por ej. if).
      */
     private void imprimirCortocircuito(OperacionBinariaLogica ob) throws ExcepcionVisitor {
         grar.coment(String.format("Cortocircuito booleano: %s", ob));
@@ -346,7 +346,7 @@ public class GeneradorDeCodigo extends Visitor {
         ob.setRefIR(expDerecha.getRefIR());
     }
 
-        /**
+    /**
          * Invocar a las funciones que asignan a las variables
          * globales el valor con el que fueron declaradas.
          */
@@ -634,17 +634,13 @@ public class GeneradorDeCodigo extends Visitor {
 
         Expresion cond = se.getCondicion();
 
-        if (cond.getEnCortocircuito()) {
-            pilaEtiquetas.push(new Etiquetas(etiBlqThen, etiFin));
-            cond.accept(this);
-            pilaEtiquetas.pop();
-        } else {
-            cond.accept(this);
-        }
+        pilaEtiquetas.push(new Etiquetas(etiBlqThen, etiFin));
+        cond.accept(this);
 
         // Salto condicional
         String refCond = cond.getRefIR();
-        grar.salto(refCond, etiBlqThen, etiFin);
+        grar.salto(refCond, pilaEtiquetas.peek().getPrimera(), pilaEtiquetas.peek().getSegunda());
+        pilaEtiquetas.pop();
 
         // Caso true
         grar.etiqueta(etiBlqThen);
@@ -665,16 +661,13 @@ public class GeneradorDeCodigo extends Visitor {
 
         Expresion cond = ses.getCondicion();
 
-        // Salto condicional
-        if (cond.getEnCortocircuito()) {
-            pilaEtiquetas.push(new Etiquetas(etiBlqThen, etiBlqElse));
-            cond.accept(this);
-            pilaEtiquetas.pop();
-        } else {
-            cond.accept(this);
-        }
+        pilaEtiquetas.push(new Etiquetas(etiBlqThen, etiBlqElse));
+        cond.accept(this);
+
         String refCond = ses.getCondicion().getRefIR();
-        grar.salto(refCond, etiBlqThen, etiBlqElse);
+        // Salto condicional
+        grar.salto(refCond, pilaEtiquetas.peek().getPrimera(), pilaEtiquetas.peek().getPrimera());
+        pilaEtiquetas.pop();
 
         // Caso true
         grar.etiqueta(etiBlqThen);
