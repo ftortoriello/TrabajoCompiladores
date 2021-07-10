@@ -42,12 +42,14 @@ public class VisitorControl extends Visitor {
         return contBucle > 0;
     }
 
+    @Override
     public void visit(DecFun df) throws ExcepcionVisitor {
         setEnFuncion(true);
         super.visit(df);
         setEnFuncion(false);
     }
 
+    @Override
     public void visit(Mientras m) throws ExcepcionVisitor {
         incContBucles();
         super.visit(m);

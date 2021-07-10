@@ -279,7 +279,7 @@ public class TransformerTipos extends Transformer {
     @Override
     public Mientras transform(Mientras m) throws ExcepcionTransformer {
         m = super.transform(m);
-        if (m.esForConvertido()) {
+        if (m.eraFor()) {
             // Verificar que el iterador de FOR sea entero
             Relacion r = (Relacion) m.getCondicion();
             Identificador i = (Identificador) r.getIzquierda();

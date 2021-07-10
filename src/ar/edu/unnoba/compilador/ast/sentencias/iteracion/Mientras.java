@@ -29,14 +29,14 @@ public class Mientras extends Sentencia {
     private Expresion condicion;
     private Bloque bloqueSentencias;
     /** Si se convirtió de FOR a WHILE */
-    private final boolean forConvertido;
+    private final boolean eraFor;
 
     public Mientras(Expresion condicion, Bloque bloqueSentencias) {
         super("Bloque WHILE");
         this.condicion = condicion;
         bloqueSentencias.setNombre("Cuerpo WHILE");
         this.bloqueSentencias = bloqueSentencias;
-        this.forConvertido = false;
+        this.eraFor = false;
     }
 
     /** Construir WHILE a partir de FOR */
@@ -44,7 +44,7 @@ public class Mientras extends Sentencia {
         super("Bloque WHILE");
         bloque.setNombre("Cuerpo WHILE");
         this.bloqueSentencias = bloque;
-        this.forConvertido = true;
+        this.eraFor = true;
 
         // Si aceptamos salto == 0 se producen bucles infinitos.
         // Podría verificarse en el lexer esto, pero si distinguimos enteros positivos de los que
@@ -119,8 +119,8 @@ public class Mientras extends Sentencia {
         this.bloqueSentencias = bloqueSentencias;
     }
 
-    public boolean esForConvertido() {
-        return forConvertido;
+    public boolean eraFor() {
+        return eraFor;
     }
 
     @Override

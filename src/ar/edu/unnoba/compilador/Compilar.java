@@ -152,6 +152,9 @@ public class Compilar {
             System.out.println("\nRecorriendo el programa para detectar cadenas...");
             new ReconocedorCadenas().procesar(programa);
 
+            System.out.println("\nRecorriendo el programa para identificar dónde aplicar cortocircuito...");
+            new VisitorCortocircuito().procesar(programa);
+
             System.out.println("\nIniciando traducción a código IR...");
             generarCodigoIR(programa, rutaEntrada,  carpetaSalida + nombreArchivo + ".ll");
             System.out.println("\nTraducción a código IR finalizada");

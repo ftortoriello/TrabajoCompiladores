@@ -1,82 +1,36 @@
-(* Programa de prueba *)
+# Utilizar cortocircuito sólo en condiciones de estructuras
+# Convertir for --> while en el propio parser.
 
-(* Se definen algunas variables globales *)
-variable aa is float = 2.0;
-variable bb is integer = 1;
-variable cc is boolean = aa == bb or bb < aa or aa > bb;
+# ====================
+# La conversión de parámetros por defecto no estaba funcionando
+{
+function inc(num is integer, inc is integer = 1.0) return integer
+    return num + inc;
 
-variable radio is float;
-variable superficie₁ is float = radio * 1.5;
+main is
+    writeln(inc(9.0));
+end.
+}
+# ====================
 
-{ Una función }
-function superficie_círculo(x is float, y is float) return float
-begin
-    writeln("Dentro de función superficie_círculo()");
-    # Definición de una variable local.
-    if radio < 0 then begin
-        variable z is integer;
-        return radio + x;
-    end
-    else begin
-        variable radio² is float = cuadrado(y);
-        return cuadrado(radio) * radio²;
-    end;
-end;
-
-
-(* Otra función pero con una única sentencia *)
-function cuadrado(valor is float) return float
-    return valor * valor;
-
-{ Otra variable global (esta vez, sin inicialización explícita) }
-variable superficie₂ is float;
-
-function g(n is integer) return integer
-begin
-    if n > 1 then
-        n = 10
-    else
-        return 0;
-    return n;
-end;
-
-function h(tope is integer = 100) return boolean
-begin
+# ====================
+# La instrucción for no funcionaba en los casos en los que la variable a iterar debe decrementarse
+# La sentencia continue saltaba al cuerpo del while o for en vez de evaluar la condición
+{
+main is
     variable i is integer;
-    variable llego is boolean = true;
-    for i from 0 to 100 do begin
-        if i > tope then begin
-            write("Entramos al break porque i > tope (i = ");
-            write(i);
-            write(" y tope = ");
-            write(tope);
-            writeln(")");
-            llego = false;
-            break;
-        end;
-        write("i: ");
-        write(i);
-        write(". Se acaba en ");
-        writeln(100 - i);
+    for i = 5 to 1 do begin
+        writeln(i);
+        if i == 1 then continue;
     end;
-    return llego;
-end;
+end.
+}
+# ====================
 
-function f(n is integer) return integer
-    if n > 1 then begin
-        return 1;
-        writeln("Esto es código inaccesible");
-        return 0;
-    end
-    else
-        return 0;
-
-function inc(a is integer, b is integer = 2, c is integer = 3) return integer
-    return a + b + c;
-
-
-function probarControl() return boolean
-begin
+# ====================
+# Los break y continue anidados no funcionaban
+{
+main is
     variable i is integer = 0;
 
     while true do begin
@@ -90,83 +44,36 @@ begin
         end;
         if i == 5 then break;
     end;
-    # break; # esto tendría que romper
-
-    return true;
-end;
-
-
-# Procedimiento principal
-main is
-
-    variable ah is boolean = true;
-    variable bh is boolean = false;
-    variable ch is boolean = ah and bh;
-    writeln(ch);
-
-    variable hh is integer = inc(5) + read_integer();
-    variable pp is integer = inc(3 + hh) + 1.0 + hh;
-    variable notnot is boolean = not(pp > hh);
-    writeln(notnot);
-    writeln(hh);
-    writeln(pp);
-    writeln(aa);
-    writeln(bb);
-    writeln(cc);
-
-    probarControl();
-
-    when 1 is < 1.0 then writeln("...");
-
-    variable j is integer = inc(3);
-    writeln(j);
-    variable llego is boolean = h(10);
-    writeln(llego);
-
-    variable c is integer = 0;
-    variable d is float = 2.0;
-    while c < 10 do
-    begin
-        if c >= 4 and c <= 5 or c == 0 then
-            writeln("Estamos en el while"); # Tendría que imprimirse un total de 3 veces
-        write("c se incrementó de ");
-        write(c);
-        c = c + 1;
-        write(" a ");
-        writeln(c);
-    end;
-
-
-    variable justo is boolean = false;
-    when superficie_círculo(radio, 1.0)
-        is < 75 then begin
-            variable primerCond is float;
-            writeln("Re mal...");
-        end
-        is < 100 then writeln("Estuvo cerca...")
-        is == 100 then begin
-            writeln("Qué puntería!");
-            justo = true;
-        end
-        is > 100 then begin
-            variable cuartaCond is float;
-            writeln("¿Adónde la tiré?");
-        end
-        else begin
-            variable quintaCond is float;
-            writeln("Este juego no me gusta");
-        end;
-
-
-    write("Acertó: "); writeln(justo);
-
-    variable i is integer;
-    for i from 5 to 1 do begin
-        variable h is integer = 2;
-        write("Se acaba en ");
-        writeln(i + h);
-    end;
-
-    writeln("Se acabó\n\nFin!");
-
 end.
+}
+# ====================
+
+
+# ====================
+# Pruebas cortocircuito
+
+main is
+    variable x is integer = 0;
+    variable y is integer = 2;
+    variable z is integer = 5;
+
+    if (x != 0) and (y != 2) or (z == 5) then
+        writeln(true);
+
+    while x < z and not(z < y) or not(z == 5) and z != 0 do begin
+        writeln(x);
+        x = x + 1;
+    end;
+
+    if not(x < z) and not(y > z) and not(z == 5) then
+        writeln(true)
+    else
+        writeln(false);
+
+    while not(x < 1) do begin
+        x = x - 1;
+        writeln(x);
+    end;
+end.
+
+# ====================

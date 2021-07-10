@@ -1,23 +1,31 @@
 package ar.edu.unnoba.compilador.util;
 
 public class Etiquetas {
-    private final String verdadero;
-    private final String falso;
+    private final String primera;
+    private final String segunda;
     private String etiIterador = null;
     private boolean invertidas;
 
-    public Etiquetas(String verdadero, String falso) {
-        this.verdadero = verdadero;
-        this.falso = falso;
+    public Etiquetas(String primera, String segunda) {
+        this.primera = primera;
+        this.segunda = segunda;
         this.invertidas = false;
     }
 
-    public String getVerdadero() {
-        return verdadero;
+    public String getPrimera() {
+        if (estanInvertidas()) {
+            return segunda;
+        } else {
+            return primera;
+        }
     }
 
-    public String getFalso() {
-        return falso;
+    public String getSegunda() {
+        if (estanInvertidas()) {
+            return primera;
+        } else {
+            return segunda;
+        }
     }
 
     public String getEtiIterador() {
@@ -28,11 +36,11 @@ public class Etiquetas {
         this.etiIterador = etiIterador;
     }
 
-    public boolean getInvertidas() {
+    public boolean estanInvertidas() {
         return invertidas;
     }
 
-    public void setInvertidas() {
-        this.invertidas = true;
+    public void invertir() {
+        this.invertidas = !this.invertidas;
     }
 }
