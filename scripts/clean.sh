@@ -1,5 +1,7 @@
 #!/bin/sh
 
+cd "$(dirname "$0")/.."
+
 find . -type f \( \
 	-name '*.class' -o -name '*~' \
 	-o -name 'Lexer.java' \

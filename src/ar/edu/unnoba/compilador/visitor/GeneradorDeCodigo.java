@@ -678,7 +678,7 @@ public class GeneradorDeCodigo extends Visitor {
 
         String refCond = ses.getCondicion().getRefIR();
         // Salto condicional
-        grar.salto(refCond, pilaEtiquetas.peek().getPrimera(), pilaEtiquetas.peek().getPrimera());
+        grar.salto(refCond, pilaEtiquetas.peek().getPrimera(), pilaEtiquetas.peek().getSegunda());
         pilaEtiquetas.pop();
 
         // Caso true
