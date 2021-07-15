@@ -328,6 +328,9 @@ public class GeneradorDeCodigo extends Visitor {
         Expresion expIzquierda = ob.getIzquierda();
 
         // Visitar el operando de la izquierda para generar sus declaraciones y crear su refIR
+        if (expIzquierda instanceof OperacionBinariaLogica || expIzquierda instanceof NegacionLogica) {
+            expIzquierda.setEnCortocircuito(true);
+        }
         expIzquierda.accept(this);
 
         // Actualizo las etiquetas porque podrían haberse invertido en el accept de expIzquierda.
@@ -340,6 +343,9 @@ public class GeneradorDeCodigo extends Visitor {
         // Desapilo para que la expr. derecha pueda utilizar las etiquetas que le corresponden
         pilaEtiquetas.pop();
         Expresion expDerecha = ob.getDerecha();
+        if (expDerecha instanceof OperacionBinariaLogica || expDerecha instanceof NegacionLogica) {
+            expDerecha.setEnCortocircuito(true);
+        }
         expDerecha.accept(this);
 
         // Asignar el nombre de la variable de la expresión derecha al resultado de la operación
@@ -633,6 +639,9 @@ public class GeneradorDeCodigo extends Visitor {
         String etiFin = Normalizador.crearNomEtiqueta("fin_if");
 
         Expresion cond = se.getCondicion();
+        if (cond instanceof OperacionBinariaLogica || cond instanceof NegacionLogica) {
+            cond.setEnCortocircuito(true);
+        }
 
         pilaEtiquetas.push(new Etiquetas(etiBlqThen, etiFin));
         cond.accept(this);
@@ -660,6 +669,9 @@ public class GeneradorDeCodigo extends Visitor {
         String etiFin = Normalizador.crearNomEtiqueta("fin_if");
 
         Expresion cond = ses.getCondicion();
+        if (cond instanceof OperacionBinariaLogica || cond instanceof NegacionLogica) {
+            cond.setEnCortocircuito(true);
+        }
 
         pilaEtiquetas.push(new Etiquetas(etiBlqThen, etiBlqElse));
         cond.accept(this);
@@ -707,7 +719,11 @@ public class GeneradorDeCodigo extends Visitor {
         grar.etiqueta(etiInicioWhile);
 
         pilaEtiquetas.push(parEtiquetas);
+
         Expresion cond = m.getCondicion();
+        if (cond instanceof OperacionBinariaLogica || cond instanceof NegacionLogica) {
+            cond.setEnCortocircuito(true);
+        }
         cond.accept(this);
 
         // Se evalúa la condición, si es verdadera se salta al bucle, sino al fin
