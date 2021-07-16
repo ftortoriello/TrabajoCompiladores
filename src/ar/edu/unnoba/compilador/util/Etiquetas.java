@@ -3,44 +3,48 @@ package ar.edu.unnoba.compilador.util;
 public class Etiquetas {
     private final String primera;
     private final String segunda;
-    private String etiIterador = null;
-    private boolean invertidas;
+    private String etiContinuar = null;
+    private boolean saltoInvertido;
 
+    /**
+     * @param primera: Bloque THEN o WHILE
+     * @param segunda: Fin de bloque THEN o WHILE
+     */
     public Etiquetas(String primera, String segunda) {
         this.primera = primera;
         this.segunda = segunda;
-        this.invertidas = false;
+        this.saltoInvertido = false;
     }
 
-    public String getPrimera() {
-        if (estanInvertidas()) {
+    public String getSaltoPrimera() {
+        if (saltoInvertido) {
             return segunda;
         } else {
             return primera;
         }
     }
 
-    public String getSegunda() {
-        if (estanInvertidas()) {
+    public String getSaltoSegunda() {
+        if (saltoInvertido) {
             return primera;
         } else {
             return segunda;
         }
     }
 
-    public String getEtiIterador() {
-        return etiIterador;
+    public String getSaltoContinuar() {
+        return etiContinuar;
     }
 
-    public void setEtiIterador(String etiIterador) {
-        this.etiIterador = etiIterador;
+    public void setEtiContinuar(String etiContinuar) {
+        this.etiContinuar = etiContinuar;
     }
 
-    public boolean estanInvertidas() {
-        return invertidas;
+    public void invertirSalto() {
+        this.saltoInvertido = !this.saltoInvertido;
     }
 
-    public void invertir() {
-        this.invertidas = !this.invertidas;
+    public boolean getSaltoInvertido() {
+        return this.saltoInvertido;
     }
 }

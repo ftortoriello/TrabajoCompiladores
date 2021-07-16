@@ -213,6 +213,9 @@ param ::= IDENTIFICADOR:id PR_IS TIPO_DE_DATO:td {:
             RESULT = param;
         :};
 
+// TODO: Reemplazar expresion por literales?
+// Como está ahora se rompe si se asigne como valor por defecto otro parámetro o una variable
+// declarada en el main
 param_def ::= IDENTIFICADOR:id PR_IS TIPO_DE_DATO:td IGUAL expresion:expr {:
             Identificador ident = new Identificador(id, Tipo.getTipoDato(td));
             ident.setPosicion(idxleft, idxright);

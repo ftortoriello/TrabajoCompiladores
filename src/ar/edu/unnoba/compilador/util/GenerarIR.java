@@ -199,6 +199,15 @@ public class GenerarIR {
         omitirLinea = true;
     }
 
+    /**
+     * Salto condicional.
+     * @param eti: Par de etiquetas. Salta a la primera o segunda según la condición y si se debe
+     *           invertir el salto.
+     */
+    public void salto(String cond, Etiquetas eti) {
+        salto(cond, eti.getSaltoPrimera(), eti.getSaltoSegunda());
+    }
+
     /** Retorno de una función de tipo void. */
     public void ret() {
         codigo("ret void");

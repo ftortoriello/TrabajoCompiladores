@@ -33,6 +33,8 @@ import ar.edu.unnoba.compilador.util.Etiquetas;
 import java.io.*;
 import java.util.*;
 
+// TODO: Reemplazar funciones enCortoCircuito() por un flag en este Visitor
+
 /**
  * Clase para generar código de LLVM IR a partir del AST.
  */
@@ -307,8 +309,9 @@ public class GeneradorDeCodigo extends Visitor {
     private void imprimirCortocircuito(OperacionBinariaLogica ob) throws ExcepcionVisitor {
         grar.coment(String.format("Cortocircuito booleano: %s", ob));
 
-        final String etiVerdadero = pilaEtiquetas.peek().getPrimera();
-        final String etiFalso = pilaEtiquetas.peek().getSegunda();
+        final Etiquetas eti = pilaEtiquetas.peek();
+        final String etiVerdadero = eti.getSaltoPrimera();
+        final String etiFalso = eti.getSaltoSegunda();
 
         // Esta etiqueta se utiliza cuando es necesario seguir comparando para
         // determinar el valor de verdad de la expresión.
@@ -333,15 +336,11 @@ public class GeneradorDeCodigo extends Visitor {
         }
         expIzquierda.accept(this);
 
-        // Actualizo las etiquetas porque podrían haberse invertido en el accept de expIzquierda.
-        final String etiSigCmp = pilaEtiquetas.peek().getPrimera();
-        final String etiFin = pilaEtiquetas.peek().getSegunda();
-
-        grar.salto(expIzquierda.getRefIR(), etiSigCmp, etiFin);
+        // Actualizar las etiquetas porque podrían haberse invertido en el accept de expIzquierda.
+        // Desapilarlas para que la expr. derecha pueda utilizar las etiquetas que le corresponden.
+        grar.salto(expIzquierda.getRefIR(), pilaEtiquetas.pop());
         grar.etiqueta(etiContCmp);
 
-        // Desapilo para que la expr. derecha pueda utilizar las etiquetas que le corresponden
-        pilaEtiquetas.pop();
         Expresion expDerecha = ob.getDerecha();
         if (expDerecha instanceof OperacionBinariaLogica || expDerecha instanceof NegacionLogica) {
             expDerecha.setEnCortocircuito(true);
@@ -648,7 +647,7 @@ public class GeneradorDeCodigo extends Visitor {
 
         // Salto condicional
         String refCond = cond.getRefIR();
-        grar.salto(refCond, pilaEtiquetas.peek().getPrimera(), pilaEtiquetas.peek().getSegunda());
+        grar.salto(refCond, pilaEtiquetas.peek());
         pilaEtiquetas.pop();
 
         // Caso true
@@ -678,7 +677,7 @@ public class GeneradorDeCodigo extends Visitor {
 
         String refCond = ses.getCondicion().getRefIR();
         // Salto condicional
-        grar.salto(refCond, pilaEtiquetas.peek().getPrimera(), pilaEtiquetas.peek().getSegunda());
+        grar.salto(refCond, pilaEtiquetas.peek());
         pilaEtiquetas.pop();
 
         // Caso true
@@ -712,7 +711,9 @@ public class GeneradorDeCodigo extends Visitor {
             // Si este while era originalmente un for, se crea una etiqueta especial en la que en cada
             // iteración siempre se incrementa el valor de la variable sobre la que se está iterando
             etiIterador = Normalizador.crearNomEtiqueta("inc_iterador");
-            parEtiquetas.setEtiIterador(etiIterador);
+            parEtiquetas.setEtiContinuar(etiIterador);
+        } else {
+            parEtiquetas.setEtiContinuar(etiInicioWhile);
         }
 
         grar.salto(etiInicioWhile);
@@ -728,7 +729,7 @@ public class GeneradorDeCodigo extends Visitor {
 
         // Se evalúa la condición, si es verdadera se salta al bucle, sino al fin
         // Tomo las etiquetas de la pila porque podrían haber sido invertidas en el visit de la expr.
-        grar.salto(cond.getRefIR(), pilaEtiquetas.peek().getPrimera(), pilaEtiquetas.peek().getSegunda());
+        grar.salto(cond.getRefIR(), pilaEtiquetas.peek());
         grar.etiqueta(etiBucleWhile);
 
         // Generar cuerpo del while
@@ -782,24 +783,16 @@ public class GeneradorDeCodigo extends Visitor {
 
     @Override
     public void visit(Continuar c) {
-        Etiquetas etiquetas = this.pilaEtiquetas.peek();
         grar.setComentLinea("continue");
-        String etiIterador = etiquetas.getEtiIterador();
-        if (etiIterador == null) {
-            // Saltar al principio del while
-            grar.salto(etiquetas.getPrimera());
-        } else {
-            // Saltar al incremento del iterador
-            grar.salto(etiIterador);
-        }
+        // Saltar a la evaluación de la condición del while, o al incremento del iterador del for
+        grar.salto(pilaEtiquetas.peek().getSaltoContinuar());
     }
 
     @Override
     public void visit(Salir s) {
-        Etiquetas etiquetas = this.pilaEtiquetas.peek();
         grar.setComentLinea("break");
         // Saltar al final del while
-        grar.salto(etiquetas.getSegunda());
+        grar.salto(pilaEtiquetas.peek().getSaltoSegunda());
     }
 
 
@@ -868,7 +861,7 @@ public class GeneradorDeCodigo extends Visitor {
         // las etiquetas ya que podemos omitir la operación de negación.
         if (neg.getEnCortocircuito()) {
             neg.setRefIR(refExpr);
-            pilaEtiquetas.peek().invertir();
+            pilaEtiquetas.peek().invertirSalto();
             grar.coment(String.format("Cortocircuito booleano: %s (se invirtieron las etiquetas)", neg));
             return;
         }
