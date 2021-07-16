@@ -5,8 +5,10 @@ import ar.edu.unnoba.compilador.ast.expresiones.Expresion;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.OperacionBinaria;
 import ar.edu.unnoba.compilador.ast.expresiones.binarias.relaciones.Relacion;
 import ar.edu.unnoba.compilador.ast.expresiones.unarias.OperacionUnaria;
+import ar.edu.unnoba.compilador.ast.expresiones.valor.literal.Literal;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.DecFun;
 import ar.edu.unnoba.compilador.ast.sentencias.declaracion.Declaracion;
+import ar.edu.unnoba.compilador.ast.sentencias.declaracion.ParamDef;
 import ar.edu.unnoba.compilador.excepciones.ExcepcionTransformer;
 
 import java.util.ArrayList;
@@ -42,5 +44,16 @@ public class Optimizador extends Transformer {
         }
         e.setDeclaraciones(declaraciones);
         return e;
+    }
+
+    @Override
+    public ParamDef transform(ParamDef pi) throws ExcepcionTransformer {
+        ParamDef paramOptimizado = super.transform(pi);
+        if (!(paramOptimizado.getExpresion() instanceof Literal)) {
+            throw new ExcepcionTransformer(pi, "La expresión del valor del parámetro " +
+                    "por defecto debe estar formada sólo por literales");
+        } else {
+            return paramOptimizado;
+        }
     }
 }

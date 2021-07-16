@@ -153,15 +153,9 @@ public class GeneradorDeCodigo extends Visitor {
             Cadena cad = (Cadena) arg;
             grar.print(cad.getPtroIR(), cad.getLongitudIR());
         } else switch (arg.getTipo()) {
-            case BOOLEAN:
-                imprimiWriteBoolean(refIR);
-                break;
-            case INTEGER:
-                grar.print("@.int_format", 3, "i32", refIR);
-                break;
-            case FLOAT:
-                grar.print("@.double_print_format", 6, "double", refIR);
-                break;
+            case BOOLEAN -> imprimiWriteBoolean(refIR);
+            case INTEGER -> grar.print("@.int_format", 3, "i32", refIR);
+            case FLOAT -> grar.print("@.double_print_format", 6, "double", refIR);
         }
 
         if (i.getNombre().equals("writeln")) {
@@ -396,12 +390,16 @@ public class GeneradorDeCodigo extends Visitor {
             // algo falló... dejarlo fijo
             if (targetEsWindows()) {
                 // Target Bruno
-                target = "target datalayout = \"e-m:w-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128\"\n" +
-                        "target triple = \"x86_64-pc-windows-msvc19.28.29335\"\n";
+                target = """
+                        target datalayout = "e-m:w-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
+                        target triple = "x86_64-pc-windows-msvc19.28.29335"
+                        """;
             } else {
                 // Target Franco
-                target = "target datalayout = \"e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128\"\n" +
-                        "target triple = \"x86_64-pc-linux-gnu\"\n";
+                target = """
+                        target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
+                        target triple = "x86_64-pc-linux-gnu"
+                        """;
             }
         }
 
@@ -840,15 +838,10 @@ public class GeneradorDeCodigo extends Visitor {
         Expresion expr = neg.getExpresion();
         Tipo tipo = expr.getTipo();
         switch (tipo) {
-            case INTEGER:
-                // Hacer 0 - expresion
-                grar.asig(neg.getRefIR(), "sub", tipo.getIR(), "0", expr.getRefIR());
-                break;
-            case FLOAT:
-                grar.asig(neg.getRefIR(), "fneg", tipo.getIR(), expr.getRefIR());
-                break;
-            default:
-                throw new ExcepcionVisitor(neg, "Tipo inesperado: " + tipo);
+            // Hacer 0 - expresion
+            case INTEGER -> grar.asig(neg.getRefIR(), "sub", tipo.getIR(), "0", expr.getRefIR());
+            case FLOAT -> grar.asig(neg.getRefIR(), "fneg", tipo.getIR(), expr.getRefIR());
+            default -> throw new ExcepcionVisitor(neg, "Tipo inesperado: " + tipo);
         }
     }
 

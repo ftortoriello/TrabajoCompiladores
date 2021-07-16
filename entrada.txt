@@ -1,28 +1,55 @@
 # Utilizar cortocircuito sólo en condiciones de estructuras
+{
+main is
+    variable a is integer = 10;
+    variable b is integer = 5;
+    variable c is boolean = a > b or a == b;
+    if c then
+        variable d is boolean = a > b or a == b;
+end.
+}
 # Convertir for --> while en el propio parser.
 
 # ====================
 # La conversión de parámetros por defecto no estaba funcionando
-{
-function inc(num is integer, inc is integer = 1.0) return integer
+
+function inc(num is integer, inc is integer = 1.0 + 1) return integer
     return num + inc;
 
 main is
     writeln(inc(9.0));
 end.
-}
+
 # ====================
 
 # ====================
 # La instrucción for no funcionaba en los casos en los que la variable a iterar debe decrementarse
 # La sentencia continue saltaba al cuerpo del while o for en vez de evaluar la condición
+# Y en el caso del for, antes de saltar a evaluar la condición tendría que realizar el incremento
+
+{
+for(expr1; expr2; expr3)
+
+expr1;
+while(expr2)
+    sentencias;
+    expr3;
+}
 {
 main is
-    variable i is integer;
-    for i = 5 to 1 do begin
+    variable i is integer = 1;
+    while i > 0 do begin
+        i = i - 1;
         writeln(i);
-        if i == 1 then continue;
+        continue;
+        i = i + 10;
     end;
+    {
+    for i from 5 to 1 do begin
+        writeln(i);
+        if i == 5 then continue;
+    end;
+    }
 end.
 }
 # ====================
@@ -51,13 +78,13 @@ end.
 
 # ====================
 # Pruebas cortocircuito
-
+{
 main is
     variable x is integer = 0;
     variable y is integer = 2;
     variable z is integer = 5;
 
-    if (x != 0) and (y != 2) or (z == 5) then
+    if (x != 0) and (y != 2) or (z == 5) and (x != 1) then
         writeln(true);
 
     while x < z and not(z < y) or not(z == 5) and z != 0 do begin
@@ -65,7 +92,7 @@ main is
         x = x + 1;
     end;
 
-    if not(x < z) and not(y > z) and not(z == 5) then
+    if not(x < z) and (y > z) and not(z == 5) then
         writeln(true)
     else
         writeln(false);
@@ -82,5 +109,5 @@ main is
         writeln("a es verdadero");
 
 end.
-
+}
 # ====================
