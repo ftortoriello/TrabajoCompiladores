@@ -353,9 +353,9 @@ public class GeneradorDeCodigo extends Visitor {
     }
 
     /**
-         * Invocar a las funciones que asignan a las variables
-         * globales el valor con el que fueron declaradas.
-         */
+     * Invocar a las funciones que asignan a las variables
+     * globales el valor con el que fueron declaradas.
+     */
     private void inicializarVarsGbls() {
         varGblInit.forEach(fun -> grar.invocacion(fun, ""));
     }
