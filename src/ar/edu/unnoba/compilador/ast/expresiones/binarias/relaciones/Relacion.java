@@ -52,14 +52,14 @@ public abstract class Relacion extends OperacionBinaria {
      * Si se utiliza el operador de IGUALDAD, devuelvo una clase Igualdad, etc.
      */
     public static Relacion getClaseRel(OperadorCmp op, Expresion expr1, Expresion expr2) {
-        switch (op) {
-            case IGUALDAD:    return new Igualdad(expr1, expr2);
-            case DESIGUALDAD: return new Desigualdad(expr1, expr2);
-            case MAYOR:       return new Mayor(expr1, expr2);
-            case MAYOR_IGUAL: return new MayorIgual(expr1, expr2);
-            case MENOR:       return new Menor(expr1, expr2);
-            case MENOR_IGUAL: return new MenorIgual(expr1, expr2);
-            default: throw new IllegalStateException("Operador inesperado: " + op);
-        }
+        return switch (op) {
+            case IGUALDAD    -> new Igualdad(expr1, expr2);
+            case DESIGUALDAD -> new Desigualdad(expr1, expr2);
+            case MAYOR       -> new Mayor(expr1, expr2);
+            case MAYOR_IGUAL -> new MayorIgual(expr1, expr2);
+            case MENOR       -> new Menor(expr1, expr2);
+            case MENOR_IGUAL -> new MenorIgual(expr1, expr2);
+            default -> throw new IllegalStateException("Operador inesperado: " + op);
+        };
     }
 }

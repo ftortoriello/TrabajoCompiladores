@@ -9,15 +9,15 @@ public enum OperadorCmp {
     MENOR_IGUAL;
 
     public static String getStrOp(OperadorCmp op) {
-        switch (op) {
-            case IGUALDAD:    return "==";
-            case DESIGUALDAD: return "!=";
-            case MAYOR:       return ">";
-            case MAYOR_IGUAL: return ">=";
-            case MENOR:       return "<";
-            case MENOR_IGUAL: return "<=";
-            default: throw new IllegalStateException("Tipo de comparación inesperada: " + op);
-        }
+        return switch (op) {
+            case IGUALDAD    -> "==";
+            case DESIGUALDAD -> "!=";
+            case MAYOR       -> ">";
+            case MAYOR_IGUAL -> ">=";
+            case MENOR       -> "<";
+            case MENOR_IGUAL -> "<=";
+            default -> throw new IllegalStateException("Tipo de comparación inesperada: " + op);
+        };
     }
 
     /**
@@ -25,14 +25,14 @@ public enum OperadorCmp {
      * correspondiente.
      */
     public static OperadorCmp getTipoOpCmp(String opStr) {
-        switch (opStr) {
-            case "==": return OperadorCmp.IGUALDAD;
-            case "!=": return OperadorCmp.DESIGUALDAD;
-            case ">":  return OperadorCmp.MAYOR;
-            case ">=": return OperadorCmp.MAYOR_IGUAL;
-            case "<":  return OperadorCmp.MENOR;
-            case "<=": return OperadorCmp.MENOR_IGUAL;
-            default: throw new IllegalStateException("Operador relacional inesperado: " + opStr);
-        }
+        return switch (opStr) {
+            case "==" -> OperadorCmp.IGUALDAD;
+            case "!=" -> OperadorCmp.DESIGUALDAD;
+            case ">"  -> OperadorCmp.MAYOR;
+            case ">=" -> OperadorCmp.MAYOR_IGUAL;
+            case "<"  -> OperadorCmp.MENOR;
+            case "<=" -> OperadorCmp.MENOR_IGUAL;
+            default -> throw new IllegalStateException("Operador relacional inesperado: " + opStr);
+        };
     }
 }

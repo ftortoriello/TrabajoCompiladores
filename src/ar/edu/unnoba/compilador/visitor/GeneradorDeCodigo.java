@@ -155,7 +155,7 @@ public class GeneradorDeCodigo extends Visitor {
         } else switch (arg.getTipo()) {
             case BOOLEAN -> imprimiWriteBoolean(refIR);
             case INTEGER -> grar.print("@.int_format", 3, "i32", refIR);
-            case FLOAT -> grar.print("@.double_print_format", 6, "double", refIR);
+            case FLOAT   -> grar.print("@.double_print_format", 6, "double", refIR);
         }
 
         if (i.getNombre().equals("writeln")) {
@@ -840,7 +840,7 @@ public class GeneradorDeCodigo extends Visitor {
         switch (tipo) {
             // Hacer 0 - expresion
             case INTEGER -> grar.asig(neg.getRefIR(), "sub", tipo.getIR(), "0", expr.getRefIR());
-            case FLOAT -> grar.asig(neg.getRefIR(), "fneg", tipo.getIR(), expr.getRefIR());
+            case FLOAT   -> grar.asig(neg.getRefIR(), "fneg", tipo.getIR(), expr.getRefIR());
             default -> throw new ExcepcionVisitor(neg, "Tipo inesperado: " + tipo);
         }
     }

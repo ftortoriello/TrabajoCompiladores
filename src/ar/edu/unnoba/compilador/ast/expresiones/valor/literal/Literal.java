@@ -44,10 +44,10 @@ public abstract class Literal extends Valor {
     }
 
     public static Literal crearNumero(Number valor, Tipo tipo) {
-        switch (tipo) {
-            case INTEGER: return new Entero(valor.intValue());
-            case FLOAT:   return new Flotante(valor.doubleValue());
-            default:      throw new IllegalStateException("Tipo de literal inesperado: " + tipo);
-        }
+        return switch (tipo) {
+            case INTEGER -> new Entero(valor.intValue());
+            case FLOAT   -> new Flotante(valor.doubleValue());
+            default -> throw new IllegalStateException("Tipo de literal inesperado: " + tipo);
+        };
     }
 }

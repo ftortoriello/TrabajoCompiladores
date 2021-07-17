@@ -55,11 +55,7 @@ public abstract class Nodo {
     }
 
     public String getEtiqueta() {
-        if (nombre == null) {
-            return this.getClass().getSimpleName();
-        } else {
-            return nombre;
-        }
+        return nombre.equals(null) ? nombre.getClass().getSimpleName() : nombre;
     }
 
     public abstract void accept(Visitor v) throws ExcepcionVisitor;
