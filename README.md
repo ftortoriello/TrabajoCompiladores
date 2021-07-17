@@ -52,7 +52,8 @@ Fecha de entrega: 04/06/2021
 
 Requisitos:
 * AST, con su visualización mediante graphviz: :white_check_mark:
-* Verificación de tipos de datos. Mostrar error si los tipos son incompatibles (por ejemplo: booleanos y números): :white_check_mark:
+* Verificación de tipos de datos. Mostrar error si los tipos son incompatibles
+(por ejemplo: booleanos y números): :white_check_mark:
   * expresiones
   * variables
   * funciones
@@ -63,11 +64,6 @@ Opcional:
 * Conversiones implícitas de tipo: :white_check_mark:
 * Transformación de estruras when y for: :white_check_mark:
 * Constant folding: :white_check_mark:
-
-### Revisar
-
-#### parser.cup
-* La *producción* sentencia no es de *tipo* sentencia porque tiene en su interior a invocacion_funcion, que es de tipo expresion. Entonces la producción sentencia está forzada a ser de tipo nodo...
 
 ## 3.ª Etapa: Generador de código ejecutable a partir del AST
 
@@ -82,7 +78,8 @@ Requisitos:
   * Read: :white_check_mark:
   * Write: :white_check_mark:
   * Truncamiento o conversiones: :white_check_mark:
-* Declaración de variables (locales y globales, inicializadas y no inicializadas): :white_check_mark:
+* Declaración de variables (locales y globales, inicializadas y no
+inicializadas): :white_check_mark:
   * Valores por defecto para las no inicializadas: :white_check_mark:
 * Bloques de código:
   * Asignaciones: :white_check_mark:
@@ -97,7 +94,14 @@ Requisitos:
     * Sentencias de control (continue y break): :white_check_mark:
 
 Mejoras posibles:
-* Reemplazo de constantes por su valor.
-* Eliminación de las declaraciones de variables sin uso.
-* Eliminación de asignaciones redundantes (ej: x = x).
-* Implementar visit(SimboloVariable) para no tener que convertir constantemente desde Identificador a SimboloVariable en los últimos visitors.
+* Parser:
+  * La *producción* sentencia no es de *tipo* sentencia porque tiene en su
+  interior a invocacion_funcion, que es de tipo expresion.
+  Por lo tanto, la producción sentencia está forzada a ser de tipo nodo...
+* Optimizaciones:
+  * Reemplazo de constantes por su valor.
+  * Eliminación de las declaraciones de variables sin uso.
+  * Eliminación de asignaciones redundantes (ej: x = x).
+* General:
+  * Implementar visit(SimboloVariable) para no tener que convertir constantemente
+  desde Identificador a SimboloVariable en los últimos visitors.
