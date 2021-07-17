@@ -10,12 +10,6 @@ public abstract class Expresion extends Nodo {
     private Tipo tipo;
     private String refIR;
 
-    /**
-     * Propiedad para tratar de manera especial a las operaciones lógicas binarias y unarias
-     * que sean la condición de una estructura. Se pone en esta clase para evitar casteos e ifs.
-     */
-    private boolean enCortocircuito = false;
-
     public Expresion() {
         this.tipo = Tipo.UNKNOWN;
     }
@@ -48,14 +42,6 @@ public abstract class Expresion extends Nodo {
 
     public void setRefIR(String refIR) {
         this.refIR = refIR;
-    }
-
-    public boolean getEnCortocircuito() {
-        return enCortocircuito;
-    }
-
-    public void setEnCortocircuito(boolean enCortocircuito) {
-        this.enCortocircuito = enCortocircuito;
     }
 
     @Override

@@ -33,8 +33,6 @@ import ar.edu.unnoba.compilador.util.Etiquetas;
 import java.io.*;
 import java.util.*;
 
-// TODO: Reemplazar funciones enCortoCircuito() por un flag en este Visitor
-
 /**
  * Clase para generar código de LLVM IR a partir del AST.
  */
@@ -67,6 +65,12 @@ public class GeneradorDeCodigo extends Visitor {
      * y para saber a donde saltar cuando se encuentra break o continue
      * dentro de un while. */
     private final Deque<Etiquetas> pilaEtiquetas = new ArrayDeque<>();
+
+    /**
+     * Flag que indica si actualmente se está recorriendo una expresión sobre la cual se aplica
+     * cortocircuito booleano (una expresión lógica binaria o unaria en una condición de WHILE o IF)
+     */
+    private boolean enCortocircuito = false;
 
     // *** Funciones auxiliares ***
 
@@ -325,9 +329,6 @@ public class GeneradorDeCodigo extends Visitor {
         Expresion expIzquierda = ob.getIzquierda();
 
         // Visitar el operando de la izquierda para generar sus declaraciones y crear su refIR
-        if (expIzquierda instanceof OperacionBinariaLogica || expIzquierda instanceof NegacionLogica) {
-            expIzquierda.setEnCortocircuito(true);
-        }
         expIzquierda.accept(this);
 
         // Actualizar las etiquetas porque podrían haberse invertido en el accept de expIzquierda.
@@ -336,13 +337,19 @@ public class GeneradorDeCodigo extends Visitor {
         grar.etiqueta(etiContCmp);
 
         Expresion expDerecha = ob.getDerecha();
-        if (expDerecha instanceof OperacionBinariaLogica || expDerecha instanceof NegacionLogica) {
-            expDerecha.setEnCortocircuito(true);
-        }
         expDerecha.accept(this);
 
         // Asignar el nombre de la variable de la expresión derecha al resultado de la operación
         ob.setRefIR(expDerecha.getRefIR());
+    }
+
+    /**
+     * Establece el flag del cortocircuito en true si la expresión es lógica.
+     */
+    private void setEnCortocircuito(Expresion expr) {
+        if (expr instanceof OperacionBinariaLogica || expr instanceof NegacionLogica) {
+            enCortocircuito = true;
+        }
     }
 
     /**
@@ -634,19 +641,16 @@ public class GeneradorDeCodigo extends Visitor {
 
         String etiBlqThen = Normalizador.crearNomEtiqueta("blq_then");
         String etiFin = Normalizador.crearNomEtiqueta("fin_if");
+        pilaEtiquetas.push(new Etiquetas(etiBlqThen, etiFin));
 
         Expresion cond = se.getCondicion();
-        if (cond instanceof OperacionBinariaLogica || cond instanceof NegacionLogica) {
-            cond.setEnCortocircuito(true);
-        }
-
-        pilaEtiquetas.push(new Etiquetas(etiBlqThen, etiFin));
+        setEnCortocircuito(cond);
         cond.accept(this);
+        enCortocircuito = false;
 
         // Salto condicional
         String refCond = cond.getRefIR();
-        grar.salto(refCond, pilaEtiquetas.peek());
-        pilaEtiquetas.pop();
+        grar.salto(refCond, pilaEtiquetas.pop());
 
         // Caso true
         grar.etiqueta(etiBlqThen);
@@ -664,19 +668,16 @@ public class GeneradorDeCodigo extends Visitor {
         String etiBlqThen = Normalizador.crearNomEtiqueta("blq_then");
         String etiBlqElse = Normalizador.crearNomEtiqueta("blq_else");
         String etiFin = Normalizador.crearNomEtiqueta("fin_if");
+        pilaEtiquetas.push(new Etiquetas(etiBlqThen, etiBlqElse));
 
         Expresion cond = ses.getCondicion();
-        if (cond instanceof OperacionBinariaLogica || cond instanceof NegacionLogica) {
-            cond.setEnCortocircuito(true);
-        }
-
-        pilaEtiquetas.push(new Etiquetas(etiBlqThen, etiBlqElse));
+        setEnCortocircuito(cond);
         cond.accept(this);
+        enCortocircuito = false;
 
         String refCond = ses.getCondicion().getRefIR();
         // Salto condicional
-        grar.salto(refCond, pilaEtiquetas.peek());
-        pilaEtiquetas.pop();
+        grar.salto(refCond, pilaEtiquetas.pop());
 
         // Caso true
         grar.etiqueta(etiBlqThen);
@@ -720,10 +721,9 @@ public class GeneradorDeCodigo extends Visitor {
         pilaEtiquetas.push(parEtiquetas);
 
         Expresion cond = m.getCondicion();
-        if (cond instanceof OperacionBinariaLogica || cond instanceof NegacionLogica) {
-            cond.setEnCortocircuito(true);
-        }
+        setEnCortocircuito(cond);
         cond.accept(this);
+        enCortocircuito = false;
 
         // Se evalúa la condición, si es verdadera se salta al bucle, sino al fin
         // Tomo las etiquetas de la pila porque podrían haber sido invertidas en el visit de la expr.
@@ -800,8 +800,8 @@ public class GeneradorDeCodigo extends Visitor {
     public void visit(OperacionBinaria ob) throws ExcepcionVisitor {
         ob.setRefIR(Normalizador.crearNomRef("ob"));
 
-        if (ob.getEnCortocircuito()) {
-            // Las operaciones binarias que sean la condición de una estructura (por ej. un if)
+        if (enCortocircuito) {
+            // Las operaciones binarias que sean la condición de una estructura IF o WHILE
             // y pertenezcan a la clase OperacionBinariaLogica tendrán este atributo en true.
             imprimirCortocircuito((OperacionBinariaLogica) ob);
             return;
@@ -850,15 +850,14 @@ public class GeneradorDeCodigo extends Visitor {
         super.visit(neg);
         String refExpr = neg.getExpresion().getRefIR();
 
-        // Si el NOT es por ejemplo parte de una condición while, nos limitamos a invertir
-        // las etiquetas ya que podemos omitir la operación de negación.
-        if (neg.getEnCortocircuito()) {
+        // Si el NOT es por ejemplo parte de una condición IF o WHILE, nos limitamos a invertir
+        // las etiquetas, ya que podemos omitir la operación de negación.
+        if (enCortocircuito) {
             neg.setRefIR(refExpr);
             pilaEtiquetas.peek().invertirSalto();
             grar.coment(String.format("Cortocircuito booleano: %s (se invirtieron las etiquetas)", neg));
             return;
         }
-
 
         neg.setRefIR(Normalizador.crearNomRef("not"));
         String refNeg = neg.getRefIR();
