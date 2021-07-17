@@ -93,7 +93,8 @@ inicializadas): :white_check_mark:
   * While: :white_check_mark:
     * Sentencias de control (continue y break): :white_check_mark:
 
-Mejoras posibles:
+## Mejoras posibles
+
 * Parser:
   * La *producción* sentencia no es de *tipo* sentencia porque tiene en su
   interior a invocacion_funcion, que es de tipo expresion.
