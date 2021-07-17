@@ -64,11 +64,6 @@ Opcional:
 * Transformación de estruras when y for: :white_check_mark:
 * Constant folding: :white_check_mark:
 
-Más que opcional:
-* Reemplazo de constantes por su valor.
-* Eliminación de las declaraciones de variables sin uso.
-* Eliminación de asignaciones redundantes (ej: x = x).
-
 ### Revisar
 
 #### parser.cup
@@ -101,6 +96,8 @@ Requisitos:
   * While: :white_check_mark:
     * Sentencias de control (continue y break): :white_check_mark:
 
-Mejoras en caso de que tengamos que seguir:
-  * Cortocircuito booleano: Manejar caso a and NOT b.
-  * Implementar visit(SimboloVariable) para no tener que convertir constantemente desde Identificador a SimboloVariable en los últimos visitors.
+Mejoras posibles:
+* Reemplazo de constantes por su valor.
+* Eliminación de las declaraciones de variables sin uso.
+* Eliminación de asignaciones redundantes (ej: x = x).
+* Implementar visit(SimboloVariable) para no tener que convertir constantemente desde Identificador a SimboloVariable en los últimos visitors.
