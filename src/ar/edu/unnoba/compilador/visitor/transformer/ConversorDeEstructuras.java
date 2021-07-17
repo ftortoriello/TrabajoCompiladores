@@ -38,7 +38,7 @@ public class ConversorDeEstructuras extends Transformer {
             // Crear la condición del if en base a la del when y el case
             Relacion cond = Relacion.getClaseRel(cc.getOp(), identAux, cc.getExpresion());
             if (seActual == null) {
-                // Si es el último case, crearlo con el else del switch (si lo tiene)
+                // Si es el último case, crearlo con el else del when (si lo tiene)
                 seActual = new SiEntoncesSino(cond, cc.getBloque(), c.getBloqueElse());
             } else {
                 // Si no, crearlo con el else del case siguiente (que está en seActual)
